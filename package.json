@@ -1,0 +1,16 @@
+{
+  "name": "PivotHead",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "publish:all": "turbo run build && pnpm -r publish --access public",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "turbo": "^1.10.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
