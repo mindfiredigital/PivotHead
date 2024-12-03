@@ -5,9 +5,11 @@
   "main": "index.js",
   "scripts": {
     "dev": "turbo run build && pnpm -r publish --access public",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky install"
   },
   "devDependencies": {
+    "husky": "^9.1.7",
     "turbo": "^1.10.0"
   },
   "keywords": [],
