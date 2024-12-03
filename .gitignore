@@ -1,0 +1,57 @@
+# Node.js specific files
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Turbo repo cache and outputs
+/.turbo
+
+# Vite-specific files
+/dist/
+/.vite/
+*.env.local
+*.env.*.local
+
+# Dependency locks and artifacts
+pnpm-lock.yaml
+.vscode/     # Optional, if using VS Code workspace-specific settings
+
+# Build artifacts
+build/
+output/
+*.output/
+
+# IDE and editor files
+.idea/
+*.sublime-workspace
+*.sublime-project
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+*.bak
+*.orig
+
+# MacOS and Linux temporary files
+*.swp
+.swp
+
+# Specific to JetBrains IDEs
+/.idea/
+/*.iml
+
+# Test Coverage Reports
+/coverage/
+
+# Turbo workspace artifacts (optional, based on local caching setup)
+/.caches/
+/artifacts/
+
+# Optional: OS-specific files
+.DS_Store
