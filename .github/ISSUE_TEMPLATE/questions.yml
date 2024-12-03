@@ -1,0 +1,30 @@
+name: General Discussion / Question
+description: Use this template for general questions or discussions about the project.
+labels: discussion, question
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## General Discussion or Question
+        Please provide a clear and concise description of your question or discussion topic.
+
+  - type: textarea
+    attributes:
+      label: Question/Topic
+      description: Please describe your question or the topic you want to discuss.
+      placeholder: "Ask your question or describe the topic here..."
+
+  - type: textarea
+    attributes:
+      label: Additional Information
+      description: Provide any extra details or context that might help clarify your question or discussion.
+      placeholder: "Include any relevant context, code snippets, or screenshots."
+
+  - type: checkbox
+    attributes:
+      label: Is this issue related to a specific part of the project?
+      description: Tick the box if your question is about a specific module or feature.
+      options:
+        - "Yes, it's related to a specific feature/module"
+        - "No, it's a general question"
+      required: false
