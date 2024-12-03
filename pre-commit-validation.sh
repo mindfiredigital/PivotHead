@@ -23,12 +23,12 @@ COMMIT_MSG_FILE=$1
 COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
 
 # Validate commit message format
-COMMIT_PATTERN="^(feat|bug|fix|hotfix):\[[[:digit:]]+\] [[:alnum:][:space:]-]+$"
+COMMIT_PATTERN="^(feat|bug|fix|hotfix):\[[[:digit:]]+\] [A-Z][[:alnum:][:space:]-]+$"
 
 if ! echo "$COMMIT_MSG" | grep -Eq "$COMMIT_PATTERN"; then
   echo -e "${RED}Invalid commit message: '$COMMIT_MSG'${NC}"
-  echo -e "${YELLOW}Commit message must be in the format: feat:[issue number]-description${NC}"
-  echo -e "${YELLOW}Example: feat:[12345]-add-login-button${NC}"
+  echo -e "${YELLOW}Commit message must be in the format: feat:[issue number] description${NC}"
+  echo -e "${YELLOW}Example: feat:[12345] Add login button${NC}"
   exit 1
 fi
 
