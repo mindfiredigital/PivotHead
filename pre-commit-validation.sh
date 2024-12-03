@@ -23,7 +23,7 @@ COMMIT_MSG_FILE=$1
 COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
 
 # Validate commit message format
-COMMIT_PATTERN="^(feat|bug|fix|hotfix):\[[[:digit:]]+\]-[[:alnum:]-]+$"
+COMMIT_PATTERN="^(feat|bug|fix|hotfix):\[[[:digit:]]+\] [[:alnum:][:space:]-]+$"
 
 if ! echo "$COMMIT_MSG" | grep -Eq "$COMMIT_PATTERN"; then
   echo -e "${RED}Invalid commit message: '$COMMIT_MSG'${NC}"
