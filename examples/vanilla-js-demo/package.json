@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "copy-core": "mkdir -p lib && cp ../../packages/core/dist/pivothead-core.umd.js lib/pivothead-core.js",
-    "start": "npm run copy-core && npx http-server ."
+    "start": "pnpm run copy-core && npx http-server ."
   },
   "devDependencies": {
     "http-server": "^14.1.1"
