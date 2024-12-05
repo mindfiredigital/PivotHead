@@ -1,27 +1,22 @@
-// src/components/PivotTable.tsx
-import { useMemo as useMemo2, useState as useState2 } from "react";
-
 // src/hooks/usePivotTable.ts
-import { useCallback, useState, useMemo } from "react";
+import { useState, useCallback } from "react";
 import { PivotEngine } from "@pivothead/core";
 function usePivotTable(config) {
-  const engine = useMemo(() => new PivotEngine(config), [config]);
+  const [engine] = useState(() => new PivotEngine(config));
   const [state, setState] = useState(() => engine.getState());
-  const updateState = useCallback(() => {
-    setState(engine.getState());
-  }, [engine]);
-  const toggleExpand = useCallback((rowId) => {
-    updateState();
-  }, [engine, updateState]);
   const sort = useCallback((field, direction) => {
     engine.sort(field, direction);
-    updateState();
-  }, [engine, updateState]);
+    setState(engine.getState());
+  }, [engine]);
+  const reset = useCallback(() => {
+    engine.reset();
+    setState(engine.getState());
+  }, [engine]);
   return {
     state,
     actions: {
-      toggleExpand,
-      sort
+      sort,
+      reset
     }
   };
 }
@@ -30,105 +25,44 @@ function usePivotTable(config) {
 import { jsx, jsxs } from "react/jsx-runtime";
 function PivotTable({
   data,
-  dimensions,
-  measures,
-  plugins,
+  columns,
   className,
   onRowClick,
   onCellClick
 }) {
-  const { state, actions } = usePivotTable({
-    data,
-    dimensions,
-    measures,
-    plugins
-  });
-  const [sortConfig, setSortConfig] = useState2(null);
-  const sortedRows = useMemo2(() => {
-    if (!sortConfig)
-      return state.rows;
-    return [...state.rows].sort((a, b) => {
-      const aValue = a.dimensions[sortConfig.field] || a.measures[sortConfig.field];
-      const bValue = b.dimensions[sortConfig.field] || b.measures[sortConfig.field];
-      if (aValue < bValue)
-        return sortConfig.direction === "asc" ? -1 : 1;
-      if (aValue > bValue)
-        return sortConfig.direction === "asc" ? 1 : -1;
-      return 0;
-    });
-  }, [state.rows, sortConfig]);
-  const handleSort = (field) => {
-    setSortConfig((prevConfig) => {
-      if ((prevConfig == null ? void 0 : prevConfig.field) === field) {
-        return { field, direction: prevConfig.direction === "asc" ? "desc" : "asc" };
-      }
-      return { field, direction: "asc" };
-    });
-  };
-  const renderedRows = useMemo2(() => {
-    return sortedRows.map((row) => /* @__PURE__ */ jsxs(
-      "tr",
-      {
-        onClick: () => onRowClick == null ? void 0 : onRowClick(row),
-        className: "hover:bg-muted/50",
-        children: [
-          dimensions.map((dim) => /* @__PURE__ */ jsx(
-            "td",
-            {
-              className: "p-2 border",
-              style: { paddingLeft: `${row.level * 1.5}rem` },
-              children: row.dimensions[dim.field]
-            },
-            dim.field
-          )),
-          measures.map((measure) => {
-            var _a, _b;
-            return /* @__PURE__ */ jsx(
-              "td",
-              {
-                className: "p-2 border text-right",
-                onClick: (e) => {
-                  e.stopPropagation();
-                  onCellClick == null ? void 0 : onCellClick(row, measure.field);
-                },
-                children: (_b = (_a = measure.formatter) == null ? void 0 : _a.call(measure, row.measures[measure.field])) != null ? _b : row.measures[measure.field]
-              },
-              measure.field
+  const { state, actions } = usePivotTable({ data, columns });
+  return /* @__PURE__ */ jsx("div", { className, children: /* @__PURE__ */ jsxs("table", { children: [
+    /* @__PURE__ */ jsx("thead", { children: /* @__PURE__ */ jsx("tr", { children: columns.map((column) => {
+      var _a;
+      return /* @__PURE__ */ jsxs(
+        "th",
+        {
+          onClick: () => {
+            var _a2;
+            return actions.sort(
+              column.field,
+              ((_a2 = state.sortConfig) == null ? void 0 : _a2.direction) === "asc" ? "desc" : "asc"
             );
-          })
-        ]
+          },
+          children: [
+            column.label,
+            ((_a = state.sortConfig) == null ? void 0 : _a.field) === column.field && (state.sortConfig.direction === "asc" ? " \u25B2" : " \u25BC")
+          ]
+        },
+        column.field
+      );
+    }) }) }),
+    /* @__PURE__ */ jsx("tbody", { children: state.data.map((row, index) => /* @__PURE__ */ jsx("tr", { onClick: () => onRowClick == null ? void 0 : onRowClick(row), children: columns.map((column) => /* @__PURE__ */ jsx(
+      "td",
+      {
+        onClick: (e) => {
+          e.stopPropagation();
+          onCellClick == null ? void 0 : onCellClick(row, column.field);
+        },
+        children: row[column.field]
       },
-      row.id
-    ));
-  }, [sortedRows, dimensions, measures, onRowClick, onCellClick]);
-  return /* @__PURE__ */ jsx("div", { className: `overflow-auto ${className != null ? className : ""}`, children: /* @__PURE__ */ jsxs("table", { className: "w-full border-collapse border", children: [
-    /* @__PURE__ */ jsx("thead", { children: /* @__PURE__ */ jsxs("tr", { children: [
-      dimensions.map((dim) => /* @__PURE__ */ jsx(
-        "th",
-        {
-          className: "p-2 border bg-muted text-left cursor-pointer",
-          onClick: () => handleSort(dim.field),
-          children: /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between", children: [
-            dim.field,
-            (sortConfig == null ? void 0 : sortConfig.field) === dim.field && (sortConfig.direction === "asc" ? "\u25B2" : "\u25BC")
-          ] })
-        },
-        dim.field
-      )),
-      measures.map((measure) => /* @__PURE__ */ jsx(
-        "th",
-        {
-          className: "p-2 border bg-muted text-right cursor-pointer",
-          onClick: () => handleSort(measure.field),
-          children: /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-end", children: [
-            measure.field,
-            (sortConfig == null ? void 0 : sortConfig.field) === measure.field && (sortConfig.direction === "asc" ? "\u25B2" : "\u25BC")
-          ] })
-        },
-        measure.field
-      ))
-    ] }) }),
-    /* @__PURE__ */ jsx("tbody", { children: renderedRows })
+      column.field
+    )) }, index)) })
   ] }) });
 }
 export {

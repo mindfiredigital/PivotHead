@@ -1,54 +1,32 @@
-interface DimensionConfig {
+interface Column {
     field: string;
-    type: 'string' | 'number' | 'date';
+    label: string;
 }
-interface MeasureConfig {
+interface SortConfig {
     field: string;
-    aggregationType: AggregationType;
-    formatter?: (value: number) => string;
-}
-type AggregationType = 'sum' | 'avg' | 'count' | 'min' | 'max';
-interface PivotTableConfig<T> {
-    data: T[];
-    dimensions: DimensionConfig[];
-    measures: MeasureConfig[];
-    plugins?: any[];
-}
-interface ProcessedRow<T> {
-    id: string;
-    level: number;
-    isExpanded: boolean;
-    parentId?: string;
-    dimensions: {
-        [key: string]: any;
-    };
-    measures: {
-        [key: string]: number;
-    };
-    originalData: T[];
+    direction: 'asc' | 'desc';
 }
 interface PivotTableState<T> {
-    rows: ProcessedRow<T>[];
-    columns: string[];
-    expandedNodes: Set<string>;
-    sortConfig: {
-        field: string;
-        direction: 'asc' | 'desc';
-    } | null;
-    filterConfig: {
-        field: string;
-        value: any;
-    } | null;
+    data: T[];
+    sortConfig: SortConfig | null;
+}
+interface PivotTableConfig<T> {
+    data: T[];
+    columns: Column[];
 }
 
-// Declare the PivotEngine class
-declare class PivotEngine<T> {
+// Declare the TableEngine class
+declare class PivotEngine<T extends Record<string, any>> {
   constructor(config: PivotTableConfig<T>)
   getState(): PivotTableState<T>
-  toggleExpand(rowId: string): void
   sort(field: string, direction: 'asc' | 'desc'): void
-  filter(field: string, value: any): void
   reset(): void
 }
 
-export { AggregationType, DimensionConfig, MeasureConfig, PivotEngine, PivotTableConfig, PivotTableState, ProcessedRow };
+// Declare the applySort function
+declare function applySort<T extends Record<string, any>>(
+  data: T[],
+  sortConfig: SortConfig
+): T[]
+
+export { Column, PivotEngine, PivotTableConfig, PivotTableState, SortConfig, applySort };

@@ -38,41 +38,11 @@ __export(src_exports, {
 });
 module.exports = __toCommonJS(src_exports);
 
-// src/engine/dataProcessor.ts
-function processData(data, dimensions, measures) {
-  const processedRows = [];
-  const dimensionFields = dimensions.map((d) => d.field);
-  const groupedData = groupData(data, dimensionFields);
-  processGroup(groupedData, dimensionFields, measures, processedRows);
-  return processedRows;
-}
-function groupData(data, fields) {
-  const groupedData = /* @__PURE__ */ new Map();
-  for (const item of data) {
-    const key = fields.map((field) => item[field]).join("|");
-    if (!groupedData.has(key)) {
-      groupedData.set(key, []);
-    }
-    groupedData.get(key).push(item);
-  }
-  return groupedData;
-}
-function processGroup(group, dimensions, measures, result, level = 0, parentId = "") {
-  for (const [key, items] of group.entries()) {
-    const dimensionValues = key.split("|");
-    const id = parentId ? `${parentId}-${key}` : key;
-    if (level < dimensions.length - 1) {
-      const nextGroup = groupData(items, dimensions.slice(level + 1));
-      processGroup(nextGroup, dimensions, measures, result, level + 1, id);
-    }
-  }
-}
-
 // src/engine/sorter.ts
-function applySort(rows, sortConfig) {
-  return [...rows].sort((a, b) => {
-    const aValue = getValue(a, sortConfig.field);
-    const bValue = getValue(b, sortConfig.field);
+function applySort(data, sortConfig) {
+  return [...data].sort((a, b) => {
+    const aValue = a[sortConfig.field];
+    const bValue = b[sortConfig.field];
     if (aValue < bValue)
       return sortConfig.direction === "asc" ? -1 : 1;
     if (aValue > bValue)
@@ -80,9 +50,14 @@ function applySort(rows, sortConfig) {
     return 0;
   });
 }
-function getValue(row, field) {
-  var _a;
-  return (_a = row.dimensions[field]) != null ? _a : row.measures[field];
+
+// src/engine/dataProcessor.ts
+function processData(config, sortConfig = null) {
+  let processedData = [...config.data];
+  if (sortConfig) {
+    processedData = applySort(processedData, sortConfig);
+  }
+  return processedData;
 }
 
 // src/engine/pivotEngine.ts
@@ -90,33 +65,23 @@ var PivotEngine = class {
   constructor(config) {
     this.config = config;
     this.state = {
-      rows: [],
-      columns: [],
-      expandedNodes: /* @__PURE__ */ new Set(),
-      sortConfig: null,
-      filterConfig: null
+      data: processData(config),
+      sortConfig: null
     };
-    this.processData();
-  }
-  processData() {
-    this.state.rows = processData(this.config.data, this.config.dimensions, this.config.measures);
-    this.applyStateChanges();
-  }
-  applyStateChanges() {
-    if (this.state.sortConfig) {
-      this.state.rows = applySort(this.state.rows, this.state.sortConfig);
-    }
   }
   sort(field, direction) {
     this.state.sortConfig = { field, direction };
-    this.applyStateChanges();
+    this.applySort();
+  }
+  applySort() {
+    this.state.data = processData(this.config, this.state.sortConfig);
   }
   getState() {
     return __spreadValues({}, this.state);
   }
   reset() {
     this.state.sortConfig = null;
-    this.processData();
+    this.state.data = processData(this.config);
   }
 };
 // Annotate the CommonJS export names for ESM import in node:

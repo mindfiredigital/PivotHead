@@ -1,6 +1,5 @@
-import { useState } from 'react'
 import { PivotTable } from '@pivothead/react'
-import type { DimensionConfig, MeasureConfig } from '@pivothead/core'
+import type { Column } from '@pivothead/core'
 
 interface SalesData {
   date: string
@@ -21,96 +20,38 @@ const data: SalesData[] = [
   { date: '2024-01-04', product: 'Widget B', region: 'East', sales: 1600, quantity: 80 },
 ]
 
-const dimensions: DimensionConfig[] = [
-  { field: 'date', type: 'date' },
-  { field: 'product', type: 'string' },
-  { field: 'region', type: 'string' }
-]
-
-const measures: MeasureConfig[] = [
-  {
-    field: 'sales',
-    aggregationType: 'sum',
-    formatter: (value) => `$${value.toLocaleString()}`
-  },
-  {
-    field: 'quantity',
-    aggregationType: 'sum'
-  }
+const columns: Column[] = [
+  { field: 'date', label: 'Date' },
+  { field: 'product', label: 'Product' },
+  { field: 'region', label: 'Region' },
+  { field: 'sales', label: 'Sales' },
+  { field: 'quantity', label: 'Quantity' }
 ]
 
 function App() {
-  const [selectedDimensions, setSelectedDimensions] = useState(dimensions)
-  const [selectedMeasures, setSelectedMeasures] = useState(measures)
-
-  const handleDimensionToggle = (dimension: DimensionConfig) => {
-    setSelectedDimensions(prev => 
-      prev.some(d => d.field === dimension.field)
-        ? prev.filter(d => d.field !== dimension.field)
-        : [...prev, dimension]
-    )
+  const handleRowClick = (row: SalesData) => {
+    console.log('Row clicked:', row)
   }
 
-  const handleMeasureToggle = (measure: MeasureConfig) => {
-    setSelectedMeasures(prev => 
-      prev.some(m => m.field === measure.field)
-        ? prev.filter(m => m.field !== measure.field)
-        : [...prev, measure]
-    )
+  const handleCellClick = (row: SalesData, field: string) => {
+    console.log('Cell clicked:', field, row)
   }
 
   return (
-    <div>
-      <h1>Pivot Table React Wrapper Test</h1>
+    <div className="p-4 max-w-6xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6">Pivot Table React Wrapper Test</h1>
       
-      <div>
-        <h3>Dimensions</h3>
-        <div>
-          {dimensions.map(dimension => (
-            <button
-              key={dimension.field}
-              onClick={() => handleDimensionToggle(dimension)}
-              style={{
-                backgroundColor: selectedDimensions.some(d => d.field === dimension.field)
-                  ? '#4CAF50'
-                  : '#ccc'
-              }}
-            >
-              {dimension.field}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <h3>Measures</h3>
-        <div>
-          {measures.map(measure => (
-            <button
-              key={measure.field}
-              onClick={() => handleMeasureToggle(measure)}
-              style={{
-                backgroundColor: selectedMeasures.some(m => m.field === measure.field)
-                  ? '#4CAF50'
-                  : '#ccc'
-              }}
-            >
-              {measure.field}
-            </button>
-          ))}
-        </div>
-      </div>
-
       <PivotTable
         data={data}
-        dimensions={selectedDimensions}
-        measures={selectedMeasures}
-        onRowClick={(row) => console.log('Row clicked:', row)}
-        onCellClick={(row, field) => console.log('Cell clicked:', field, row)}
+        columns={columns}
+        className="w-full border border-gray-300 rounded-lg overflow-hidden"
+        onRowClick={handleRowClick}
+        onCellClick={handleCellClick}
       />
     </div>
   )
 }
 
 export default App
+
 

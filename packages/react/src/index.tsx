@@ -5,9 +5,6 @@ export { usePivotTable } from './hooks/usePivotTable'
 export type {
   PivotTableConfig,
   PivotTableState,
-  ProcessedRow,
-  DimensionConfig,
-  MeasureConfig,
-  AggregationType
+  Column
 } from '@pivothead/core'
 
