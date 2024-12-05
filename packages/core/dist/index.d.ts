@@ -1,32 +1,17 @@
-interface Column {
-    field: string;
-    label: string;
-}
-interface SortConfig {
-    field: string;
-    direction: 'asc' | 'desc';
-}
-interface PivotTableState<T> {
-    data: T[];
-    sortConfig: SortConfig | null;
-}
-interface PivotTableConfig<T> {
-    data: T[];
-    columns: Column[];
-}
+export * from './types/interfaces'
 
 // Declare the TableEngine class
-declare class PivotEngine<T extends Record<string, any>> {
-  constructor(config: PivotTableConfig<T>)
-  getState(): PivotTableState<T>
+export declare class PivotEngine<T extends Record<string, any>> {
+  constructor(config: import('./types/interfaces').PivotTableConfig<T>)
+  getState(): import('./types/interfaces').PivotTableState<T>
   sort(field: string, direction: 'asc' | 'desc'): void
   reset(): void
 }
 
 // Declare the applySort function
-declare function applySort<T extends Record<string, any>>(
+export declare function applySort<T extends Record<string, any>>(
   data: T[],
-  sortConfig: SortConfig
+  sortConfig: import('./types/interfaces').SortConfig
 ): T[]
 
-export { Column, PivotEngine, PivotTableConfig, PivotTableState, SortConfig, applySort };
+

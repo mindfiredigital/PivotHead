@@ -1,25 +1,23 @@
 {
   "name": "@pivothead/core",
   "version": "1.0.0",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "main": "./dist/pivothead-core.umd.js",
+  "module": "./dist/pivothead-core.umd.js",
   "types": "./dist/index.d.ts",
-  "sideEffects": false,
-  "license": "MIT",
   "files": [
-    "dist/**"
+    "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts",
-    "dev": "tsup src/index.ts --format esm,cjs --watch --dts",
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "preview": "vite preview",
     "lint": "eslint \"src/**/*.ts*\"",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "devDependencies": {
-    "@types/node": "^18.0.0",
-    "eslint": "^8.40.0",
-    "tsup": "^6.7.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.2",
+    "vite": "^4.3.9",
+    "vite-plugin-dts": "^2.3.0"
   }
 }
 
