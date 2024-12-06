@@ -1,18 +1,26 @@
 {
   "name": "PivotHead",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "examples/*"
+  ],
   "scripts": {
-    "dev": "turbo run build && pnpm -r publish --access public",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "husky install"
+    "build": "turbo run build --filter=@pivothead/core... --filter=@pivothead/react...",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "husky": "^9.1.7",
-    "turbo": "^1.10.0"
+    "turbo": "^1.10.0",
+    "typescript": "^5.0.0",
+    "prettier": "^2.8.8"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "packageManager": "pnpm@7.15.0"
 }

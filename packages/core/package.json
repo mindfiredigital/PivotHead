@@ -1,9 +1,23 @@
 {
-  "name": "@PivotHead/core",
+  "name": "@pivothead/core",
   "version": "1.0.0",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/pivothead-core.umd.js",
+  "module": "./dist/pivothead-core.umd.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "tsc"
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "preview": "vite preview",
+    "lint": "eslint \"src/**/*.ts*\"",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.2",
+    "vite": "^4.3.9",
+    "vite-plugin-dts": "^2.3.0"
   }
 }
+
