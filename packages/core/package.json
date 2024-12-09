@@ -8,16 +8,18 @@
     "dist"
   ],
   "scripts": {
-    "build": "vite build",
+    "build": "pnpm run test && vite build",
     "dev": "vite build --watch",
-    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "eslint \"src/**/*.ts*\"",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "devDependencies": {
     "typescript": "^5.0.2",
     "vite": "^4.3.9",
-    "vite-plugin-dts": "^2.3.0"
+    "vite-plugin-dts": "^2.3.0",
+    "vitest": "^0.32.0"
   }
 }
 
