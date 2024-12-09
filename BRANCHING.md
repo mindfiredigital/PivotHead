@@ -12,7 +12,7 @@
 
 ## Naming Convention
 Branches should follow the format:
-
+Format: `<type>/<issue-id>-<description>`
 Example: `feature/12345-add-login-button`
 
 ## Merge Strategy
