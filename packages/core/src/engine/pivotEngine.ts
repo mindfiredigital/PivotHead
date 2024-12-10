@@ -38,6 +38,7 @@ export class PivotEngine<T extends Record<string, any>> {
   public reset() {
     this.state.sortConfig = null
     this.state.data = processData(this.config)
+    this.state.rowSizes = this.initializeRowSizes(this.config.data);
   }
   
   public resizeRow(index: number, height: number) {
