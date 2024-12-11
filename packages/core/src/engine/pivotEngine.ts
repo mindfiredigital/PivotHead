@@ -1,4 +1,4 @@
-import { PivotTableConfig, PivotTableState, RowSize  } from '../types/interfaces'
+import { Group, GroupConfig, PivotTableConfig, PivotTableState, RowSize  } from '../types/interfaces'
 import { processData } from './dataProcessor'
 
 
@@ -11,7 +11,10 @@ export class PivotEngine<T extends Record<string, any>> {
     this.state = {
       data: processData(config),
       sortConfig: null,
-      rowSizes: this.initializeRowSizes(config.data)
+      rowSizes: this.initializeRowSizes(config.data),
+      expandedRows: {},
+      groupConfig: config.groupConfig || null,
+      groups: []
     }
   }
 
@@ -31,6 +34,50 @@ export class PivotEngine<T extends Record<string, any>> {
   )
   }
 
+  private applyGrouping() {
+    if (!this.state.groupConfig) return;
+
+    const { fields, grouper } = this.state.groupConfig;
+    this.state.groups = this.createGroups(this.state.data, fields, grouper);
+  }
+
+  private createGroups(data: T[], fields: string[], grouper: (item: any, fields: string[]) => string): Group[] {
+    if (fields.length === 0) {
+      return [{ key: 'All', items: data }];
+    }
+
+    const groups: { [key: string]: Group } = {};
+
+    data.forEach(item => {
+      const key = grouper(item, fields);
+      if (!groups[key]) {
+        groups[key] = { key, items: [], subgroups: [] };
+      }
+      groups[key].items.push(item);
+    });
+
+    if (fields.length > 1) {
+      Object.values(groups).forEach(group => {
+        group.subgroups = this.createGroups(group.items, fields.slice(1), grouper);
+      });
+    }
+
+    return Object.values(groups);
+  }
+
+  public setGroupConfig(groupConfig: GroupConfig | null) {
+    this.state.groupConfig = groupConfig;
+    if (groupConfig) {
+      this.applyGrouping();
+    } else {
+      this.state.groups = [];
+    }
+  }
+
+  public getGroupedData(): Group[] {
+    return this.state.groups;
+  }
+
   public getState(): PivotTableState<T> {
     return { ...this.state }
   }
@@ -39,6 +86,7 @@ export class PivotEngine<T extends Record<string, any>> {
     this.state.sortConfig = null
     this.state.data = processData(this.config)
     this.state.rowSizes = this.initializeRowSizes(this.config.data);
+    this.state.expandedRows = {};
   }
   
   public resizeRow(index: number, height: number) {
@@ -47,6 +95,15 @@ export class PivotEngine<T extends Record<string, any>> {
       this.state.rowSizes[rowIndex].height = Math.max(20, height) // Minimum height of 20px
     }
   }
+
+  public toggleRowExpansion(rowId: string) {
+    this.state.expandedRows[rowId] = !this.state.expandedRows[rowId]
+  }
+
+  public isRowExpanded(rowId: string): boolean {
+    return !!this.state.expandedRows[rowId]
+  }
+  
 }
 
 
