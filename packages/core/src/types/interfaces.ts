@@ -7,10 +7,15 @@ export interface SortConfig {
   field: string
   direction: 'asc' | 'desc'
 }
+export interface RowSize {
+  index: number
+  height: number
+}
 
 export interface PivotTableState<T> {
   data: T[]
   sortConfig: SortConfig | null
+  rowSizes: RowSize[]
 }
 
 export interface PivotTableConfig<T> {
