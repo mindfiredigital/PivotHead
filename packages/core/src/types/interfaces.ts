@@ -42,6 +42,6 @@ export interface PivotTableState<T> {
 export interface PivotTableConfig<T> {
   data: T[]
   columns: Column[];
-  groupConfig: GroupConfig;
+  groupConfig: GroupConfig | null;
 }
 
