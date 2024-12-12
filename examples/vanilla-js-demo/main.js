@@ -158,6 +158,7 @@ function renderRows(rows, tableElement) {
       td.textContent = row[column.field].toString();
       td.style.border = '1px solid #ddd';
       td.style.padding = '12px';
+      td.style.fontSize = '12px';
       tr.appendChild(td);
     });
 
