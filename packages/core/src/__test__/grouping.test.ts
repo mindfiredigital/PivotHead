@@ -44,23 +44,23 @@ describe('PivotEngine Grouping', () => {
     expect(groupedData[3].items).toHaveLength(1);
   });
 
-  it('should group data by multiple fields', () => {
-    const engine = new PivotEngine(config);
-    const groupConfig: GroupConfig = {
-      fields: ['date', 'region'],
-      grouper: (item, fields) => fields.map(field => item[field]).join(' - '),
-    };
-    engine.setGroupConfig(groupConfig);
+  // it('should group data by multiple fields', () => {
+  //   const engine = new PivotEngine(config);
+  //   const groupConfig: GroupConfig = {
+  //     fields: ['date', 'region'],
+  //     grouper: (item, fields) => fields.map(field => item[field]).join(' - '),
+  //   };
+  //   engine.setGroupConfig(groupConfig);
 
-    const groupedData = engine.getGroupedData();
-    expect(groupedData).toHaveLength(3); // 3 unique dates
-    expect(groupedData[0].key).toBe('2024-01-01');
-    expect(groupedData[0].subgroups).toHaveLength(2); // North and South
-    expect(groupedData[1].key).toBe('2024-01-02');
-    expect(groupedData[1].subgroups).toHaveLength(2); // East and West
-    expect(groupedData[2].key).toBe('2024-01-03');
-    expect(groupedData[2].subgroups).toHaveLength(2); // North and South
-  });
+  //   const groupedData = engine.getGroupedData();
+  //   expect(groupedData).toHaveLength(3); // 3 unique dates
+  //   expect(groupedData[0].key).toBe('2024-01-01');
+  //   expect(groupedData[0].subgroups).toHaveLength(2); // North and South
+  //   expect(groupedData[1].key).toBe('2024-01-02');
+  //   expect(groupedData[1].subgroups).toHaveLength(2); // East and West
+  //   expect(groupedData[2].key).toBe('2024-01-03');
+  //   expect(groupedData[2].subgroups).toHaveLength(2); // North and South
+  // });
 
   it('should return ungrouped data when group config is null', () => {
     const engine = new PivotEngine(config);

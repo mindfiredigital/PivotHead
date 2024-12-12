@@ -16,6 +16,9 @@ export class PivotEngine<T extends Record<string, any>> {
       groupConfig: config.groupConfig || null,
       groups: []
     }
+    if (this.state.groupConfig) {
+      this.applyGrouping();
+    }
   }
 
   private initializeRowSizes(data: T[]): RowSize[] {
@@ -25,6 +28,10 @@ export class PivotEngine<T extends Record<string, any>> {
   public sort(field: string, direction: 'asc' | 'desc') {
     this.state.sortConfig = { field, direction }
     this.applySort()
+    if (this.state.groupConfig) {
+      this.applyGrouping();
+    }
+
   }
 
   private applySort() {
@@ -87,6 +94,12 @@ export class PivotEngine<T extends Record<string, any>> {
     this.state.data = processData(this.config)
     this.state.rowSizes = this.initializeRowSizes(this.config.data);
     this.state.expandedRows = {};
+    this.state.groupConfig = this.config.groupConfig || null;
+    this.state.groups = [];
+
+    if (this.state.groupConfig) {
+      this.applyGrouping();
+    }
   }
   
   public resizeRow(index: number, height: number) {

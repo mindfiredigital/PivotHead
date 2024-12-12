@@ -9,6 +9,7 @@ const data = [
     { date: '2024-01-01', product: 'Widget B', region: 'South', sales: 1500, quantity: 75 },
     { date: '2024-01-01', product: 'Widget D', region: 'North', sales: 1300, quantity: 70 },
     { date: '2024-01-02', product: 'Widget A', region: 'East', sales: 1200, quantity: 60 },
+    { date: '2024-01-02', product: 'Widget A', region: 'East', sales: 100, quantity: 44 },
     { date: '2024-01-02', product: 'Widget C', region: 'West', sales: 800, quantity: 40 },
     { date: '2024-01-03', product: 'Widget B', region: 'North', sales: 1800, quantity: 90 },
     { date: '2024-01-03', product: 'Widget C', region: 'South', sales: 1100, quantity: 55 },
