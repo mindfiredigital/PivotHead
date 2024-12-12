@@ -44,23 +44,36 @@ describe('PivotEngine Grouping', () => {
     expect(groupedData[3].items).toHaveLength(1);
   });
 
-  // it('should group data by multiple fields', () => {
-  //   const engine = new PivotEngine(config);
-  //   const groupConfig: GroupConfig = {
-  //     fields: ['date', 'region'],
-  //     grouper: (item, fields) => fields.map(field => item[field]).join(' - '),
-  //   };
-  //   engine.setGroupConfig(groupConfig);
+  it('should group data by multiple fields', () => {
+    const engine = new PivotEngine(config);
+    const groupConfig: GroupConfig = {
+      fields: ['date', 'region'],
+      grouper: (item, fields) => fields.map(field => item[field]).join(' - '),
+    };
+    engine.setGroupConfig(groupConfig);
 
-  //   const groupedData = engine.getGroupedData();
-  //   expect(groupedData).toHaveLength(3); // 3 unique dates
-  //   expect(groupedData[0].key).toBe('2024-01-01');
-  //   expect(groupedData[0].subgroups).toHaveLength(2); // North and South
-  //   expect(groupedData[1].key).toBe('2024-01-02');
-  //   expect(groupedData[1].subgroups).toHaveLength(2); // East and West
-  //   expect(groupedData[2].key).toBe('2024-01-03');
-  //   expect(groupedData[2].subgroups).toHaveLength(2); // North and South
-  // });
+    const groupedData = engine.getGroupedData();
+    expect(groupedData).toHaveLength(6); // 6 unique date-region combinations
+
+    // Check first date group (2024-01-01)
+    expect(groupedData[0]?.key).toBe('2024-01-01 - North');
+    expect(groupedData[0]?.items).toHaveLength(1); // Only one item in this group
+    expect(groupedData[1]?.key).toBe('2024-01-01 - South');
+    expect(groupedData[1]?.items).toHaveLength(1); // Only one item in this group
+
+    // Check second date group (2024-01-02)
+    expect(groupedData[2]?.key).toBe('2024-01-02 - East');
+    expect(groupedData[2]?.items).toHaveLength(1); // Only one item in this group
+    expect(groupedData[3]?.key).toBe('2024-01-02 - West');
+    expect(groupedData[3]?.items).toHaveLength(1); // Only one item in this group
+
+    // Check third date group (2024-01-03)
+    expect(groupedData[4]?.key).toBe('2024-01-03 - North');
+    expect(groupedData[4]?.items).toHaveLength(1); // Only one item in this group
+    expect(groupedData[5]?.key).toBe('2024-01-03 - South');
+    expect(groupedData[5]?.items).toHaveLength(1); // Only one item in this group
+
+  });
 
   it('should return ungrouped data when group config is null', () => {
     const engine = new PivotEngine(config);
