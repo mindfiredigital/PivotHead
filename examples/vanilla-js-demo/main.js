@@ -1,9 +1,22 @@
+/**
+ * PivotHead Demo
+ * 
+ * This file demonstrates the usage of the PivotheadCore library to create an interactive pivot table.
+ * Features include:
+ * - Sorting
+ * - Grouping
+ * - Column resizing
+ * - Column reordering (drag and drop)
+ * - Row reordering (drag and drop)
+ */
 if (typeof PivotheadCore === 'undefined') {
-    console.error('PivotheadCore is not defined. Make sure the library is loaded correctly.');
+  console.error('PivotheadCore is not defined. Make sure the library is loaded correctly.');
 }
 
+// Importing the Package
 const { PivotEngine } = PivotheadCore;
 
+// Dummy data.
 const data = [
     { date: '2024-01-01', product: 'Widget A', region: 'North', sales: 1000, quantity: 50 },
     { date: '2024-01-01', product: 'Widget B', region: 'South', sales: 1500, quantity: 75 },
@@ -17,6 +30,7 @@ const data = [
     { date: '2024-01-04', product: 'Widget B', region: 'East', sales: 1600, quantity: 80 },
 ];
 
+// Setting column 
 const columns = [
   { field: 'date', label: 'Date' },
   { field: 'product', label: 'Product' },
@@ -25,6 +39,7 @@ const columns = [
   { field: 'quantity', label: 'Quantity' }
 ];
 
+// Config the pivot table
 const config = {
   data,
   columns: columns,
@@ -33,24 +48,126 @@ const config = {
 
 const engine = new PivotEngine(config);
 
-function renderTable() {
-  const state = engine.getState();
+function createControlPanel() {
+  const controlPanel = document.createElement('div');
+  controlPanel.style.display = 'flex';
+  controlPanel.style.alignItems = 'center';
+  controlPanel.style.gap = '20px';
+  controlPanel.style.marginBottom = '20px';
+  controlPanel.style.padding = '10px';
+  controlPanel.style.backgroundColor = '#f8f9fa';
+  controlPanel.style.border = '1px solid #dee2e6';
+  controlPanel.style.borderRadius = '4px';
 
+  // Create Reset button
+  const resetButton = document.createElement('button');
+  resetButton.textContent = 'Reset';
+  resetButton.style.padding = '6px 12px';
+  resetButton.style.border = '1px solid #ced4da';
+  resetButton.style.borderRadius = '4px';
+  resetButton.style.backgroundColor = '#fff';
+  resetButton.style.cursor = 'pointer';
+  resetButton.onclick = () => {
+    engine.reset();
+    renderTable();
+  };
+
+  // Create Group by control
+  const groupByContainer = document.createElement('div');
+  groupByContainer.style.display = 'flex';
+  groupByContainer.style.alignItems = 'center';
+  groupByContainer.style.gap = '8px';
+
+  const groupByLabel = document.createElement('label');
+  groupByLabel.textContent = 'Group by:';
+  groupByLabel.style.fontWeight = '500';
+
+  const select = document.createElement('select');
+  select.multiple = true;
+  select.style.minWidth = '200px';
+  select.style.padding = '6px';
+  select.style.border = '1px solid #ced4da';
+  select.style.borderRadius = '4px';
+  select.style.backgroundColor = '#fff';
+
+  config.columns.forEach(column => {
+    const option = document.createElement('option');
+    option.value = column.field;
+    option.textContent = column.label;
+    select.appendChild(option);
+  });
+
+  // Set initial selected options based on current groupConfig
+  const currentGroupFields = engine.getState().groupConfig?.fields || [];
+  Array.from(select.options).forEach(option => {
+    option.selected = currentGroupFields.includes(option.value);
+  });
+
+  select.addEventListener('change', (event) => {
+    const selectedFields = Array.from(event.target.selectedOptions, option => option.value);
+    if (selectedFields.length > 0) {
+      const groupConfig = {
+        fields: selectedFields,
+        grouper: (item, fields) => fields.map(field => item[field]).join(' - ')
+      };
+      engine.setGroupConfig(groupConfig);
+    } else {
+      engine.setGroupConfig(null);
+    }
+    renderTable();
+
+    // Update selected options
+    Array.from(select.options).forEach(option => {
+      option.selected = selectedFields.includes(option.value);
+    });
+  });
+
+  groupByContainer.appendChild(groupByLabel);
+  groupByContainer.appendChild(select);
+
+  controlPanel.appendChild(resetButton);
+  controlPanel.appendChild(groupByContainer);
+
+  return controlPanel;
+}
+
+function renderTable() {
+  let state = engine.getState();
+  const container = document.getElementById('pivotTable');
+  if (!container) {
+    console.error('Container element with id "pivotTable" not found');
+    return;
+  }
+
+  // Clear the container
+  container.innerHTML = '';
+
+  // Add the control panel
+  const controlPanel = createControlPanel();
+  container.appendChild(controlPanel);
+
+  // Update grouping dropdown to reflect current state
+  updateGroupingDropdown();
+
+  // Create and add the table
   const tableElement = document.createElement('table');
   tableElement.style.width = '100%';
   tableElement.style.borderCollapse = 'collapse';
-  tableElement.style.marginTop = '20px';
+  tableElement.style.backgroundColor = '#fff';
+  tableElement.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
 
   // Create header
   const headerRow = document.createElement('tr');
   config.columns.forEach((column, columnIndex) => {
     const th = document.createElement('th');
-    th.style.border = '1px solid #ddd';
+    //th.textContent = column.label;
+    th.style.border = '1px solid #dee2e6';
     th.style.padding = '12px';
-    th.style.backgroundColor = '#f2f2f2';
+    th.style.backgroundColor = '#f8f9fa';
     th.style.cursor = 'pointer';
     th.style.position = 'relative';
-    th.style.minWidth = '100px'; // Set a minimum width for columns
+    th.style.minWidth = '100px';
+    th.style.userSelect = 'none';
     
     const headerContent = document.createElement('div');
     headerContent.style.display = 'flex';
@@ -63,15 +180,36 @@ function renderTable() {
     const sortIcon = document.createElement('span');
     sortIcon.className = 'sort-icon';
     sortIcon.style.marginLeft = '5px';
+    sortIcon.style.fontSize = '0.8em';
+    sortIcon.style.opacity = '0.5';
     
     headerContent.appendChild(labelSpan);
     headerContent.appendChild(sortIcon);
     th.appendChild(headerContent);
     
     th.onclick = () => {
+      const state = engine.getState();
       const newDirection = state.sortConfig?.field === column.field && state.sortConfig.direction === 'asc' ? 'desc' : 'asc';
       engine.sort(column.field, newDirection);
       renderTable();
+    };
+
+    // Add drag and drop functionality for columns
+    th.draggable = true;
+    th.ondragstart = (e) => {
+      e.dataTransfer.setData('text/plain', columnIndex.toString());
+    };
+    th.ondragover = (e) => {
+      e.preventDefault();
+    };
+    th.ondrop = (e) => {
+      e.preventDefault();
+      const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
+      const toIndex = columnIndex;
+      if (fromIndex !== toIndex) {
+        engine.dragColumn(fromIndex, toIndex);
+        renderTable();
+      }
     };
 
     // Add resize handle
@@ -80,9 +218,9 @@ function renderTable() {
     resizeHandle.style.right = '0';
     resizeHandle.style.top = '0';
     resizeHandle.style.bottom = '0';
-    resizeHandle.style.width = '5px';
+    resizeHandle.style.width = '4px';
     resizeHandle.style.cursor = 'col-resize';
-    resizeHandle.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
+    resizeHandle.style.backgroundColor = 'rgba(0,0,0,0.1)';
 
     resizeHandle.addEventListener('mousedown', (e) => {
       e.preventDefault();
@@ -97,7 +235,7 @@ function renderTable() {
       function onMouseUp() {
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
-        engine.resizeRow(column.field, th.offsetWidth);
+        engine.resizeColumn(column.field, th.offsetWidth);
       }
 
       document.addEventListener('mousemove', onMouseMove);
@@ -109,6 +247,9 @@ function renderTable() {
   });
   tableElement.appendChild(headerRow);
 
+  // Get current state
+  state = engine.getState();
+
   // Create data rows
   if (state.groups.length > 0) {
     renderGroups(state.groups, tableElement);
@@ -116,14 +257,7 @@ function renderTable() {
     renderRows(state.data, tableElement);
   }
 
-  const container = document.getElementById('pivotTable');
-  if (container) {
-    container.innerHTML = '';
-    container.appendChild(tableElement);
-  } else {
-    console.error('Container element with id "pivotTable" not found');
-  }
-
+  container.appendChild(tableElement);
   updateSortIcons(tableElement, state);
 }
 
@@ -131,7 +265,7 @@ function renderGroups(groups, tableElement, level = 0) {
   groups.forEach(group => {
     const groupRow = document.createElement('tr');
     const groupCell = document.createElement('td');
-    groupCell.colSpan = config.columns.length;
+    groupCell.colSpan = engine.getState().columns.length;
     groupCell.style.fontWeight = 'bold';
     groupCell.style.backgroundColor = '#e6e6e6';
     groupCell.style.padding = '8px';
@@ -152,6 +286,22 @@ function renderRows(rows, tableElement) {
   rows.forEach((row, rowIndex) => {
     const tr = document.createElement('tr');
     tr.style.backgroundColor = rowIndex % 2 === 0 ? '#ffffff' : '#f9f9f9';
+    tr.draggable = true;
+    tr.ondragstart = (e) => {
+      e.dataTransfer.setData('text/plain', rowIndex.toString());
+    };
+    tr.ondragover = (e) => {
+      e.preventDefault();
+    };
+    tr.ondrop = (e) => {
+      e.preventDefault();
+      const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
+      const toIndex = rowIndex;
+      if (fromIndex !== toIndex) {
+        engine.dragRow(fromIndex, toIndex);
+        renderTable();
+      }
+    };
 
     config.columns.forEach((column) => {
       const td = document.createElement('td');
@@ -166,26 +316,11 @@ function renderRows(rows, tableElement) {
   });
 }
 
-function createDataRow(row, rowIndex) {
-  const tr = document.createElement('tr');
-  tr.style.backgroundColor = rowIndex % 2 === 0 ? '#ffffff' : '#f9f9f9';
-
-  config.columns.forEach((column) => {
-    const td = document.createElement('td');
-    td.textContent = row[column.field].toString();
-    td.style.border = '1px solid #ddd';
-    td.style.padding = '12px';
-    tr.appendChild(td);
-  });
-
-  return tr;
-}
-
 function updateSortIcons(tableElement, state) {
   const headers = tableElement.querySelectorAll('th');
   headers.forEach((th, index) => {
     const sortIcon = th.querySelector('.sort-icon');
-    if (state.sortConfig && state.sortConfig.field === config.columns[index].field) {
+    if (state.sortConfig && state.sortConfig.field === state.columns[index].field) {
       sortIcon.textContent = state.sortConfig.direction === 'asc' ? '▲' : '▼';
     } else {
       sortIcon.textContent = '▲▼';
@@ -193,61 +328,17 @@ function updateSortIcons(tableElement, state) {
   });
 }
 
-function createGroupingControls() {
-  const controlsContainer = document.createElement('div');
-  controlsContainer.style.marginBottom = '20px';
-
-  const select = document.createElement('select');
-  select.multiple = true;
-  select.style.width = '200px';
-
-  config.columns.forEach(column => {
-    const option = document.createElement('option');
-    option.value = column.field;
-    option.textContent = column.label;
-    select.appendChild(option);
-  });
-
-  select.addEventListener('change', (event) => {
-    const selectedFields = Array.from(event.target.selectedOptions, option => option.value);
-   
-    if (selectedFields.length > 0) {
-      const groupConfig = {
-        fields: selectedFields,
-        grouper: (item, fields) => fields.map(field => item[field]).join(' - ')
-      };
-      engine.setGroupConfig(groupConfig);
-    } else {
-      engine.setGroupConfig(null);
-    }
-    renderTable();
-  });
-
-  const label = document.createElement('label');
-  label.textContent = 'Group by: ';
-  label.appendChild(select);
-
-  controlsContainer.appendChild(label);
-  return controlsContainer;
+function initializeTable() {
+  renderTable();
 }
 
-function initializeTable() {
-  const container = document.getElementById('pivotTable');
-  if (container) {
-    const controls = createGroupingControls();
-    container.parentNode.insertBefore(controls, container);
-  }
-
-  renderTable();
-
-  const resetButton = document.getElementById('resetButton');
-  if (resetButton) {
-    resetButton.onclick = () => {
-      engine.reset();
-      renderTable();
-    };
-  } else {
-    console.error('Reset button not found in the DOM');
+function updateGroupingDropdown() {
+  const select = document.querySelector('select[multiple]');
+  if (select) {
+    const currentGroupFields = engine.getState().groupConfig?.fields || [];
+    Array.from(select.options).forEach(option => {
+      option.selected = currentGroupFields.includes(option.value);
+    });
   }
 }
 
