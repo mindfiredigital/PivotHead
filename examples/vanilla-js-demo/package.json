@@ -6,7 +6,8 @@
     "copy-core": "mkdir -p lib && cp ../../packages/core/dist/pivothead-core.umd.js lib/pivothead-core.js",
     "build": "mkdir -p lib && cp ../../packages/core/dist/pivothead-core.umd.js lib/pivothead-core.js",
     "start": "pnpm run copy-core && pnpm dlx http-server .",
-    "deploy": "vercel"
+    "deploy": "vercel",
+    "preinstall": "npx only-allow pnpm"
   },
   "devDependencies": {
     "http-server": "^14.1.1"

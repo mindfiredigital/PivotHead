@@ -1,4 +1,3 @@
-// Check if PivotheadCore is available
 if (typeof PivotheadCore === 'undefined') {
     console.error('PivotheadCore is not defined. Make sure the library is loaded correctly.');
 }
@@ -8,7 +7,9 @@ const { PivotEngine } = PivotheadCore;
 const data = [
     { date: '2024-01-01', product: 'Widget A', region: 'North', sales: 1000, quantity: 50 },
     { date: '2024-01-01', product: 'Widget B', region: 'South', sales: 1500, quantity: 75 },
+    { date: '2024-01-01', product: 'Widget D', region: 'North', sales: 1300, quantity: 70 },
     { date: '2024-01-02', product: 'Widget A', region: 'East', sales: 1200, quantity: 60 },
+    { date: '2024-01-02', product: 'Widget A', region: 'East', sales: 100, quantity: 44 },
     { date: '2024-01-02', product: 'Widget C', region: 'West', sales: 800, quantity: 40 },
     { date: '2024-01-03', product: 'Widget B', region: 'North', sales: 1800, quantity: 90 },
     { date: '2024-01-03', product: 'Widget C', region: 'South', sales: 1100, quantity: 55 },
@@ -16,15 +17,18 @@ const data = [
     { date: '2024-01-04', product: 'Widget B', region: 'East', sales: 1600, quantity: 80 },
 ];
 
+const columns = [
+  { field: 'date', label: 'Date' },
+  { field: 'product', label: 'Product' },
+  { field: 'region', label: 'Region' },
+  { field: 'sales', label: 'Sales' },
+  { field: 'quantity', label: 'Quantity' }
+];
+
 const config = {
-    data,
-    columns: [
-        { field: 'date', label: 'Date' },
-        { field: 'product', label: 'Product' },
-        { field: 'region', label: 'Region' },
-        { field: 'sales', label: 'Sales' },
-        { field: 'quantity', label: 'Quantity' }
-    ]
+  data,
+  columns: columns,
+  groupConfig: null
 };
 
 const engine = new PivotEngine(config);
@@ -81,7 +85,6 @@ function renderTable() {
     resizeHandle.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
 
     resizeHandle.addEventListener('mousedown', (e) => {
-      
       e.preventDefault();
       const startX = e.clientX;
       const startWidth = th.offsetWidth;
@@ -107,20 +110,11 @@ function renderTable() {
   tableElement.appendChild(headerRow);
 
   // Create data rows
-  state.data.forEach((row, rowIndex) => {
-    const tr = document.createElement('tr');
-    tr.style.backgroundColor = rowIndex % 2 === 0 ? '#ffffff' : '#f9f9f9';
-
-    config.columns.forEach((column) => {
-      const td = document.createElement('td');
-      td.textContent = row[column.field].toString();
-      td.style.border = '1px solid #ddd';
-      td.style.padding = '12px';
-      tr.appendChild(td);
-    });
-
-    tableElement.appendChild(tr);
-  });
+  if (state.groups.length > 0) {
+    renderGroups(state.groups, tableElement);
+  } else {
+    renderRows(state.data, tableElement);
+  }
 
   const container = document.getElementById('pivotTable');
   if (container) {
@@ -131,6 +125,60 @@ function renderTable() {
   }
 
   updateSortIcons(tableElement, state);
+}
+
+function renderGroups(groups, tableElement, level = 0) {
+  groups.forEach(group => {
+    const groupRow = document.createElement('tr');
+    const groupCell = document.createElement('td');
+    groupCell.colSpan = config.columns.length;
+    groupCell.style.fontWeight = 'bold';
+    groupCell.style.backgroundColor = '#e6e6e6';
+    groupCell.style.padding = '8px';
+    groupCell.style.paddingLeft = `${level * 20 + 8}px`;
+    groupCell.textContent = `${group.key} (${group.items.length} items)`;
+    groupRow.appendChild(groupCell);
+    tableElement.appendChild(groupRow);
+
+    if (group.subgroups && group.subgroups.length > 0) {
+      renderGroups(group.subgroups, tableElement, level + 1);
+    } else {
+      renderRows(group.items, tableElement);
+    }
+  });
+}
+
+function renderRows(rows, tableElement) {
+  rows.forEach((row, rowIndex) => {
+    const tr = document.createElement('tr');
+    tr.style.backgroundColor = rowIndex % 2 === 0 ? '#ffffff' : '#f9f9f9';
+
+    config.columns.forEach((column) => {
+      const td = document.createElement('td');
+      td.textContent = row[column.field].toString();
+      td.style.border = '1px solid #ddd';
+      td.style.padding = '12px';
+      td.style.fontSize = '12px';
+      tr.appendChild(td);
+    });
+
+    tableElement.appendChild(tr);
+  });
+}
+
+function createDataRow(row, rowIndex) {
+  const tr = document.createElement('tr');
+  tr.style.backgroundColor = rowIndex % 2 === 0 ? '#ffffff' : '#f9f9f9';
+
+  config.columns.forEach((column) => {
+    const td = document.createElement('td');
+    td.textContent = row[column.field].toString();
+    td.style.border = '1px solid #ddd';
+    td.style.padding = '12px';
+    tr.appendChild(td);
+  });
+
+  return tr;
 }
 
 function updateSortIcons(tableElement, state) {
@@ -145,7 +193,51 @@ function updateSortIcons(tableElement, state) {
   });
 }
 
+function createGroupingControls() {
+  const controlsContainer = document.createElement('div');
+  controlsContainer.style.marginBottom = '20px';
+
+  const select = document.createElement('select');
+  select.multiple = true;
+  select.style.width = '200px';
+
+  config.columns.forEach(column => {
+    const option = document.createElement('option');
+    option.value = column.field;
+    option.textContent = column.label;
+    select.appendChild(option);
+  });
+
+  select.addEventListener('change', (event) => {
+    const selectedFields = Array.from(event.target.selectedOptions, option => option.value);
+   
+    if (selectedFields.length > 0) {
+      const groupConfig = {
+        fields: selectedFields,
+        grouper: (item, fields) => fields.map(field => item[field]).join(' - ')
+      };
+      engine.setGroupConfig(groupConfig);
+    } else {
+      engine.setGroupConfig(null);
+    }
+    renderTable();
+  });
+
+  const label = document.createElement('label');
+  label.textContent = 'Group by: ';
+  label.appendChild(select);
+
+  controlsContainer.appendChild(label);
+  return controlsContainer;
+}
+
 function initializeTable() {
+  const container = document.getElementById('pivotTable');
+  if (container) {
+    const controls = createGroupingControls();
+    container.parentNode.insertBefore(controls, container);
+  }
+
   renderTable();
 
   const resetButton = document.getElementById('resetButton');

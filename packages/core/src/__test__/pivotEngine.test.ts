@@ -15,6 +15,7 @@ describe('PivotEngine', () => {
       { field: 'name', label: 'Name' },
       { field: 'age', label: 'Age' },
     ],
+    groupConfig: null
   }
 
   it('should initialize with correct data and default row sizes', () => {
