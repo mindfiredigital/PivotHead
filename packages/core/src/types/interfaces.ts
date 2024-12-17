@@ -37,6 +37,7 @@ export interface PivotTableState<T> {
   expandedRows: ExpandedState;
   groupConfig: GroupConfig | null;
   groups: Group[];
+  columns: Array<{ field: keyof T; label: string }>
 }
 
 export interface PivotTableConfig<T> {

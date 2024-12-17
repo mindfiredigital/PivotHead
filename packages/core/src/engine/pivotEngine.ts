@@ -14,7 +14,8 @@ export class PivotEngine<T extends Record<string, any>> {
       rowSizes: this.initializeRowSizes(config.data),
       expandedRows: {},
       groupConfig: config.groupConfig || null,
-      groups: []
+      groups: [],
+      columns: [...config.columns] 
     }
     if (this.state.groupConfig) {
       this.applyGrouping();
@@ -115,6 +116,28 @@ export class PivotEngine<T extends Record<string, any>> {
 
   public isRowExpanded(rowId: string): boolean {
     return !!this.state.expandedRows[rowId]
+  }
+
+  public dragRow(fromIndex: number, toIndex: number) {
+    const newData = [...this.state.data];
+    const [removed] = newData.splice(fromIndex, 1);
+    newData.splice(toIndex, 0, removed);
+    this.state.data = newData;
+    this.state.rowSizes = this.state.rowSizes.map((size, index) => ({
+      ...size,
+      index: index < fromIndex || index > toIndex ? index : 
+             index < toIndex ? index + 1 : index - 1
+    }));
+    if (this.state.groupConfig) {
+      this.applyGrouping();
+    }
+  }
+
+  public dragColumn(fromIndex: number, toIndex: number) {
+    const newColumns = [...this.state.columns];
+    const [removed] = newColumns.splice(fromIndex, 1);
+    newColumns.splice(toIndex, 0, removed);
+    this.state.columns = newColumns;
   }
   
 }
