@@ -2,7 +2,7 @@
 
 This pull request addresses the following issue:
 
-**Feature**: [GitHub Issue #<issue_number>](https://github.com/lakinmindfire/PivotHead/issues/<issue_number>)
+**Feature**: [GitHub Issue #<issue_number>](https://github.com/mindfiredigital/PivotHead/issues/<issue_number>)
 
 ### Changes Made:
 
