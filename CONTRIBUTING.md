@@ -29,17 +29,16 @@ Here are some ways you can contribute to the project:
 7. Create a **Pull Request (PR)** from your branch to the original repository's `main` or `master` branch.
 
 ## Setting up Husky for Git Hooks
+
 Husky is used for running pre-commit checks and enforcing commit message conventions. Follow these steps to set up Husky in the project:
 
-1. Install Husky: After cloning the repository, install the project dependencies by running: ```pnpm install```
+1. Install Husky: After cloning the repository, install the project dependencies by running: `pnpm install`
 
 2. Enable Husky Hooks:
-Once dependencies are installed, enable Git hooks with Husky: ```pnpm husky install```
+   Once dependencies are installed, enable Git hooks with Husky: `pnpm husky install`
 
-
-4. Verify Husky Setup:
-After Husky is installed, you can test the hooks by making a commit.For more refer [husky](https://typicode.github.io/husky/get-started.html)
-
+3. Verify Husky Setup:
+   After Husky is installed, you can test the hooks by making a commit.For more refer [husky](https://typicode.github.io/husky/get-started.html)
 
 ## Pull Request Guidelines
 
