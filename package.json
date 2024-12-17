@@ -13,12 +13,14 @@
     "test": "turbo run test",
     "clean": "turbo run clean && rm -rf node_modules",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "preinstall": "npx only-allow pnpm"
+    "preinstall": "npx only-allow pnpm",
+    "prepare": "husky"
   },
   "devDependencies": {
+    "husky": "^9.1.7",
+    "prettier": "^2.8.8",
     "turbo": "^1.10.0",
-    "typescript": "^5.0.0",
-    "prettier": "^2.8.8"
+    "typescript": "^5.0.0"
   },
   "engines": {
     "node": ">=14.0.0"

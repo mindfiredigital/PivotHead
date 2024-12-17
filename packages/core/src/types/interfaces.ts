@@ -46,3 +46,9 @@ export interface PivotTableConfig<T> {
   groupConfig: GroupConfig | null;
 }
 
+export type ChartType = 'bar' | 'line' | 'pie' | 'scatter';
+
+export interface PivotData {
+  [key: string]: string | number;
+}
+

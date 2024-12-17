@@ -9,6 +9,7 @@
 - **fixes/***:     General fixes that do not need to be immediately addressed.
 - **docs/***:      Documentation-related changes (e.g., README updates, new docs).
 - **other/***:     For any other changes that do not fall into the above categories.
+- **enhancement/***: Indicates improvements that are not categorized as features or bug fixes.
 
 ## Naming Convention
 Branches should follow the format:

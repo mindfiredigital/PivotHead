@@ -18,7 +18,7 @@ Here are some ways you can contribute to the project:
 
 2. **Clone** the forked repository to your local machine.
 
-3. Create a new **branch** for your feature | bug | fixes | hotFixes |docs | other: `git checkout -b <feature|bug|fixes|hotFixes|docs|other>/<issueNumber/ticketNumber>`.check [branching guidelines](./BRANCHING.md).
+3. Create a new **branch** for your feature | bug | fixes | hotFixes |docs | other | enhancement: `git checkout -b <feature|bug|fixes|hotFixes|docs|other|enhancement>/<issueNumber/ticketNumber>`.check [branching guidelines](./BRANCHING.md).
 
 4. **Make changes** and **test** to ensure they work as expected.
 
