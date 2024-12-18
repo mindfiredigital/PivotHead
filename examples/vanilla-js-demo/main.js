@@ -308,7 +308,7 @@ function renderRows(rows, tableElement) {
 
         config.columns.forEach((column) => {
             const td = document.createElement('td');
-            td.textContent =  row[column.field]?.toString() || '';
+            td.textContent = row[column.field]?.toString() || '';
             td.style.border = '1px solid #ddd';
             td.style.padding = '12px';
             td.style.fontSize = '12px';
@@ -333,44 +333,61 @@ function updateSortIcons(tableElement, state) {
 }
 
 function updateResultField(operation) {
-    const numericColumns = config.columns.filter(col => col.type === 'number' && col.field !== 'result');
-    // Update each row's "result" field based on the selected operation
-    const processedData = data.map(row => {
-        const values = numericColumns.map(col => row[col.field] || 0);
-        let temp;
-        switch (operation) {
-            case 'sum':
-                temp = values.reduce((sum, val) => sum + val, 0);
-                break;
-            case 'avg':
-                temp = values.length > 0 ? values.reduce((sum, val) => sum + val, 0) / values.length : 0;
-                break;
-            case 'count':
-                temp = values.length;
-                break;
-            case 'min':
-                temp = values.length > 0 ? Math.min(...values) : 0;
-                break;
-            case 'max':
-                temp = values.length > 0 ? Math.max(...values) : 0;
-                break;
-            default:
-                temp = 0; // Default to 0 for unsupported operations
-        }
-        return { ...row, result: temp };
-    });
-    
-    // Initialize PivotEngine
-     engine = new PivotEngine({
-        data:processedData,
-        columns: columns,
-        groupConfig: null
-    });
- renderTable()
-   
+    // Find the selected column from the dropdown
+    const selectedColumn = document.querySelector('input[name="columnSelector"]:checked');
+    if (!selectedColumn) {
+        console.error("No column selected.");
+        return;
+    }
+
+    const columnField = selectedColumn.value;
+    const columnConfig = config.columns.find(col => col.field === columnField);
+
+    if (!columnConfig) {
+        console.error("Selected column not found in configuration.");
+        return;
+    }
+
+    // Calculate aggregation for the selected column
+    const values = data.map(row => row[columnField] || 0); // Use 0 if the value is undefined
+
+    let result;
+    switch (operation) {
+        case 'sum':
+            result = values.reduce((sum, val) => sum + val, 0);
+            break;
+        case 'avg':
+            result = values.length > 0 ? values.reduce((sum, val) => sum + val, 0) / values.length : 0;
+            break;
+        case 'count':
+            result = values.length;
+            break;
+        case 'min':
+            result = values.length > 0 ? Math.min(...values) : 0;
+            break;
+        case 'max':
+            result = values.length > 0 ? Math.max(...values) : 0;
+            break;
+        default:
+            result = 0; // Default to 0 for unsupported operations
+    }
+
+    // Display the result below the pivot table
+    const resultContainer = document.getElementById('resultContainer');
+    if (!resultContainer) {
+        console.error("Result container (#resultContainer) is missing.");
+        return;
+    }
+    resultContainer.style.padding = '10px';
+    resultContainer.style.border = '1px solid #ccc';
+    resultContainer.style.borderRadius = '5px';
+    resultContainer.style.backgroundColor = '#f9f9f9';
+    resultContainer.style.width = '100%';
+    resultContainer.style.textAlign = 'right';
+    resultContainer.textContent = `${operation.toLowerCase()} of ${columnConfig.label}: ${result}`;
 }
 
-// Update dropdown event listener
+// Function to render the dropdown for operation selection
 function renderDropdown() {
     const container = document.getElementById('dropdownContainer');
     if (!container) {
@@ -397,20 +414,68 @@ function renderDropdown() {
     dropdown.addEventListener('change', () => {
         const selectedOperation = dropdown.value;
         updateResultField(selectedOperation); // Update the result field
-      
     });
 
     container.innerHTML = '';
     container.appendChild(dropdown);
+
+    // Trigger the initial operation to show default sum
+    dropdown.value = 'sum';
+    updateResultField('sum');
 }
 
+// Function to render radio buttons for column selection
+function renderColumnSelector() {
+    const container = document.getElementById('multiSelectContainer');
+    if (!container) {
+        console.error("Column selector container (#multiSelectContainer) is missing.");
+        return;
+    }
 
+    container.innerHTML = ''; // Clear existing content
+
+    const numericColumns = config.columns.filter(col => col.type === 'number'); // Filter numeric columns
+    if (numericColumns.length === 0) {
+        console.error("No numeric columns available in configuration.");
+        return;
+    }
+
+    numericColumns.forEach((column, index) => {
+        const optionContainer = document.createElement('div');
+        optionContainer.style.marginBottom = '5px';
+
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = 'columnSelector';
+        radio.value = column.field;
+        radio.checked = index === 0; // Select the first column by default
+        radio.style.marginRight = '10px';
+
+        const label = document.createElement('label');
+        label.textContent = column.label;
+
+        optionContainer.appendChild(radio);
+        optionContainer.appendChild(label);
+        container.appendChild(optionContainer);
+    });
+
+    // Add event listener to update result when column selection changes
+    container.addEventListener('change', () => {
+        const selectedOperation = document.getElementById('operationDropdown').value;
+        updateResultField(selectedOperation); // Recalculate result
+    });
+}
+
+// Initialize the UI
 function initializeTable() {
+   
+    renderDropdown();
+    renderColumnSelector();
+    renderTable();
     const defaultOperation = 'sum';
     updateResultField(defaultOperation);
-    renderDropdown();
-    renderTable();
 }
+
 
 function updateGroupingDropdown() {
     const select = document.querySelector('select[multiple]');
