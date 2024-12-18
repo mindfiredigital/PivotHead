@@ -1,18 +1,4 @@
-// processData.ts
-
-export type Column = {
-    field: string;
-    type: string;
-};
-
-export type Row = {
-    [key: string]: any;
-    result?: number;
-};
-
-export type Config = {
-    columns: Column[];
-};
+import { Config, Row } from "../types/interfaces";
 
 export function processData(
     config: Config,
