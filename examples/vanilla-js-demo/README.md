@@ -11,3 +11,4 @@ To use Pivothead in your vanilla JavaScript project, follow these steps:
 
 ```html
 <script src="path/to/pivothead-core.umd.js"></script>
+```

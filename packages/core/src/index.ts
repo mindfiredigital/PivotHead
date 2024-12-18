@@ -1,5 +1,5 @@
-export { PivotEngine, } from './engine/pivotEngine'
-export * from './types/interfaces'
+export { PivotEngine } from './engine/pivotEngine';
+export * from './types/interfaces';
 
 // Ensure all necessary types are exported
 export type {
@@ -9,5 +9,5 @@ export type {
   SortConfig,
   GroupConfig,
   Group,
-  RowSize
-} from './types/interfaces'
+  RowSize,
+} from './types/interfaces';

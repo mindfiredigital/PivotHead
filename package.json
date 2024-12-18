@@ -7,7 +7,7 @@
     "examples/*"
   ],
   "scripts": {
-    "build": "turbo run build --filter=@pivothead/core... --filter=@pivothead/react...",
+    "build": "turbo run lint && turbo run build --filter=@pivothead/core... --filter=@pivothead/react...",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "test": "turbo run test",
@@ -18,7 +18,12 @@
   "devDependencies": {
     "turbo": "^1.10.0",
     "typescript": "^5.0.0",
-    "prettier": "^2.8.8"
+    "@typescript-eslint/eslint-plugin": "^5.59.0",
+    "@typescript-eslint/parser": "^5.59.0",
+    "eslint": "^8.38.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.8.7"
   },
   "engines": {
     "node": ">=14.0.0"
