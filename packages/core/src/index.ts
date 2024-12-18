@@ -6,5 +6,8 @@ export type {
   PivotTableConfig,
   PivotTableState,
   Column,
-  SortConfig
+  SortConfig,
+  GroupConfig,
+  Group,
+  RowSize
 } from './types/interfaces'

@@ -1,11 +1,15 @@
 export * from './types/interfaces'
 
-// Declare the TableEngine class
 export declare class PivotEngine<T extends Record<string, any>> {
   constructor(config: import('./types/interfaces').PivotTableConfig<T>)
   getState(): import('./types/interfaces').PivotTableState<T>
   sort(field: string, direction: 'asc' | 'desc'): void
   reset(): void
+  resizeRow(index: number, height: number): void
+  setGroupConfig(groupConfig: import('./types/interfaces').GroupConfig | null): void;
+  getGroupedData(): import('./types/interfaces').Group[];
+  toggleRowExpansion(rowId: string): void;
+  isRowExpanded(rowId: string): boolean;
 }
 
 // Declare the applySort function
