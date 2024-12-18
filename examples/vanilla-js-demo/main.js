@@ -37,7 +37,6 @@ const columns = [
     { field: 'region', label: 'Region', type: "string" },
     { field: 'sales', label: 'Sales', type: "number" },
     { field: 'quantity', label: 'Quantity', type: "number" },
-    { field: 'result', label: 'Operation Result', type: "number" },
 ];
 
 // Config the pivot table
