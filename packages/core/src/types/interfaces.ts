@@ -1,15 +1,15 @@
 export interface Column {
-  field: string
-  label: string
+  field: string;
+  label: string;
 }
 
 export interface SortConfig {
-  field: string
-  direction: 'asc' | 'desc'
+  field: string;
+  direction: 'asc' | 'desc';
 }
 export interface RowSize {
-  index: number
-  height: number
+  index: number;
+  height: number;
 }
 
 // Define the structure for expanded rows
@@ -31,18 +31,17 @@ export interface Group {
 }
 
 export interface PivotTableState<T> {
-  data: T[]
-  sortConfig: SortConfig | null
+  data: T[];
+  sortConfig: SortConfig | null;
   rowSizes: RowSize[];
   expandedRows: ExpandedState;
   groupConfig: GroupConfig | null;
   groups: Group[];
-  columns: Array<{ field: keyof T; label: string }>
+  columns: Array<{ field: keyof T; label: string }>;
 }
 
 export interface PivotTableConfig<T> {
-  data: T[]
+  data: T[];
   columns: Column[];
   groupConfig: GroupConfig | null;
 }
-
