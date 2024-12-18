@@ -379,7 +379,10 @@ function renderDropdown() {
     }
 
     const dropdown = document.createElement('select');
-    dropdown.style.marginBottom = '20px';
+    dropdown.style.marginBottom = '10px';
+    dropdown.style.padding = '5px 10px';
+    dropdown.style.border = '1px solid #ced4da';
+    dropdown.style.borderRadius = '4px';
     dropdown.id = 'operationDropdown';
 
     const operations = ['Sum', 'Avg', 'Count', 'Min', 'Max'];
@@ -420,7 +423,6 @@ function updateGroupingDropdown() {
 }
 
 // Initialize the table when the DOM is fully loaded
-// document.addEventListener('DOMContentLoaded', initializeTable);
 document.addEventListener('DOMContentLoaded', () => {
     const pivotTableContainer = document.getElementById('pivotTable');
     const dropdownContainer = document.getElementById('dropdownContainer');
