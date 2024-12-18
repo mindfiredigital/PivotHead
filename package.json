@@ -7,7 +7,7 @@
     "examples/*"
   ],
   "scripts": {
-    "build": "turbo run build --filter=@pivothead/core... --filter=@pivothead/react...",
+    "build": "turbo run lint && turbo run build --filter=@pivothead/core... --filter=@pivothead/react...",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "test": "turbo run test",
@@ -18,9 +18,11 @@
   },
   "devDependencies": {
     "husky": "^9.1.7",
-    "prettier": "^2.8.8",
-    "turbo": "^1.10.0",
-    "typescript": "^5.0.0"
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^8.10.0",
+    "eslint-plugin-prettier": "^4.2.1"
   },
   "engines": {
     "node": ">=14.0.0"

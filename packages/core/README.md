@@ -16,7 +16,6 @@ PivotHead is a powerful and flexible library for creating interactive pivot tabl
 6. [API Reference](#api-reference)
 7. [Examples](#examples)
 
-
 ## Features
 
 - Flexible data pivoting and aggregation
@@ -35,9 +34,8 @@ To install PivotHead, use pnpm:
 
 ## Basic Usage
 
-` javascript
-// Basic usage example
-`
+`javascript
+// Basic usage example`
 
 ## Package Methods and Examples
 
@@ -46,7 +44,7 @@ To install PivotHead, use pnpm:
 The `PivotEngine` class provides several methods for manipulating and querying the pivot table data.
 
 1. **constructor(config: PivotTableConfig)**
-   
+
    Creates a new instance of the PivotEngine.
 
    ```
@@ -72,19 +70,19 @@ The `PivotEngine` class provides several methods for manipulating and querying t
    ```
 
 2. **getState(): PivotTableState**
-   
+
    Returns the current state of the pivot table.
 
    ```
    const state = engine.getState();
-   
+
    console.log(state.data); // Logs the current data array
-   
+
    console.log(state.sortConfig); // Logs the current sort configuration
    ```
 
 3. **sort(field: string, direction: 'asc' | 'desc')**
-   
+
    Sorts the data based on the specified field and direction.
 
    ```
@@ -94,7 +92,7 @@ The `PivotEngine` class provides several methods for manipulating and querying t
    ```
 
 4. **setGroupConfig(groupConfig: GroupConfig | null)**
-   
+
    Sets the grouping configuration for the pivot table.
 
    ```
@@ -107,7 +105,7 @@ The `PivotEngine` class provides several methods for manipulating and querying t
    ```
 
 5. **reset()**
-   
+
    Resets the pivot table to its initial state.
 
    ```
@@ -117,7 +115,7 @@ The `PivotEngine` class provides several methods for manipulating and querying t
    ```
 
 6. **resizeColumn(field: string, width: number)**
-   
+
    Resizes a column to the specified width.
 
    ```
@@ -127,7 +125,7 @@ The `PivotEngine` class provides several methods for manipulating and querying t
    ```
 
 7. **dragRow(fromIndex: number, toIndex: number)**
-   
+
    Moves a row from one index to another.
 
    ```
@@ -137,7 +135,7 @@ The `PivotEngine` class provides several methods for manipulating and querying t
    ```
 
 8. **dragColumn(fromIndex: number, toIndex: number)**
-   
+
    Moves a column from one index to another.
 
    ```
@@ -146,16 +144,14 @@ The `PivotEngine` class provides several methods for manipulating and querying t
    console.log(state.columns); // Logs the reordered columns array
    ```
 
-
 ## API Reference
+
 - Coming soon
 
 ## Examples
+
 - Go `examples/vanilla-js-demo` folder.
 - Rhen install `pnpm i`.
 - Run test by command `pnpm run build`.
 - Then start `pnpm start`.
 - Go to local host on browser.
-
-
-

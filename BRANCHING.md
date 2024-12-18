@@ -12,19 +12,23 @@
 - **enhancement/***: Indicates improvements that are not categorized as features or bug fixes.
 
 ## Naming Convention
+
 Branches should follow the format:
 Format: `<type>/<issue-id>-<description>`
 Example: `feature/12345-add-login-button`
 
 ## Merge Strategy
+
 - Use pull requests for all merges.
 - Code must be reviewed and approved before merging to `main` or `development`.
 
 ## Commit Messages
+
 Format: `<type>:[<issue-id>] <description>`
 Example: `feat:[12345] Add login button`
 
 ## Conflict Resolution
+
 1. Pull the latest changes from the base branch.
 2. Resolve conflicts locally.
 3. Rebase the branch and push changes.

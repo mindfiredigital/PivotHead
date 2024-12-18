@@ -4,31 +4,67 @@ import { PivotTableConfig, GroupConfig } from '../types/interfaces';
 
 describe('PivotEngine Grouping', () => {
   const sampleData = [
-    { date: '2024-01-01', product: 'Widget A', region: 'North', sales: 1000, quantity: 50 },
-    { date: '2024-01-01', product: 'Widget B', region: 'South', sales: 1500, quantity: 75 },
-    { date: '2024-01-02', product: 'Widget A', region: 'East', sales: 1200, quantity: 60 },
-    { date: '2024-01-02', product: 'Widget C', region: 'West', sales: 800, quantity: 40 },
-    { date: '2024-01-03', product: 'Widget B', region: 'North', sales: 1800, quantity: 90 },
-    { date: '2024-01-03', product: 'Widget C', region: 'South', sales: 1100, quantity: 55 },
+    {
+      date: '2024-01-01',
+      product: 'Widget A',
+      region: 'North',
+      sales: 1000,
+      quantity: 50,
+    },
+    {
+      date: '2024-01-01',
+      product: 'Widget B',
+      region: 'South',
+      sales: 1500,
+      quantity: 75,
+    },
+    {
+      date: '2024-01-02',
+      product: 'Widget A',
+      region: 'East',
+      sales: 1200,
+      quantity: 60,
+    },
+    {
+      date: '2024-01-02',
+      product: 'Widget C',
+      region: 'West',
+      sales: 800,
+      quantity: 40,
+    },
+    {
+      date: '2024-01-03',
+      product: 'Widget B',
+      region: 'North',
+      sales: 1800,
+      quantity: 90,
+    },
+    {
+      date: '2024-01-03',
+      product: 'Widget C',
+      region: 'South',
+      sales: 1100,
+      quantity: 55,
+    },
   ];
 
-  const config: PivotTableConfig<typeof sampleData[0]> = {
-      data: sampleData,
-      columns: [
-          { field: 'date', label: 'Date' },
-          { field: 'product', label: 'Product' },
-          { field: 'region', label: 'Region' },
-          { field: 'sales', label: 'Sales' },
-          { field: 'quantity', label: 'Quantity' },
-      ],
-      groupConfig: null
+  const config: PivotTableConfig<(typeof sampleData)[0]> = {
+    data: sampleData,
+    columns: [
+      { field: 'date', label: 'Date' },
+      { field: 'product', label: 'Product' },
+      { field: 'region', label: 'Region' },
+      { field: 'sales', label: 'Sales' },
+      { field: 'quantity', label: 'Quantity' },
+    ],
+    groupConfig: null,
   };
 
   it('should group data by a single field', () => {
     const engine = new PivotEngine(config);
     const groupConfig: GroupConfig = {
       fields: ['region'],
-      grouper: (item, fields) => fields.map(field => item[field]).join(' - '),
+      grouper: (item, fields) => fields.map((field) => item[field]).join(' - '),
     };
     engine.setGroupConfig(groupConfig);
 
@@ -48,7 +84,7 @@ describe('PivotEngine Grouping', () => {
     const engine = new PivotEngine(config);
     const groupConfig: GroupConfig = {
       fields: ['date', 'region'],
-      grouper: (item, fields) => fields.map(field => item[field]).join(' - '),
+      grouper: (item, fields) => fields.map((field) => item[field]).join(' - '),
     };
     engine.setGroupConfig(groupConfig);
 
@@ -72,7 +108,6 @@ describe('PivotEngine Grouping', () => {
     expect(groupedData[4]?.items).toHaveLength(1); // Only one item in this group
     expect(groupedData[5]?.key).toBe('2024-01-03 - South');
     expect(groupedData[5]?.items).toHaveLength(1); // Only one item in this group
-
   });
 
   it('should return ungrouped data when group config is null', () => {
@@ -88,7 +123,7 @@ describe('PivotEngine Grouping', () => {
     const engine = new PivotEngine(config);
     const groupConfig: GroupConfig = {
       fields: ['region'],
-      grouper: (item, fields) => fields.map(field => item[field]).join(' - '),
+      grouper: (item, fields) => fields.map((field) => item[field]).join(' - '),
     };
     engine.setGroupConfig(groupConfig);
     engine.sort('sales', 'desc');
@@ -102,14 +137,14 @@ describe('PivotEngine Grouping', () => {
   });
 
   it('should handle empty data set', () => {
-    const emptyConfig: PivotTableConfig<typeof sampleData[0]> = {
+    const emptyConfig: PivotTableConfig<(typeof sampleData)[0]> = {
       ...config,
       data: [],
     };
     const engine = new PivotEngine(emptyConfig);
     const groupConfig: GroupConfig = {
       fields: ['region'],
-      grouper: (item, fields) => fields.map(field => item[field]).join(' - '),
+      grouper: (item, fields) => fields.map((field) => item[field]).join(' - '),
     };
     engine.setGroupConfig(groupConfig);
 
@@ -121,7 +156,8 @@ describe('PivotEngine Grouping', () => {
     const engine = new PivotEngine(config);
     const groupConfig: GroupConfig = {
       fields: ['nonExistentField'],
-      grouper: (item, fields) => fields.map(field => item[field] || 'N/A').join(' - '),
+      grouper: (item, fields) =>
+        fields.map((field) => item[field] || 'N/A').join(' - '),
     };
     engine.setGroupConfig(groupConfig);
 
@@ -131,4 +167,3 @@ describe('PivotEngine Grouping', () => {
     expect(groupedData[0].items).toHaveLength(sampleData.length);
   });
 });
-
