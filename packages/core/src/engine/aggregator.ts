@@ -1,41 +1,46 @@
-import { Config, Row } from "../types/interfaces";
+import { Config, Row } from '../types/interfaces';
 
 export function processData(
-    config: Config,
-    data: Row[],
-    operation: string
+  config: Config,
+  data: Row[],
+  operation: string,
 ): Row[] {
-    const numericColumns = config.columns.filter(col => col.type === 'number' && col.field !== 'result');
-    
-    return data.map((row) => {
-        const values = numericColumns.map((col) => row[col.field] || 0);
-        let temp: number;
-        switch (operation) {
-            case 'sum':
-                temp = values.reduce((sum, val) => sum + val, 0);
-                break;
-            case 'avg':
-                temp = values.length > 0 ? values.reduce((sum, val) => sum + val, 0) / values.length : 0;
-                break;
-            case 'count':
-                temp = values.length;
-                break;
-            case 'min':
-                temp = values.length > 0 ? Math.min(...values) : 0;
-                break;
-            case 'max':
-                temp = values.length > 0 ? Math.max(...values) : 0;
-                break;
-            default:
-                temp = 0; // Default to 0 for unsupported operations
-        }
-        return { ...row, result: temp };
-    });
+  const numericColumns = config.columns.filter(
+    (col) => col.type === 'number' && col.field !== 'result',
+  );
+
+  return data.map((row) => {
+    const values = numericColumns.map((col) => row[col.field] || 0);
+    let temp: number;
+    switch (operation) {
+      case 'sum':
+        temp = values.reduce((sum, val) => sum + val, 0);
+        break;
+      case 'avg':
+        temp =
+          values.length > 0
+            ? values.reduce((sum, val) => sum + val, 0) / values.length
+            : 0;
+        break;
+      case 'count':
+        temp = values.length;
+        break;
+      case 'min':
+        temp = values.length > 0 ? Math.min(...values) : 0;
+        break;
+      case 'max':
+        temp = values.length > 0 ? Math.max(...values) : 0;
+        break;
+      default:
+        temp = 0; // Default to 0 for unsupported operations
+    }
+    return { ...row, result: temp };
+  });
 }
 
-
-
-{/*We'll use this function later while creating dropdown list for column */}
+{
+  /*We'll use this function later while creating dropdown list for column */
+}
 
 // Render Multi-Select Dropdown with Checkboxes
 // function renderMultiSelectWithCheckboxes() {

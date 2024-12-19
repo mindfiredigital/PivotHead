@@ -1,7 +1,7 @@
 export interface Column {
-  field: string
-  label: string
-  type?: string
+  field: string;
+  label: string;
+  type?: string;
 }
 
 export interface SortConfig {
@@ -59,8 +59,5 @@ export type Row = {
 
 export type Config = {
   columns: Column[];
-  data: Row[]
+  data: Row[];
 };
-
-
-
