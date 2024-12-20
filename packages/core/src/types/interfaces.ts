@@ -1,6 +1,7 @@
 export interface Column {
-  field: string;
-  label: string;
+  field: string
+  label: string
+  type?: string
 }
 
 export interface SortConfig {
@@ -45,3 +46,21 @@ export interface PivotTableConfig<T> {
   columns: Column[];
   groupConfig: GroupConfig | null;
 }
+
+export type ChartType = 'bar' | 'line' | 'pie' | 'scatter';
+
+export interface PivotData {
+  [key: string]: string | number;
+}
+
+export type Row = {
+  [key: string]: any;
+};
+
+export type Config = {
+  columns: Column[];
+  data: Row[]
+};
+
+
+
