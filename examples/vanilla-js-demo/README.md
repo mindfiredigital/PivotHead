@@ -18,17 +18,19 @@ To deploy this project to Vercel using the CLI, follow these steps:
 
 1. Install the Vercel CLI globally:
    ```bash
-   
+
    pnpm i -g vercel
 
    ```
 
-2.  ```bash 
+2. Login to you vercel account :
+   ```bash 
 
    vercel login
 
    ```
-3. ```bash 
+3. Deploy your app to your vercel account :
+   ```bash 
 
    pnpm run vercel
 
