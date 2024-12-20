@@ -365,29 +365,34 @@ function createHeader() {
         dropdown.style.left = "0";
         dropdown.style.backgroundColor = "#ffffff";
         dropdown.style.border = "1px solid #d1d5db";
+        dropdown.style.borderRadius = "10px";
         dropdown.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.1)";
         dropdown.style.display = "none";
         dropdown.style.flexDirection = "column";
         dropdown.style.padding = "5px";
         dropdown.style.zIndex = "1000";
+        dropdown.style.width = "max-content";
+        dropdown.style.whiteSpace = "nowrap";
 
         dropdownOptions.forEach((optionName) => {
             const dropdownItem = document.createElement("div");
             dropdownItem.textContent = optionName;
-            dropdownItem.style.padding = "5px 10px";
+            dropdownItem.style.padding = "8px 16px"; // Adjusted padding for better spacing
             dropdownItem.style.cursor = "pointer";
             dropdownItem.style.fontSize = "14px";
+            dropdownItem.style.backgroundColor = "#ffffff"; // Default background color
+            dropdownItem.style.transition = "background-color 0.3s"; // Smooth hover effect
 
             dropdownItem.addEventListener("click", () => {
                 alert(optionName);
             });
 
             dropdownItem.addEventListener("mouseover", () => {
-                dropdownItem.style.backgroundColor = "#f3f4f6";
+                dropdownItem.style.backgroundColor = "#f3f4f6"; // Highlight on hover
             });
 
             dropdownItem.addEventListener("mouseout", () => {
-                dropdownItem.style.backgroundColor = "#ffffff";
+                dropdownItem.style.backgroundColor = "#ffffff"; // Revert on mouse out
             });
 
             dropdown.appendChild(dropdownItem);
