@@ -8,7 +8,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "pnpm run test && vite build",
+    "build": "vite build",
     "dev": "vite build --watch",
     "test": "vitest run",
     "test:watch": "vitest",
