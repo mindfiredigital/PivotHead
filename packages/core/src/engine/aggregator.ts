@@ -1,31 +1,52 @@
-import { AggregationType } from '../types/interfaces';
+import { Row, AggregationType } from '../types/interfaces';
 
-export function calculateAggregates<T extends Record<string, any>>(
+export function calculateAggregates<T extends Row>(
   items: T[],
   measure: keyof T,
   aggregationType: AggregationType,
 ): number {
-  if (items.length === 0) return 0;
+  if (items.length === 0) {
+    return 0;
+  }
+
+  const validValues = items
+    .map((item) => {
+      const value = Number(item[measure]);
+      if (isNaN(value)) {
+        return null;
+      }
+      return value;
+    })
+    .filter((value): value is number => value !== null);
+
+  if (validValues.length === 0) {
+    return 0;
+  }
+
+  const sum = validValues.reduce((acc, value) => acc + value, 0);
+
+  let result: number;
 
   switch (aggregationType) {
     case 'sum':
-      return items.reduce((sum, item) => sum + (Number(item[measure]) || 0), 0);
+      result = sum;
+      break;
     case 'avg':
-      // eslint-disable-next-line no-case-declarations
-      const sum = items.reduce(
-        (sum, item) => sum + (Number(item[measure]) || 0),
-        0,
-      );
-      return sum / items.length;
+      result = sum / validValues.length;
+      break;
     case 'count':
-      return items.length;
+      result = validValues.length;
+      break;
     case 'min':
-      return Math.min(...items.map((item) => Number(item[measure]) || 0));
+      result = Math.min(...validValues);
+      break;
     case 'max':
-      return Math.max(...items.map((item) => Number(item[measure]) || 0));
+      result = Math.max(...validValues);
+      break;
     default:
       return 0;
   }
+  return result;
 }
 
 {

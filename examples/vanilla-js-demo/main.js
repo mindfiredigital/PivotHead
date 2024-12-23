@@ -498,13 +498,14 @@
 //     initializeTable();
 // });
 
-
 /*
   TODO: Remove upper code aftering updating the test cases.
 */
 
 if (typeof PivotheadCore === 'undefined') {
-    console.error('PivotheadCore is not defined. Make sure the library is loaded correctly.');
+  console.error(
+    'PivotheadCore is not defined. Make sure the library is loaded correctly.',
+  );
 }
 
 // Importing the Package
@@ -512,29 +513,83 @@ const { PivotEngine } = PivotheadCore;
 
 // Dummy data.
 const data = [
-    { date: '2024-01-01', product: 'Widget A', region: 'North', sales: 1000, quantity: 50 },
-    { date: '2024-01-01', product: 'Widget B', region: 'South', sales: 1500, quantity: 75 },
-    { date: '2024-01-01', product: 'Widget D', region: 'North', sales: 1300, quantity: 70 },
-    { date: '2024-01-02', product: 'Widget A', region: 'East', sales: 1200, quantity: 60 },
-    { date: '2024-01-02', product: 'Widget A', region: 'East', sales: 100, quantity: 44 },
-    { date: '2024-01-02', product: 'Widget C', region: 'West', sales: 800, quantity: 40 },
-    { date: '2024-01-03', product: 'Widget B', region: 'North', sales: 1800, quantity: 90 },
-    { date: '2024-01-03', product: 'Widget C', region: 'South', sales: 1100, quantity: 55 },
-    { date: '2024-01-04', product: 'Widget A', region: 'West', sales: 1300, quantity: 65 },
-    { date: '2024-01-04', product: 'Widget B', region: 'East', sales: 1600, quantity: 80 },
+  {
+    date: '2024-01-01',
+    product: 'Widget A',
+    region: 'North',
+    sales: 1000,
+    quantity: 50,
+  },
+  {
+    date: '2024-01-01',
+    product: 'Widget B',
+    region: 'South',
+    sales: 1500,
+    quantity: 75,
+  },
+  {
+    date: '2024-01-01',
+    product: 'Widget D',
+    region: 'North',
+    sales: 1300,
+    quantity: 70,
+  },
+  {
+    date: '2024-01-02',
+    product: 'Widget A',
+    region: 'East',
+    sales: 1200,
+    quantity: 60,
+  },
+  {
+    date: '2024-01-02',
+    product: 'Widget A',
+    region: 'East',
+    sales: 100,
+    quantity: 44,
+  },
+  {
+    date: '2024-01-02',
+    product: 'Widget C',
+    region: 'West',
+    sales: 800,
+    quantity: 40,
+  },
+  {
+    date: '2024-01-03',
+    product: 'Widget B',
+    region: 'North',
+    sales: 1800,
+    quantity: 90,
+  },
+  {
+    date: '2024-01-03',
+    product: 'Widget C',
+    region: 'South',
+    sales: 1100,
+    quantity: 55,
+  },
+  {
+    date: '2024-01-04',
+    product: 'Widget A',
+    region: 'West',
+    sales: 1300,
+    quantity: 65,
+  },
+  {
+    date: '2024-01-04',
+    product: 'Widget B',
+    region: 'East',
+    sales: 1600,
+    quantity: 80,
+  },
 ];
-
-
 
 // Updated configuration for the pivot table
 const config = {
   data: data,
-  rows: [
-    { uniqueName: 'product', caption: 'Product' },
-  ],
-  columns: [
-    { uniqueName: 'date', caption: 'Date' },
-  ],
+  rows: [{ uniqueName: 'product', caption: 'Product' }],
+  columns: [{ uniqueName: 'region', caption: 'Region' }],
   measures: [
     {
       uniqueName: 'sales',
@@ -567,7 +622,7 @@ const config = {
   isResponsive: true,
   groupConfig: {
     rowFields: ['product'],
-    columnFields: ['date'],
+    columnFields: ['region'],
     grouper: (item, fields) => fields.map((field) => item[field]).join(' - '),
   },
 };
@@ -704,6 +759,124 @@ function createAggregationPanel() {
   return panel;
 }
 
+// function renderTable() {
+//   const state = engine.getState();
+//   const container = document.getElementById('pivotTable');
+//   if (!container) {
+//     console.error('Container element with id "pivotTable" not found');
+//     return;
+//   }
+
+//   container.innerHTML = '';
+
+//   const controlPanel = createControlPanel();
+//   container.appendChild(controlPanel);
+
+//   const table = document.createElement('table');
+//   table.style.width = '100%';
+//   table.style.borderCollapse = 'collapse';
+//   table.style.marginTop = '20px';
+
+//   // Create header
+//   const thead = document.createElement('thead');
+//   const headerRow = document.createElement('tr');
+
+//   // Add row headers
+//   state.rows.forEach((row) => {
+//     const th = document.createElement('th');
+//     th.textContent = row.caption;
+//     th.style.padding = '10px';
+//     th.style.backgroundColor = '#f0f0f0';
+//     th.style.borderBottom = '2px solid #ddd';
+//     headerRow.appendChild(th);
+//   });
+
+//   // Add column headers (Product Categories)
+//   const uniqueCategories = [
+//     ...new Set(data.map((item) => item.ProductCategory)),
+//   ];
+//   uniqueCategories.forEach((category) => {
+//     const th = document.createElement('th');
+//     th.textContent = category;
+//     th.style.padding = '10px';
+//     th.style.backgroundColor = '#f0f0f0';
+//     th.style.borderBottom = '2px solid #ddd';
+//     th.colSpan = state.measures.length;
+//     headerRow.appendChild(th);
+//   });
+
+//   thead.appendChild(headerRow);
+
+//   // Add measure subheaders
+//   const measureRow = document.createElement('tr');
+//   state.rows.forEach(() => {
+//     const th = document.createElement('th');
+//     measureRow.appendChild(th);
+//   });
+
+//   uniqueCategories.forEach(() => {
+//     state.measures.forEach((measure) => {
+//       const th = document.createElement('th');
+//       th.textContent = measure.caption;
+//       th.style.padding = '10px';
+//       th.style.backgroundColor = '#f0f0f0';
+//       th.style.borderBottom = '2px solid #ddd';
+//       measureRow.appendChild(th);
+//     });
+//   });
+
+//   thead.appendChild(measureRow);
+//   table.appendChild(thead);
+
+//   // Create body
+//   const tbody = document.createElement('tbody');
+
+//   const groupedData = groupData(
+//     data,
+//     state.rows.map((r) => r.uniqueName),
+//   );
+
+//   Object.entries(groupedData).forEach(([groupKey, groupItems]) => {
+//     const tr = document.createElement('tr');
+
+//     // Add row headers
+//     groupKey.split(' - ').forEach((value) => {
+//       const td = document.createElement('td');
+//       td.textContent = value;
+//       td.style.padding = '10px';
+//       td.style.borderBottom = '1px solid #ddd';
+//       td.style.fontWeight = 'bold';
+//       tr.appendChild(td);
+//     });
+
+//     // Add data cells
+//     uniqueCategories.forEach((category) => {
+//       const categoryItems = groupItems.filter(
+//         (item) => item.ProductCategory === category,
+//       );
+//       state.measures.forEach((measure) => {
+//         const td = document.createElement('td');
+//         td.style.padding = '10px';
+//         td.style.borderBottom = '1px solid #ddd';
+//         td.style.textAlign = 'right';
+
+//         const value = categoryItems.reduce(
+//           (sum, item) => sum + item[measure.uniqueName],
+//           0,
+//         );
+//         td.textContent = engine.formatValue(value, measure);
+
+//         tr.appendChild(td);
+//       });
+//     });
+
+//     tbody.appendChild(tr);
+//   });
+
+//   table.appendChild(tbody);
+
+//   container.appendChild(table);
+// }
 function renderTable() {
   const state = engine.getState();
   const container = document.getElementById('pivotTable');
@@ -713,103 +886,108 @@ function renderTable() {
   }
 
   container.innerHTML = '';
-
-  const controlPanel = createControlPanel();
-  container.appendChild(controlPanel);
+  container.appendChild(createControlPanel());
 
   const table = document.createElement('table');
   table.style.width = '100%';
   table.style.borderCollapse = 'collapse';
   table.style.marginTop = '20px';
 
-  // Create header
   const thead = document.createElement('thead');
-  const headerRow = document.createElement('tr');
 
-  // Add row headers
-  state.rows.forEach((row) => {
-    const th = document.createElement('th');
-    th.textContent = row.caption;
-    th.style.padding = '10px';
-    th.style.backgroundColor = '#f0f0f0';
-    th.style.borderBottom = '2px solid #ddd';
-    headerRow.appendChild(th);
-  });
+  // First header row for columns
+  const columnHeaderRow = document.createElement('tr');
 
-  // Add column headers (Product Categories)
-  const uniqueCategories = [
-    ...new Set(data.map((item) => item.ProductCategory)),
-  ];
-  uniqueCategories.forEach((category) => {
+  // Add empty cell for row headers
+  const emptyHeaderCell = document.createElement('th');
+  emptyHeaderCell.style.padding = '10px';
+  emptyHeaderCell.style.backgroundColor = '#f0f0f0';
+  emptyHeaderCell.style.borderBottom = '2px solid #ddd';
+  columnHeaderRow.appendChild(emptyHeaderCell);
+
+  // Get unique column values based on the configured column fields
+  const columnField = state.columns[0]?.uniqueName;
+  const uniqueColumnValues = columnField 
+    ? [...new Set(data.map(item => item[columnField]))]
+    : [];
+
+  // Add column headers with colspan
+  uniqueColumnValues.forEach(value => {
     const th = document.createElement('th');
-    th.textContent = category;
-    th.style.padding = '10px';
-    th.style.backgroundColor = '#f0f0f0';
-    th.style.borderBottom = '2px solid #ddd';
+    th.textContent = value;
     th.colSpan = state.measures.length;
-    headerRow.appendChild(th);
+    th.style.padding = '10px';
+    th.style.backgroundColor = '#f0f0f0';
+    th.style.borderBottom = '2px solid #ddd';
+    columnHeaderRow.appendChild(th);
   });
 
-  thead.appendChild(headerRow);
+  thead.appendChild(columnHeaderRow);
 
-  // Add measure subheaders
-  const measureRow = document.createElement('tr');
-  state.rows.forEach(() => {
-    const th = document.createElement('th');
-    measureRow.appendChild(th);
-  });
+  // Second header row for measures
+  const measureHeaderRow = document.createElement('tr');
 
-  uniqueCategories.forEach(() => {
-    state.measures.forEach((measure) => {
+  // Add empty cell for row headers
+  const emptyMeasureCell = document.createElement('th');
+  emptyMeasureCell.style.padding = '10px';
+  emptyMeasureCell.style.backgroundColor = '#f0f0f0';
+  emptyMeasureCell.style.borderBottom = '2px solid #ddd';
+  measureHeaderRow.appendChild(emptyMeasureCell);
+
+  // Add measure headers for each column value
+  uniqueColumnValues.forEach(() => {
+    state.measures.forEach(measure => {
       const th = document.createElement('th');
       th.textContent = measure.caption;
       th.style.padding = '10px';
       th.style.backgroundColor = '#f0f0f0';
       th.style.borderBottom = '2px solid #ddd';
-      measureRow.appendChild(th);
+      measureHeaderRow.appendChild(th);
     });
   });
 
-  thead.appendChild(measureRow);
+  thead.appendChild(measureHeaderRow);
   table.appendChild(thead);
 
-  // Create body
+  // Create table body
   const tbody = document.createElement('tbody');
-
-  const groupedData = groupData(
-    data,
-    state.rows.map((r) => r.uniqueName),
-  );
+  const rowField = state.rows[0]?.uniqueName;
+  const groupedData = rowField ? groupData(data, [rowField]) : {};
 
   Object.entries(groupedData).forEach(([groupKey, groupItems]) => {
     const tr = document.createElement('tr');
 
-    // Add row headers
-    groupKey.split(' - ').forEach((value) => {
-      const td = document.createElement('td');
-      td.textContent = value;
-      td.style.padding = '10px';
-      td.style.borderBottom = '1px solid #ddd';
-      td.style.fontWeight = 'bold';
-      tr.appendChild(td);
-    });
+    // Add row header
+    const rowHeaderCell = document.createElement('td');
+    rowHeaderCell.textContent = groupKey;
+    rowHeaderCell.style.padding = '10px';
+    rowHeaderCell.style.borderBottom = '1px solid #ddd';
+    rowHeaderCell.style.fontWeight = 'bold';
+    tr.appendChild(rowHeaderCell);
 
-    // Add data cells
-    uniqueCategories.forEach((category) => {
-      const categoryItems = groupItems.filter(
-        (item) => item.ProductCategory === category,
-      );
-      state.measures.forEach((measure) => {
+    // Add data cells for each column value
+    uniqueColumnValues.forEach(columnValue => {
+      const columnItems = groupItems.filter(item => item[columnField] === columnValue);
+
+      state.measures.forEach(measure => {
         const td = document.createElement('td');
         td.style.padding = '10px';
         td.style.borderBottom = '1px solid #ddd';
         td.style.textAlign = 'right';
 
-        const value = categoryItems.reduce(
-          (sum, item) => sum + item[measure.uniqueName],
-          0,
-        );
-        td.textContent = engine.formatValue(value, measure);
+        if (columnItems.length > 0) {
+          let value;
+          if (measure.uniqueName === 'averageSale') {
+            const totalSales = columnItems.reduce((sum, item) => sum + item.sales, 0);
+            const totalQuantity = columnItems.reduce((sum, item) => sum + item.quantity, 0);
+            value = totalQuantity !== 0 ? totalSales / totalQuantity : 0;
+          } else {
+            value = columnItems.reduce((sum, item) => sum + item[measure.uniqueName], 0);
+          }
+          td.textContent = engine.formatValue(value, measure.uniqueName);
+        } else {
+          td.textContent = engine.formatValue(0, measure.uniqueName);
+        }
 
         tr.appendChild(td);
       });
@@ -819,7 +997,6 @@ function renderTable() {
   });
 
   table.appendChild(tbody);
-
   container.appendChild(table);
 }
 

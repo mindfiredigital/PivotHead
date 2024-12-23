@@ -85,6 +85,8 @@ export interface PivotTableState<T> {
   formatting: { [key: string]: FormatOptions };
   columnWidths: { [key: string]: number };
   isResponsive: boolean;
+  rowGroups: Group[];
+  columnGroups: Group[];
 }
 
 export interface PivotTableConfig<T> {
@@ -104,12 +106,18 @@ export interface MeasureConfig {
   caption?: string;
   aggregation: AggregationType;
   format?: FormatOptions;
+  formula?: (item: any) => number;
 }
 
 export interface ProcessedData {
   headers: string[];
   rows: any[][];
   totals: Record<string, number>;
+}
+
+export interface ProcessedDataResult<T> {
+  data: T[];
+  groups: Group[];
 }
 
 // Chart types supported

@@ -46,6 +46,8 @@ export class PivotEngine<T extends Record<string, any>> {
       formatting: config.formatting || {},
       columnWidths: {},
       isResponsive: this.config.isResponsive ?? true,
+      rowGroups: [],
+      columnGroups: [],
     };
 
     // Process data after state initialization
@@ -105,16 +107,20 @@ export class PivotEngine<T extends Record<string, any>> {
   public setMeasures(measureFields: MeasureConfig[]) {
     this.state.selectedMeasures = measureFields;
     this.state.processedData = this.processData(this.state.data);
+    this.updateAggregates();
   }
 
   public setDimensions(dimensionFields: Dimension[]) {
     this.state.selectedDimensions = dimensionFields;
     this.state.processedData = this.processData(this.state.data);
+    this.updateAggregates();
   }
 
   public setAggregation(type: AggregationType) {
     this.state.selectedAggregation = type;
     this.state.processedData = this.processData(this.state.data);
+    this.updateAggregates();
+    this.updateAggregates();
   }
 
   public formatValue(value: any, field: string): string {
@@ -153,12 +159,60 @@ export class PivotEngine<T extends Record<string, any>> {
 
   public sort(field: string, direction: 'asc' | 'desc') {
     this.state.sortConfig = { field, direction };
-    this.state.data = processData(
+    const { data, groups } = processData(
       this.config,
       this.state.sortConfig,
       this.state.groupConfig,
     );
+    this.state.data = data;
+    this.state.groups = groups;
     this.state.processedData = this.processData(this.state.data);
+    this.updateAggregates();
+  }
+
+  private updateAggregates() {
+    const updateGroupAggregates = (group: Group) => {
+      this.state.measures.forEach((measure) => {
+        const aggregateKey = `${this.state.selectedAggregation}_${measure.uniqueName}`;
+        if (measure.formula && typeof measure.formula === 'function') {
+          // Handle custom measures
+          const formulaResults = group.items.map((item) =>
+            measure.formula?.(item),
+          );
+          group.aggregates[aggregateKey] = calculateAggregates(
+            formulaResults.map((value) => ({ value })),
+            'value' as keyof { value: number },
+            this.state.selectedAggregation,
+          );
+        } else if (measure.uniqueName === 'averageSale') {
+          // Special handling for averageSale
+          const totalSales = calculateAggregates(
+            group.items,
+            'sales' as keyof T,
+            'sum',
+          );
+          const totalQuantity = calculateAggregates(
+            group.items,
+            'quantity' as keyof T,
+            'sum',
+          );
+          group.aggregates[aggregateKey] =
+            totalQuantity !== 0 ? totalSales / totalQuantity : 0;
+        } else {
+          group.aggregates[aggregateKey] = calculateAggregates(
+            group.items,
+            measure.uniqueName as keyof T,
+            this.state.selectedAggregation as AggregationType,
+          );
+        }
+      });
+
+      if (group.subgroups) {
+        group.subgroups.forEach(updateGroupAggregates);
+      }
+    };
+
+    this.state.groups.forEach(updateGroupAggregates);
   }
 
   private applyGrouping() {
@@ -171,11 +225,15 @@ export class PivotEngine<T extends Record<string, any>> {
       return;
     }
 
-    this.state.groups = this.createGroups(
-      this.state.data,
-      [...rowFields, ...columnFields],
-      grouper,
+    const { data, groups } = processData(
+      this.config,
+      this.state.sortConfig,
+      this.state.groupConfig,
     );
+
+    this.state.data = data;
+    this.state.groups = groups;
+    this.updateAggregates();
     this.state.processedData = this.processData(this.state.data);
   }
 
@@ -296,6 +354,7 @@ export class PivotEngine<T extends Record<string, any>> {
           : index - 1,
     }));
     this.state.processedData = this.processData(this.state.data);
+    this.updateAggregates();
   }
 
   public dragColumn(fromIndex: number, toIndex: number) {
@@ -304,5 +363,6 @@ export class PivotEngine<T extends Record<string, any>> {
     newColumns.splice(toIndex, 0, removed);
     this.state.columns = newColumns;
     this.state.processedData = this.processData(this.state.data);
+    this.updateAggregates();
   }
 }
