@@ -1,3 +1,5 @@
+import { formatCellPopUp } from "./formatCell.js";
+import { conditionFormattingPopUp } from "./conditionFormattingPopUp.js";
 
 export function createHeader() {
     const header = document.createElement("div");
@@ -49,22 +51,33 @@ export function createHeader() {
         dropdownOptions.forEach((optionName) => {
             const dropdownItem = document.createElement("div");
             dropdownItem.textContent = optionName;
-            dropdownItem.style.padding = "8px 16px"; // Adjusted padding for better spacing
+            dropdownItem.style.padding = "8px 16px";
             dropdownItem.style.cursor = "pointer";
             dropdownItem.style.fontSize = "14px";
-            dropdownItem.style.backgroundColor = "#ffffff"; // Default background color
-            dropdownItem.style.transition = "background-color 0.3s"; // Smooth hover effect
+            dropdownItem.style.backgroundColor = "#ffffff";
+            dropdownItem.style.transition = "background-color 0.3s";
 
             dropdownItem.addEventListener("click", () => {
-                alert(optionName);
+
+                switch (optionName) {
+                    case 'Format Cell':
+                        formatCellPopUp()
+                        break;
+                    case 'Condition Formatting':
+                        conditionFormattingPopUp()
+                        break;
+
+                    default:
+                        alert(optionName);
+                }
             });
 
             dropdownItem.addEventListener("mouseover", () => {
-                dropdownItem.style.backgroundColor = "#f3f4f6"; // Highlight on hover
+                dropdownItem.style.backgroundColor = "#f3f4f6";
             });
 
             dropdownItem.addEventListener("mouseout", () => {
-                dropdownItem.style.backgroundColor = "#ffffff"; // Revert on mouse out
+                dropdownItem.style.backgroundColor = "#ffffff";
             });
 
             dropdown.appendChild(dropdownItem);
@@ -93,32 +106,32 @@ export function createHeader() {
 
     const leftOptions = [
         {
+            icon: "🔗",
+            label: "Connect",
+            dropdownOptions: ["To Local CSV", "To Local JSON"],
+        },
+        {
             icon: "📂",
             label: "Open",
-            dropdownOptions: ["Option 1", "Option 2", "Option 3", "Option 4"],
+            dropdownOptions: ["Local Report", "Remote Report"],
         },
         {
             icon: "💾",
             label: "Save",
-            dropdownOptions: ["Save As", "Save All", "Quick Save", "Backup Save"],
+            dropdownOptions: [],
         },
+
         {
-            icon: "✏️",
-            label: "Edit",
-            dropdownOptions: ["Undo", "Redo", "Cut", "Copy"],
-        },
-        {
-            icon: "🗑️",
-            label: "Delete",
-            dropdownOptions: ["Delete File", "Delete Folder", "Clear All", "Restore"],
+            icon: "📤",
+            label: "Export",
+            dropdownOptions: ["Print", "To HTML", "To Excel", "To PDF"],
         },
     ];
 
     const rightOptions = [
-        { icon: "🔍", label: "Search", dropdownOptions: [] },
-        { icon: "⚙️", label: "Settings", dropdownOptions: [] },
-        { icon: "🔔", label: "Notifications", dropdownOptions: [] },
-        { icon: "📋", label: "Clipboard", dropdownOptions: [] },
+        { icon: "↕️", label: "Format", dropdownOptions: ["Format Cell", "Condition Formatting"] },
+        { icon: "⚙️", label: "Options", dropdownOptions: [] },
+        { icon: "📋", label: "Fields", dropdownOptions: [] },
     ];
 
     leftOptions.forEach((option) =>
