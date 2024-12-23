@@ -626,9 +626,6 @@ const config = {
     grouper: (item, fields) => fields.map((field) => item[field]).join(' - '),
   },
 };
-// Initialize PivotEngine with the new config
-const pivotEngine = new PivotEngine(config);
-
 // Initialize PivotEngine
 let engine = new PivotEngine(config);
 
@@ -759,124 +756,6 @@ function createAggregationPanel() {
   return panel;
 }
 
-// function renderTable() {
-//   const state = engine.getState();
-//   const container = document.getElementById('pivotTable');
-//   if (!container) {
-//     console.error('Container element with id "pivotTable" not found');
-//     return;
-//   }
-
-//   container.innerHTML = '';
-
-//   const controlPanel = createControlPanel();
-//   container.appendChild(controlPanel);
-
-//   const table = document.createElement('table');
-//   table.style.width = '100%';
-//   table.style.borderCollapse = 'collapse';
-//   table.style.marginTop = '20px';
-
-//   // Create header
-//   const thead = document.createElement('thead');
-//   const headerRow = document.createElement('tr');
-
-//   // Add row headers
-//   state.rows.forEach((row) => {
-//     const th = document.createElement('th');
-//     th.textContent = row.caption;
-//     th.style.padding = '10px';
-//     th.style.backgroundColor = '#f0f0f0';
-//     th.style.borderBottom = '2px solid #ddd';
-//     headerRow.appendChild(th);
-//   });
-
-//   // Add column headers (Product Categories)
-//   const uniqueCategories = [
-//     ...new Set(data.map((item) => item.ProductCategory)),
-//   ];
-//   uniqueCategories.forEach((category) => {
-//     const th = document.createElement('th');
-//     th.textContent = category;
-//     th.style.padding = '10px';
-//     th.style.backgroundColor = '#f0f0f0';
-//     th.style.borderBottom = '2px solid #ddd';
-//     th.colSpan = state.measures.length;
-//     headerRow.appendChild(th);
-//   });
-
-//   thead.appendChild(headerRow);
-
-//   // Add measure subheaders
-//   const measureRow = document.createElement('tr');
-//   state.rows.forEach(() => {
-//     const th = document.createElement('th');
-//     measureRow.appendChild(th);
-//   });
-
-//   uniqueCategories.forEach(() => {
-//     state.measures.forEach((measure) => {
-//       const th = document.createElement('th');
-//       th.textContent = measure.caption;
-//       th.style.padding = '10px';
-//       th.style.backgroundColor = '#f0f0f0';
-//       th.style.borderBottom = '2px solid #ddd';
-//       measureRow.appendChild(th);
-//     });
-//   });
-
-//   thead.appendChild(measureRow);
-//   table.appendChild(thead);
-
-//   // Create body
-//   const tbody = document.createElement('tbody');
-
-//   const groupedData = groupData(
-//     data,
-//     state.rows.map((r) => r.uniqueName),
-//   );
-
-//   Object.entries(groupedData).forEach(([groupKey, groupItems]) => {
-//     const tr = document.createElement('tr');
-
-//     // Add row headers
-//     groupKey.split(' - ').forEach((value) => {
-//       const td = document.createElement('td');
-//       td.textContent = value;
-//       td.style.padding = '10px';
-//       td.style.borderBottom = '1px solid #ddd';
-//       td.style.fontWeight = 'bold';
-//       tr.appendChild(td);
-//     });
-
-//     // Add data cells
-//     uniqueCategories.forEach((category) => {
-//       const categoryItems = groupItems.filter(
-//         (item) => item.ProductCategory === category,
-//       );
-//       state.measures.forEach((measure) => {
-//         const td = document.createElement('td');
-//         td.style.padding = '10px';
-//         td.style.borderBottom = '1px solid #ddd';
-//         td.style.textAlign = 'right';
-
-//         const value = categoryItems.reduce(
-//           (sum, item) => sum + item[measure.uniqueName],
-//           0,
-//         );
-//         td.textContent = engine.formatValue(value, measure);
-
-//         tr.appendChild(td);
-//       });
-//     });
-
-//     tbody.appendChild(tr);
-//   });
-
-//   table.appendChild(tbody);
-
-//   container.appendChild(table);
-// }
 function renderTable() {
   const state = engine.getState();
   const container = document.getElementById('pivotTable');
@@ -907,12 +786,12 @@ function renderTable() {
 
   // Get unique column values based on the configured column fields
   const columnField = state.columns[0]?.uniqueName;
-  const uniqueColumnValues = columnField 
-    ? [...new Set(data.map(item => item[columnField]))]
+  const uniqueColumnValues = columnField
+    ? [...new Set(data.map((item) => item[columnField]))]
     : [];
 
   // Add column headers with colspan
-  uniqueColumnValues.forEach(value => {
+  uniqueColumnValues.forEach((value) => {
     const th = document.createElement('th');
     th.textContent = value;
     th.colSpan = state.measures.length;
@@ -936,7 +815,7 @@ function renderTable() {
 
   // Add measure headers for each column value
   uniqueColumnValues.forEach(() => {
-    state.measures.forEach(measure => {
+    state.measures.forEach((measure) => {
       const th = document.createElement('th');
       th.textContent = measure.caption;
       th.style.padding = '10px';
@@ -966,10 +845,12 @@ function renderTable() {
     tr.appendChild(rowHeaderCell);
 
     // Add data cells for each column value
-    uniqueColumnValues.forEach(columnValue => {
-      const columnItems = groupItems.filter(item => item[columnField] === columnValue);
+    uniqueColumnValues.forEach((columnValue) => {
+      const columnItems = groupItems.filter(
+        (item) => item[columnField] === columnValue,
+      );
 
-      state.measures.forEach(measure => {
+      state.measures.forEach((measure) => {
         const td = document.createElement('td');
         td.style.padding = '10px';
         td.style.borderBottom = '1px solid #ddd';
@@ -977,13 +858,28 @@ function renderTable() {
 
         if (columnItems.length > 0) {
           let value;
-          if (measure.uniqueName === 'averageSale') {
-            const totalSales = columnItems.reduce((sum, item) => sum + item.sales, 0);
-            const totalQuantity = columnItems.reduce((sum, item) => sum + item.quantity, 0);
-            value = totalQuantity !== 0 ? totalSales / totalQuantity : 0;
+          if (measure.formula && typeof measure.formula === 'function') {
+            // For custom measures with a formula
+            value =
+              columnItems.reduce(
+                (sum, item) => sum + measure.formula(item),
+                0,
+              ) / columnItems.length;
           } else {
-            value = columnItems.reduce((sum, item) => sum + item[measure.uniqueName], 0);
+            // For standard measures
+            value = columnItems.reduce(
+              (sum, item) => sum + (item[measure.uniqueName] || 0),
+              0,
+            );
           }
+
+          // Apply the measure's aggregation if specified
+          if (measure.aggregation === 'avg') {
+            value /= columnItems.length;
+          } else if (measure.aggregation === 'count') {
+            value = columnItems.length;
+          } // 'sum' is default, 'min' and 'max' would need additional logic
+
           td.textContent = engine.formatValue(value, measure.uniqueName);
         } else {
           td.textContent = engine.formatValue(0, measure.uniqueName);

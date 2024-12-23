@@ -177,32 +177,20 @@ export class PivotEngine<T extends Record<string, any>> {
         if (measure.formula && typeof measure.formula === 'function') {
           // Handle custom measures
           const formulaResults = group.items.map((item) =>
-            measure.formula?.(item),
+            measure.formula!(item),
           );
           group.aggregates[aggregateKey] = calculateAggregates(
             formulaResults.map((value) => ({ value })),
             'value' as keyof { value: number },
-            this.state.selectedAggregation,
+            measure.aggregation ||
+              (this.state.selectedAggregation as AggregationType),
           );
-        } else if (measure.uniqueName === 'averageSale') {
-          // Special handling for averageSale
-          const totalSales = calculateAggregates(
-            group.items,
-            'sales' as keyof T,
-            'sum',
-          );
-          const totalQuantity = calculateAggregates(
-            group.items,
-            'quantity' as keyof T,
-            'sum',
-          );
-          group.aggregates[aggregateKey] =
-            totalQuantity !== 0 ? totalSales / totalQuantity : 0;
         } else {
           group.aggregates[aggregateKey] = calculateAggregates(
             group.items,
             measure.uniqueName as keyof T,
-            this.state.selectedAggregation as AggregationType,
+            (measure.aggregation as AggregationType) ||
+              (this.state.selectedAggregation as AggregationType),
           );
         }
       });
