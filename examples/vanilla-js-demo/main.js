@@ -366,6 +366,8 @@ function renderTable() {
         td.style.padding = '10px';
         td.style.borderBottom = '1px solid #ddd';
         td.style.textAlign = 'right';
+        td.style.verticalAlign = 'middle';
+        td.style.textAlign = 'center';
 
         if (columnItems.length > 0) {
           let value;
@@ -396,12 +398,16 @@ function renderTable() {
           td.style.borderBottom = '1px solid #dee2e6';
           td.style.borderRight = '1px solid #dee2e6';
           td.style.backgroundColor = '#ffffff';
+          td.style.verticalAlign = 'middle';
+          td.style.textAlign = 'center';
         } else {
           td.textContent = engine.formatValue(0, measure.uniqueName);
           td.style.padding = '12px';
           td.style.borderBottom = '1px solid #dee2e6';
           td.style.borderRight = '1px solid #dee2e6';
           td.style.backgroundColor = '#ffffff';
+          td.style.verticalAlign = 'middle';
+          td.style.textAlign = 'center';
         }
 
         tr.appendChild(td);
