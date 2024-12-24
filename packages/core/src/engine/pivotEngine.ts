@@ -230,11 +230,11 @@ export class PivotEngine<T extends Record<string, any>> {
     fields: string[],
     grouper: (item: T, fields: string[]) => string,
   ): Group[] {
-    if (!fields || fields.length === 0) {
+    if (!fields || fields.length === 0 || !data) {
       return [
         {
           key: 'All',
-          items: data,
+          items: data || [],
           aggregates: {},
         },
       ];
@@ -243,33 +243,41 @@ export class PivotEngine<T extends Record<string, any>> {
     const groups: { [key: string]: Group } = {};
 
     data.forEach((item) => {
-      const key = grouper(item, fields);
-      if (!groups[key]) {
-        groups[key] = { key, items: [], subgroups: [], aggregates: {} };
+      if (item && grouper) {
+        const key = grouper(item, fields);
+        if (!groups[key]) {
+          groups[key] = { key, items: [], subgroups: [], aggregates: {} };
+        }
+        groups[key].items.push(item);
       }
-      groups[key].items.push(item);
     });
 
     if (fields.length > 1) {
       Object.values(groups).forEach((group) => {
-        group.subgroups = this.createGroups(
-          group.items,
-          fields.slice(1),
-          grouper,
-        );
+        if (group && group.items) {
+          group.subgroups = this.createGroups(
+            group.items,
+            fields.slice(1),
+            grouper,
+          );
+        }
       });
     }
 
     // Calculate aggregates for each group
     Object.values(groups).forEach((group) => {
-      this.state.measures.forEach((measure) => {
-        const aggregateKey = `${this.state.selectedAggregation}_${measure.uniqueName}`;
-        group.aggregates[aggregateKey] = calculateAggregates(
-          group.items,
-          measure.uniqueName as keyof T,
-          this.state.selectedAggregation as AggregationType,
-        );
-      });
+      if (group && group.items && this.state.measures) {
+        this.state.measures.forEach((measure) => {
+          if (measure && measure.uniqueName) {
+            const aggregateKey = `${this.state.selectedAggregation}_${measure.uniqueName}`;
+            group.aggregates[aggregateKey] = calculateAggregates(
+              group.items,
+              measure.uniqueName as keyof T,
+              this.state.selectedAggregation as AggregationType,
+            );
+          }
+        });
+      }
     });
 
     return Object.values(groups);
