@@ -279,6 +279,7 @@ function renderTable() {
   table.style.width = '100%';
   table.style.borderCollapse = 'collapse';
   table.style.marginTop = '20px';
+  table.style.border = '1px solid #dee2e6';
 
   const thead = document.createElement('thead');
 
@@ -303,9 +304,10 @@ function renderTable() {
     const th = document.createElement('th');
     th.textContent = value;
     th.colSpan = state.measures.length;
-    th.style.padding = '10px';
-    th.style.backgroundColor = '#f0f0f0';
-    th.style.borderBottom = '2px solid #ddd';
+    th.style.padding = '12px';
+    th.style.backgroundColor = '#f8f9fa';
+    th.style.borderBottom = '2px solid #dee2e6';
+    th.style.borderRight = '1px solid #dee2e6';
     columnHeaderRow.appendChild(th);
   });
 
@@ -326,9 +328,10 @@ function renderTable() {
     state.measures.forEach((measure) => {
       const th = document.createElement('th');
       th.textContent = measure.caption;
-      th.style.padding = '10px';
-      th.style.backgroundColor = '#f0f0f0';
-      th.style.borderBottom = '2px solid #ddd';
+      th.style.padding = '12px';
+      th.style.backgroundColor = '#f8f9fa';
+      th.style.borderBottom = '2px solid #dee2e6';
+      th.style.borderRight = '1px solid #dee2e6';
       measureHeaderRow.appendChild(th);
     });
   });
@@ -389,8 +392,16 @@ function renderTable() {
           } // 'sum' is default, 'min' and 'max' would need additional logic
 
           td.textContent = engine.formatValue(value, measure.uniqueName);
+          td.style.padding = '12px';
+          td.style.borderBottom = '1px solid #dee2e6';
+          td.style.borderRight = '1px solid #dee2e6';
+          td.style.backgroundColor = '#ffffff';
         } else {
           td.textContent = engine.formatValue(0, measure.uniqueName);
+          td.style.padding = '12px';
+          td.style.borderBottom = '1px solid #dee2e6';
+          td.style.borderRight = '1px solid #dee2e6';
+          td.style.backgroundColor = '#ffffff';
         }
 
         tr.appendChild(td);
