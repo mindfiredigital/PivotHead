@@ -96,7 +96,10 @@ const data = [
 // Updated configuration for the pivot table
 const config = {
   data: data,
-  rows: [{ uniqueName: 'product', caption: 'Product' }],
+  rows: [
+    { uniqueName: 'product', caption: 'Product' },
+    { uniqueName: 'date', caption: 'Date' },
+  ],
   columns: [{ uniqueName: 'region', caption: 'Region' }],
   measures: [
     {
@@ -129,7 +132,7 @@ const config = {
   defaultAggregation: 'sum',
   isResponsive: true,
   groupConfig: {
-    rowFields: ['product'],
+    rowFields: ['product','date'],
     columnFields: ['region'],
     grouper: (item, fields) => fields.map((field) => item[field]).join(' - '),
   },
@@ -282,12 +285,112 @@ function renderTable() {
   table.style.border = '1px solid #dee2e6';
 
   const thead = document.createElement('thead');
+  renderTableHeader(thead, state);
+  table.appendChild(thead);
 
-  // First header row for columns
+  const tbody = document.createElement('tbody');
+  const rowFields = state.rows.map((r) => r.uniqueName);
+  const groupedData = groupData(data, rowFields);
+
+  renderGroupedRows(tbody, groupedData, state, 0);
+
+  table.appendChild(tbody);
+  container.appendChild(table);
+}
+
+function renderGroupedRows(tbody, groups, state, level) {
+  const columnField = state.columns[0]?.uniqueName;
+  const uniqueColumnValues = columnField
+    ? [...new Set(data.map((item) => item[columnField]))]
+    : [];
+
+  Object.entries(groups).forEach(([key, value]) => {
+    const tr = document.createElement('tr');
+
+    // Add group header cell
+    const headerCell = document.createElement('td');
+    headerCell.textContent = key;
+    headerCell.style.padding = '12px';
+    headerCell.style.paddingLeft = `${level * 20 + 10}px`;
+    headerCell.style.borderBottom = '2px solid #ddd';
+    headerCell.style.fontWeight = 'bold';
+    headerCell.colSpan = Array.isArray(value) ? 1 : state.rows.length - level;
+    tr.appendChild(headerCell);
+
+    // Add data cells for leaf nodes
+    if (Array.isArray(value)) {
+      uniqueColumnValues.forEach((columnValue) => {
+        const columnItems = value.filter(
+          (item) => item[columnField] === columnValue,
+        );
+
+        state.measures.forEach((measure) => {
+          const td = document.createElement('td');
+          td.style.padding = '12px';
+          td.style.borderBottom = '1px solid #dee2e6';
+          td.style.borderRight = '1px solid #dee2e6';
+          td.style.backgroundColor = '#f8f9fa';
+          td.style.textAlign = 'center';
+
+          if (columnItems.length > 0) {
+            let aggregateValue;
+            if (measure.formula && typeof measure.formula === 'function') {
+              aggregateValue =
+                columnItems.reduce(
+                  (sum, item) => sum + measure.formula(item),
+                  0,
+                ) / columnItems.length;
+            } else {
+              aggregateValue = columnItems.reduce(
+                (sum, item) => sum + (item[measure.uniqueName] || 0),
+                0,
+              );
+            }
+
+            if (measure.aggregation === 'avg') {
+              aggregateValue /= columnItems.length;
+            }
+
+            td.textContent = engine.formatValue(
+              aggregateValue,
+              measure.uniqueName,
+            );
+          } else {
+            td.textContent = engine.formatValue(0, measure.uniqueName);
+          }
+
+          tr.appendChild(td);
+        });
+      });
+    } else {
+      // Add empty cells for non-leaf nodes
+      uniqueColumnValues.forEach(() => {
+        state.measures.forEach(() => {
+          const td = document.createElement('td');
+          td.style.padding = '12px';
+          td.style.borderBottom = '1px solid #dee2e6';
+          td.style.borderRight = '1px solid #dee2e6';
+          tr.appendChild(td);
+        });
+      });
+    }
+
+    tbody.appendChild(tr);
+
+    // Recursively render subgroups
+    if (!Array.isArray(value)) {
+      renderGroupedRows(tbody, value, state, level + 1);
+    }
+  });
+}
+
+function renderTableHeader(thead, state) {
+  // Column header row
   const columnHeaderRow = document.createElement('tr');
 
   // Add empty cell for row headers
   const emptyHeaderCell = document.createElement('th');
+  emptyHeaderCell.colSpan = state.rows.length;
   emptyHeaderCell.style.padding = '10px';
   emptyHeaderCell.style.backgroundColor = '#f0f0f0';
   emptyHeaderCell.style.borderBottom = '2px solid #ddd';
@@ -317,11 +420,14 @@ function renderTable() {
   const measureHeaderRow = document.createElement('tr');
 
   // Add empty cell for row headers
-  const emptyMeasureCell = document.createElement('th');
-  emptyMeasureCell.style.padding = '10px';
-  emptyMeasureCell.style.backgroundColor = '#f0f0f0';
-  emptyMeasureCell.style.borderBottom = '2px solid #ddd';
-  measureHeaderRow.appendChild(emptyMeasureCell);
+  state.rows.forEach((row) => {
+    const emptyMeasureCell = document.createElement('th');
+    emptyMeasureCell.textContent = row.caption;
+    emptyMeasureCell.style.padding = '12px';
+    emptyMeasureCell.style.backgroundColor = '#f8f9fa';
+    emptyMeasureCell.style.borderBottom = '2px solid #dee2e6';
+    measureHeaderRow.appendChild(emptyMeasureCell);
+  });
 
   // Add measure headers for each column value
   uniqueColumnValues.forEach(() => {
@@ -337,99 +443,32 @@ function renderTable() {
   });
 
   thead.appendChild(measureHeaderRow);
-  table.appendChild(thead);
-
-  // Create table body
-  const tbody = document.createElement('tbody');
-  const rowField = state.rows[0]?.uniqueName;
-  const groupedData = rowField ? groupData(data, [rowField]) : {};
-
-  Object.entries(groupedData).forEach(([groupKey, groupItems]) => {
-    const tr = document.createElement('tr');
-
-    // Add row header
-    const rowHeaderCell = document.createElement('td');
-    rowHeaderCell.textContent = groupKey;
-    rowHeaderCell.style.padding = '10px';
-    rowHeaderCell.style.borderBottom = '1px solid #ddd';
-    rowHeaderCell.style.fontWeight = 'bold';
-    tr.appendChild(rowHeaderCell);
-
-    // Add data cells for each column value
-    uniqueColumnValues.forEach((columnValue) => {
-      const columnItems = groupItems.filter(
-        (item) => item[columnField] === columnValue,
-      );
-
-      state.measures.forEach((measure) => {
-        const td = document.createElement('td');
-        td.style.padding = '10px';
-        td.style.borderBottom = '1px solid #ddd';
-        td.style.textAlign = 'right';
-        td.style.verticalAlign = 'middle';
-        td.style.textAlign = 'center';
-
-        if (columnItems.length > 0) {
-          let value;
-          if (measure.formula && typeof measure.formula === 'function') {
-            // For custom measures with a formula
-            value =
-              columnItems.reduce(
-                (sum, item) => sum + measure.formula(item),
-                0,
-              ) / columnItems.length;
-          } else {
-            // For standard measures
-            value = columnItems.reduce(
-              (sum, item) => sum + (item[measure.uniqueName] || 0),
-              0,
-            );
-          }
-
-          // Apply the measure's aggregation if specified
-          if (measure.aggregation === 'avg') {
-            value /= columnItems.length;
-          } else if (measure.aggregation === 'count') {
-            value = columnItems.length;
-          } // 'sum' is default, 'min' and 'max' would need additional logic
-
-          td.textContent = engine.formatValue(value, measure.uniqueName);
-          td.style.padding = '12px';
-          td.style.borderBottom = '1px solid #dee2e6';
-          td.style.borderRight = '1px solid #dee2e6';
-          td.style.backgroundColor = '#ffffff';
-          td.style.verticalAlign = 'middle';
-          td.style.textAlign = 'center';
-        } else {
-          td.textContent = engine.formatValue(0, measure.uniqueName);
-          td.style.padding = '12px';
-          td.style.borderBottom = '1px solid #dee2e6';
-          td.style.borderRight = '1px solid #dee2e6';
-          td.style.backgroundColor = '#ffffff';
-          td.style.verticalAlign = 'middle';
-          td.style.textAlign = 'center';
-        }
-
-        tr.appendChild(td);
-      });
-    });
-
-    tbody.appendChild(tr);
-  });
-
-  table.appendChild(tbody);
-  container.appendChild(table);
 }
 
 function groupData(data, groupFields) {
-  return data.reduce((acc, item) => {
-    const key = groupFields.map((field) => item[field]).join(' - ');
-    if (!acc[key]) {
-      acc[key] = [];
-    }
-    acc[key].push(item);
-    return acc;
-  }, {});
+  if (!groupFields || groupFields.length === 0) return {};
+
+  const result = {};
+
+  data.forEach((item) => {
+    let current = result;
+
+    groupFields.forEach((field, index) => {
+      const value = String(item[field]); // Convert all values to string for consistent grouping
+
+      if (!current[value]) {
+        current[value] = index === groupFields.length - 1 ? [] : {};
+      }
+
+      if (index === groupFields.length - 1) {
+        current[value].push(item);
+      } else {
+        current = current[value];
+      }
+    });
+  });
+
+  return result;
 }
 
 // Initialize the table when the DOM is fully loaded
