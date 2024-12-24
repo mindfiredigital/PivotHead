@@ -98,7 +98,6 @@ const config = {
   data: data,
   rows: [
     { uniqueName: 'product', caption: 'Product' },
-    { uniqueName: 'date', caption: 'Date' },
   ],
   columns: [{ uniqueName: 'region', caption: 'Region' }],
   measures: [
@@ -132,7 +131,7 @@ const config = {
   defaultAggregation: 'sum',
   isResponsive: true,
   groupConfig: {
-    rowFields: ['product','date'],
+    rowFields: ['product'],
     columnFields: ['region'],
     grouper: (item, fields) => fields.map((field) => item[field]).join(' - '),
   },
@@ -307,15 +306,19 @@ function renderGroupedRows(tbody, groups, state, level) {
   Object.entries(groups).forEach(([key, value]) => {
     const tr = document.createElement('tr');
 
-    // Add group header cell
-    const headerCell = document.createElement('td');
-    headerCell.textContent = key;
-    headerCell.style.padding = '12px';
-    headerCell.style.paddingLeft = `${level * 20 + 10}px`;
-    headerCell.style.borderBottom = '2px solid #ddd';
-    headerCell.style.fontWeight = 'bold';
-    headerCell.colSpan = Array.isArray(value) ? 1 : state.rows.length - level;
-    tr.appendChild(headerCell);
+    // Add group header cells
+    const groupKeys = key.split(' - ');
+    (state.rows || []).forEach((row, index) => {
+      // Update: Added null check for state.rows
+      const headerCell = document.createElement('td');
+      headerCell.style.padding = '12px';
+      headerCell.style.paddingLeft =
+        index === 0 ? `${level * 20 + 10}px` : '12px';
+      headerCell.style.borderBottom = '1px solid #dee2e6';
+      headerCell.style.fontWeight = 'bold';
+      headerCell.textContent = index < groupKeys.length ? groupKeys[index] : '';
+      tr.appendChild(headerCell);
+    });
 
     // Add data cells for leaf nodes
     if (Array.isArray(value)) {
