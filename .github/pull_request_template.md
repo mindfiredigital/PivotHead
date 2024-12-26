@@ -20,6 +20,7 @@ This pull request addresses the following issue:
 - [ ] Add or update unit tests for new functionality.
 - [ ] Update documentation (comments, README, etc.) to reflect changes.
 - [ ] The file(s) or folder(s) now contain changes as specified in the issue I worked on.
+- [ ] Check build, test, lint and format by run running command `pnpm run build` at root directory.
 - [ ] I certify that I ran the checklist.
 
 ### Testing:
