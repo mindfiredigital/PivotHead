@@ -1,4 +1,5 @@
 import { formatCellPopUp } from "./formatCell.js";
+import { createOptionsPopup } from "./optionsPopup.js"
 import { conditionFormattingPopUp } from "./conditionFormattingPopUp.js";
 
 export function createHeader() {
@@ -23,16 +24,19 @@ export function createHeader() {
         option.style.alignItems = "center";
         option.style.margin = "0 10px";
         option.style.cursor = "pointer";
-
+      
+        // Icon element
         const iconElement = document.createElement("div");
         iconElement.textContent = icon;
         iconElement.style.fontSize = "24px";
-
+      
+        // Label element
         const labelElement = document.createElement("span");
         labelElement.textContent = label;
         labelElement.style.fontSize = "12px";
         labelElement.style.color = "#4b5563";
-
+      
+        // Dropdown container
         const dropdown = document.createElement("div");
         dropdown.style.position = "absolute";
         dropdown.style.top = "100%";
@@ -47,8 +51,10 @@ export function createHeader() {
         dropdown.style.zIndex = "1000";
         dropdown.style.width = "max-content";
         dropdown.style.whiteSpace = "nowrap";
-
-        dropdownOptions.forEach((optionName) => {
+      
+        // Populate dropdown if options are provided
+        if (dropdownOptions && dropdownOptions.length) {
+          dropdownOptions.forEach((optionName) => {
             const dropdownItem = document.createElement("div");
             dropdownItem.textContent = optionName;
             dropdownItem.style.padding = "8px 16px";
@@ -56,48 +62,69 @@ export function createHeader() {
             dropdownItem.style.fontSize = "14px";
             dropdownItem.style.backgroundColor = "#ffffff";
             dropdownItem.style.transition = "background-color 0.3s";
-
+      
+            // Dropdown item click logic
             dropdownItem.addEventListener("click", () => {
-
-                switch (optionName) {
-                    case 'Format Cell':
-                        formatCellPopUp()
-                        break;
-                    case 'Condition Formatting':
-                        conditionFormattingPopUp()
-                        break;
-
-                    default:
-                        alert(optionName);
-                }
+              console.log(optionName);
+              switch (optionName) {
+                case "Format Cell":
+                  formatCellPopUp();
+                  break;
+                case "Condition Formatting":
+                  conditionFormattingPopUp();
+                  break;
+                case "Options":
+                  createOptionsPopup();
+                  break;
+                default:
+                  alert(optionName);
+              }
             });
-
+      
+            // Hover effects for dropdown items
             dropdownItem.addEventListener("mouseover", () => {
-                dropdownItem.style.backgroundColor = "#f3f4f6";
+              dropdownItem.style.backgroundColor = "#f3f4f6";
             });
-
+      
             dropdownItem.addEventListener("mouseout", () => {
-                dropdownItem.style.backgroundColor = "#ffffff";
+              dropdownItem.style.backgroundColor = "#ffffff";
             });
-
+      
             dropdown.appendChild(dropdownItem);
-        });
-
+          });
+        } else {
+          // Fallback for no dropdown options
+          option.addEventListener("click", () => {
+            console.log(label);
+            switch (label) {
+              case "Options":
+                console.log("HI");
+                createPopupWithRadioButtons();
+                break;
+              default:
+                alert(label);
+            }
+          });
+        }
+      
+        // Append elements to the option container
         option.appendChild(iconElement);
         option.appendChild(labelElement);
         option.appendChild(dropdown);
-
+      
+        // Show dropdown on hover
         option.addEventListener("mouseover", () => {
-            dropdown.style.display = "flex";
+          dropdown.style.display = "flex";
         });
-
+      
+        // Hide dropdown when mouse leaves
         option.addEventListener("mouseout", () => {
-            dropdown.style.display = "none";
+          dropdown.style.display = "none";
         });
-
+      
         return option;
-    }
-
+      }
+      
     const leftSection = document.createElement("div");
     leftSection.style.display = "flex";
 

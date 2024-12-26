@@ -1,3 +1,4 @@
+
 export function conditionFormattingPopUp() {
   const overlay = document.createElement("div");
   overlay.style.position = "fixed";
@@ -12,7 +13,7 @@ export function conditionFormattingPopUp() {
   overlay.style.zIndex = "1000";
 
   const popup = document.createElement("div");
-  popup.style.width = "600px";
+  popup.style.width = "500px";
   popup.style.padding = "20px";
   popup.style.backgroundColor = "#fff";
   popup.style.borderRadius = "8px";
@@ -25,7 +26,7 @@ export function conditionFormattingPopUp() {
   headerContainer.style.marginBottom = "10px";
 
   const header = document.createElement("h2");
-  header.textContent = "Popup Header";
+  header.textContent = "Condition Formatting";
   header.style.margin = "0";
 
   const buttonContainer = document.createElement("div");
@@ -40,10 +41,6 @@ export function conditionFormattingPopUp() {
   addButton.style.cursor = "pointer";
   addButton.style.marginRight = "10px";
 
-  addButton.addEventListener("click", () => {
-    alert("Add button clicked!");
-  });
-
   const applyButton = document.createElement("button");
   applyButton.textContent = "Apply";
   applyButton.style.padding = "8px 16px";
@@ -52,10 +49,21 @@ export function conditionFormattingPopUp() {
   applyButton.style.border = "1px solid #000";
   applyButton.style.borderRadius = "4px";
   applyButton.style.cursor = "pointer";
-  applyButton.style.margin = "0px 10px";
+  applyButton.style.marginRight = "10px";
 
   applyButton.addEventListener("click", () => {
-    alert("Apply button clicked!");
+      const values = [];
+      Array.from(formContainer.children).forEach((row) => {
+          const dropdowns = row.querySelectorAll("select");
+          const dropdownValues = Array.from(dropdowns).map((dropdown) => dropdown.value);
+          const buttonColors = {
+              buttonAColor: row.querySelector(".button-a").style.color || "default",
+              buttonBBackground: row.querySelector(".button-b").style.backgroundColor || "default",
+          };
+          values.push({ dropdownValues, buttonColors });
+      });
+      console.log(values);
+      document.body.removeChild(overlay);
   });
 
   const cancelButton = document.createElement("button");
@@ -68,14 +76,12 @@ export function conditionFormattingPopUp() {
   cancelButton.style.cursor = "pointer";
 
   cancelButton.addEventListener("click", () => {
-    document.body.removeChild(overlay);
+      document.body.removeChild(overlay);
   });
 
   buttonContainer.appendChild(addButton);
   buttonContainer.appendChild(applyButton);
   buttonContainer.appendChild(cancelButton);
-
- 
 
   headerContainer.appendChild(header);
   headerContainer.appendChild(buttonContainer);
@@ -88,39 +94,170 @@ export function conditionFormattingPopUp() {
 
   const formContainer = document.createElement("div");
 
-  for (let i = 1; i <= 2; i++) {
-    const row = document.createElement("div");
-    row.style.display = "flex";
-    row.style.alignItems = "center";
-    row.style.marginBottom = "20px";
+  function createRow(container) {
+      const row = document.createElement("div");
+      row.style.marginBottom = "20px";
 
-    const label = document.createElement("label");
-    label.textContent = `Label ${i}`;
-    label.style.flex = "1";
-    label.style.marginRight = "10px";
+      const labelRow = document.createElement("div");
+      labelRow.style.display = "flex";
+      labelRow.style.alignItems = "center";
+      labelRow.style.gap = "10px";
+      labelRow.style.marginBottom = "10px";
 
-    row.appendChild(label);
+      const labelText = document.createElement("span");
+      labelText.textContent = "Label:";
+      labelText.style.flex = "0 0 60px";
 
-    for (let j = 1; j <= 3; j++) {
-      const dropdown = document.createElement("select");
-      dropdown.style.flex = "1";
-      dropdown.style.padding = "10px";
-      dropdown.style.marginRight = j < 3 ? "10px" : "0";
-      dropdown.style.borderRadius = "4px";
-      dropdown.style.border = "1px solid #ccc";
+      for (let i = 1; i <= 3; i++) {
+          const dropdown = document.createElement("select");
+          dropdown.style.padding = "10px";
+          dropdown.style.borderRadius = "4px";
+          dropdown.style.border = "1px solid #ccc";
+          ["Option 1", "Option 2", "Option 3"].forEach((text) => {
+              const option = document.createElement("option");
+              option.value = text;
+              option.textContent = text;
+              dropdown.appendChild(option);
+          });
+          labelRow.appendChild(dropdown);
+      }
 
-      ["Option 1", "Option 2", "Option 3"].forEach((optionText) => {
-        const option = document.createElement("option");
-        option.value = optionText;
-        option.textContent = optionText;
-        dropdown.appendChild(option);
+      labelRow.insertBefore(labelText, labelRow.firstChild);
+
+      const crossButton = document.createElement("button");
+      crossButton.textContent = "✖";
+      crossButton.style.border = "none";
+      crossButton.style.background = "transparent";
+      crossButton.style.cursor = "pointer";
+      crossButton.style.color = "#000";
+      crossButton.style.margin = "0 20px";
+      
+      crossButton.addEventListener("click", () => {
+        container.removeChild(row);
+    });
+
+    labelRow.appendChild(crossButton);
+
+      const valueRow = document.createElement("div");
+      valueRow.style.display = "flex";
+      valueRow.style.alignItems = "center";
+      valueRow.style.gap = "10px";
+
+      const valueText = document.createElement("span");
+      valueText.textContent = "Value:";
+      valueText.style.flex = "0 0 60px";
+
+      for (let i = 1; i <= 2; i++) {
+          const dropdown = document.createElement("select");
+          dropdown.style.padding = "10px";
+          dropdown.style.borderRadius = "4px";
+          dropdown.style.border = "1px solid #ccc";
+          ["Option A", "Option B", "Option C"].forEach((text) => {
+              const option = document.createElement("option");
+              option.value = text;
+              option.textContent = text;
+              dropdown.appendChild(option);
+          });
+          valueRow.appendChild(dropdown);
+      }
+
+      const buttonA = document.createElement("button");
+      buttonA.textContent = "A";
+      buttonA.className = "button-a";
+      buttonA.style.padding = "8px";
+      buttonA.style.border = "1px solid #ccc";
+      buttonA.style.borderRadius = "4px";
+      buttonA.style.cursor = "pointer";
+
+      buttonA.addEventListener("click", (event) => {
+        const colorPicker = document.createElement("input");
+        colorPicker.type = "color";
+        colorPicker.style.position = "absolute";
+        colorPicker.style.zIndex = "1001";
+        colorPicker.style.border = "none";
+        colorPicker.style.width = "100px";
+        colorPicker.style.height = "50px";
+    
+        // Position the color picker above the button
+        const buttonRect = event.target.getBoundingClientRect();
+        colorPicker.style.left = `${buttonRect.left}px`;
+        colorPicker.style.top = `${buttonRect.top - 40}px`;
+    
+        document.body.appendChild(colorPicker);
+    
+        colorPicker.addEventListener("input", (event) => {
+            buttonA.style.color = event.target.value;
+        });
+    
+        colorPicker.addEventListener("change", () => {
+            document.body.removeChild(colorPicker);
+        });
+    
+        colorPicker.click(); 
+    });
+      const buttonB = document.createElement("button");
+      buttonB.textContent = "B";
+      buttonB.className = "button-b";
+      buttonB.style.padding = "8px";
+      buttonB.style.border = "1px solid #ccc";
+      buttonB.style.borderRadius = "4px";
+      buttonB.style.cursor = "pointer";
+
+      buttonB.addEventListener("click", (event) => {
+        const colorPicker = document.createElement("input");
+        colorPicker.type = "color";
+        colorPicker.style.position = "absolute";
+        colorPicker.style.zIndex = "1001";
+        colorPicker.style.border = "none";
+        colorPicker.style.width = "100px";
+        colorPicker.style.height = "50px";
+    
+        const buttonRect = event.target.getBoundingClientRect();
+        colorPicker.style.left = `${buttonRect.left - 20 }px`;
+        colorPicker.style.top = `${buttonRect.top - 60}px`;
+    
+        document.body.appendChild(colorPicker);
+    
+        colorPicker.addEventListener("input", (event) => {
+            buttonB.style.backgroundColor = event.target.value;
+        });
+    
+        colorPicker.addEventListener("change", () => {
+            document.body.removeChild(colorPicker);
+        });
+    
+        colorPicker.click();
+    });
+
+      valueRow.appendChild(buttonA);
+      valueRow.appendChild(buttonB);
+
+      valueRow.insertBefore(valueText, valueRow.firstChild);
+
+      const removeButton = document.createElement("button");
+      removeButton.textContent = "✖";
+      removeButton.style.border = "none";
+      removeButton.style.background = "transparent";
+      removeButton.style.cursor = "pointer";
+      removeButton.style.color = "red";
+
+      removeButton.addEventListener("click", () => {
+          container.removeChild(row);
       });
 
-      row.appendChild(dropdown);
-    }
-
-    formContainer.appendChild(row);
+      row.appendChild(labelRow);
+      row.appendChild(valueRow);
+      // row.appendChild(removeButton);
+      container.appendChild(row);
   }
+
+  // Initial rows
+  createRow(formContainer);
+  createRow(formContainer);
+
+  addButton.addEventListener("click", () => {
+      createRow(formContainer);
+  });
 
   popup.appendChild(headerContainer);
   popup.appendChild(separator);
@@ -128,3 +265,5 @@ export function conditionFormattingPopUp() {
   overlay.appendChild(popup);
   document.body.appendChild(overlay);
 }
+
+
