@@ -12,3 +12,31 @@ To use Pivothead in your vanilla JavaScript project, follow these steps:
 ```html
 <script src="path/to/pivothead-core.umd.js"></script>
 ```
+## Deploying to Vercel
+
+To deploy this project to Vercel using the CLI, follow these steps:
+
+1. Install the Vercel CLI globally:
+   ```bash
+
+   pnpm i -g vercel
+
+   ```
+
+2. Login to you vercel account :
+   ```bash 
+
+   vercel login
+
+   ```
+3. Deploy your app to your vercel account :
+   ```bash 
+
+   pnpm run vercel
+
+   ```
+
+4. Set up and deploy ```yes```
+5. Which scope should contain your project? ```Enter```
+6. What’s your project’s name?  ```Enter```
+7. In which directory is your code located? ./  ```Enter```

@@ -1,41 +1,57 @@
-import { Config, Row } from "../types/interfaces";
+import { Row, AggregationType } from '../types/interfaces';
 
-export function processData(
-    config: Config,
-    data: Row[],
-    operation: string
-): Row[] {
-    const numericColumns = config.columns.filter(col => col.type === 'number' && col.field !== 'result');
-    
-    return data.map((row) => {
-        const values = numericColumns.map((col) => row[col.field] || 0);
-        let temp: number;
-        switch (operation) {
-            case 'sum':
-                temp = values.reduce((sum, val) => sum + val, 0);
-                break;
-            case 'avg':
-                temp = values.length > 0 ? values.reduce((sum, val) => sum + val, 0) / values.length : 0;
-                break;
-            case 'count':
-                temp = values.length;
-                break;
-            case 'min':
-                temp = values.length > 0 ? Math.min(...values) : 0;
-                break;
-            case 'max':
-                temp = values.length > 0 ? Math.max(...values) : 0;
-                break;
-            default:
-                temp = 0; // Default to 0 for unsupported operations
-        }
-        return { ...row, result: temp };
-    });
+export function calculateAggregates<T extends Row>(
+  items: T[],
+  measure: keyof T,
+  aggregationType: AggregationType,
+): number {
+  if (items.length === 0) {
+    return 0;
+  }
+
+  const validValues = items
+    .map((item) => {
+      const value = Number(item[measure]);
+      if (isNaN(value)) {
+        return null;
+      }
+      return value;
+    })
+    .filter((value): value is number => value !== null);
+
+  if (validValues.length === 0) {
+    return 0;
+  }
+
+  const sum = validValues.reduce((acc, value) => acc + value, 0);
+
+  let result: number;
+
+  switch (aggregationType) {
+    case 'sum':
+      result = sum;
+      break;
+    case 'avg':
+      result = sum / validValues.length;
+      break;
+    case 'count':
+      result = validValues.length;
+      break;
+    case 'min':
+      result = Math.min(...validValues);
+      break;
+    case 'max':
+      result = Math.max(...validValues);
+      break;
+    default:
+      return 0;
+  }
+  return result;
 }
 
-
-
-{/*We'll use this function later while creating dropdown list for column */}
+{
+  /*We'll use this function later while creating dropdown list for column */
+}
 
 // Render Multi-Select Dropdown with Checkboxes
 // function renderMultiSelectWithCheckboxes() {

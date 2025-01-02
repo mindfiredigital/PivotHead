@@ -10,4 +10,8 @@ export type {
   GroupConfig,
   Group,
   RowSize,
+  Measure,
+  Dimension,
+  AggregationType,
+  FormatOptions,
 } from './types/interfaces';
