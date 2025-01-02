@@ -95,11 +95,9 @@ export function createHeader() {
         } else {
           // Fallback for no dropdown options
           option.addEventListener("click", () => {
-            console.log(label);
             switch (label) {
               case "Options":
-                console.log("HI");
-                createPopupWithRadioButtons();
+                createOptionsPopup();
                 break;
               default:
                 alert(label);
