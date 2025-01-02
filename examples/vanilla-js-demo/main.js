@@ -9,7 +9,7 @@
  * - Column reordering (drag and drop)
  * - Row reordering (drag and drop)
  */
-
+import { createHeader } from "./header.js"
 if (typeof PivotheadCore === 'undefined') {
   console.error(
     'PivotheadCore is not defined. Make sure the library is loaded correctly.',
@@ -484,6 +484,6 @@ document.addEventListener('DOMContentLoaded', () => {
     );
     return;
   }
-
+  createHeader();
   renderTable();
 });
