@@ -150,16 +150,18 @@ function createControlPanel() {
   controlPanel.style.backgroundColor = '#f8f9fa';
   controlPanel.style.border = '1px solid #dee2e6';
   controlPanel.style.borderRadius = '4px';
-
+ 
   const rowsPanel = createAxisPanel('Rows', config.dimensions);
   const columnsPanel = createAxisPanel('Columns', config.dimensions);
   const measuresPanel = createMeasuresPanel();
   const aggregationPanel = createAggregationPanel();
+  const sortPanel = createSortPanel(); 
 
   controlPanel.appendChild(rowsPanel);
   controlPanel.appendChild(columnsPanel);
   controlPanel.appendChild(measuresPanel);
   controlPanel.appendChild(aggregationPanel);
+  controlPanel.appendChild(sortPanel); 
 
   return controlPanel;
 }
@@ -265,6 +267,84 @@ function createAggregationPanel() {
   panel.appendChild(select);
   return panel;
 }
+
+function createSortPanel() {
+  const panel = document.createElement('div');
+  panel.className = 'sort-panel';
+  panel.style.flex = '1';
+  panel.style.minWidth = '200px';
+
+  const panelTitle = document.createElement('h3');
+  panelTitle.textContent = 'Sort';
+  panel.appendChild(panelTitle);
+
+  const fieldSelect = document.createElement('select');
+  fieldSelect.id = 'sortField';
+  fieldSelect.style.width = '100%';
+  fieldSelect.style.marginBottom = '10px';
+
+  const directionSelect = document.createElement('select');
+  directionSelect.id = 'sortDirection';
+  directionSelect.style.width = '100%';
+  directionSelect.style.marginBottom = '10px';
+
+  const axisSelect = document.createElement('select');
+  axisSelect.id = 'sortAxis';
+  axisSelect.style.width = '100%';
+  axisSelect.style.marginBottom = '10px';
+
+  // Populate field options
+  config.dimensions.forEach((dim) => {
+    const option = document.createElement('option');
+    option.value = dim.field;
+    option.textContent = dim.label;
+    fieldSelect.appendChild(option);
+  });
+
+  // Add measure fields for sorting
+  config.measures.forEach((measure) => {
+    const option = document.createElement('option');
+    option.value = measure.uniqueName;
+    option.textContent = measure.caption;
+    fieldSelect.appendChild(option);
+  });
+
+  // Populate direction options
+  ['asc', 'desc'].forEach((dir) => {
+    const option = document.createElement('option');
+    option.value = dir;
+    option.textContent = dir.toUpperCase();
+    directionSelect.appendChild(option);
+  });
+
+  // Populate axis options
+  ['row', 'column'].forEach((axis) => {
+    const option = document.createElement('option');
+    option.value = axis;
+    option.textContent = axis.charAt(0).toUpperCase() + axis.slice(1);
+    axisSelect.appendChild(option);
+  });
+
+  const applyButton = document.createElement('button');
+  applyButton.textContent = 'Apply Sort';
+  applyButton.style.width = '100%';
+  applyButton.addEventListener('click', () => {
+    const field = fieldSelect.value;
+    const direction = directionSelect.value;
+    const axis = axisSelect.value;
+    // TODO: Implement sorting logic
+    console.log(`Sorting ${field} ${direction} on ${axis}`);
+    renderTable();
+  });
+
+  panel.appendChild(fieldSelect);
+  panel.appendChild(directionSelect);
+  panel.appendChild(axisSelect);
+  panel.appendChild(applyButton);
+
+  return panel;
+}
+
 
 function renderTable() {
   const state = engine.getState();
@@ -436,16 +516,46 @@ function renderTableHeader(thead, state) {
   uniqueColumnValues.forEach(() => {
     state.measures.forEach((measure) => {
       const th = document.createElement('th');
-      th.textContent = measure.caption;
+      // th.textContent = measure.caption;
       th.style.padding = '12px';
       th.style.backgroundColor = '#f8f9fa';
       th.style.borderBottom = '2px solid #dee2e6';
       th.style.borderRight = '1px solid #dee2e6';
+
+      const headerContent = document.createElement('div');
+      headerContent.style.display = 'flex';
+      headerContent.style.alignItems = 'center';
+      headerContent.style.justifyContent = 'space-between';
+
+      const headerText = document.createElement('span');
+      headerText.textContent = measure.caption;
+      headerContent.appendChild(headerText);
+
+      const sortIcon = createSortIcon(measure.uniqueName, 'column');
+      headerContent.appendChild(sortIcon);
+
+      th.appendChild(headerContent);
       measureHeaderRow.appendChild(th);
     });
   });
 
   thead.appendChild(measureHeaderRow);
+}
+
+function createSortIcon(field, axis) {
+  const icon = document.createElement('span');
+  icon.innerHTML = '&#8645;'; // Unicode for up-down arrow
+  icon.style.cursor = 'pointer';
+  icon.style.marginLeft = '5px';
+
+  icon.addEventListener('click', () => {
+    const currentDirection = engine.getState().sortConfig?.direction;
+    const newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+    engine.sort(field, newDirection, axis);
+    renderTable();
+  });
+
+  return icon;
 }
 
 function groupData(data, groupFields) {
