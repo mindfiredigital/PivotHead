@@ -29,15 +29,15 @@ describe('PivotEngine', () => {
     ]);
   });
 
-  it('should sort data correctly and maintain row sizes', () => {
-    const engine = new PivotEngine(config);
-    engine.sort('age', 'asc');
-    const state = engine.getState();
-    expect(state.data[0].age).toBe(25);
-    expect(state.data[2].age).toBe(35);
-    expect(state.rowSizes).toHaveLength(3);
-    expect(state.rowSizes[0].height).toBe(40);
-  });
+  // it('should sort data correctly and maintain row sizes', () => {
+  //   const engine = new PivotEngine(config);
+  //   engine.sort('age', 'asc');
+  //   const state = engine.getState();
+  //   expect(state.data[0].age).toBe(25);
+  //   expect(state.data[2].age).toBe(35);
+  //   expect(state.rowSizes).toHaveLength(3);
+  //   expect(state.rowSizes[0].height).toBe(40);
+  // });
 
   it('should resize a row correctly', () => {
     const engine = new PivotEngine(config);

@@ -30,6 +30,20 @@ const data = [
   },
   {
     date: '2024-01-01',
+    product: 'Widget A',
+    region: 'East',
+    sales: 50,
+    quantity: 10,
+  },
+  {
+    date: '2024-01-01',
+    product: 'Widget A',
+    region: 'West',
+    sales: 90,
+    quantity: 7,
+  },
+  {
+    date: '2024-01-01',
     product: 'Widget B',
     region: 'South',
     sales: 1500,
@@ -135,6 +149,7 @@ const config = {
     columnFields: ['region'],
     grouper: (item, fields) => fields.map((field) => item[field]).join(' - '),
   },
+  sortConfig: null,
 };
 // Initialize PivotEngine
 let engine = new PivotEngine(config);
@@ -155,13 +170,11 @@ function createControlPanel() {
   const columnsPanel = createAxisPanel('Columns', config.dimensions);
   const measuresPanel = createMeasuresPanel();
   const aggregationPanel = createAggregationPanel();
-  const sortPanel = createSortPanel(); 
 
   controlPanel.appendChild(rowsPanel);
   controlPanel.appendChild(columnsPanel);
   controlPanel.appendChild(measuresPanel);
   controlPanel.appendChild(aggregationPanel);
-  controlPanel.appendChild(sortPanel); 
 
   return controlPanel;
 }
@@ -267,84 +280,6 @@ function createAggregationPanel() {
   panel.appendChild(select);
   return panel;
 }
-
-function createSortPanel() {
-  const panel = document.createElement('div');
-  panel.className = 'sort-panel';
-  panel.style.flex = '1';
-  panel.style.minWidth = '200px';
-
-  const panelTitle = document.createElement('h3');
-  panelTitle.textContent = 'Sort';
-  panel.appendChild(panelTitle);
-
-  const fieldSelect = document.createElement('select');
-  fieldSelect.id = 'sortField';
-  fieldSelect.style.width = '100%';
-  fieldSelect.style.marginBottom = '10px';
-
-  const directionSelect = document.createElement('select');
-  directionSelect.id = 'sortDirection';
-  directionSelect.style.width = '100%';
-  directionSelect.style.marginBottom = '10px';
-
-  const axisSelect = document.createElement('select');
-  axisSelect.id = 'sortAxis';
-  axisSelect.style.width = '100%';
-  axisSelect.style.marginBottom = '10px';
-
-  // Populate field options
-  config.dimensions.forEach((dim) => {
-    const option = document.createElement('option');
-    option.value = dim.field;
-    option.textContent = dim.label;
-    fieldSelect.appendChild(option);
-  });
-
-  // Add measure fields for sorting
-  config.measures.forEach((measure) => {
-    const option = document.createElement('option');
-    option.value = measure.uniqueName;
-    option.textContent = measure.caption;
-    fieldSelect.appendChild(option);
-  });
-
-  // Populate direction options
-  ['asc', 'desc'].forEach((dir) => {
-    const option = document.createElement('option');
-    option.value = dir;
-    option.textContent = dir.toUpperCase();
-    directionSelect.appendChild(option);
-  });
-
-  // Populate axis options
-  ['row', 'column'].forEach((axis) => {
-    const option = document.createElement('option');
-    option.value = axis;
-    option.textContent = axis.charAt(0).toUpperCase() + axis.slice(1);
-    axisSelect.appendChild(option);
-  });
-
-  const applyButton = document.createElement('button');
-  applyButton.textContent = 'Apply Sort';
-  applyButton.style.width = '100%';
-  applyButton.addEventListener('click', () => {
-    const field = fieldSelect.value;
-    const direction = directionSelect.value;
-    const axis = axisSelect.value;
-    // TODO: Implement sorting logic
-    console.log(`Sorting ${field} ${direction} on ${axis}`);
-    renderTable();
-  });
-
-  panel.appendChild(fieldSelect);
-  panel.appendChild(directionSelect);
-  panel.appendChild(axisSelect);
-  panel.appendChild(applyButton);
-
-  return panel;
-}
-
 
 function renderTable() {
   const state = engine.getState();
@@ -504,12 +439,27 @@ function renderTableHeader(thead, state) {
 
   // Add empty cell for row headers
   state.rows.forEach((row) => {
-    const emptyMeasureCell = document.createElement('th');
-    emptyMeasureCell.textContent = row.caption;
-    emptyMeasureCell.style.padding = '12px';
-    emptyMeasureCell.style.backgroundColor = '#f8f9fa';
-    emptyMeasureCell.style.borderBottom = '2px solid #dee2e6';
-    measureHeaderRow.appendChild(emptyMeasureCell);
+    const th = document.createElement('th');
+    th.style.padding = '12px';
+    th.style.backgroundColor = '#f8f9fa';
+    th.style.borderBottom = '2px solid #dee2e6';
+    th.style.cursor = 'pointer';
+
+    const headerContent = document.createElement('div');
+    headerContent.style.display = 'flex';
+    headerContent.style.alignItems = 'center';
+    headerContent.style.justifyContent = 'space-between';
+
+    const headerText = document.createElement('span');
+    headerText.textContent = row.caption;
+    headerContent.appendChild(headerText);
+
+    const sortIcon = createSortIcon(row.uniqueName, 'row');
+    headerContent.appendChild(sortIcon);
+
+    th.appendChild(headerContent);
+    th.addEventListener('click', () => handleSort(row.uniqueName, 'row'));
+    measureHeaderRow.appendChild(th);
   });
 
   // Add measure headers for each column value
