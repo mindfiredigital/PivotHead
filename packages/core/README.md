@@ -55,30 +55,68 @@ The `PivotEngine` class provides several methods for manipulating and querying t
    const { PivotEngine } = PivotheadCore;
 
    const data = [
-     { date: '2024-01-01', category: 'Electronics', product: 'Laptop', region: 'North', sales: 1000, units: 5, profit: 300 },
-     { date: '2024-01-01', category: 'Furniture', product: 'Desk', region: 'South', sales: 800, units: 10, profit: 200 },
+     {
+       date: '2024-01-01',
+       category: 'Electronics',
+       product: 'Laptop',
+       region: 'North',
+       sales: 1000,
+       units: 5,
+       profit: 300,
+     },
+     {
+       date: '2024-01-01',
+       category: 'Furniture',
+       product: 'Desk',
+       region: 'South',
+       sales: 800,
+       units: 10,
+       profit: 200,
+     },
      // ... more data
    ];
 
    const config = {
      data: data,
-     columns: [
-       { field: 'date', label: 'Date' },
-       { field: 'category', label: 'Category' },
-       { field: 'product', label: 'Product' },
-       { field: 'region', label: 'Region' },
-       { field: 'sales', label: 'Sales Amount' },
-       { field: 'units', label: 'Units Sold' },
-       { field: 'profit', label: 'Profit' }
+     rows: [{ uniqueName: 'product', caption: 'Product' }],
+     columns: [{ uniqueName: 'region', caption: 'Region' }],
+     measures: [
+       {
+         uniqueName: 'sales',
+         caption: 'Total Sales',
+         aggregation: 'sum',
+         format: { type: 'currency', currency: 'USD' },
+       },
+       {
+         uniqueName: 'quantity',
+         caption: 'Total Quantity',
+         aggregation: 'sum',
+         format: { type: 'number' },
+       },
+       {
+         uniqueName: 'averageSale',
+         caption: 'Average Sale',
+         aggregation: 'avg',
+         format: { type: 'currency', currency: 'USD' },
+         formula: (item) => item.sales / item.quantity,
+       },
      ],
-     groupConfig: null,
-     aggregationFields: [
-       { field: 'sales', type: 'sum', label: 'Total Sales' },
-       { field: 'units', type: 'sum', label: 'Total Units' },
-       { field: 'profit', type: 'sum', label: 'Total Profit' }
-     ]
+     dimensions: [
+       { field: 'product', label: 'Product', type: 'string' },
+       { field: 'region', label: 'Region', type: 'string' },
+       { field: 'date', label: 'Date', type: 'date' },
+       { field: 'sales', label: 'Sales', type: 'number' },
+       { field: 'quantity', label: 'Quantity', type: 'number' },
+     ],
+     defaultAggregation: 'sum',
+     isResponsive: true,
+     groupConfig: {
+       rowFields: ['product'],
+       columnFields: ['region'],
+       grouper: (item, fields) =>
+         fields.map((field) => item[field]).join(' - '),
+     },
    };
-
    const engine = new PivotEngine(config);
    ```
 
@@ -109,7 +147,7 @@ The `PivotEngine` class provides several methods for manipulating and querying t
    ```javascript
    engine.setGroupConfig({
      fields: ['product'],
-     grouper: (item, fields) => item[fields[0]]
+     grouper: (item, fields) => item[fields[0]],
    });
    const state = engine.getState();
    console.log(state.groups); // Logs the grouped data
@@ -160,7 +198,20 @@ The `PivotEngine` class provides several methods for manipulating and querying t
    Updates the selected measures for the pivot table.
 
    ```javascript
-   const selectedMeasures = ['sales', 'units', 'profit'];
+   const selectedMeasures = [
+     {
+       uniqueName: 'sales',
+       caption: 'Total Sales',
+       aggregation: 'sum',
+       format: { type: 'currency', currency: 'USD' },
+     },
+     {
+       uniqueName: 'quantity',
+       caption: 'Total Quantity',
+       aggregation: 'sum',
+       format: { type: 'number' },
+     },
+   ];
    engine.setMeasures(selectedMeasures);
    ```
 
@@ -209,7 +260,7 @@ The `PivotEngine` class provides several methods for manipulating and querying t
         return new Intl.NumberFormat('en-US', {
           style: 'currency',
           currency: 'USD',
-          minimumFractionDigits: 0
+          minimumFractionDigits: 0,
         }).format(value);
       }
       return new Intl.NumberFormat().format(value);
@@ -222,15 +273,19 @@ The `PivotEngine` class provides several methods for manipulating and querying t
 
     ```javascript
     function updateGrouping() {
-      const rowFields = Array.from(document.getElementById('row-groups').selectedOptions).map(opt => opt.value);
-      const colFields = Array.from(document.getElementById('col-groups').selectedOptions).map(opt => opt.value);
-      
+      const rowFields = Array.from(
+        document.getElementById('row-groups').selectedOptions,
+      ).map((opt) => opt.value);
+      const colFields = Array.from(
+        document.getElementById('col-groups').selectedOptions,
+      ).map((opt) => opt.value);
+
       engine.setGroupConfig({
         rowFields,
         columnFields: colFields,
-        grouper: (item, fields) => fields.map(f => item[f]).join(' - ')
+        grouper: (item, fields) => fields.map((f) => item[f]).join(' - '),
       });
-      
+
       renderTable();
     }
     ```
@@ -255,7 +310,7 @@ function renderTable() {
   container.appendChild(createAnalysisControls());
 
   const tableElement = document.createElement('table');
-  
+
   // Render column groups
   const { columnGroups } = engine.getGroupedData();
   if (columnGroups.length > 0) {
@@ -316,15 +371,14 @@ const config = {
     { field: 'sales', type: 'sum', label: 'Total Sales' },
     { field: 'units', type: 'sum', label: 'Total Units' },
     { field: 'profit', type: 'sum', label: 'Total Profit' },
-    { 
-      field: 'profitMargin', 
-      type: 'custom', 
+    {
+      field: 'profitMargin',
+      type: 'custom',
       label: 'Profit Margin',
-      formula: (item) => (item.profit / item.sales) * 100
-    }
+      formula: (item) => (item.profit / item.sales) * 100,
+    },
   ],
 };
-
 ```
 
 ## API Reference
