@@ -1,19 +1,13 @@
 import {
   AggregationType,
-  AxisConfig,
-  Column,
   Dimension,
-  ExpandedState,
-  FormatOptions,
   Group,
   GroupConfig,
-  Measure,
   MeasureConfig,
   PivotTableConfig,
   PivotTableState,
   ProcessedData,
   RowSize,
-  SortConfig,
 } from '../types/interfaces';
 import { calculateAggregates } from './aggregator';
 import { processData } from './dataProcessor';

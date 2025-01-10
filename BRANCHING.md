@@ -1,15 +1,16 @@
 # Branching Strategy
 
 ## Branch Types
-- **main**:         Production-ready code.
-- **development**:  Integration branch for features and bug fixes.
-- **feature/***:    New features.
-- **bug/***:       Bug fixes.
-- **hotfix/***:    Critical fixes.
-- **fixes/***:     General fixes that do not need to be immediately addressed.
-- **docs/***:      Documentation-related changes (e.g., README updates, new docs).
-- **other/***:     For any other changes that do not fall into the above categories.
-- **enhancement/***: Indicates improvements that are not categorized as features or bug fixes.
+
+- **main**: Production-ready code.
+- **development**: Integration branch for features and bug fixes.
+- **feature/\***: New features.
+- **bug/\***: Bug fixes.
+- **hotfix/\***: Critical fixes.
+- **fixes/\***: General fixes that do not need to be immediately addressed.
+- **docs/\***: Documentation-related changes (e.g., README updates, new docs).
+- **other/\***: For any other changes that do not fall into the above categories.
+- **enhancement/\***: Indicates improvements that are not categorized as features or bug fixes.
 
 ## Naming Convention
 

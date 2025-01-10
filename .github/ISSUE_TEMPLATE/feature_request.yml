@@ -1,7 +1,7 @@
-name: "New feature proposal"
+name: 'New feature proposal'
 description: Suggest an idea for this project
-title: "[Feature]:"
-labels: [":sparkles: feature request"]
+title: '[Feature]:'
+labels: [':sparkles: feature request']
 body:
   - type: textarea
     id: problem-description
