@@ -402,4 +402,3 @@ To run the examples:
 5. Open your browser and navigate to the local host address provided.
 
 These examples demonstrate various features of the PivotHead library, including basic usage, custom measures, grouping, and more.
-
