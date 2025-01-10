@@ -55,8 +55,24 @@ The `PivotEngine` class provides several methods for manipulating and querying t
    const { PivotEngine } = PivotheadCore;
 
    const data = [
-     { date: '2024-01-01', category: 'Electronics', product: 'Laptop', region: 'North', sales: 1000, units: 5, profit: 300 },
-     { date: '2024-01-01', category: 'Furniture', product: 'Desk', region: 'South', sales: 800, units: 10, profit: 200 },
+     {
+       date: '2024-01-01',
+       category: 'Electronics',
+       product: 'Laptop',
+       region: 'North',
+       sales: 1000,
+       units: 5,
+       profit: 300,
+     },
+     {
+       date: '2024-01-01',
+       category: 'Furniture',
+       product: 'Desk',
+       region: 'South',
+       sales: 800,
+       units: 10,
+       profit: 200,
+     },
      // ... more data
    ];
 
@@ -69,14 +85,14 @@ The `PivotEngine` class provides several methods for manipulating and querying t
        { field: 'region', label: 'Region' },
        { field: 'sales', label: 'Sales Amount' },
        { field: 'units', label: 'Units Sold' },
-       { field: 'profit', label: 'Profit' }
+       { field: 'profit', label: 'Profit' },
      ],
      groupConfig: null,
      aggregationFields: [
        { field: 'sales', type: 'sum', label: 'Total Sales' },
        { field: 'units', type: 'sum', label: 'Total Units' },
-       { field: 'profit', type: 'sum', label: 'Total Profit' }
-     ]
+       { field: 'profit', type: 'sum', label: 'Total Profit' },
+     ],
    };
 
    const engine = new PivotEngine(config);
@@ -109,7 +125,7 @@ The `PivotEngine` class provides several methods for manipulating and querying t
    ```javascript
    engine.setGroupConfig({
      fields: ['product'],
-     grouper: (item, fields) => item[fields[0]]
+     grouper: (item, fields) => item[fields[0]],
    });
    const state = engine.getState();
    console.log(state.groups); // Logs the grouped data
@@ -209,7 +225,7 @@ The `PivotEngine` class provides several methods for manipulating and querying t
         return new Intl.NumberFormat('en-US', {
           style: 'currency',
           currency: 'USD',
-          minimumFractionDigits: 0
+          minimumFractionDigits: 0,
         }).format(value);
       }
       return new Intl.NumberFormat().format(value);
@@ -222,15 +238,19 @@ The `PivotEngine` class provides several methods for manipulating and querying t
 
     ```javascript
     function updateGrouping() {
-      const rowFields = Array.from(document.getElementById('row-groups').selectedOptions).map(opt => opt.value);
-      const colFields = Array.from(document.getElementById('col-groups').selectedOptions).map(opt => opt.value);
-      
+      const rowFields = Array.from(
+        document.getElementById('row-groups').selectedOptions,
+      ).map((opt) => opt.value);
+      const colFields = Array.from(
+        document.getElementById('col-groups').selectedOptions,
+      ).map((opt) => opt.value);
+
       engine.setGroupConfig({
         rowFields,
         columnFields: colFields,
-        grouper: (item, fields) => fields.map(f => item[f]).join(' - ')
+        grouper: (item, fields) => fields.map((f) => item[f]).join(' - '),
       });
-      
+
       renderTable();
     }
     ```
@@ -255,7 +275,7 @@ function renderTable() {
   container.appendChild(createAnalysisControls());
 
   const tableElement = document.createElement('table');
-  
+
   // Render column groups
   const { columnGroups } = engine.getGroupedData();
   if (columnGroups.length > 0) {
@@ -316,15 +336,14 @@ const config = {
     { field: 'sales', type: 'sum', label: 'Total Sales' },
     { field: 'units', type: 'sum', label: 'Total Units' },
     { field: 'profit', type: 'sum', label: 'Total Profit' },
-    { 
-      field: 'profitMargin', 
-      type: 'custom', 
+    {
+      field: 'profitMargin',
+      type: 'custom',
       label: 'Profit Margin',
-      formula: (item) => (item.profit / item.sales) * 100
-    }
+      formula: (item) => (item.profit / item.sales) * 100,
+    },
   ],
 };
-
 ```
 
 ## API Reference
@@ -348,4 +367,3 @@ To run the examples:
 5. Open your browser and navigate to the local host address provided.
 
 These examples demonstrate various features of the PivotHead library, including basic usage, custom measures, grouping, and more.
-
