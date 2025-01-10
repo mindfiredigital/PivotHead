@@ -135,30 +135,29 @@ export function createHeader() {
   const rightSection = document.createElement('div');
   rightSection.style.display = 'flex';
 
-  // TODO: Uncomment when needed to implement these feature (FUTURE SCOPE)
-  // const leftOptions = [
-  //   {
-  //     icon: '🔗',
-  //     label: 'Connect',
-  //     dropdownOptions: ['To Local CSV', 'To Local JSON'],
-  //   },
-  //   {
-  //     icon: '📂',
-  //     label: 'Open',
-  //     dropdownOptions: ['Local Report', 'Remote Report'],
-  //   },
-  //   {
-  //     icon: '💾',
-  //     label: 'Save',
-  //     dropdownOptions: [],
-  //   },
+  const leftOptions = [
+    {
+      icon: '🔗',
+      label: 'Connect',
+      dropdownOptions: ['To Local CSV', 'To Local JSON'],
+    },
+    {
+      icon: '📂',
+      label: 'Open',
+      dropdownOptions: ['Local Report', 'Remote Report'],
+    },
+    {
+      icon: '💾',
+      label: 'Save',
+      dropdownOptions: [],
+    },
 
-  //   {
-  //     icon: '📤',
-  //     label: 'Export',
-  //     dropdownOptions: ['Print', 'To HTML', 'To Excel', 'To PDF'],
-  //   },
-  // ];
+    {
+      icon: '📤',
+      label: 'Export',
+      dropdownOptions: ['Print', 'To HTML', 'To Excel', 'To PDF'],
+    },
+  ];
 
   const rightOptions = [
     {
@@ -170,12 +169,11 @@ export function createHeader() {
     { icon: '📋', label: 'Fields', dropdownOptions: [] },
   ];
 
-  // TODO: Uncomment when needed to implement these feature (FUTURE SCOPE)
-  // leftOptions.forEach((option) =>
-  //   leftSection.appendChild(
-  //     createOption(option.icon, option.label, option.dropdownOptions),
-  //   ),
-  // );
+  leftOptions.forEach((option) =>
+    leftSection.appendChild(
+      createOption(option.icon, option.label, option.dropdownOptions),
+    ),
+  );
   rightOptions.forEach((option) =>
     rightSection.appendChild(
       createOption(option.icon, option.label, option.dropdownOptions),
