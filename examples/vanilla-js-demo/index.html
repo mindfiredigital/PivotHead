@@ -1,34 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pivothead Core Demo</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-        }
-        h1 {
-            color: #333;
-        }
-        button {
-            margin-bottom: 10px;
-            padding: 5px 10px;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        overflow-x: hidden;
+      }
+      h1 {
+        color: #333;
+      }
+      button {
+        margin-bottom: 10px;
+        padding: 5px 10px;
+      }
+      #pivotTable {
+        width: 100%;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div id="app">
-        <h1 style="margin-top: 60px;">Pivothead Core Demo</h1>
-        <div id="dropdownContainer" style="margin-bottom: 20px;"></div>
-        <div id="multiSelectContainer"></div>
-        <div id="pivotTable"></div>
-        <div id="resultContainer"></div>
+      <h1 style="margin-top: 60px">Pivothead Core Demo</h1>
+      <div id="dropdownContainer" style="margin-bottom: 20px"></div>
+      <div id="multiSelectContainer"></div>
+      <div id="pivotTable"></div>
+      <div id="resultContainer"></div>
     </div>
     <script src="lib/pivothead-core.js"></script>
     <script type="module" src="main.js"></script>
-</body>
+  </body>
 </html>
-

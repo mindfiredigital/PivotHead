@@ -9,7 +9,7 @@
  * - Column reordering (drag and drop)
  * - Row reordering (drag and drop)
  */
-import { createHeader } from "./header.js"
+import { createHeader } from './header.js';
 if (typeof PivotheadCore === 'undefined') {
   console.error(
     'PivotheadCore is not defined. Make sure the library is loaded correctly.',
@@ -110,9 +110,7 @@ const data = [
 // Updated configuration for the pivot table
 const config = {
   data: data,
-  rows: [
-    { uniqueName: 'product', caption: 'Product' },
-  ],
+  rows: [{ uniqueName: 'product', caption: 'Product' }],
   columns: [{ uniqueName: 'region', caption: 'Region' }],
   measures: [
     {
@@ -309,7 +307,14 @@ function renderTable() {
   renderGroupedRows(tbody, groupedData, state, 0);
 
   table.appendChild(tbody);
-  container.appendChild(table);
+
+  const tableWrapper = document.createElement('div');
+  tableWrapper.style.overflowX = 'auto';
+  tableWrapper.style.maxWidth = '100%';
+
+  tableWrapper.appendChild(table);
+
+  container.appendChild(tableWrapper);
 }
 
 function renderGroupedRows(tbody, groups, state, level) {

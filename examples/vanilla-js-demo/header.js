@@ -169,11 +169,15 @@ export function createHeader() {
     { icon: '📋', label: 'Fields', dropdownOptions: [] },
   ];
 
-  leftOptions.forEach((option) =>
-    leftSection.appendChild(
-      createOption(option.icon, option.label, option.dropdownOptions),
-    ),
-  );
+  // will set it to true when we develop the functionalities of left options
+  const showLeftOptions = false;
+
+  if (showLeftOptions)
+    leftOptions.forEach((option) =>
+      leftSection.appendChild(
+        createOption(option.icon, option.label, option.dropdownOptions),
+      ),
+    );
   rightOptions.forEach((option) =>
     rightSection.appendChild(
       createOption(option.icon, option.label, option.dropdownOptions),
