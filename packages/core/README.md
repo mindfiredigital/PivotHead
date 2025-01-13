@@ -78,23 +78,45 @@ The `PivotEngine` class provides several methods for manipulating and querying t
 
    const config = {
      data: data,
-     columns: [
-       { field: 'date', label: 'Date' },
-       { field: 'category', label: 'Category' },
-       { field: 'product', label: 'Product' },
-       { field: 'region', label: 'Region' },
-       { field: 'sales', label: 'Sales Amount' },
-       { field: 'units', label: 'Units Sold' },
-       { field: 'profit', label: 'Profit' },
+     rows: [{ uniqueName: 'product', caption: 'Product' }],
+     columns: [{ uniqueName: 'region', caption: 'Region' }],
+     measures: [
+       {
+         uniqueName: 'sales',
+         caption: 'Total Sales',
+         aggregation: 'sum',
+         format: { type: 'currency', currency: 'USD' },
+       },
+       {
+         uniqueName: 'quantity',
+         caption: 'Total Quantity',
+         aggregation: 'sum',
+         format: { type: 'number' },
+       },
+       {
+         uniqueName: 'averageSale',
+         caption: 'Average Sale',
+         aggregation: 'avg',
+         format: { type: 'currency', currency: 'USD' },
+         formula: (item) => item.sales / item.quantity,
+       },
      ],
-     groupConfig: null,
-     aggregationFields: [
-       { field: 'sales', type: 'sum', label: 'Total Sales' },
-       { field: 'units', type: 'sum', label: 'Total Units' },
-       { field: 'profit', type: 'sum', label: 'Total Profit' },
+     dimensions: [
+       { field: 'product', label: 'Product', type: 'string' },
+       { field: 'region', label: 'Region', type: 'string' },
+       { field: 'date', label: 'Date', type: 'date' },
+       { field: 'sales', label: 'Sales', type: 'number' },
+       { field: 'quantity', label: 'Quantity', type: 'number' },
      ],
+     defaultAggregation: 'sum',
+     isResponsive: true,
+     groupConfig: {
+       rowFields: ['product'],
+       columnFields: ['region'],
+       grouper: (item, fields) =>
+         fields.map((field) => item[field]).join(' - '),
+     },
    };
-
    const engine = new PivotEngine(config);
    ```
 
@@ -176,7 +198,20 @@ The `PivotEngine` class provides several methods for manipulating and querying t
    Updates the selected measures for the pivot table.
 
    ```javascript
-   const selectedMeasures = ['sales', 'units', 'profit'];
+   const selectedMeasures = [
+     {
+       uniqueName: 'sales',
+       caption: 'Total Sales',
+       aggregation: 'sum',
+       format: { type: 'currency', currency: 'USD' },
+     },
+     {
+       uniqueName: 'quantity',
+       caption: 'Total Quantity',
+       aggregation: 'sum',
+       format: { type: 'number' },
+     },
+   ];
    engine.setMeasures(selectedMeasures);
    ```
 
