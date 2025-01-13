@@ -103,19 +103,33 @@ const config = {
       uniqueName: 'sales',
       caption: 'Total Sales',
       aggregation: 'sum',
-      format: { type: 'currency', currency: 'USD' },
+      format: { 
+        type: 'currency', 
+        currency: 'USD',
+        locale: 'en-US',
+        decimals: 2
+      },
     },
     {
       uniqueName: 'quantity',
       caption: 'Total Quantity',
       aggregation: 'sum',
-      format: { type: 'number' },
+      format: { 
+        type: 'number',
+        decimals: 2,
+        locale: 'en-US'
+      },
     },
     {
       uniqueName: 'averageSale',
       caption: 'Average Sale',
       aggregation: 'avg',
-      format: { type: 'currency', currency: 'USD' },
+      format: { 
+        type: 'currency', 
+        currency: 'USD',
+        locale: 'en-US',
+        decimals: 2
+      },
       formula: (item) => item.sales / item.quantity,
     },
   ],
@@ -133,6 +147,26 @@ const config = {
     columnFields: ['region'],
     grouper: (item, fields) => fields.map((field) => item[field]).join(' - '),
   },
+  formatting: {
+    sales: { 
+      type: 'currency', 
+      currency: 'USD',
+      locale: 'en-US',
+      decimals: 2
+    },
+    quantity: { 
+      type: 'number',
+      decimals: 2,
+      locale: 'en-US'
+    },
+    averageSale: { 
+      type: 'currency', 
+      currency: 'USD',
+      locale: 'en-US',
+      decimals: 2
+    }
+  },
+
 };
 // Initialize PivotEngine
 let engine = new PivotEngine(config);
