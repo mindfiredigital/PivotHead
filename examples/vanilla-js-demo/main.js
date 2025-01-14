@@ -379,6 +379,27 @@ function createAggregationPanel() {
 // }
 
 
+export function onSectionItemDrop(droppedFields) {
+  let droppedFieldsInSections=JSON.stringify({
+    rows: Array.from(droppedFields.rows),
+    columns: Array.from(droppedFields.columns),
+    values: Array.from(droppedFields.values),
+    filters: Array.from(droppedFields.filters)
+  });
+  const parsedDroppedFieldsInSections=JSON.parse(droppedFieldsInSections)
+
+  const transformedRows=parsedDroppedFieldsInSections.rows.map((rowField)=>{ return { uniqueName:rowField.toLowerCase(), caption:rowField}});
+        const transformedColumns=parsedDroppedFieldsInSections.columns.map((columnField)=>{ return { uniqueName:columnField.toLowerCase(), caption:columnField}});
+        // const transformedValues=parsedDroppedFieldsInSections.values.map((valueField)=>{ return { uniqueName:valueField.toLowerCase(), caption:valueField}})
+        // const transformedFilters=parsedDroppedFieldsInSections.filters.map((filterField)=>{ return { uniqueName:filterField.toLowerCase(), caption:filterField}})
+
+        //TODO: for now only-applicable to rows and columns, will do the same for values and global filters in next iteration
+        engine.state.rows=transformedRows;
+        engine.state.columns=transformedColumns;
+
+        renderTable();
+}
+
 function renderTable() {
   const state = engine.getState();
   const container = document.getElementById('pivotTable');
@@ -388,7 +409,7 @@ function renderTable() {
   }
 
   container.innerHTML = '';
-  container.appendChild(createControlPanel());
+  // container.appendChild(createControlPanel());
 
   const table = document.createElement('table');
   table.style.width = '100%';

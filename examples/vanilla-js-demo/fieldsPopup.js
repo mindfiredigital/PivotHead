@@ -1,3 +1,12 @@
+import { onSectionItemDrop } from './main.js';
+
+const droppedFields = {
+  rows: new Set(),
+  columns: new Set(),
+  values: new Set(),
+  filters: new Set(),
+};
+
 export function createFieldsPopup() {
   let fieldSettingsPopups = document.getElementById('fieldSettingsPopup');
   if (!fieldSettingsPopups) {
@@ -132,6 +141,8 @@ body {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     flex: 1;
     display: flex;
+    width:100%;
+    height:100%;
     flex-direction: column;
     justify-content: flex-start;
     gap: 10px;
@@ -163,8 +174,8 @@ ul.section-list {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     flex: 1;
     overflow-y: auto;
-    max-height: 100px;
-    min-height: 100px;
+    width:100%;
+    height:100%;
 }
 
 #fieldsList {
@@ -291,6 +302,18 @@ li .field-info input {
     `;
     document.head.appendChild(style);
 
+    // TODO: will add the following in next iteration once functioanlity is ready
+//     <div id="reportFilters" class="section">
+//                           <h3>Report Filters</h3>
+//                           <ul id="reportFiltersList" class="section-list"></ul>
+//                       </div>
+
+
+//  <div id="values" class="section">
+//                           <h3>Values</h3>
+//                           <ul id="valuesList" class="section-list"></ul>
+//                       </div>
+
     const container = document.createElement('div');
     container.innerHTML = `
       <div id="pivotTableContainer">
@@ -310,10 +333,7 @@ li .field-info input {
                       <ul id="fieldsList" class="section-list"></ul>
                   </div>
                   <div id="rightSection" class="right-section">
-                      <div id="reportFilters" class="section">
-                          <h3>Report Filters</h3>
-                          <ul id="reportFiltersList" class="section-list"></ul>
-                      </div>
+                      
                       <div id="columns" class="section">
                           <h3>Columns</h3>
                           <ul id="columnsList" class="section-list"></ul>
@@ -322,10 +342,7 @@ li .field-info input {
                           <h3>Rows</h3>
                           <ul id="rowsList" class="section-list"></ul>
                       </div>
-                      <div id="values" class="section">
-                          <h3>Values</h3>
-                          <ul id="valuesList" class="section-list"></ul>
-                      </div>
+                     
                   </div>
               </div>
           </div>
@@ -340,18 +357,12 @@ li .field-info input {
     const allSections = document.querySelectorAll('.section-list');
 
     const fields = [
-      { name: 'Country', type: 'string' },
-      { name: 'Category', type: 'string' },
+      { name: 'Product', type: 'string' },
+      { name: 'Date', type: 'string' },
       { name: 'Region', type: 'string' },
       { name: 'Sales', type: 'number' },
+      { name: 'Quantity', type: 'number' },
     ];
-
-    const droppedFields = {
-      rows: new Set(),
-      columns: new Set(),
-      values: new Set(),
-      filters: new Set(),
-    };
 
     const populateFields = () => {
       fieldsList.innerHTML = '';
@@ -416,6 +427,7 @@ li .field-info input {
     function hidePopup() {
       fieldSettingsPopup.classList.add('hidden');
       fieldSettingsPopup.classList.remove('visible');
+      onSectionItemDrop(droppedFields);
     }
 
     function dragStart(event) {
