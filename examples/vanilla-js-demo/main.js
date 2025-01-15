@@ -117,19 +117,33 @@ const config = {
       uniqueName: 'sales',
       caption: 'Total Sales',
       aggregation: 'sum',
-      format: { type: 'currency', currency: 'USD' },
+      format: { 
+        type: 'currency', 
+        currency: 'USD',
+        locale: 'en-US',
+        decimals: 2
+      },
     },
     {
       uniqueName: 'quantity',
       caption: 'Total Quantity',
       aggregation: 'sum',
-      format: { type: 'number' },
+      format: { 
+        type: 'number',
+        decimals: 2,
+        locale: 'en-US'
+      },
     },
     {
       uniqueName: 'averageSale',
       caption: 'Average Sale',
       aggregation: 'avg',
-      format: { type: 'currency', currency: 'USD' },
+      format: { 
+        type: 'currency', 
+        currency: 'USD',
+        locale: 'en-US',
+        decimals: 2
+      },
       formula: (item) => item.sales / item.quantity,
     },
   ],
@@ -147,7 +161,26 @@ const config = {
     columnFields: ['region'],
     grouper: (item, fields) => fields.map((field) => item[field]).join(' - '),
   },
-  sortConfig: null,
+  formatting: {
+    sales: { 
+      type: 'currency', 
+      currency: 'USD',
+      locale: 'en-US',
+      decimals: 2
+    },
+    quantity: { 
+      type: 'number',
+      decimals: 2,
+      locale: 'en-US'
+    },
+    averageSale: { 
+      type: 'currency', 
+      currency: 'USD',
+      locale: 'en-US',
+      decimals: 2
+    }
+  },
+
 };
 // Initialize PivotEngine
 let engine = new PivotEngine(config);
@@ -168,11 +201,13 @@ function createControlPanel() {
   const columnsPanel = createAxisPanel('Columns', config.dimensions);
   const measuresPanel = createMeasuresPanel();
   const aggregationPanel = createAggregationPanel();
+  // const sortPanel = createSortPanel(); 
 
   controlPanel.appendChild(rowsPanel);
   controlPanel.appendChild(columnsPanel);
   controlPanel.appendChild(measuresPanel);
   controlPanel.appendChild(aggregationPanel);
+  // controlPanel.appendChild(sortPanel); 
 
   return controlPanel;
 }
@@ -278,6 +313,85 @@ function createAggregationPanel() {
   panel.appendChild(select);
   return panel;
 }
+
+//TODO: Uncomment when sort featur works.
+// function createSortPanel() {
+//   const panel = document.createElement('div');
+//   panel.className = 'sort-panel';
+//   panel.style.flex = '1';
+//   panel.style.minWidth = '200px';
+
+//   const panelTitle = document.createElement('h3');
+//   panelTitle.textContent = 'Sort';
+//   panel.appendChild(panelTitle);
+
+//   const fieldSelect = document.createElement('select');
+//   fieldSelect.id = 'sortField';
+//   fieldSelect.style.width = '100%';
+//   fieldSelect.style.marginBottom = '10px';
+
+//   const directionSelect = document.createElement('select');
+//   directionSelect.id = 'sortDirection';
+//   directionSelect.style.width = '100%';
+//   directionSelect.style.marginBottom = '10px';
+
+//   const axisSelect = document.createElement('select');
+//   axisSelect.id = 'sortAxis';
+//   axisSelect.style.width = '100%';
+//   axisSelect.style.marginBottom = '10px';
+
+//   // Populate field options
+//   config.dimensions.forEach((dim) => {
+//     const option = document.createElement('option');
+//     option.value = dim.field;
+//     option.textContent = dim.label;
+//     fieldSelect.appendChild(option);
+//   });
+
+//   // Add measure fields for sorting
+//   config.measures.forEach((measure) => {
+//     const option = document.createElement('option');
+//     option.value = measure.uniqueName;
+//     option.textContent = measure.caption;
+//     fieldSelect.appendChild(option);
+//   });
+
+//   // Populate direction options
+//   ['asc', 'desc'].forEach((dir) => {
+//     const option = document.createElement('option');
+//     option.value = dir;
+//     option.textContent = dir.toUpperCase();
+//     directionSelect.appendChild(option);
+//   });
+
+//   // Populate axis options
+//   ['row', 'column'].forEach((axis) => {
+//     const option = document.createElement('option');
+//     option.value = axis;
+//     option.textContent = axis.charAt(0).toUpperCase() + axis.slice(1);
+//     axisSelect.appendChild(option);
+//   });
+
+//   const applyButton = document.createElement('button');
+//   applyButton.textContent = 'Apply Sort';
+//   applyButton.style.width = '100%';
+//   applyButton.addEventListener('click', () => {
+//     const field = fieldSelect.value;
+//     const direction = directionSelect.value;
+//     const axis = axisSelect.value;
+//     // TODO: Implement sorting logic
+//     console.log(`Sorting ${field} ${direction} on ${axis}`);
+//     renderTable();
+//   });
+
+//   panel.appendChild(fieldSelect);
+//   panel.appendChild(directionSelect);
+//   panel.appendChild(axisSelect);
+//   panel.appendChild(applyButton);
+
+//   return panel;
+// }
+
 
 function renderTable() {
   const state = engine.getState();
@@ -459,8 +573,8 @@ function renderTableHeader(thead, state) {
     headerText.textContent = row.caption;
     headerContent.appendChild(headerText);
 
-    const sortIcon = createSortIcon(row.uniqueName, 'row');
-    headerContent.appendChild(sortIcon);
+   // const sortIcon = createSortIcon(row.uniqueName, 'row');
+  //  headerContent.appendChild(sortIcon);
 
     th.appendChild(headerContent);
     th.addEventListener('click', () => handleSort(row.uniqueName, 'row'));
@@ -486,8 +600,8 @@ function renderTableHeader(thead, state) {
       headerText.textContent = measure.caption;
       headerContent.appendChild(headerText);
 
-      const sortIcon = createSortIcon(measure.uniqueName, 'column');
-      headerContent.appendChild(sortIcon);
+      // const sortIcon = createSortIcon(measure.uniqueName, 'column');
+      // headerContent.appendChild(sortIcon);
 
       th.appendChild(headerContent);
       measureHeaderRow.appendChild(th);
@@ -497,21 +611,22 @@ function renderTableHeader(thead, state) {
   thead.appendChild(measureHeaderRow);
 }
 
-function createSortIcon(field, axis) {
-  const icon = document.createElement('span');
-  icon.innerHTML = '&#8645;'; // Unicode for up-down arrow
-  icon.style.cursor = 'pointer';
-  icon.style.marginLeft = '5px';
+//TODO : Uncomment when sort feature updated in pivot table
+// function createSortIcon(field, axis) {
+//   const icon = document.createElement('span');
+//   icon.innerHTML = '&#8645;'; // Unicode for up-down arrow
+//   icon.style.cursor = 'pointer';
+//   icon.style.marginLeft = '5px';
 
-  icon.addEventListener('click', () => {
-    const currentDirection = engine.getState().sortConfig?.direction;
-    const newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
-    engine.sort(field, newDirection, axis);
-    renderTable();
-  });
+//   icon.addEventListener('click', () => {
+//     const currentDirection = engine.getState().sortConfig?.direction;
+//     const newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+//     engine.sort(field, newDirection, axis);
+//     renderTable();
+//   });
 
-  return icon;
-}
+//   return icon;
+// }
 
 function groupData(data, groupFields) {
   if (!groupFields || groupFields.length === 0) return {};
