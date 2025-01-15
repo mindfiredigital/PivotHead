@@ -1,17 +1,15 @@
-import temp from "./constant.js"
-
 /**
-* PivotHead Demo
-*
-* This file demonstrates the usage of the PivotheadCore library to create an interactive pivot table.
-* Features include:
-* - Sorting
-* - Grouping
-* - Column resizing
-* - Column reordering (drag and drop)
-* - Row reordering (drag and drop)
-*/
-import { createHeader } from "./header.js"
+ * PivotHead Demo
+ *
+ * This file demonstrates the usage of the PivotheadCore library to create an interactive pivot table.
+ * Features include:
+ * - Sorting
+ * - Grouping
+ * - Column resizing
+ * - Column reordering (drag and drop)
+ * - Row reordering (drag and drop)
+ */
+import { createHeader } from './header.js';
 if (typeof PivotheadCore === 'undefined') {
   console.error(
     'PivotheadCore is not defined. Make sure the library is loaded correctly.',
@@ -98,28 +96,40 @@ const data = [
 // Updated configuration for the pivot table
 const config = {
   data: data,
-  rows: [
-    { uniqueName: 'product', caption: 'Product' },
-  ],
+  rows: [{ uniqueName: 'product', caption: 'Product' }],
   columns: [{ uniqueName: 'region', caption: 'Region' }],
   measures: [
     {
       uniqueName: 'sales',
       caption: 'Total Sales',
       aggregation: 'sum',
-      format: { type: 'currency', currency: 'USD' },
+      format: { 
+        type: 'currency', 
+        currency: 'USD',
+        locale: 'en-US',
+        decimals: 2
+      },
     },
     {
       uniqueName: 'quantity',
       caption: 'Total Quantity',
       aggregation: 'sum',
-      format: { type: 'number' },
+      format: { 
+        type: 'number',
+        decimals: 2,
+        locale: 'en-US'
+      },
     },
     {
       uniqueName: 'averageSale',
       caption: 'Average Sale',
       aggregation: 'avg',
-      format: { type: 'currency', currency: 'USD' },
+      format: { 
+        type: 'currency', 
+        currency: 'USD',
+        locale: 'en-US',
+        decimals: 2
+      },
       formula: (item) => item.sales / item.quantity,
     },
   ],
@@ -127,12 +137,7 @@ const config = {
     { field: 'product', label: 'Product', type: 'string' },
     { field: 'region', label: 'Region', type: 'string' },
     { field: 'date', label: 'Date', type: 'date' },
-    {
-      field: 'sales', label: 'Sales', type: 'number', format: {
-        type: 'currency',
-        currency: 'USD',
-      },
-    },
+    { field: 'sales', label: 'Sales', type: 'number' },
     { field: 'quantity', label: 'Quantity', type: 'number' },
   ],
   defaultAggregation: 'sum',
@@ -142,13 +147,29 @@ const config = {
     columnFields: ['region'],
     grouper: (item, fields) => fields.map((field) => item[field]).join(' - '),
   },
+  formatting: {
+    sales: { 
+      type: 'currency', 
+      currency: 'USD',
+      locale: 'en-US',
+      decimals: 2
+    },
+    quantity: { 
+      type: 'number',
+      decimals: 2,
+      locale: 'en-US'
+    },
+    averageSale: { 
+      type: 'currency', 
+      currency: 'USD',
+      locale: 'en-US',
+      decimals: 2
+    }
+  },
+
 };
 // Initialize PivotEngine
-console.log(temp, "mainTemp")
-export let engine = new PivotEngine(config);
-
-console.log(PivotEngine, "==<")
-
+let engine = new PivotEngine(config);
 PivotEngine.prototype.formatValue = function (value, field) {
   // Search in measures first
   const measure = config.measures.find((m) => m.uniqueName === field);
@@ -190,6 +211,33 @@ PivotEngine.prototype.formatValue = function (value, field) {
   return value;
 };
 
+
+// function createControlPanel() {
+//   const controlPanel = document.createElement('div');
+//   controlPanel.className = 'control-panel';
+//   controlPanel.style.display = 'flex';
+//   controlPanel.style.flexWrap = 'wrap';
+//   controlPanel.style.gap = '20px';
+//   controlPanel.style.marginBottom = '20px';
+//   controlPanel.style.padding = '10px';
+//   controlPanel.style.backgroundColor = '#f8f9fa';
+//   controlPanel.style.border = '1px solid #dee2e6';
+//   controlPanel.style.borderRadius = '4px';
+ 
+//   const rowsPanel = createAxisPanel('Rows', config.dimensions);
+//   const columnsPanel = createAxisPanel('Columns', config.dimensions);
+//   const measuresPanel = createMeasuresPanel();
+//   const aggregationPanel = createAggregationPanel();
+//   // const sortPanel = createSortPanel(); 
+
+//   controlPanel.appendChild(rowsPanel);
+//   controlPanel.appendChild(columnsPanel);
+//   controlPanel.appendChild(measuresPanel);
+//   controlPanel.appendChild(aggregationPanel);
+//   // controlPanel.appendChild(sortPanel); 
+
+//   return controlPanel;
+// }
 
 // function createAxisPanel(title, options) {
 //   const panel = document.createElement('div');
@@ -293,6 +341,85 @@ PivotEngine.prototype.formatValue = function (value, field) {
 //   return panel;
 // }
 
+//TODO: Uncomment when sort featur works.
+// function createSortPanel() {
+//   const panel = document.createElement('div');
+//   panel.className = 'sort-panel';
+//   panel.style.flex = '1';
+//   panel.style.minWidth = '200px';
+
+//   const panelTitle = document.createElement('h3');
+//   panelTitle.textContent = 'Sort';
+//   panel.appendChild(panelTitle);
+
+//   const fieldSelect = document.createElement('select');
+//   fieldSelect.id = 'sortField';
+//   fieldSelect.style.width = '100%';
+//   fieldSelect.style.marginBottom = '10px';
+
+//   const directionSelect = document.createElement('select');
+//   directionSelect.id = 'sortDirection';
+//   directionSelect.style.width = '100%';
+//   directionSelect.style.marginBottom = '10px';
+
+//   const axisSelect = document.createElement('select');
+//   axisSelect.id = 'sortAxis';
+//   axisSelect.style.width = '100%';
+//   axisSelect.style.marginBottom = '10px';
+
+//   // Populate field options
+//   config.dimensions.forEach((dim) => {
+//     const option = document.createElement('option');
+//     option.value = dim.field;
+//     option.textContent = dim.label;
+//     fieldSelect.appendChild(option);
+//   });
+
+//   // Add measure fields for sorting
+//   config.measures.forEach((measure) => {
+//     const option = document.createElement('option');
+//     option.value = measure.uniqueName;
+//     option.textContent = measure.caption;
+//     fieldSelect.appendChild(option);
+//   });
+
+//   // Populate direction options
+//   ['asc', 'desc'].forEach((dir) => {
+//     const option = document.createElement('option');
+//     option.value = dir;
+//     option.textContent = dir.toUpperCase();
+//     directionSelect.appendChild(option);
+//   });
+
+//   // Populate axis options
+//   ['row', 'column'].forEach((axis) => {
+//     const option = document.createElement('option');
+//     option.value = axis;
+//     option.textContent = axis.charAt(0).toUpperCase() + axis.slice(1);
+//     axisSelect.appendChild(option);
+//   });
+
+//   const applyButton = document.createElement('button');
+//   applyButton.textContent = 'Apply Sort';
+//   applyButton.style.width = '100%';
+//   applyButton.addEventListener('click', () => {
+//     const field = fieldSelect.value;
+//     const direction = directionSelect.value;
+//     const axis = axisSelect.value;
+//     // TODO: Implement sorting logic
+//     console.log(`Sorting ${field} ${direction} on ${axis}`);
+//     renderTable();
+//   });
+
+//   panel.appendChild(fieldSelect);
+//   panel.appendChild(directionSelect);
+//   panel.appendChild(axisSelect);
+//   panel.appendChild(applyButton);
+
+//   return panel;
+// }
+
+
 function renderTable() {
   const state = engine.getState();
   const container = document.getElementById('pivotTable');
@@ -302,7 +429,7 @@ function renderTable() {
   }
 
   container.innerHTML = '';
- 
+  // container.appendChild(createControlPanel());
 
   const table = document.createElement('table');
   table.style.width = '100%';
@@ -321,7 +448,14 @@ function renderTable() {
   renderGroupedRows(tbody, groupedData, state, 0);
 
   table.appendChild(tbody);
-  container.appendChild(table);
+
+  const tableWrapper = document.createElement('div');
+  tableWrapper.style.overflowX = 'auto';
+  tableWrapper.style.maxWidth = '100%';
+
+  tableWrapper.appendChild(table);
+
+  container.appendChild(tableWrapper);
 }
 
 function renderGroupedRows(tbody, groups, state, level) {
@@ -360,6 +494,7 @@ function renderGroupedRows(tbody, groups, state, level) {
           td.style.borderBottom = '1px solid #dee2e6';
           td.style.borderRight = '1px solid #dee2e6';
           td.style.backgroundColor = '#f8f9fa';
+          td.style.textAlign = 'center';
 
           if (columnItems.length > 0) {
             let aggregateValue;
@@ -392,6 +527,7 @@ function renderGroupedRows(tbody, groups, state, level) {
         });
       });
     } else {
+      // Add empty cells for non-leaf nodes
       uniqueColumnValues.forEach(() => {
         state.measures.forEach(() => {
           const td = document.createElement('td');
@@ -461,17 +597,48 @@ function renderTableHeader(thead, state) {
   uniqueColumnValues.forEach(() => {
     state.measures.forEach((measure) => {
       const th = document.createElement('th');
-      th.textContent = measure.caption;
+      // th.textContent = measure.caption;
       th.style.padding = '12px';
       th.style.backgroundColor = '#f8f9fa';
       th.style.borderBottom = '2px solid #dee2e6';
       th.style.borderRight = '1px solid #dee2e6';
+
+      const headerContent = document.createElement('div');
+      headerContent.style.display = 'flex';
+      headerContent.style.alignItems = 'center';
+      headerContent.style.justifyContent = 'space-between';
+
+      const headerText = document.createElement('span');
+      headerText.textContent = measure.caption;
+      headerContent.appendChild(headerText);
+
+      // const sortIcon = createSortIcon(measure.uniqueName, 'column');
+      // headerContent.appendChild(sortIcon);
+
+      th.appendChild(headerContent);
       measureHeaderRow.appendChild(th);
     });
   });
 
   thead.appendChild(measureHeaderRow);
 }
+
+//TODO : Uncomment when sort feature updated in pivot table
+// function createSortIcon(field, axis) {
+//   const icon = document.createElement('span');
+//   icon.innerHTML = '&#8645;'; // Unicode for up-down arrow
+//   icon.style.cursor = 'pointer';
+//   icon.style.marginLeft = '5px';
+
+//   icon.addEventListener('click', () => {
+//     const currentDirection = engine.getState().sortConfig?.direction;
+//     const newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+//     engine.sort(field, newDirection, axis);
+//     renderTable();
+//   });
+
+//   return icon;
+// }
 
 function groupData(data, groupFields) {
   if (!groupFields || groupFields.length === 0) return {};
@@ -509,7 +676,6 @@ document.addEventListener('DOMContentLoaded', () => {
     );
     return;
   }
-  const { PivotEngine } = PivotheadCore;
-  createHeader(config,PivotEngine);
+  createHeader();
   renderTable();
 });
