@@ -652,16 +652,6 @@ function renderTableHeader(thead, state) {
     th.style.borderRight = '1px solid #dee2e6';
     columnHeaderRow.appendChild(th);
   });
-
-  // Add a button to open the conditional formatting popup
-  const formatButton = document.createElement('button');
-  formatButton.textContent = 'Conditional Formatting';
-  formatButton.addEventListener('click', showConditionFormattingPopup);
-  
-  const buttonCell = document.createElement('th');
-  buttonCell.appendChild(formatButton);
-  columnHeaderRow.appendChild(buttonCell);
-
   thead.appendChild(columnHeaderRow);
 
   // Second header row for measures

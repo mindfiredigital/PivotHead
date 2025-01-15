@@ -131,7 +131,7 @@ function addCondition(container) {
   // Value row
   const valueRow = createFormRow('Value:', [
     createSelect(['All values', 'Number', 'Text']),
-    createSelect(['Greater than', 'Less than', 'Between', 'Equal to']),
+    createSelect(['Greater than', 'Less than', 'Equal to']), // Add 'Between' to list in future.
     createInput('text', ''),
   ]);
 
@@ -335,10 +335,18 @@ function updateRemoveButtons(container) {
 }
 
 export function conditionFormattingPopUp(config) {
+  // Ensure config is an object
+  if (typeof config !== 'object' || config === null) {
+    config = {};
+  }
+
   createConditionFormattingPopup({
     onApply: (conditions) => {
       console.log('Applied conditions:', conditions);
       // Update the formatting configuration
+      if (!config.hasOwnProperty('conditionalFormatting')) {
+        config.conditionalFormatting = [];
+      }
       config.conditionalFormatting = conditions;
       // Apply the formatting directly
       applyConditionalFormatting(config);
@@ -353,6 +361,14 @@ function applyConditionalFormatting(config) {
   const table = document.querySelector('#pivotTable table');
   if (!table) {
     console.error('Pivot table not found');
+    return;
+  }
+
+  if (
+    !config.conditionalFormatting ||
+    !Array.isArray(config.conditionalFormatting)
+  ) {
+    console.warn('No conditional formatting rules found');
     return;
   }
 
@@ -380,11 +396,12 @@ function applyConditionalFormatting(config) {
           case 'Less than':
             applyFormat = value < parseFloat(rule.value.value1);
             break;
-          case 'Between':
-            applyFormat =
-              value >= parseFloat(rule.value.value1) &&
-              value <= parseFloat(rule.value.value2);
-            break;
+          //TODO: Update in future 
+          // case 'Between':
+          //   applyFormat =
+          //     value >= parseFloat(rule.value.value1) &&
+          //     value <= parseFloat(rule.value.value2);
+          //   break;
           case 'Equal to':
             applyFormat = value === parseFloat(rule.value.value1);
             break;
