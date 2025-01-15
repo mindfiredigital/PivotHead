@@ -1,4 +1,6 @@
-export function createOptionsPopup() {
+import {engine} from "./main.js"
+export function createOptionsPopup(data) {
+    console.log(data)
     // Create the overlay
     const overlay = document.createElement("div");
     overlay.style.position = "fixed";
@@ -49,9 +51,21 @@ export function createOptionsPopup() {
         groups.forEach((group) => {
             const title = group.dataset.title;
             const selectedRadio = group.querySelector("input[type='radio']:checked");
-            selectedData[title] = selectedRadio ? selectedRadio.value : "None Selected";
+            selectedData[title] = selectedRadio ? selectedRadio.value : null;
         });
-        console.log(selectedData); // Log the selected data
+    
+        // Update the rows and columns in the config object
+        if (selectedData.Row) {
+            data.rows = [{ uniqueName: selectedData.Row, caption: selectedData.Row }];
+            data.groupConfig.rowFields = [selectedData.Row];
+        }
+        if (selectedData.Column) {
+            data.columns = [{ uniqueName: selectedData.Column, caption: selectedData.Column }];
+            data.groupConfig.columnFields = [selectedData.Column];
+        }
+    
+        console.log("Updated Config:", data); // Log the updated config for debugging
+        document.body.removeChild(overlay);
     });
 
     const cancelButton = document.createElement("button");
@@ -73,8 +87,8 @@ export function createOptionsPopup() {
     headerContainer.appendChild(header);
     headerContainer.appendChild(buttonContainer);
 
-    // Function to create a title with 4 radio buttons
-    const createRadioButtonGroup = (titleText) => {
+    // Function to create a title with radio buttons
+    const createRadioButtonGroup = (titleText, options) => {
         const groupContainer = document.createElement("div");
         groupContainer.classList.add("radio-group");
         groupContainer.dataset.title = titleText;
@@ -89,7 +103,7 @@ export function createOptionsPopup() {
         radioContainer.style.flexDirection = "column";
         radioContainer.style.gap = "5px";
 
-        for (let i = 1; i <= 4; i++) {
+        options.forEach((optionText) => {
             const radioLabel = document.createElement("label");
             radioLabel.style.display = "flex";
             radioLabel.style.alignItems = "center";
@@ -97,13 +111,13 @@ export function createOptionsPopup() {
             const radio = document.createElement("input");
             radio.type = "radio";
             radio.name = titleText;
-            radio.value = `Option ${i}`;
+            radio.value = optionText;
             radio.style.marginRight = "5px";
 
             radioLabel.appendChild(radio);
-            radioLabel.appendChild(document.createTextNode(`Option ${i}`));
+            radioLabel.appendChild(document.createTextNode(optionText));
             radioContainer.appendChild(radioLabel);
-        }
+        });
 
         groupContainer.appendChild(title);
         groupContainer.appendChild(radioContainer);
@@ -111,15 +125,23 @@ export function createOptionsPopup() {
         return groupContainer;
     };
 
-    // Add radio button groups (3 titles)
+    // Add radio button groups for Row, Column, and Measures
     const formContainer = document.createElement("div");
     formContainer.style.display = "grid";
     formContainer.style.gridTemplateColumns = "1fr 1fr";
     formContainer.style.gap = "20px";
 
-    formContainer.appendChild(createRadioButtonGroup("Title 1"));
-    formContainer.appendChild(createRadioButtonGroup("Title 2"));
-    formContainer.appendChild(createRadioButtonGroup("Title 3"));
+    // Title 1: Row -> All dimensions labels
+    const rowOptions = data.dimensions.map(dimension => dimension.label);
+    formContainer.appendChild(createRadioButtonGroup("Row", rowOptions));
+
+    // Title 2: Column -> All dimensions labels
+    const columnOptions = data.dimensions.map(dimension => dimension.label);
+    formContainer.appendChild(createRadioButtonGroup("Column", columnOptions));
+
+    // Title 3: Measures -> All measures captions
+    const measuresOptions = data.measures.map(measure => measure.caption);
+    formContainer.appendChild(createRadioButtonGroup("Measures", measuresOptions));
 
     // Append everything to the popup
     popup.appendChild(headerContainer);

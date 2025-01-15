@@ -1,4 +1,12 @@
-export function formatCellPopUp() {
+import temp from "./constant.js";
+import { engine } from "./main.js"
+
+export function formatCellPopUp(config, PivotEngine) {
+    const dynamicData = config.measures;
+    console.log(dynamicData);
+
+    engine = new PivotEngine(config);
+
     const overlay = document.createElement("div");
     overlay.style.position = "fixed";
     overlay.style.top = "0";
@@ -31,18 +39,22 @@ export function formatCellPopUp() {
 
     const formContainer = document.createElement("div");
 
+    // Updated "Choose Value" to show dynamic measure captions
     const fields = [
-        "Choose Value",
-        "Text Align",
-        "Thousand Separator",
-        "Decimal Separator",
-        "Decimal Places",
-        "Currency Symbol",
-        "Currency Align",
-        "Null Value",
-        "Format as Percent",
+        { name: "Choose Value", options: ["None", ...dynamicData.map(measure => measure.caption)] },
+        { name: "Text Align", options: ["Left", "Right"] },
+        { name: "Thousand Separator", options: ["Space", "Comma", "Dot"] },
+        { name: "Decimal Separator", options: ["Comma", "Dot"] },
+        { name: "Decimal Places", options: Array.from({ length: 9 }, (_, i) => (i + 1).toString()) },
+        { name: "Currency Symbol", options: ["Dollar ($)", "Rupees (₹)"] },
+        { name: "Currency Align", options: ["Left", "Right"] },
+        { name: "Null Value", options: ["None", "Null"] },
+        { name: "Format as Percent", options: ["Yes", "No"] },
     ];
-    const dropdownValues = fields.map((field) => ({ field, value: "" }));
+
+    const dropdownValues = fields.map((field) => ({ field: field.name, value: field.options[0] }));
+
+    const dropdownElements = [];
 
     fields.forEach((field, index) => {
         const row = document.createElement("div");
@@ -51,7 +63,7 @@ export function formatCellPopUp() {
         row.style.marginBottom = "15px";
 
         const label = document.createElement("label");
-        label.textContent = `${field}:`;
+        label.textContent = `${field.name}:`;
         label.style.flex = "1";
         label.style.marginRight = "10px";
 
@@ -61,13 +73,37 @@ export function formatCellPopUp() {
         dropdown.style.borderRadius = "4px";
         dropdown.style.border = "1px solid #ccc";
 
-        const options = ["Option 1", "Option 2", "Option 3"];
-        options.forEach((optionText) => {
+        // Populate the dropdown with dynamic options
+        field.options.forEach((optionText) => {
             const option = document.createElement("option");
             option.value = optionText;
             option.textContent = optionText;
             dropdown.appendChild(option);
         });
+
+        // Disable all fields except "Choose Value"
+        if (index !== 0) {
+            dropdown.disabled = true;
+        }
+
+        if (index === 0) {
+            dropdown.addEventListener("change", (e) => {
+                const selectedValue = e.target.value;
+                if (selectedValue !== "None") {
+                    dropdownElements.forEach((dropdown, i) => {
+                        if (i !== 0) {
+                            dropdown.disabled = false;
+                        }
+                    });
+                } else {
+                    dropdownElements.forEach((dropdown, i) => {
+                        if (i !== 0) {
+                            dropdown.disabled = true;
+                        }
+                    });
+                }
+            });
+        }
 
         dropdown.addEventListener("change", (e) => {
             dropdownValues[index].value = e.target.value;
@@ -76,6 +112,7 @@ export function formatCellPopUp() {
         row.appendChild(label);
         row.appendChild(dropdown);
         formContainer.appendChild(row);
+        dropdownElements.push(dropdown);
     });
 
     const buttonContainer = document.createElement("div");
@@ -110,7 +147,45 @@ export function formatCellPopUp() {
     });
 
     applyButton.addEventListener("click", () => {
-        console.log(dropdownValues);
+        console.log("Selected Values:", dropdownValues);
+        let engine = new PivotEngine(config);
+        PivotEngine.prototype.formatValue = function (value, field) {
+            // Search in measures first
+            const measure = config.measures.find((m) => m.uniqueName === field);
+
+            if (measure && measure.format?.type === 'currency') {
+                const format = measure.format || {};
+                const { symbol, align } = format;
+
+                // Format the currency value
+                const formattedValue = value
+                    .toFixed(temp.decimalPlaces)
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, temp.thousandSeparator)
+                    .replace('.', temp.decimalSeparator);
+
+                return `${symbol || temp.currencySymbol}${formattedValue}`
+
+            }
+
+            // If not found in measures, check in dimensions
+            const dimension = config.dimensions.find((dim) => dim.field === field);
+
+            if (dimension && dimension.format?.type === 'currency') {
+                const format = dimension.format || {};
+                const { symbol, align } = format;
+
+                // Format the currency value
+                const formattedValue = value
+                    .toFixed(temp.decimalPlaces)
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, temp.thousandSeparator)
+                    .replace('.', temp.decimalSeparator);
+
+                return `${symbol || temp.currencySymbol}${formattedValue}`
+            }
+
+            // Return the original value if it's not a currency type
+            return value;
+        };
         document.body.removeChild(overlay);
     });
 

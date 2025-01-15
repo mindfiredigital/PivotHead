@@ -1,14 +1,16 @@
+import temp from "./constant.js"
+
 /**
- * PivotHead Demo
- *
- * This file demonstrates the usage of the PivotheadCore library to create an interactive pivot table.
- * Features include:
- * - Sorting
- * - Grouping
- * - Column resizing
- * - Column reordering (drag and drop)
- * - Row reordering (drag and drop)
- */
+* PivotHead Demo
+*
+* This file demonstrates the usage of the PivotheadCore library to create an interactive pivot table.
+* Features include:
+* - Sorting
+* - Grouping
+* - Column resizing
+* - Column reordering (drag and drop)
+* - Row reordering (drag and drop)
+*/
 import { createHeader } from "./header.js"
 if (typeof PivotheadCore === 'undefined') {
   console.error(
@@ -125,7 +127,12 @@ const config = {
     { field: 'product', label: 'Product', type: 'string' },
     { field: 'region', label: 'Region', type: 'string' },
     { field: 'date', label: 'Date', type: 'date' },
-    { field: 'sales', label: 'Sales', type: 'number' },
+    {
+      field: 'sales', label: 'Sales', type: 'number', format: {
+        type: 'currency',
+        currency: 'USD',
+      },
+    },
     { field: 'quantity', label: 'Quantity', type: 'number' },
   ],
   defaultAggregation: 'sum',
@@ -137,134 +144,154 @@ const config = {
   },
 };
 // Initialize PivotEngine
-let engine = new PivotEngine(config);
+console.log(temp, "mainTemp")
+export let engine = new PivotEngine(config);
 
-function createControlPanel() {
-  const controlPanel = document.createElement('div');
-  controlPanel.className = 'control-panel';
-  controlPanel.style.display = 'flex';
-  controlPanel.style.flexWrap = 'wrap';
-  controlPanel.style.gap = '20px';
-  controlPanel.style.marginBottom = '20px';
-  controlPanel.style.padding = '10px';
-  controlPanel.style.backgroundColor = '#f8f9fa';
-  controlPanel.style.border = '1px solid #dee2e6';
-  controlPanel.style.borderRadius = '4px';
+console.log(PivotEngine, "==<")
 
-  const rowsPanel = createAxisPanel('Rows', config.dimensions);
-  const columnsPanel = createAxisPanel('Columns', config.dimensions);
-  const measuresPanel = createMeasuresPanel();
-  const aggregationPanel = createAggregationPanel();
+PivotEngine.prototype.formatValue = function (value, field) {
+  // Search in measures first
+  const measure = config.measures.find((m) => m.uniqueName === field);
+  
+  if (measure && measure.format?.type === 'currency') {
+    const format = measure.format || {};
+    const { symbol, align } = format;
 
-  controlPanel.appendChild(rowsPanel);
-  controlPanel.appendChild(columnsPanel);
-  controlPanel.appendChild(measuresPanel);
-  controlPanel.appendChild(aggregationPanel);
+    // Format the currency value
+    const formattedValue = value
+      .toFixed(temp.decimalPlaces)
+      .replace(/\B(?=(\d{3})+(?!\d))/g, temp.thousandSeparator)
+      .replace('.', temp.decimalSeparator);
 
-  return controlPanel;
-}
+    return align === "left"
+      ? `${symbol || temp.currencySymbol}${formattedValue}`
+      : `${formattedValue}${symbol || temp.currencySymbol}`;
+  }
 
-function createAxisPanel(title, options) {
-  const panel = document.createElement('div');
-  panel.className = 'axis-panel';
-  panel.style.flex = '1';
-  panel.style.minWidth = '200px';
+  // If not found in measures, check in dimensions
+  const dimension = config.dimensions.find((dim) => dim.field === field);
 
-  const panelTitle = document.createElement('h3');
-  panelTitle.textContent = title;
-  panel.appendChild(panelTitle);
+  if (dimension && dimension.format?.type === 'currency') {
+    const format = dimension.format || {};
+    const { symbol, align } = format;
 
-  const select = document.createElement('select');
-  select.multiple = true;
-  select.style.width = '100%';
-  select.style.height = '100px';
+    // Format the currency value
+    const formattedValue = value
+      .toFixed(temp.decimalPlaces)
+      .replace(/\B(?=(\d{3})+(?!\d))/g, temp.thousandSeparator)
+      .replace('.', temp.decimalSeparator);
 
-  options.forEach((option) => {
-    const optionElement = document.createElement('option');
-    optionElement.value = option.field;
-    optionElement.textContent = option.label;
-    select.appendChild(optionElement);
-  });
+    return align === "left"
+      ? `${symbol || temp.currencySymbol}${formattedValue}`
+      : `${formattedValue}${symbol || temp.currencySymbol}`;
+  }
 
-  select.addEventListener('change', () => {
-    const selectedFields = Array.from(select.selectedOptions).map((option) => ({
-      uniqueName: option.value,
-      caption: option.textContent,
-    }));
-    if (title === 'Rows') {
-      engine.state.rows = selectedFields;
-    } else {
-      engine.state.columns = selectedFields;
-    }
-    renderTable();
-  });
+  // Return the original value if it's not a currency type
+  return value;
+};
 
-  panel.appendChild(select);
-  return panel;
-}
 
-function createMeasuresPanel() {
-  const panel = document.createElement('div');
-  panel.className = 'measures-panel';
-  panel.style.flex = '1';
-  panel.style.minWidth = '200px';
+// function createAxisPanel(title, options) {
+//   const panel = document.createElement('div');
+//   panel.className = 'axis-panel';
+//   panel.style.flex = '1';
+//   panel.style.minWidth = '200px';
 
-  const panelTitle = document.createElement('h3');
-  panelTitle.textContent = 'Measures';
-  panel.appendChild(panelTitle);
+//   const panelTitle = document.createElement('h3');
+//   panelTitle.textContent = title;
+//   panel.appendChild(panelTitle);
 
-  const select = document.createElement('select');
-  select.multiple = true;
-  select.style.width = '100%';
-  select.style.height = '100px';
+//   const select = document.createElement('select');
+//   select.multiple = true;
+//   select.style.width = '100%';
+//   select.style.height = '100px';
 
-  config.measures.forEach((measure) => {
-    const optionElement = document.createElement('option');
-    optionElement.value = measure.uniqueName;
-    optionElement.textContent = measure.caption;
-    select.appendChild(optionElement);
-  });
+//   options.forEach((option) => {
+//     const optionElement = document.createElement('option');
+//     optionElement.value = option.field;
+//     optionElement.textContent = option.label;
+//     select.appendChild(optionElement);
+//   });
 
-  select.addEventListener('change', () => {
-    const selectedMeasures = Array.from(select.selectedOptions).map((option) =>
-      config.measures.find((m) => m.uniqueName === option.value),
-    );
-    engine.setMeasures(selectedMeasures);
-    renderTable();
-  });
+//   select.addEventListener('change', () => {
+//     const selectedFields = Array.from(select.selectedOptions).map((option) => ({
+//       uniqueName: option.value,
+//       caption: option.textContent,
+//     }));
+//     if (title === 'Rows') {
+//       engine.state.rows = selectedFields;
+//     } else {
+//       engine.state.columns = selectedFields;
+//     }
+//     renderTable();
+//   });
 
-  panel.appendChild(select);
-  return panel;
-}
+//   panel.appendChild(select);
+//   return panel;
+// }
 
-function createAggregationPanel() {
-  const panel = document.createElement('div');
-  panel.className = 'aggregation-panel';
-  panel.style.flex = '1';
-  panel.style.minWidth = '200px';
+// function createMeasuresPanel() {
+//   const panel = document.createElement('div');
+//   panel.className = 'measures-panel';
+//   panel.style.flex = '1';
+//   panel.style.minWidth = '200px';
 
-  const panelTitle = document.createElement('h3');
-  panelTitle.textContent = 'Aggregation';
-  panel.appendChild(panelTitle);
+//   const panelTitle = document.createElement('h3');
+//   panelTitle.textContent = 'Measures';
+//   panel.appendChild(panelTitle);
 
-  const select = document.createElement('select');
-  select.style.width = '100%';
+//   const select = document.createElement('select');
+//   select.multiple = true;
+//   select.style.width = '100%';
+//   select.style.height = '100px';
 
-  ['sum', 'avg', 'count', 'min', 'max'].forEach((agg) => {
-    const optionElement = document.createElement('option');
-    optionElement.value = agg;
-    optionElement.textContent = agg.toUpperCase();
-    select.appendChild(optionElement);
-  });
+//   config.measures.forEach((measure) => {
+//     const optionElement = document.createElement('option');
+//     optionElement.value = measure.uniqueName;
+//     optionElement.textContent = measure.caption;
+//     select.appendChild(optionElement);
+//   });
 
-  select.addEventListener('change', (event) => {
-    engine.setAggregation(event.target.value);
-    renderTable();
-  });
+//   select.addEventListener('change', () => {
+//     const selectedMeasures = Array.from(select.selectedOptions).map((option) =>
+//       config.measures.find((m) => m.uniqueName === option.value),
+//     );
+//     engine.setMeasures(selectedMeasures);
+//     renderTable();
+//   });
 
-  panel.appendChild(select);
-  return panel;
-}
+//   panel.appendChild(select);
+//   return panel;
+// }
+
+// function createAggregationPanel() {
+//   const panel = document.createElement('div');
+//   panel.className = 'aggregation-panel';
+//   panel.style.flex = '1';
+//   panel.style.minWidth = '200px';
+
+//   const panelTitle = document.createElement('h3');
+//   panelTitle.textContent = 'Aggregation';
+//   panel.appendChild(panelTitle);
+
+//   const select = document.createElement('select');
+//   select.style.width = '100%';
+
+//   ['sum', 'avg', 'count', 'min', 'max'].forEach((agg) => {
+//     const optionElement = document.createElement('option');
+//     optionElement.value = agg;
+//     optionElement.textContent = agg.toUpperCase();
+//     select.appendChild(optionElement);
+//   });
+
+//   select.addEventListener('change', (event) => {
+//     engine.setAggregation(event.target.value);
+//     renderTable();
+//   });
+
+//   panel.appendChild(select);
+//   return panel;
+// }
 
 function renderTable() {
   const state = engine.getState();
@@ -275,7 +302,7 @@ function renderTable() {
   }
 
   container.innerHTML = '';
-  container.appendChild(createControlPanel());
+ 
 
   const table = document.createElement('table');
   table.style.width = '100%';
@@ -333,7 +360,6 @@ function renderGroupedRows(tbody, groups, state, level) {
           td.style.borderBottom = '1px solid #dee2e6';
           td.style.borderRight = '1px solid #dee2e6';
           td.style.backgroundColor = '#f8f9fa';
-          td.style.textAlign = 'center';
 
           if (columnItems.length > 0) {
             let aggregateValue;
@@ -366,7 +392,6 @@ function renderGroupedRows(tbody, groups, state, level) {
         });
       });
     } else {
-      // Add empty cells for non-leaf nodes
       uniqueColumnValues.forEach(() => {
         state.measures.forEach(() => {
           const td = document.createElement('td');
@@ -484,6 +509,7 @@ document.addEventListener('DOMContentLoaded', () => {
     );
     return;
   }
-  createHeader();
+  const { PivotEngine } = PivotheadCore;
+  createHeader(config,PivotEngine);
   renderTable();
 });
