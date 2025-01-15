@@ -1,4 +1,5 @@
-export function conditionFormattingPopUp() {
+function createConditionFormattingPopup({ onApply, onCancel }) {
+  // Create overlay
   const overlay = document.createElement('div');
   overlay.style.position = 'fixed';
   overlay.style.top = '0';
@@ -16,254 +17,318 @@ export function conditionFormattingPopUp() {
   popup.style.padding = '20px';
   popup.style.backgroundColor = '#fff';
   popup.style.borderRadius = '8px';
-  popup.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+  popup.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
+  popup.style.width = '600px';
+  popup.style.padding = '24px';
 
-  const headerContainer = document.createElement('div');
-  headerContainer.style.display = 'flex';
-  headerContainer.style.justifyContent = 'space-between';
-  headerContainer.style.alignItems = 'center';
-  headerContainer.style.marginBottom = '10px';
+  // Create header
+  const header = document.createElement('div');
+  header.style.display = 'flex';
+  header.style.justifyContent = 'space-between';
+  header.style.alignItems = 'center';
+  header.style.marginBottom = '16px';
 
-  const header = document.createElement('h2');
-  header.textContent = 'Condition Formatting';
-  header.style.margin = '0';
+  const title = document.createElement('h2');
+  title.textContent = 'Conditional formatting';
+  title.style.fontSize = '20px';
+  title.style.fontWeight = '600';
 
-  const buttonContainer = document.createElement('div');
+  const buttonGroup = document.createElement('div');
+  buttonGroup.style.display = 'flex';
+  buttonGroup.style.gap = '8px';
 
-  const addButton = document.createElement('button');
-  addButton.textContent = '+';
-  addButton.style.padding = '8px 16px';
-  addButton.style.backgroundColor = '#fff';
-  addButton.style.color = '#000';
-  addButton.style.border = '1px solid #000';
-  addButton.style.borderRadius = '4px';
-  addButton.style.cursor = 'pointer';
-  addButton.style.marginRight = '10px';
+  const addButton = createButton('+', 'border');
+  const applyButton = createButton('APPLY', 'primary');
+  const cancelButton = createButton('CANCEL', 'secondary');
 
-  const applyButton = document.createElement('button');
-  applyButton.textContent = 'Apply';
-  applyButton.style.padding = '8px 16px';
-  applyButton.style.backgroundColor = '#fff';
-  applyButton.style.color = '#000';
-  applyButton.style.border = '1px solid #000';
-  applyButton.style.borderRadius = '4px';
-  applyButton.style.cursor = 'pointer';
-  applyButton.style.marginRight = '10px';
+  buttonGroup.append(addButton, applyButton, cancelButton);
+  header.append(title, buttonGroup);
 
-  applyButton.addEventListener('click', () => {
-    const values = [];
-    Array.from(formContainer.children).forEach((row) => {
-      const dropdowns = row.querySelectorAll('select');
-      const dropdownValues = Array.from(dropdowns).map(
-        (dropdown) => dropdown.value,
-      );
-      const buttonColors = {
-        buttonAColor: row.querySelector('.button-a').style.color || 'default',
-        buttonBBackground:
-          row.querySelector('.button-b').style.backgroundColor || 'default',
-      };
-      values.push({ dropdownValues, buttonColors });
-    });
-    console.log(values);
+  // Create divider
+  const divider = document.createElement('hr');
+  divider.style.margin = '16px 0';
+  divider.style.border = 'none';
+  divider.style.borderTop = '1px solid #e5e7eb';
+
+  // Create conditions container
+  const conditionsContainer = document.createElement('div');
+  conditionsContainer.style.display = 'flex';
+  conditionsContainer.style.flexDirection = 'column';
+  conditionsContainer.style.gap = '24px';
+
+  // Add initial condition
+  addCondition(conditionsContainer);
+
+  // Close function
+  const close = () => {
     document.body.removeChild(overlay);
-  });
+  };
 
-  const cancelButton = document.createElement('button');
-  cancelButton.textContent = 'Cancel';
-  cancelButton.style.padding = '8px 16px';
-  cancelButton.style.backgroundColor = '#fff';
-  cancelButton.style.color = '#000';
-  cancelButton.style.border = '1px solid #000';
-  cancelButton.style.borderRadius = '4px';
-  cancelButton.style.cursor = 'pointer';
-
-  cancelButton.addEventListener('click', () => {
-    document.body.removeChild(overlay);
-  });
-
-  buttonContainer.appendChild(addButton);
-  buttonContainer.appendChild(applyButton);
-  buttonContainer.appendChild(cancelButton);
-
-  headerContainer.appendChild(header);
-  headerContainer.appendChild(buttonContainer);
-
-  const separator = document.createElement('hr');
-  separator.style.border = '0';
-  separator.style.height = '1px';
-  separator.style.backgroundColor = '#ccc';
-  separator.style.margin = '10px 0';
-
-  const formContainer = document.createElement('div');
-
-  function createRow(container) {
-    const row = document.createElement('div');
-    row.style.marginBottom = '20px';
-
-    const labelRow = document.createElement('div');
-    labelRow.style.display = 'flex';
-    labelRow.style.alignItems = 'center';
-    labelRow.style.gap = '10px';
-    labelRow.style.marginBottom = '10px';
-
-    const labelText = document.createElement('span');
-    labelText.textContent = 'Label:';
-    labelText.style.flex = '0 0 60px';
-
-    for (let i = 1; i <= 3; i++) {
-      const dropdown = document.createElement('select');
-      dropdown.style.padding = '10px';
-      dropdown.style.borderRadius = '4px';
-      dropdown.style.border = '1px solid #ccc';
-      ['Option 1', 'Option 2', 'Option 3'].forEach((text) => {
-        const option = document.createElement('option');
-        option.value = text;
-        option.textContent = text;
-        dropdown.appendChild(option);
-      });
-      labelRow.appendChild(dropdown);
-    }
-
-    labelRow.insertBefore(labelText, labelRow.firstChild);
-
-    const crossButton = document.createElement('button');
-    crossButton.textContent = '✖';
-    crossButton.style.border = 'none';
-    crossButton.style.background = 'transparent';
-    crossButton.style.cursor = 'pointer';
-    crossButton.style.color = '#000';
-    crossButton.style.margin = '0 20px';
-
-    crossButton.addEventListener('click', () => {
-      container.removeChild(row);
-    });
-
-    labelRow.appendChild(crossButton);
-
-    const valueRow = document.createElement('div');
-    valueRow.style.display = 'flex';
-    valueRow.style.alignItems = 'center';
-    valueRow.style.gap = '10px';
-
-    const valueText = document.createElement('span');
-    valueText.textContent = 'Value:';
-    valueText.style.flex = '0 0 60px';
-
-    for (let i = 1; i <= 2; i++) {
-      const dropdown = document.createElement('select');
-      dropdown.style.padding = '10px';
-      dropdown.style.borderRadius = '4px';
-      dropdown.style.border = '1px solid #ccc';
-      ['Option A', 'Option B', 'Option C'].forEach((text) => {
-        const option = document.createElement('option');
-        option.value = text;
-        option.textContent = text;
-        dropdown.appendChild(option);
-      });
-      valueRow.appendChild(dropdown);
-    }
-
-    const buttonA = document.createElement('button');
-    buttonA.textContent = 'A';
-    buttonA.className = 'button-a';
-    buttonA.style.padding = '8px';
-    buttonA.style.border = '1px solid #ccc';
-    buttonA.style.borderRadius = '4px';
-    buttonA.style.cursor = 'pointer';
-
-    buttonA.addEventListener('click', (event) => {
-      const colorPicker = document.createElement('input');
-      colorPicker.type = 'color';
-      colorPicker.style.position = 'absolute';
-      colorPicker.style.zIndex = '1001';
-      colorPicker.style.border = 'none';
-      colorPicker.style.width = '100px';
-      colorPicker.style.height = '50px';
-
-      // Position the color picker above the button
-      const buttonRect = event.target.getBoundingClientRect();
-      colorPicker.style.left = `${buttonRect.left}px`;
-      colorPicker.style.top = `${buttonRect.top - 40}px`;
-
-      document.body.appendChild(colorPicker);
-
-      colorPicker.addEventListener('input', (event) => {
-        buttonA.style.color = event.target.value;
-      });
-
-      colorPicker.addEventListener('change', () => {
-        document.body.removeChild(colorPicker);
-      });
-
-      colorPicker.click();
-    });
-    const buttonB = document.createElement('button');
-    buttonB.textContent = 'B';
-    buttonB.className = 'button-b';
-    buttonB.style.padding = '8px';
-    buttonB.style.border = '1px solid #ccc';
-    buttonB.style.borderRadius = '4px';
-    buttonB.style.cursor = 'pointer';
-
-    buttonB.addEventListener('click', (event) => {
-      const colorPicker = document.createElement('input');
-      colorPicker.type = 'color';
-      colorPicker.style.position = 'absolute';
-      colorPicker.style.zIndex = '1001';
-      colorPicker.style.border = 'none';
-      colorPicker.style.width = '100px';
-      colorPicker.style.height = '50px';
-
-      const buttonRect = event.target.getBoundingClientRect();
-      colorPicker.style.left = `${buttonRect.left - 20}px`;
-      colorPicker.style.top = `${buttonRect.top - 60}px`;
-
-      document.body.appendChild(colorPicker);
-
-      colorPicker.addEventListener('input', (event) => {
-        buttonB.style.backgroundColor = event.target.value;
-      });
-
-      colorPicker.addEventListener('change', () => {
-        document.body.removeChild(colorPicker);
-      });
-
-      colorPicker.click();
-    });
-
-    valueRow.appendChild(buttonA);
-    valueRow.appendChild(buttonB);
-
-    valueRow.insertBefore(valueText, valueRow.firstChild);
-
-    const removeButton = document.createElement('button');
-    removeButton.textContent = '✖';
-    removeButton.style.border = 'none';
-    removeButton.style.background = 'transparent';
-    removeButton.style.cursor = 'pointer';
-    removeButton.style.color = 'red';
-
-    removeButton.addEventListener('click', () => {
-      container.removeChild(row);
-    });
-
-    row.appendChild(labelRow);
-    row.appendChild(valueRow);
-    // row.appendChild(removeButton);
-    container.appendChild(row);
-  }
-
-  // Initial rows
-  createRow(formContainer);
-  createRow(formContainer);
-
+  // Event listeners
   addButton.addEventListener('click', () => {
-    createRow(formContainer);
+    addCondition(conditionsContainer);
+    updateRemoveButtons(conditionsContainer);
+  });
+  applyButton.addEventListener('click', () => {
+    const conditions = Array.from(conditionsContainer.children).map(getConditionData);
+    onApply(conditions);
+    close();
+  });
+  cancelButton.addEventListener('click', () => {
+    close();
+    onCancel();
   });
 
-  popup.appendChild(headerContainer);
-  popup.appendChild(separator);
-  popup.appendChild(formContainer);
+  // Assemble popup
+  popup.append(header, divider, conditionsContainer);
   overlay.appendChild(popup);
   document.body.appendChild(overlay);
+
+  return { overlay, close };
 }
+
+function createButton(text, variant) {
+  const button = document.createElement('button');
+  button.textContent = text;
+  button.style.padding = variant === '+' ? '4px 12px' : '4px 16px';
+  button.style.borderRadius = '4px';
+  button.style.cursor = 'pointer';
+  button.style.fontWeight = '500';
+
+  switch (variant) {
+    case 'primary':
+      button.style.backgroundColor = '#1f2937';
+      button.style.color = 'white';
+      button.style.border = 'none';
+      break;
+    case 'secondary':
+      button.style.backgroundColor = '#e5e7eb';
+      button.style.color = '#374151';
+      button.style.border = 'none';
+      break;
+    case 'border':
+      button.style.backgroundColor = 'white';
+      button.style.border = '1px solid #d1d5db';
+      button.style.color = '#374151';
+      break;
+  }
+
+  return button;
+}
+
+function addCondition(container) {
+  const condition = document.createElement('div');
+  condition.style.display = 'flex';
+  condition.style.flexDirection = 'column';
+  condition.style.gap = '16px';
+
+  // Value row
+  const valueRow = createFormRow('Value:', [
+    createSelect(['All values', 'Number', 'Text']),
+    createSelect(['Greater than', 'Less than', 'Between', 'Equal to']),
+    createInput('text', ''),
+  ]);
+
+  // Add "between" input when needed
+  const operatorSelect = valueRow.querySelector('select:nth-child(2)');
+  operatorSelect.addEventListener('change', (e) => {
+    const existingBetween = valueRow.querySelector('.between-input');
+    if (e.target.value === 'Between' && !existingBetween) {
+      const betweenGroup = document.createElement('div');
+      betweenGroup.className = 'between-input';
+      betweenGroup.style.display = 'flex';
+      betweenGroup.style.alignItems = 'center';
+      betweenGroup.style.gap = '8px';
+
+      const andText = document.createElement('span');
+      andText.textContent = '&';
+      const secondInput = createInput('text', '');
+
+      betweenGroup.append(andText, secondInput);
+      valueRow.insertBefore(betweenGroup, valueRow.lastChild);
+    } else if (e.target.value !== 'Between' && existingBetween) {
+      existingBetween.remove();
+    }
+  });
+
+  // Format row
+  const formatRow = createFormRow('Format:', [
+    createSelect(['Trebuchet MS', 'Arial', 'Times New Roman']),
+    createSelect(['12px', '14px', '16px']),
+    createColorInput('#000000'),
+    createBackgroundColorInput('#FFFFFF'),
+  ]);
+
+  // Remove button
+  const removeButton = document.createElement('button');
+  removeButton.textContent = '×';
+  removeButton.style.position = 'absolute';
+  removeButton.style.right = '0';
+  removeButton.style.top = '0';
+  removeButton.style.padding = '8px';
+  removeButton.style.color = '#6b7280';
+  removeButton.style.backgroundColor = 'transparent';
+  removeButton.style.border = 'none';
+  removeButton.style.cursor = 'pointer';
+  removeButton.style.fontSize = '20px';
+  removeButton.style.display = 'none'; // Initially hidden
+
+  removeButton.addEventListener('click', () => {
+    condition.remove();
+    updateRemoveButtons(container);
+  });
+
+  // Assemble condition
+  condition.append(valueRow, formatRow, removeButton);
+  container.appendChild(condition);
+  updateRemoveButtons(container);
+}
+
+function createFormRow(label, inputs) {
+  const row = document.createElement('div');
+  row.style.display = 'flex';
+  row.style.alignItems = 'center';
+  row.style.gap = '16px';
+  row.style.position = 'relative';
+
+  const labelElement = document.createElement('span');
+  labelElement.textContent = label;
+  labelElement.style.width = '64px';
+
+  row.appendChild(labelElement);
+  inputs.forEach(input => row.appendChild(input));
+
+  return row;
+}
+
+function createSelect(options) {
+  const select = document.createElement('select');
+  select.style.padding = '8px';
+  select.style.border = '1px solid #d1d5db';
+  select.style.borderRadius = '4px';
+  select.style.backgroundColor = 'white';
+
+  options.forEach(optionText => {
+    const option = document.createElement('option');
+    option.value = optionText;
+    option.textContent = optionText;
+    select.appendChild(option);
+  });
+
+  return select;
+}
+
+function createInput(type, value) {
+  const input = document.createElement('input');
+  input.type = type;
+  input.value = value;
+  input.style.padding = '8px';
+  input.style.border = '1px solid #d1d5db';
+  input.style.borderRadius = '4px';
+  input.style.width = type === 'text' ? '100px' : 'auto';
+  return input;
+}
+
+function createColorInput(defaultColor) {
+  const wrapper = document.createElement('div');
+  wrapper.style.position = 'relative';
+  wrapper.style.width = '32px';
+  wrapper.style.height = '32px';
+
+  const input = document.createElement('input');
+  input.type = 'color';
+  input.value = defaultColor;
+  input.style.position = 'absolute';
+  input.style.inset = '0';
+  input.style.opacity = '0';
+  input.style.cursor = 'pointer';
+
+  const preview = document.createElement('div');
+  preview.style.width = '100%';
+  preview.style.height = '100%';
+  preview.style.backgroundColor = defaultColor;
+  preview.style.border = '1px solid #d1d5db';
+  preview.style.borderRadius = '4px';
+
+  input.addEventListener('input', (e) => {
+    preview.style.backgroundColor = e.target.value;
+  });
+
+  wrapper.append(preview, input);
+  return wrapper;
+}
+
+function createBackgroundColorInput(defaultColor) {
+  const wrapper = document.createElement('div');
+  wrapper.style.width = '128px';
+  wrapper.style.height = '32px';
+  wrapper.style.position = 'relative';
+
+  const input = document.createElement('input');
+  input.type = 'color';
+  input.value = defaultColor;
+  input.style.position = 'absolute';
+  input.style.inset = '0';
+  input.style.opacity = '0';
+  input.style.cursor = 'pointer';
+
+  const preview = document.createElement('div');
+  preview.style.width = '100%';
+  preview.style.height = '100%';
+  preview.style.backgroundColor = defaultColor;
+  preview.style.border = '1px solid #d1d5db';
+  preview.style.borderRadius = '4px';
+
+  input.addEventListener('input', (e) => {
+    preview.style.backgroundColor = e.target.value;
+  });
+
+  wrapper.append(preview, input);
+  return wrapper;
+}
+
+function getConditionData(conditionElement) {
+  const [valueRow, formatRow] = conditionElement.children;
+  const valueSelects = valueRow.querySelectorAll('select');
+  const valueInputs = valueRow.querySelectorAll('input[type="text"]');
+  const formatSelects = formatRow.querySelectorAll('select');
+  const formatColors = formatRow.querySelectorAll('input[type="color"]');
+
+  return {
+    value: {
+      type: valueSelects[0].value,
+      operator: valueSelects[1].value,
+      value1: valueInputs[0].value,
+      value2: valueInputs[1]?.value || '',
+    },
+    format: {
+      font: formatSelects[0].value,
+      size: formatSelects[1].value,
+      color: formatColors[0].value,
+      backgroundColor: formatColors[1].value,
+    },
+  };
+}
+
+function updateRemoveButtons(container) {
+  const removeButtons = container.querySelectorAll('button');
+  removeButtons.forEach(button => {
+    button.style.display = container.children.length > 1 ? 'block' : 'none';
+  });
+}
+
+export function conditionFormattingPopUp(config, onFormatUpdate) {
+  createConditionFormattingPopup({
+    onApply: (conditions) => {
+      console.log('Applied conditions:', conditions);
+      // Update the formatting configuration
+      const newConfig = { ...config, conditionalFormatting: conditions };
+      // Call the callback to update main.js and re-render the table
+      onFormatUpdate(newConfig);
+    },
+    onCancel: () => {
+      console.log('Conditional formatting cancelled');
+    },
+  });
+}
+
