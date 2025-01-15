@@ -70,7 +70,9 @@ function createConditionFormattingPopup({ onApply, onCancel }) {
     updateRemoveButtons(conditionsContainer);
   });
   applyButton.addEventListener('click', () => {
-    const conditions = Array.from(conditionsContainer.children).map(getConditionData);
+    const conditions = Array.from(conditionsContainer.children).map(
+      getConditionData,
+    );
     onApply(conditions);
     close();
   });
@@ -117,6 +119,10 @@ function createButton(text, variant) {
 }
 
 function addCondition(container) {
+  const conditionWrapper = document.createElement('div');
+  conditionWrapper.style.position = 'relative';
+  conditionWrapper.style.width = '100%';
+
   const condition = document.createElement('div');
   condition.style.display = 'flex';
   condition.style.flexDirection = 'column';
@@ -161,7 +167,7 @@ function addCondition(container) {
 
   // Remove button
   const removeButton = document.createElement('button');
-  removeButton.textContent = '×';
+  removeButton.innerHTML = '&#10005;'; // 'x' symbol
   removeButton.style.position = 'absolute';
   removeButton.style.right = '0';
   removeButton.style.top = '0';
@@ -170,17 +176,22 @@ function addCondition(container) {
   removeButton.style.backgroundColor = 'transparent';
   removeButton.style.border = 'none';
   removeButton.style.cursor = 'pointer';
-  removeButton.style.fontSize = '20px';
+  removeButton.style.fontSize = '16px';
   removeButton.style.display = 'none'; // Initially hidden
 
   removeButton.addEventListener('click', () => {
-    condition.remove();
+    conditionWrapper.remove();
     updateRemoveButtons(container);
   });
 
-  // Assemble condition
-  condition.append(valueRow, formatRow, removeButton);
-  container.appendChild(condition);
+  condition.append(valueRow, formatRow);
+  conditionWrapper.appendChild(condition);
+  conditionWrapper.appendChild(removeButton);
+
+  // Set a data attribute to identify if it's the first condition
+  conditionWrapper.dataset.isFirst = container.children.length === 0;
+
+  container.appendChild(conditionWrapper);
   updateRemoveButtons(container);
 }
 
@@ -196,7 +207,7 @@ function createFormRow(label, inputs) {
   labelElement.style.width = '64px';
 
   row.appendChild(labelElement);
-  inputs.forEach(input => row.appendChild(input));
+  inputs.forEach((input) => row.appendChild(input));
 
   return row;
 }
@@ -208,7 +219,7 @@ function createSelect(options) {
   select.style.borderRadius = '4px';
   select.style.backgroundColor = 'white';
 
-  options.forEach(optionText => {
+  options.forEach((optionText) => {
     const option = document.createElement('option');
     option.value = optionText;
     option.textContent = optionText;
@@ -287,8 +298,9 @@ function createBackgroundColorInput(defaultColor) {
   return wrapper;
 }
 
-function getConditionData(conditionElement) {
-  const [valueRow, formatRow] = conditionElement.children;
+function getConditionData(conditionWrapper) {
+  const condition = conditionWrapper.firstChild;
+  const [valueRow, formatRow] = condition.children;
   const valueSelects = valueRow.querySelectorAll('select');
   const valueInputs = valueRow.querySelectorAll('input[type="text"]');
   const formatSelects = formatRow.querySelectorAll('select');
@@ -311,20 +323,25 @@ function getConditionData(conditionElement) {
 }
 
 function updateRemoveButtons(container) {
-  const removeButtons = container.querySelectorAll('button');
-  removeButtons.forEach(button => {
-    button.style.display = container.children.length > 1 ? 'block' : 'none';
+  const conditionWrappers = container.children;
+  Array.from(conditionWrappers).forEach((wrapper, index) => {
+    const removeButton = wrapper.querySelector('button');
+    if (index === 0 && wrapper.dataset.isFirst === 'true') {
+      removeButton.style.display = 'none';
+    } else {
+      removeButton.style.display = 'block';
+    }
   });
 }
 
-export function conditionFormattingPopUp(config, onFormatUpdate) {
+export function conditionFormattingPopUp(config) {
   createConditionFormattingPopup({
     onApply: (conditions) => {
       console.log('Applied conditions:', conditions);
       // Update the formatting configuration
-      const newConfig = { ...config, conditionalFormatting: conditions };
-      // Call the callback to update main.js and re-render the table
-      onFormatUpdate(newConfig);
+      config.conditionalFormatting = conditions;
+      // Apply the formatting directly
+      applyConditionalFormatting(config);
     },
     onCancel: () => {
       console.log('Conditional formatting cancelled');
@@ -332,3 +349,54 @@ export function conditionFormattingPopUp(config, onFormatUpdate) {
   });
 }
 
+function applyConditionalFormatting(config) {
+  const table = document.querySelector('#pivotTable table');
+  if (!table) {
+    console.error('Pivot table not found');
+    return;
+  }
+
+  const cells = table.querySelectorAll('td');
+  cells.forEach((cell) => {
+    const value = parseFloat(cell.textContent);
+    if (isNaN(value)) return; // Skip non-numeric cells
+
+    // Reset styles before applying new formatting
+    cell.style.fontFamily = '';
+    cell.style.fontSize = '';
+    cell.style.color = '';
+    cell.style.backgroundColor = '';
+
+    config.conditionalFormatting.forEach((rule) => {
+      if (
+        rule.value.type === 'All values' ||
+        (rule.value.type === 'Number' && typeof value === 'number')
+      ) {
+        let applyFormat = false;
+        switch (rule.value.operator) {
+          case 'Greater than':
+            applyFormat = value > parseFloat(rule.value.value1);
+            break;
+          case 'Less than':
+            applyFormat = value < parseFloat(rule.value.value1);
+            break;
+          case 'Between':
+            applyFormat =
+              value >= parseFloat(rule.value.value1) &&
+              value <= parseFloat(rule.value.value2);
+            break;
+          case 'Equal to':
+            applyFormat = value === parseFloat(rule.value.value1);
+            break;
+        }
+        if (applyFormat) {
+          console.log('Applying format:', rule.format);
+          cell.style.fontFamily = rule.format.font;
+          cell.style.fontSize = rule.format.size;
+          cell.style.color = rule.format.color;
+          cell.style.backgroundColor = rule.format.backgroundColor;
+        }
+      }
+    });
+  });
+}
