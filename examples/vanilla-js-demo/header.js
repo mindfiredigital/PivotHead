@@ -3,7 +3,7 @@ import { createOptionsPopup } from './optionsPopup.js';
 import { conditionFormattingPopUp } from './conditionFormattingPopUp.js';
 import { createFieldsPopup } from './fieldsPopup.js';
 
-export function createHeader() {
+export function createHeader(config) {
   console.log('createHeader called yes');
   const header = document.createElement('div');
   header.style.display = 'flex';
@@ -76,7 +76,7 @@ export function createHeader() {
               conditionFormattingPopUp();
               break;
             case 'Options':
-              createOptionsPopup();
+              createOptionsPopup(config);
               break;
             default:
               alert(optionName);
@@ -100,7 +100,7 @@ export function createHeader() {
         console.log('label clicked: ' + label);
         switch (label) {
           case 'Options':
-            createOptionsPopup();
+            createOptionsPopup(config);
             break;
           case 'Fields':
             createFieldsPopup();

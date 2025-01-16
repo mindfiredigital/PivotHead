@@ -10,6 +10,7 @@
  * - Row reordering (drag and drop)
  */
 import { createHeader } from './header.js';
+import temp from "./constant.js"
 if (typeof PivotheadCore === 'undefined') {
   console.error(
     'PivotheadCore is not defined. Make sure the library is loaded correctly.',
@@ -169,7 +170,7 @@ const config = {
 
 };
 // Initialize PivotEngine
-let engine = new PivotEngine(config);
+export let engine = new PivotEngine(config);
 PivotEngine.prototype.formatValue = function (value, field) {
   // Search in measures first
   const measure = config.measures.find((m) => m.uniqueName === field);
@@ -665,7 +666,9 @@ function groupData(data, groupFields) {
 
   return result;
 }
-
+export function renderData (data){
+  console.log(config)
+}
 // Initialize the table when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
   const pivotTableContainer = document.getElementById('pivotTable');
@@ -676,6 +679,6 @@ document.addEventListener('DOMContentLoaded', () => {
     );
     return;
   }
-  createHeader();
+  createHeader(config);
   renderTable();
 });

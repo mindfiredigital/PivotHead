@@ -1,5 +1,4 @@
 import temp from "./constant.js";
-import { engine } from "./main.js"
 
 export function formatCellPopUp(config, PivotEngine) {
     const dynamicData = config.measures;
@@ -42,13 +41,13 @@ export function formatCellPopUp(config, PivotEngine) {
     // Updated "Choose Value" to show dynamic measure captions
     const fields = [
         { name: "Choose Value", options: ["None", ...dynamicData.map(measure => measure.caption)] },
-        { name: "Text Align", options: ["Left", "Right"] },
-        { name: "Thousand Separator", options: ["Space", "Comma", "Dot"] },
-        { name: "Decimal Separator", options: ["Comma", "Dot"] },
-        { name: "Decimal Places", options: Array.from({ length: 9 }, (_, i) => (i + 1).toString()) },
+        // { name: "Text Align", options: ["Left", "Right"] },
+        // { name: "Thousand Separator", options: ["Space", "Comma", "Dot"] },
+        { name: "Decimal Separator", options: [",", "."] },
+        // { name: "Decimal Places", options: Array.from({ length: 9 }, (_, i) => (i + 1).toString()) },
         { name: "Currency Symbol", options: ["Dollar ($)", "Rupees (₹)"] },
         { name: "Currency Align", options: ["Left", "Right"] },
-        { name: "Null Value", options: ["None", "Null"] },
+        // { name: "Null Value", options: ["None", "Null"] },
         { name: "Format as Percent", options: ["Yes", "No"] },
     ];
 
