@@ -120,26 +120,46 @@ export function formatCellPopUp(config, PivotEngine) {
 
     const applyButton = document.createElement("button");
     applyButton.textContent = "Apply";
-    applyButton.style.padding = "10px 20px";
-    applyButton.style.backgroundColor = "#fff";
-    applyButton.style.color = "#000";
+    applyButton.style.padding = "12px 24px";
+    applyButton.style.backgroundColor = "#28a745";
+    applyButton.style.color = "#fff";
     applyButton.style.border = "none";
-    applyButton.style.borderRadius = "4px";
+    applyButton.style.borderRadius = "6px";
     applyButton.style.cursor = "pointer";
-    applyButton.style.border = "1px solid #000";
+    applyButton.style.fontSize = "16px";
+    applyButton.style.fontWeight = "bold";
     applyButton.style.margin = "0px 10px";
-
+    applyButton.style.transition = "background-color 0.3s ease, transform 0.2s ease";
+    applyButton.addEventListener("mouseover", () => {
+        applyButton.style.backgroundColor = "#218838";
+        applyButton.style.transform = "scale(1.05)";
+    });
+    applyButton.addEventListener("mouseout", () => {
+        applyButton.style.backgroundColor = "#28a745";
+        applyButton.style.transform = "scale(1)";
+    });
+    
     const cancelButton = document.createElement("button");
     cancelButton.textContent = "Cancel";
-    cancelButton.style.padding = "10px 20px";
-    cancelButton.style.backgroundColor = "#fff";
-    cancelButton.style.color = "#000";
+    cancelButton.style.padding = "12px 24px";
+    cancelButton.style.backgroundColor = "#dc3545";
+    cancelButton.style.color = "#fff";
     cancelButton.style.border = "none";
-    cancelButton.style.borderRadius = "4px";
+    cancelButton.style.borderRadius = "6px";
     cancelButton.style.cursor = "pointer";
-    cancelButton.style.border = "1px solid #000";
+    cancelButton.style.fontSize = "16px";
+    cancelButton.style.fontWeight = "bold";
     cancelButton.style.margin = "0px 10px";
-
+    cancelButton.style.transition = "background-color 0.3s ease, transform 0.2s ease";
+    cancelButton.addEventListener("mouseover", () => {
+        cancelButton.style.backgroundColor = "#c82333";
+        cancelButton.style.transform = "scale(1.05)";
+    });
+    cancelButton.addEventListener("mouseout", () => {
+        cancelButton.style.backgroundColor = "#dc3545";
+        cancelButton.style.transform = "scale(1)";
+    });
+    
     cancelButton.addEventListener("click", () => {
         document.body.removeChild(overlay);
     });
