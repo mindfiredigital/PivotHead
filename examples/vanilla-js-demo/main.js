@@ -10,6 +10,7 @@
  * - Row reordering (drag and drop)
  */
 import { createHeader } from './header.js';
+import temp from "./constant.js"
 if (typeof PivotheadCore === 'undefined') {
   console.error(
     'PivotheadCore is not defined. Make sure the library is loaded correctly.',
@@ -25,7 +26,7 @@ const data = [
     date: '2024-01-01',
     product: 'Widget A',
     region: 'North',
-    sales: 1000,
+    sales: 1000.98765454,
     quantity: 50,
   },
   {
@@ -103,8 +104,8 @@ const config = {
       uniqueName: 'sales',
       caption: 'Total Sales',
       aggregation: 'sum',
-      format: { 
-        type: 'currency', 
+      format: {
+        type: 'currency',
         currency: 'USD',
         locale: 'en-US',
         decimals: 2
@@ -114,7 +115,7 @@ const config = {
       uniqueName: 'quantity',
       caption: 'Total Quantity',
       aggregation: 'sum',
-      format: { 
+      format: {
         type: 'number',
         decimals: 2,
         locale: 'en-US'
@@ -124,8 +125,8 @@ const config = {
       uniqueName: 'averageSale',
       caption: 'Average Sale',
       aggregation: 'avg',
-      format: { 
-        type: 'currency', 
+      format: {
+        type: 'currency',
         currency: 'USD',
         locale: 'en-US',
         decimals: 2
@@ -148,19 +149,19 @@ const config = {
     grouper: (item, fields) => fields.map((field) => item[field]).join(' - '),
   },
   formatting: {
-    sales: { 
-      type: 'currency', 
+    sales: {
+      type: 'currency',
       currency: 'USD',
       locale: 'en-US',
       decimals: 2
     },
-    quantity: { 
+    quantity: {
       type: 'number',
       decimals: 2,
       locale: 'en-US'
     },
-    averageSale: { 
-      type: 'currency', 
+    averageSale: {
+      type: 'currency',
       currency: 'USD',
       locale: 'en-US',
       decimals: 2
@@ -171,134 +172,135 @@ const config = {
 // Initialize PivotEngine
 let engine = new PivotEngine(config);
 
-function createControlPanel() {
-  const controlPanel = document.createElement('div');
-  controlPanel.className = 'control-panel';
-  controlPanel.style.display = 'flex';
-  controlPanel.style.flexWrap = 'wrap';
-  controlPanel.style.gap = '20px';
-  controlPanel.style.marginBottom = '20px';
-  controlPanel.style.padding = '10px';
-  controlPanel.style.backgroundColor = '#f8f9fa';
-  controlPanel.style.border = '1px solid #dee2e6';
-  controlPanel.style.borderRadius = '4px';
- 
-  const rowsPanel = createAxisPanel('Rows', config.dimensions);
-  const columnsPanel = createAxisPanel('Columns', config.dimensions);
-  const measuresPanel = createMeasuresPanel();
-  const aggregationPanel = createAggregationPanel();
-  // const sortPanel = createSortPanel(); 
 
-  controlPanel.appendChild(rowsPanel);
-  controlPanel.appendChild(columnsPanel);
-  controlPanel.appendChild(measuresPanel);
-  controlPanel.appendChild(aggregationPanel);
-  // controlPanel.appendChild(sortPanel); 
+// function createControlPanel() {
+//   const controlPanel = document.createElement('div');
+//   controlPanel.className = 'control-panel';
+//   controlPanel.style.display = 'flex';
+//   controlPanel.style.flexWrap = 'wrap';
+//   controlPanel.style.gap = '20px';
+//   controlPanel.style.marginBottom = '20px';
+//   controlPanel.style.padding = '10px';
+//   controlPanel.style.backgroundColor = '#f8f9fa';
+//   controlPanel.style.border = '1px solid #dee2e6';
+//   controlPanel.style.borderRadius = '4px';
 
-  return controlPanel;
-}
+//   const rowsPanel = createAxisPanel('Rows', config.dimensions);
+//   const columnsPanel = createAxisPanel('Columns', config.dimensions);
+//   const measuresPanel = createMeasuresPanel();
+//   const aggregationPanel = createAggregationPanel();
+//   // const sortPanel = createSortPanel(); 
 
-function createAxisPanel(title, options) {
-  const panel = document.createElement('div');
-  panel.className = 'axis-panel';
-  panel.style.flex = '1';
-  panel.style.minWidth = '200px';
+//   controlPanel.appendChild(rowsPanel);
+//   controlPanel.appendChild(columnsPanel);
+//   controlPanel.appendChild(measuresPanel);
+//   controlPanel.appendChild(aggregationPanel);
+//   // controlPanel.appendChild(sortPanel); 
 
-  const panelTitle = document.createElement('h3');
-  panelTitle.textContent = title;
-  panel.appendChild(panelTitle);
+//   return controlPanel;
+// }
 
-  const select = document.createElement('select');
-  select.multiple = true;
-  select.style.width = '100%';
-  select.style.height = '100px';
+// function createAxisPanel(title, options) {
+//   const panel = document.createElement('div');
+//   panel.className = 'axis-panel';
+//   panel.style.flex = '1';
+//   panel.style.minWidth = '200px';
 
-  options.forEach((option) => {
-    const optionElement = document.createElement('option');
-    optionElement.value = option.field;
-    optionElement.textContent = option.label;
-    select.appendChild(optionElement);
-  });
+//   const panelTitle = document.createElement('h3');
+//   panelTitle.textContent = title;
+//   panel.appendChild(panelTitle);
 
-  select.addEventListener('change', () => {
-    const selectedFields = Array.from(select.selectedOptions).map((option) => ({
-      uniqueName: option.value,
-      caption: option.textContent,
-    }));
-    if (title === 'Rows') {
-      engine.state.rows = selectedFields;
-    } else {
-      engine.state.columns = selectedFields;
-    }
-    renderTable();
-  });
+//   const select = document.createElement('select');
+//   select.multiple = true;
+//   select.style.width = '100%';
+//   select.style.height = '100px';
 
-  panel.appendChild(select);
-  return panel;
-}
+//   options.forEach((option) => {
+//     const optionElement = document.createElement('option');
+//     optionElement.value = option.field;
+//     optionElement.textContent = option.label;
+//     select.appendChild(optionElement);
+//   });
 
-function createMeasuresPanel() {
-  const panel = document.createElement('div');
-  panel.className = 'measures-panel';
-  panel.style.flex = '1';
-  panel.style.minWidth = '200px';
+//   select.addEventListener('change', () => {
+//     const selectedFields = Array.from(select.selectedOptions).map((option) => ({
+//       uniqueName: option.value,
+//       caption: option.textContent,
+//     }));
+//     if (title === 'Rows') {
+//       engine.state.rows = selectedFields;
+//     } else {
+//       engine.state.columns = selectedFields;
+//     }
+//     renderTable();
+//   });
 
-  const panelTitle = document.createElement('h3');
-  panelTitle.textContent = 'Measures';
-  panel.appendChild(panelTitle);
+//   panel.appendChild(select);
+//   return panel;
+// }
 
-  const select = document.createElement('select');
-  select.multiple = true;
-  select.style.width = '100%';
-  select.style.height = '100px';
+// function createMeasuresPanel() {
+//   const panel = document.createElement('div');
+//   panel.className = 'measures-panel';
+//   panel.style.flex = '1';
+//   panel.style.minWidth = '200px';
 
-  config.measures.forEach((measure) => {
-    const optionElement = document.createElement('option');
-    optionElement.value = measure.uniqueName;
-    optionElement.textContent = measure.caption;
-    select.appendChild(optionElement);
-  });
+//   const panelTitle = document.createElement('h3');
+//   panelTitle.textContent = 'Measures';
+//   panel.appendChild(panelTitle);
 
-  select.addEventListener('change', () => {
-    const selectedMeasures = Array.from(select.selectedOptions).map((option) =>
-      config.measures.find((m) => m.uniqueName === option.value),
-    );
-    engine.setMeasures(selectedMeasures);
-    renderTable();
-  });
+//   const select = document.createElement('select');
+//   select.multiple = true;
+//   select.style.width = '100%';
+//   select.style.height = '100px';
 
-  panel.appendChild(select);
-  return panel;
-}
+//   config.measures.forEach((measure) => {
+//     const optionElement = document.createElement('option');
+//     optionElement.value = measure.uniqueName;
+//     optionElement.textContent = measure.caption;
+//     select.appendChild(optionElement);
+//   });
 
-function createAggregationPanel() {
-  const panel = document.createElement('div');
-  panel.className = 'aggregation-panel';
-  panel.style.flex = '1';
-  panel.style.minWidth = '200px';
+//   select.addEventListener('change', () => {
+//     const selectedMeasures = Array.from(select.selectedOptions).map((option) =>
+//       config.measures.find((m) => m.uniqueName === option.value),
+//     );
+//     engine.setMeasures(selectedMeasures);
+//     renderTable();
+//   });
 
-  const panelTitle = document.createElement('h3');
-  panelTitle.textContent = 'Aggregation';
-  panel.appendChild(panelTitle);
+//   panel.appendChild(select);
+//   return panel;
+// }
 
-  const select = document.createElement('select');
-  select.style.width = '100%';
+// function createAggregationPanel() {
+//   const panel = document.createElement('div');
+//   panel.className = 'aggregation-panel';
+//   panel.style.flex = '1';
+//   panel.style.minWidth = '200px';
 
-  ['sum', 'avg', 'count', 'min', 'max'].forEach((agg) => {
-    const optionElement = document.createElement('option');
-    optionElement.value = agg;
-    optionElement.textContent = agg.toUpperCase();
-    select.appendChild(optionElement);
-  });
+//   const panelTitle = document.createElement('h3');
+//   panelTitle.textContent = 'Aggregation';
+//   panel.appendChild(panelTitle);
 
-  select.addEventListener('change', (event) => {
-    engine.setAggregation(event.target.value);
-    renderTable();
-  });
+//   const select = document.createElement('select');
+//   select.style.width = '100%';
 
-  panel.appendChild(select);
-  return panel;
-}
+//   ['sum', 'avg', 'count', 'min', 'max'].forEach((agg) => {
+//     const optionElement = document.createElement('option');
+//     optionElement.value = agg;
+//     optionElement.textContent = agg.toUpperCase();
+//     select.appendChild(optionElement);
+//   });
+
+//   select.addEventListener('change', (event) => {
+//     engine.setAggregation(event.target.value);
+//     renderTable();
+//   });
+
+//   panel.appendChild(select);
+//   return panel;
+// }
 
 //TODO: Uncomment when sort featur works.
 // function createSortPanel() {
@@ -380,24 +382,24 @@ function createAggregationPanel() {
 
 
 export function onSectionItemDrop(droppedFields) {
-  let droppedFieldsInSections=JSON.stringify({
+  let droppedFieldsInSections = JSON.stringify({
     rows: Array.from(droppedFields.rows),
     columns: Array.from(droppedFields.columns),
     values: Array.from(droppedFields.values),
     filters: Array.from(droppedFields.filters)
   });
-  const parsedDroppedFieldsInSections=JSON.parse(droppedFieldsInSections)
+  const parsedDroppedFieldsInSections = JSON.parse(droppedFieldsInSections)
 
-  const transformedRows=parsedDroppedFieldsInSections.rows.map((rowField)=>{ return { uniqueName:rowField.toLowerCase(), caption:rowField}});
-        const transformedColumns=parsedDroppedFieldsInSections.columns.map((columnField)=>{ return { uniqueName:columnField.toLowerCase(), caption:columnField}});
-        // const transformedValues=parsedDroppedFieldsInSections.values.map((valueField)=>{ return { uniqueName:valueField.toLowerCase(), caption:valueField}})
-        // const transformedFilters=parsedDroppedFieldsInSections.filters.map((filterField)=>{ return { uniqueName:filterField.toLowerCase(), caption:filterField}})
+  const transformedRows = parsedDroppedFieldsInSections.rows.map((rowField) => { return { uniqueName: rowField.toLowerCase(), caption: rowField } });
+  const transformedColumns = parsedDroppedFieldsInSections.columns.map((columnField) => { return { uniqueName: columnField.toLowerCase(), caption: columnField } });
+  // const transformedValues=parsedDroppedFieldsInSections.values.map((valueField)=>{ return { uniqueName:valueField.toLowerCase(), caption:valueField}})
+  // const transformedFilters=parsedDroppedFieldsInSections.filters.map((filterField)=>{ return { uniqueName:filterField.toLowerCase(), caption:filterField}})
 
-        //TODO: for now only-applicable to rows and columns, will do the same for values and global filters in next iteration
-        engine.state.rows=transformedRows;
-        engine.state.columns=transformedColumns;
+  //TODO: for now only-applicable to rows and columns, will do the same for values and global filters in next iteration
+  engine.state.rows = transformedRows;
+  engine.state.columns = transformedColumns;
 
-        renderTable();
+  renderTable();
 }
 
 function renderTable() {
@@ -645,7 +647,10 @@ function groupData(data, groupFields) {
 
   return result;
 }
-
+export function formatTable(newConfig) {
+  engine = new PivotEngine(newConfig);
+  renderTable()
+}
 // Initialize the table when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
   const pivotTableContainer = document.getElementById('pivotTable');
@@ -656,6 +661,6 @@ document.addEventListener('DOMContentLoaded', () => {
     );
     return;
   }
-  createHeader();
+  createHeader(config);
   renderTable();
 });

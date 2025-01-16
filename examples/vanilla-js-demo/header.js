@@ -3,7 +3,7 @@ import { createOptionsPopup } from './optionsPopup.js';
 import { conditionFormattingPopUp } from './conditionFormattingPopUp.js';
 import { createFieldsPopup } from './fieldsPopup.js';
 
-export function createHeader() {
+export function createHeader(config) {
   console.log('createHeader called yes');
   const header = document.createElement('div');
   header.style.display = 'flex';
@@ -42,7 +42,7 @@ export function createHeader() {
     const dropdown = document.createElement('div');
     dropdown.style.position = 'absolute';
     dropdown.style.top = '100%';
-    dropdown.style.left = '0';
+    dropdown.style.right = '0px';
     dropdown.style.backgroundColor = '#ffffff';
     dropdown.style.border = '1px solid #d1d5db';
     dropdown.style.borderRadius = '10px';
@@ -70,13 +70,13 @@ export function createHeader() {
           console.log(optionName);
           switch (optionName) {
             case 'Format Cell':
-              formatCellPopUp();
+              formatCellPopUp(config);
               break;
             case 'Condition Formatting':
               conditionFormattingPopUp();
               break;
             case 'Options':
-              createOptionsPopup();
+              createOptionsPopup(config);
               break;
             default:
               alert(optionName);
@@ -100,7 +100,7 @@ export function createHeader() {
         console.log('label clicked: ' + label);
         switch (label) {
           case 'Options':
-            createOptionsPopup();
+            createOptionsPopup(config);
             break;
           case 'Fields':
             createFieldsPopup();
@@ -165,7 +165,7 @@ export function createHeader() {
       label: 'Format',
       dropdownOptions: ['Format Cell', 'Condition Formatting'],
     },
-    { icon: '⚙️', label: 'Options', dropdownOptions: [] },
+    // { icon: '⚙️', label: 'Options', dropdownOptions: [] },
     { icon: '📋', label: 'Fields', dropdownOptions: [] },
   ];
 
