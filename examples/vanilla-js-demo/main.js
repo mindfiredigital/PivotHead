@@ -26,7 +26,7 @@ const data = [
     date: '2024-01-01',
     product: 'Widget A',
     region: 'North',
-    sales: 1000,
+    sales: 1000.98765454,
     quantity: 50,
   },
   {
@@ -104,8 +104,8 @@ const config = {
       uniqueName: 'sales',
       caption: 'Total Sales',
       aggregation: 'sum',
-      format: { 
-        type: 'currency', 
+      format: {
+        type: 'currency',
         currency: 'USD',
         locale: 'en-US',
         decimals: 2
@@ -115,7 +115,7 @@ const config = {
       uniqueName: 'quantity',
       caption: 'Total Quantity',
       aggregation: 'sum',
-      format: { 
+      format: {
         type: 'number',
         decimals: 2,
         locale: 'en-US'
@@ -125,8 +125,8 @@ const config = {
       uniqueName: 'averageSale',
       caption: 'Average Sale',
       aggregation: 'avg',
-      format: { 
-        type: 'currency', 
+      format: {
+        type: 'currency',
         currency: 'USD',
         locale: 'en-US',
         decimals: 2
@@ -149,19 +149,19 @@ const config = {
     grouper: (item, fields) => fields.map((field) => item[field]).join(' - '),
   },
   formatting: {
-    sales: { 
-      type: 'currency', 
+    sales: {
+      type: 'currency',
       currency: 'USD',
       locale: 'en-US',
       decimals: 2
     },
-    quantity: { 
+    quantity: {
       type: 'number',
       decimals: 2,
       locale: 'en-US'
     },
-    averageSale: { 
-      type: 'currency', 
+    averageSale: {
+      type: 'currency',
       currency: 'USD',
       locale: 'en-US',
       decimals: 2
@@ -170,47 +170,7 @@ const config = {
 
 };
 // Initialize PivotEngine
-export let engine = new PivotEngine(config);
-PivotEngine.prototype.formatValue = function (value, field) {
-  // Search in measures first
-  const measure = config.measures.find((m) => m.uniqueName === field);
-  
-  if (measure && measure.format?.type === 'currency') {
-    const format = measure.format || {};
-    const { symbol, align } = format;
-
-    // Format the currency value
-    const formattedValue = value
-      .toFixed(temp.decimalPlaces)
-      .replace(/\B(?=(\d{3})+(?!\d))/g, temp.thousandSeparator)
-      .replace('.', temp.decimalSeparator);
-
-    return align === "left"
-      ? `${symbol || temp.currencySymbol}${formattedValue}`
-      : `${formattedValue}${symbol || temp.currencySymbol}`;
-  }
-
-  // If not found in measures, check in dimensions
-  const dimension = config.dimensions.find((dim) => dim.field === field);
-
-  if (dimension && dimension.format?.type === 'currency') {
-    const format = dimension.format || {};
-    const { symbol, align } = format;
-
-    // Format the currency value
-    const formattedValue = value
-      .toFixed(temp.decimalPlaces)
-      .replace(/\B(?=(\d{3})+(?!\d))/g, temp.thousandSeparator)
-      .replace('.', temp.decimalSeparator);
-
-    return align === "left"
-      ? `${symbol || temp.currencySymbol}${formattedValue}`
-      : `${formattedValue}${symbol || temp.currencySymbol}`;
-  }
-
-  // Return the original value if it's not a currency type
-  return value;
-};
+let engine = new PivotEngine(config);
 
 
 // function createControlPanel() {
@@ -224,7 +184,7 @@ PivotEngine.prototype.formatValue = function (value, field) {
 //   controlPanel.style.backgroundColor = '#f8f9fa';
 //   controlPanel.style.border = '1px solid #dee2e6';
 //   controlPanel.style.borderRadius = '4px';
- 
+
 //   const rowsPanel = createAxisPanel('Rows', config.dimensions);
 //   const columnsPanel = createAxisPanel('Columns', config.dimensions);
 //   const measuresPanel = createMeasuresPanel();
@@ -422,24 +382,24 @@ PivotEngine.prototype.formatValue = function (value, field) {
 
 
 export function onSectionItemDrop(droppedFields) {
-  let droppedFieldsInSections=JSON.stringify({
+  let droppedFieldsInSections = JSON.stringify({
     rows: Array.from(droppedFields.rows),
     columns: Array.from(droppedFields.columns),
     values: Array.from(droppedFields.values),
     filters: Array.from(droppedFields.filters)
   });
-  const parsedDroppedFieldsInSections=JSON.parse(droppedFieldsInSections)
+  const parsedDroppedFieldsInSections = JSON.parse(droppedFieldsInSections)
 
-  const transformedRows=parsedDroppedFieldsInSections.rows.map((rowField)=>{ return { uniqueName:rowField.toLowerCase(), caption:rowField}});
-        const transformedColumns=parsedDroppedFieldsInSections.columns.map((columnField)=>{ return { uniqueName:columnField.toLowerCase(), caption:columnField}});
-        // const transformedValues=parsedDroppedFieldsInSections.values.map((valueField)=>{ return { uniqueName:valueField.toLowerCase(), caption:valueField}})
-        // const transformedFilters=parsedDroppedFieldsInSections.filters.map((filterField)=>{ return { uniqueName:filterField.toLowerCase(), caption:filterField}})
+  const transformedRows = parsedDroppedFieldsInSections.rows.map((rowField) => { return { uniqueName: rowField.toLowerCase(), caption: rowField } });
+  const transformedColumns = parsedDroppedFieldsInSections.columns.map((columnField) => { return { uniqueName: columnField.toLowerCase(), caption: columnField } });
+  // const transformedValues=parsedDroppedFieldsInSections.values.map((valueField)=>{ return { uniqueName:valueField.toLowerCase(), caption:valueField}})
+  // const transformedFilters=parsedDroppedFieldsInSections.filters.map((filterField)=>{ return { uniqueName:filterField.toLowerCase(), caption:filterField}})
 
-        //TODO: for now only-applicable to rows and columns, will do the same for values and global filters in next iteration
-        engine.state.rows=transformedRows;
-        engine.state.columns=transformedColumns;
+  //TODO: for now only-applicable to rows and columns, will do the same for values and global filters in next iteration
+  engine.state.rows = transformedRows;
+  engine.state.columns = transformedColumns;
 
-        renderTable();
+  renderTable();
 }
 
 function renderTable() {
@@ -687,8 +647,9 @@ function groupData(data, groupFields) {
 
   return result;
 }
-export function renderData (data){
-  console.log(config)
+export function formatTable(newConfig) {
+  engine = new PivotEngine(newConfig);
+  renderTable()
 }
 // Initialize the table when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {

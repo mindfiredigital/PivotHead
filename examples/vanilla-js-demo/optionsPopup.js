@@ -1,6 +1,5 @@
-import {engine} from "./main.js"
+
 export function createOptionsPopup(data) {
-    console.log(data)
     // Create the overlay
     const overlay = document.createElement("div");
     overlay.style.position = "fixed";
@@ -53,7 +52,7 @@ export function createOptionsPopup(data) {
             const selectedRadio = group.querySelector("input[type='radio']:checked");
             selectedData[title] = selectedRadio ? selectedRadio.value : null;
         });
-    
+
         // Update the rows and columns in the config object
         if (selectedData.Row) {
             data.rows = [{ uniqueName: selectedData.Row, caption: selectedData.Row }];
@@ -63,7 +62,7 @@ export function createOptionsPopup(data) {
             data.columns = [{ uniqueName: selectedData.Column, caption: selectedData.Column }];
             data.groupConfig.columnFields = [selectedData.Column];
         }
-    
+
         console.log("Updated Config:", data); // Log the updated config for debugging
         document.body.removeChild(overlay);
     });

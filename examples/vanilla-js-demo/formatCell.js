@@ -1,10 +1,9 @@
-import temp from "./constant.js";
 
+import { formatTable } from "./main.js"
 export function formatCellPopUp(config, PivotEngine) {
     const dynamicData = config.measures;
     console.log(dynamicData);
 
-    engine = new PivotEngine(config);
 
     const overlay = document.createElement("div");
     overlay.style.position = "fixed";
@@ -43,12 +42,12 @@ export function formatCellPopUp(config, PivotEngine) {
         { name: "Choose Value", options: ["None", ...dynamicData.map(measure => measure.caption)] },
         // { name: "Text Align", options: ["Left", "Right"] },
         // { name: "Thousand Separator", options: ["Space", "Comma", "Dot"] },
-        { name: "Decimal Separator", options: [",", "."] },
-        // { name: "Decimal Places", options: Array.from({ length: 9 }, (_, i) => (i + 1).toString()) },
+        // { name: "Decimal Separator", options: [",", "."] },
+        { name: "Decimal Places", options: Array.from({ length: 9 }, (_, i) => (i + 1).toString()) },
         { name: "Currency Symbol", options: ["Dollar ($)", "Rupees (₹)"] },
-        { name: "Currency Align", options: ["Left", "Right"] },
+        // { name: "Currency Align", options: ["Left", "Right"] },
         // { name: "Null Value", options: ["None", "Null"] },
-        { name: "Format as Percent", options: ["Yes", "No"] },
+        // { name: "Format as Percent", options: ["Yes", "No"] },
     ];
 
     const dropdownValues = fields.map((field) => ({ field: field.name, value: field.options[0] }));
@@ -147,46 +146,44 @@ export function formatCellPopUp(config, PivotEngine) {
 
     applyButton.addEventListener("click", () => {
         console.log("Selected Values:", dropdownValues);
-        let engine = new PivotEngine(config);
-        PivotEngine.prototype.formatValue = function (value, field) {
-            // Search in measures first
-            const measure = config.measures.find((m) => m.uniqueName === field);
 
-            if (measure && measure.format?.type === 'currency') {
-                const format = measure.format || {};
-                const { symbol, align } = format;
+        // Extract the selected "Choose Value" field
+        const selectedMeasure = dropdownValues.find(item => item.field === "Choose Value")?.value;
 
-                // Format the currency value
-                const formattedValue = value
-                    .toFixed(temp.decimalPlaces)
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, temp.thousandSeparator)
-                    .replace('.', temp.decimalSeparator);
+        if (selectedMeasure && selectedMeasure !== "None") {
+            // Find the corresponding measure in the config
+            const measure = config.measures.find(m => m.caption === selectedMeasure);
 
-                return `${symbol || temp.currencySymbol}${formattedValue}`
+            if (measure) {
+                // Update the measure's format based on the dropdown selections
+                measure.format = {
+                    type: "currency",
+                    currency: dropdownValues.find(item => item.field === "Currency Symbol")?.value.includes("Dollar") ? "USD" : "INR",
+                    locale: "en-US",
+                    decimals: parseInt(dropdownValues.find(item => item.field === "Decimal Places")?.value, 10) || 2,
+                    // decimalSeparator: dropdownValues.find(item => item.field === "Decimal Separator")?.value || ".",
+                    // align: dropdownValues.find(item => item.field === "Currency Align")?.value || "Left",
+                    // percent: dropdownValues.find(item => item.field === "Format as Percent")?.value === "Yes",
+                };
+                config.formatting[measure.uniqueName] = {
+                    type: "currency",
+                    currency: measure.format.currency,
+                    locale: measure.format.locale,
+                    decimals: measure.format.decimals,
+                    // percent: measure.format.percent,
+                };
 
+                console.log("Updated Measure Format:", measure.format);
             }
+        } else {
+            console.log("No valid measure selected. Config unchanged.");
+        }
 
-            // If not found in measures, check in dimensions
-            const dimension = config.dimensions.find((dim) => dim.field === field);
-
-            if (dimension && dimension.format?.type === 'currency') {
-                const format = dimension.format || {};
-                const { symbol, align } = format;
-
-                // Format the currency value
-                const formattedValue = value
-                    .toFixed(temp.decimalPlaces)
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, temp.thousandSeparator)
-                    .replace('.', temp.decimalSeparator);
-
-                return `${symbol || temp.currencySymbol}${formattedValue}`
-            }
-
-            // Return the original value if it's not a currency type
-            return value;
-        };
-        document.body.removeChild(overlay);
+        console.log("Updated Config:", config); // Log the updated config for debugging
+        formatTable(config)
+        document.body.removeChild(overlay); // Remove the popup
     });
+
 
     buttonContainer.appendChild(applyButton);
     buttonContainer.appendChild(cancelButton);
