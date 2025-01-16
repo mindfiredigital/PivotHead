@@ -174,58 +174,58 @@ const config = {
         type: 'Number',
         operator: 'Greater than',
         value1: '1000',
-        value2: ''
+        value2: '',
       },
       format: {
         font: 'Arial',
         size: '14px',
         color: '#ffffff',
-        backgroundColor: '#4CAF50'
-      }
+        backgroundColor: '#4CAF50',
+      },
     },
     {
       value: {
         type: 'Number',
         operator: 'Less than',
         value1: '500',
-        value2: ''
+        value2: '',
       },
       format: {
         font: 'Arial',
         size: '14px',
         color: '#ffffff',
-        backgroundColor: '#F44336'
-      }
+        backgroundColor: '#F44336',
+      },
     },
     {
       value: {
         type: 'Number',
         operator: 'Between',
         value1: '500',
-        value2: '1000'
+        value2: '1000',
       },
       format: {
         font: 'Arial',
         size: '14px',
         color: '#000000',
-        backgroundColor: '#FFC107'
-      }
+        backgroundColor: '#FFC107',
+      },
     },
     {
       value: {
         type: 'Number',
         operator: 'Greater than',
         value1: '50',
-        value2: ''
+        value2: '',
       },
       format: {
         font: 'Arial',
         size: '14px',
         color: '#ffffff',
-        backgroundColor: '#2196F3'
-      }
-    }
-  ]
+        backgroundColor: '#2196F3',
+      },
+    },
+  ],
 };
 // Initialize PivotEngine
 let engine = new PivotEngine(config);

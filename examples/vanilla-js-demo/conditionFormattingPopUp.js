@@ -376,8 +376,8 @@ function applyConditionalFormatting(config) {
 
   const cells = table.querySelectorAll('td');
   cells.forEach((cell) => {
-    const value = parseFloat(cell.textContent);
-    if (isNaN(value)) return; // Skip non-numeric cells
+    const cellValue = cell.textContent.trim();
+    let value = parseFloat(cellValue.replace(/[^0-9.-]+/g, ''));
 
     // Reset styles before applying new formatting
     cell.style.fontFamily = '';
@@ -388,7 +388,7 @@ function applyConditionalFormatting(config) {
     config.conditionalFormatting.forEach((rule) => {
       if (
         rule.value.type === 'All values' ||
-        (rule.value.type === 'Number' && typeof value === 'number')
+        (rule.value.type === 'Number' && !isNaN(value))
       ) {
         let applyFormat = false;
         switch (rule.value.operator) {
@@ -398,18 +398,16 @@ function applyConditionalFormatting(config) {
           case 'Less than':
             applyFormat = value < parseFloat(rule.value.value1);
             break;
-          //TODO: Update in future 
-          // case 'Between':
-          //   applyFormat =
-          //     value >= parseFloat(rule.value.value1) &&
-          //     value <= parseFloat(rule.value.value2);
-          //   break;
           case 'Equal to':
             applyFormat = value === parseFloat(rule.value.value1);
             break;
+          case 'Between':
+            applyFormat =
+              value >= parseFloat(rule.value.value1) &&
+              value <= parseFloat(rule.value.value2);
+            break;
         }
         if (applyFormat) {
-          console.log('Applying format:', rule.format);
           cell.style.fontFamily = rule.format.font;
           cell.style.fontSize = rule.format.size;
           cell.style.color = rule.format.color;
