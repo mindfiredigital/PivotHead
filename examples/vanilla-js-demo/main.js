@@ -746,9 +746,6 @@ function groupData(data, groupFields) {
   return result;
 }
 
-function showConditionFormattingPopup() {
-  conditionFormattingPopUp(config, updateFormatting);
-}
 
 // Initialize the table when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
