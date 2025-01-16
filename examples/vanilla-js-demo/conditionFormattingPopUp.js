@@ -99,14 +99,16 @@ function createButton(text, variant) {
 
   switch (variant) {
     case 'primary':
-      button.style.backgroundColor = '#1f2937';
+      button.style.backgroundColor = '#28a745';
       button.style.color = 'white';
       button.style.border = 'none';
+      button.style.padding = '10px 15px';
       break;
     case 'secondary':
-      button.style.backgroundColor = '#e5e7eb';
-      button.style.color = '#374151';
+      button.style.backgroundColor = ' #dc3545';
+      button.style.color = 'white';
       button.style.border = 'none';
+      button.style.padding = '10px 15px';
       break;
     case 'border':
       button.style.backgroundColor = 'white';

@@ -182,6 +182,8 @@ export class PivotEngine<T extends Record<string, any>> {
           return new Intl.NumberFormat(format.locale || 'en-US', {
             style: 'currency',
             currency: format.currency || 'USD',
+            minimumFractionDigits: format.decimals || 0,
+            maximumFractionDigits: format.decimals || 0,
           }).format(value);
         case 'number':
           return new Intl.NumberFormat(format.locale || 'en-US', {

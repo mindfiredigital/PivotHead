@@ -109,7 +109,7 @@ const config = {
         type: 'currency', 
         currency: 'USD',
         locale: 'en-US',
-        decimals: 2
+        decimals: 4
       },
     },
     {
@@ -130,7 +130,7 @@ const config = {
         type: 'currency', 
         currency: 'USD',
         locale: 'en-US',
-        decimals: 2
+        decimals: 4
       },
       formula: (item) => item.sales / item.quantity,
     },
@@ -154,18 +154,18 @@ const config = {
       type: 'currency', 
       currency: 'USD',
       locale: 'en-US',
-      decimals: 2
+      decimals: 4
     },
     quantity: { 
       type: 'number',
-      decimals: 2,
-      locale: 'en-US'
+      // decimals: 2,
+      // locale: 'en-US'
     },
     averageSale: { 
       type: 'currency', 
       currency: 'USD',
       locale: 'en-US',
-      decimals: 2
+      decimals: 4
     }
   },
   conditionalFormatting: [
