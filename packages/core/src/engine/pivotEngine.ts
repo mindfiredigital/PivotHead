@@ -182,8 +182,6 @@ export class PivotEngine<T extends Record<string, any>> {
           return new Intl.NumberFormat(format.locale || 'en-US', {
             style: 'currency',
             currency: format.currency || 'USD',
-            minimumFractionDigits: format.decimals || 0,
-            maximumFractionDigits: format.decimals || 0,
           }).format(value);
         case 'number':
           return new Intl.NumberFormat(format.locale || 'en-US', {
@@ -244,14 +242,14 @@ export class PivotEngine<T extends Record<string, any>> {
             formulaResults.map((value) => ({ value })),
             'value' as keyof { value: number },
             measure.aggregation ||
-            (this.state.selectedAggregation as AggregationType),
+              (this.state.selectedAggregation as AggregationType),
           );
         } else {
           group.aggregates[aggregateKey] = calculateAggregates(
             group.items,
             measure.uniqueName as keyof T,
             (measure.aggregation as AggregationType) ||
-            (this.state.selectedAggregation as AggregationType),
+              (this.state.selectedAggregation as AggregationType),
           );
         }
       });
@@ -461,8 +459,8 @@ export class PivotEngine<T extends Record<string, any>> {
         index < fromIndex || index > toIndex
           ? index
           : index < toIndex
-            ? index + 1
-            : index - 1,
+          ? index + 1
+          : index - 1,
     }));
     this.state.processedData = this.processData(this.state.data);
     this.updateAggregates();
