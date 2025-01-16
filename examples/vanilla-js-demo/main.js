@@ -10,11 +10,13 @@
  * - Row reordering (drag and drop)
  */
 import { createHeader } from './header.js';
+import { conditionFormattingPopUp } from './conditionFormattingPopUp.js';
 if (typeof PivotheadCore === 'undefined') {
   console.error(
     'PivotheadCore is not defined. Make sure the library is loaded correctly.',
   );
 }
+
 
 // Importing the Package
 const { PivotEngine } = PivotheadCore;
@@ -107,7 +109,7 @@ const config = {
         type: 'currency', 
         currency: 'USD',
         locale: 'en-US',
-        decimals: 2
+        decimals: 4
       },
     },
     {
@@ -128,7 +130,7 @@ const config = {
         type: 'currency', 
         currency: 'USD',
         locale: 'en-US',
-        decimals: 2
+        decimals: 4
       },
       formula: (item) => item.sales / item.quantity,
     },
@@ -152,21 +154,78 @@ const config = {
       type: 'currency', 
       currency: 'USD',
       locale: 'en-US',
-      decimals: 2
+      decimals: 4
     },
     quantity: { 
       type: 'number',
-      decimals: 2,
-      locale: 'en-US'
+      // decimals: 2,
+      // locale: 'en-US'
     },
     averageSale: { 
       type: 'currency', 
       currency: 'USD',
       locale: 'en-US',
-      decimals: 2
+      decimals: 4
     }
   },
-
+  conditionalFormatting: [
+    {
+      value: {
+        type: 'Number',
+        operator: 'Greater than',
+        value1: '1000',
+        value2: '',
+      },
+      format: {
+        font: 'Arial',
+        size: '14px',
+        color: '#ffffff',
+        backgroundColor: '#4CAF50',
+      },
+    },
+    {
+      value: {
+        type: 'Number',
+        operator: 'Less than',
+        value1: '500',
+        value2: '',
+      },
+      format: {
+        font: 'Arial',
+        size: '14px',
+        color: '#ffffff',
+        backgroundColor: '#F44336',
+      },
+    },
+    {
+      value: {
+        type: 'Number',
+        operator: 'Between',
+        value1: '500',
+        value2: '1000',
+      },
+      format: {
+        font: 'Arial',
+        size: '14px',
+        color: '#000000',
+        backgroundColor: '#FFC107',
+      },
+    },
+    {
+      value: {
+        type: 'Number',
+        operator: 'Greater than',
+        value1: '50',
+        value2: '',
+      },
+      format: {
+        font: 'Arial',
+        size: '14px',
+        color: '#ffffff',
+        backgroundColor: '#2196F3',
+      },
+    },
+  ],
 };
 // Initialize PivotEngine
 let engine = new PivotEngine(config);
@@ -499,6 +558,9 @@ function renderGroupedRows(tbody, groups, state, level) {
               aggregateValue,
               measure.uniqueName,
             );
+
+            //Apply condition formatting
+            applyConditionalFormatting(td, aggregateValue, measure.uniqueName);
           } else {
             td.textContent = engine.formatValue(0, measure.uniqueName);
           }
@@ -526,6 +588,39 @@ function renderGroupedRows(tbody, groups, state, level) {
       renderGroupedRows(tbody, value, state, level + 1);
     }
   });
+}
+
+function applyConditionalFormatting(td, value, measureName) {
+  if (config.conditionalFormatting && config.conditionalFormatting.length > 0) {
+    config.conditionalFormatting.forEach((rule) => {
+      if (rule.value.type === 'All values' || 
+          (rule.value.type === 'Number' && typeof value === 'number') ||
+          (rule.value.type === 'Text' && typeof value === 'string')) {
+        let applyFormat = false;
+        switch (rule.value.operator) {
+          case 'Greater than':
+            applyFormat = value > parseFloat(rule.value.value1);
+            break;
+          case 'Less than':
+            applyFormat = value < parseFloat(rule.value.value1);
+            break;
+          case 'Between':
+            applyFormat = value >= parseFloat(rule.value.value1) && 
+                          value <= parseFloat(rule.value.value2);
+            break;
+          case 'Equal to':
+            applyFormat = value === parseFloat(rule.value.value1) || value === rule.value.value1;
+            break;
+        }
+        if (applyFormat) {
+          td.style.fontFamily = rule.format.font;
+          td.style.fontSize = rule.format.size;
+          td.style.color = rule.format.color;
+          td.style.backgroundColor = rule.format.backgroundColor;
+        }
+      }
+    });
+  }
 }
 
 function renderTableHeader(thead, state) {
@@ -557,7 +652,6 @@ function renderTableHeader(thead, state) {
     th.style.borderRight = '1px solid #dee2e6';
     columnHeaderRow.appendChild(th);
   });
-
   thead.appendChild(columnHeaderRow);
 
   // Second header row for measures
@@ -620,6 +714,12 @@ function renderTableHeader(thead, state) {
 //   return icon;
 // }
 
+
+function updateFormatting(newConfig) {
+  config.conditionalFormatting = newConfig.conditionalFormatting;
+  renderTable();
+}
+
 function groupData(data, groupFields) {
   if (!groupFields || groupFields.length === 0) return {};
 
@@ -645,6 +745,7 @@ function groupData(data, groupFields) {
 
   return result;
 }
+
 
 // Initialize the table when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
