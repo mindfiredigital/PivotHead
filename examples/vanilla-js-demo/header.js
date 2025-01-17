@@ -41,7 +41,7 @@ export function createHeader(config) {
     const dropdown = document.createElement('div');
     dropdown.style.position = 'absolute';
     dropdown.style.top = '100%';
-    dropdown.style.left = '0';
+    dropdown.style.right = '0';
     dropdown.style.backgroundColor = '#ffffff';
     dropdown.style.border = '1px solid #d1d5db';
     dropdown.style.borderRadius = '10px';
@@ -164,7 +164,7 @@ export function createHeader(config) {
       label: 'Format',
       dropdownOptions: ['Format Cell', 'Condition Formatting'],
     },
-    { icon: '⚙️', label: 'Options', dropdownOptions: [] },
+    // { icon: '⚙️', label: 'Options', dropdownOptions: [] },
     { icon: '📋', label: 'Fields', dropdownOptions: [] },
   ];
 
