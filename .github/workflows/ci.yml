@@ -31,10 +31,6 @@ jobs:
       - name: Build application
         run: pnpm run build  # Use pnpm to run the build
 
-      - name: Restore changes in json
-        run: |
-          git restore package-lock.json
-
       - name: Set Git user name and email
         run: |
           git config --local user.email "github-actions@github.com"
