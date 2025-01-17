@@ -30,6 +30,9 @@ jobs:
         with:
           run_install: true
 
+      - name: Configure npm registry
+        run: pnpm config set registry https://registry.npmjs.org/
+
       # Step 4: Install dependencies
       - name: "Install dependencies"
         run: pnpm install --frozen-lockfile
