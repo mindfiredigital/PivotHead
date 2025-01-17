@@ -3,7 +3,7 @@ name: Deployment Workflow
 on:
   push:
     branches:
-      - test-workflow)
+      - test-workflow
   workflow_dispatch:
 
 jobs:
@@ -17,19 +17,21 @@ jobs:
       # Step 1: Checkout the repository
       - name: "Checkout repository"
         uses: actions/checkout@v2
+      
       # Step 2: Setup Node.js and pnpm
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'pnpm'
+      
       # Step 3: Install pnpm
       - name: "Install pnpm"
         run: npm install -g pnpm
 
       # Step 4: Install dependencies
       - name: "Install dependencies"
-        runs: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       # Step 5: Create build
       - name: "Build application"
