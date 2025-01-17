@@ -3,8 +3,7 @@ import { createOptionsPopup } from './optionsPopup.js';
 import { conditionFormattingPopUp } from './conditionFormattingPopUp.js';
 import { createFieldsPopup } from './fieldsPopup.js';
 
-export function createHeader() {
-  console.log('createHeader called yes');
+export function createHeader(config) {
   const header = document.createElement('div');
   header.style.display = 'flex';
   header.style.justifyContent = 'space-between';
@@ -70,7 +69,7 @@ export function createHeader() {
           console.log(optionName);
           switch (optionName) {
             case 'Format Cell':
-              formatCellPopUp();
+              formatCellPopUp(config);
               break;
             case 'Condition Formatting':
               conditionFormattingPopUp();
