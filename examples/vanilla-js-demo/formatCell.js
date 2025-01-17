@@ -1,8 +1,8 @@
 
 import { formatTable } from "./main.js"
 export function formatCellPopUp(config, PivotEngine) {
-    const dynamicData = config.measures;
-    console.log(dynamicData);
+    const dynamicData = config.measures.filter(measure => measure.format.type === "currency");
+
 
 
     const overlay = document.createElement("div");
