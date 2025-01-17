@@ -1,6 +1,6 @@
 {
-  "name": "PivotHead",
-  "version": "1.0.0",
+  "name": "@mindfiredigital/pivothead-core",
+  "version": "0.1.0",
   "private": true,
   "workspaces": [
     "packages/*",
