@@ -27,15 +27,20 @@ jobs:
       # Step 3: Set up pnpm
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
-        with:
-          run_install: true
+        # with:
+        #   run_install: true
 
-      - name: Configure npm registry
-        run: pnpm config set registry https://registry.npmjs.org/
+      # - name: Configure npm registry
+      #   run: pnpm config set registry https://registry.npmjs.org/
 
       # Step 4: Install dependencies
       - name: "Install dependencies"
-        run: pnpm install --frozen-lockfile
+        run: |
+          if [ -f pnpm-lock.yaml ]; then
+            pnpm install --frozen-lockfile
+          else
+            pnpm install
+          fi
 
       # Step 5: Create build
       - name: "Build application"
