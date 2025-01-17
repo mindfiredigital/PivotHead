@@ -62,7 +62,10 @@ jobs:
 
       - name: Semantic Release and npm release
         run: |
+          cd packages/core
+          pnpm install --frozen-lockfile
           npx semantic-release
+          
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
