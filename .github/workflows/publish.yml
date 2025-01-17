@@ -3,73 +3,72 @@ name: Deployment Workflow
 on:
   push:
     branches:
-      - main
+      - development  # Trigger on push to the 'development' branch
   workflow_dispatch:
 
 jobs:
   build:
-    name: "@mindfiredigital/pivothead-core"
+    name: "@mindfiredigital/pivothead_core"
     runs-on: ubuntu-latest
     permissions:
       contents: write
       packages: read
     steps:
-      # Step 1: Checkout the repository
-      - name: "Checkout repository"
+      - name: Checkout repository
         uses: actions/checkout@v2
-      # Step 2: Setup Node.js and pnpm
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
-      # Step 3: Install pnpm
-      - name: "Install pnpm"
-        run: npm install -g pnpm
 
-      # Step 4: Install dependencies
-      - name: "Install dependencies"
-        runs: pnpm install --frozen-lockfile
+      - name: Install pnpm
+        run: npm install -g pnpm  # Install pnpm globally
 
-      # Step 5: Create build
-      - name: "Build application"
-        run: pnpm run build
+      - name: Install dependencies
+        run: pnpm install  # Use pnpm to install dependencies
 
-      # Step 6: Set Git user name and email
-      - name: "Set Git user name and email"
+      - name: Build application
+        run: pnpm run build  # Use pnpm to run the build
+
+      - name: Set Git user name and email
         run: |
           git config --local user.email "github-actions@github.com"
           git config --local user.name "GitHub Actions"
 
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Authentication token for GitHub
+
   create-github-release:
-    name: Create Github release document and publish to node
+    name: Create GitHub release document and publish to npm
     runs-on: ubuntu-latest
     permissions:
       contents: write
     needs: build
     steps:
-      # Step 1: Checkout repository
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Step 2: Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
 
-      # Step 3: Run Semantic Release and npm release
+      - name: Install pnpm
+        run: npm install -g pnpm  # Install pnpm globally
+
+      - name: Install dependencies
+        run: pnpm install  # Use pnpm to install dependencies
+
       - name: Semantic Release and npm release
         run: |
-          npm ci
           npx semantic-release
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 4: Upload build artifacts as a ZIP file
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
-          name: core-build-zip # Name of the artifact
+          name: core-build-zip  # Name of the artifact
           path: ./packages/core/dist  # Path to the build folder to zip and upload
