@@ -36,12 +36,6 @@ jobs:
           git config --local user.email "github-actions@github.com"
           git config --local user.name "GitHub Actions"
 
-      - name: Push code to main branch
-        run: |
-          git fetch origin main  # Fetch the latest 'main' branch to make sure it's up to date
-          git checkout main  # Switch to the main branch
-          git merge development --no-ff -m "Merge development into main"  # Merge development into main
-          git push origin main  # Push the changes to the main branch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Authentication token for GitHub
 
