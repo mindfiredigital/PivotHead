@@ -30,8 +30,11 @@ jobs:
         # with:
         #   run_install: true
 
-      # - name: Configure npm registry
-      #   run: pnpm config set registry https://registry.npmjs.org/
+      - name: Clear pnpm cache
+        run: pnpm store prune
+
+      - name: Set npm registry
+        run: pnpm config set registry https://registry.npmjs.org/
 
       # Step 4: Install dependencies
       - name: "Install dependencies"
