@@ -1,11 +1,42 @@
 {
-  "name": "@pivothead/core",
+  "name": "@mindfiredigital/pivot-head-core",
   "version": "1.0.0",
   "main": "./dist/pivothead-core.umd.js",
   "module": "./dist/pivothead-core.umd.js",
   "types": "./dist/index.d.ts",
   "files": [
     "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mindfiredigital/PivotHead/"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "keywords": [
+    "pivothead-core",
+    "pivot",
+    "pivotTablepivot",
+    "table",
+    "spreadsheet",
+    "javascript",
+    "typescript",
+    "data-drill-down",
+    "data-analysis",
+    "data-visualization",
+    "dynamic-table",
+    "data-aggregation",
+    "data-grid",
+    "interactive-reports",
+    "data-exploration",
+    "olap",
+    "data-pivoting",
+    "data-summarization",
+    "react-pivot",
+    "business-intelligence",
+    "analytics-tool"
   ],
   "scripts": {
     "build": "pnpm run test && vite build",

@@ -36,14 +36,14 @@ PivotHead is a powerful and flexible library for creating interactive pivot tabl
 To install PivotHead, use npm or yarn:
 
 ```bash
-pnpm install @pivothead/core
+pnpm install @mindfiredigital/pivot-head-core
 
 ```
 
 ## Basic Usage
 
 ```javascript
-import { PivotEngine } from '@pivothead/core';
+import { PivotEngine } from '@mindfiredigital/pivot-head-core';
 
 const data = [
   {
