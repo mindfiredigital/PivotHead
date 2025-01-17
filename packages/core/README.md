@@ -1,6 +1,6 @@
 # PivotHead
 
-PivotHead is a powerful and flexible library for creating interactive pivot tables in JavaScript applications. It provides a core engine for data manipulation and upcoming React wrapper for easy integration into React applications.
+PivotHead is a powerful and flexible library for creating interactive pivot tables in JavaScript applications. It provides a core engine for data manipulation and, in the future, will be compatible with wrappers for React, Vue, Svelte, and Angular, making it easy to integrate into applications built with these frameworks.
 
 ## Table of Contents
 
