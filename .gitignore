@@ -1,57 +1,77 @@
-# Node.js specific files
-node_modules/
+# Dependencies
+node_modules
+packages/core/node_modules
+.pnp
+.pnp.js
+
+# Testing
+coverage
+.nyc_output
+
+# Build outputs
+dist
+build
+out
+.next
+.nuxt
+.cache
+.turbo
+packages/core/dist
+
+
+# Environment files
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Debug logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-*.log
 
-# Turbo repo cache and outputs
-/.turbo
-
-# Vite-specific files
-/dist/
-/.vite/
-*.env.local
-*.env.*.local
-
-# Dependency locks and artifacts
-pnpm-lock.yaml
-.vscode/     # Optional, if using VS Code workspace-specific settings
-
-# Build artifacts
-build/
-output/
-*.output/
-
-# IDE and editor files
-.idea/
-*.sublime-workspace
-*.sublime-project
+# Editor directories and files
+.idea
 .DS_Store
-Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# TypeScript
+*.tsbuildinfo
+
+# Vercel
+.vercel
+
+# Package manager specific
+.pnpm-store/
+
+# Project specific
+# Don't ignore the lib directory in vanilla-js-demo
+!examples/vanilla-js-demo/lib
 
 # Temporary files
+*.log
 *.tmp
-*.swp
-*.swo
-*.bak
-*.orig
+.temp
+.tmp
 
-# MacOS and Linux temporary files
-*.swp
-.swp
-
-# Specific to JetBrains IDEs
-/.idea/
-/*.iml
-
-# Test Coverage Reports
-/coverage/
-
-# Turbo workspace artifacts (optional, based on local caching setup)
-/.caches/
-/artifacts/
-
-# Optional: OS-specific files
+# OS generated files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Do NOT ignore pnpm-lock.yaml
+!pnpm-lock.yaml

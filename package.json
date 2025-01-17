@@ -1,18 +1,76 @@
 {
-  "name": "PivotHead",
+  "name": "@mindfiredigital/pivothead-core",
+  "description": "PivotHead is a powerful and flexible library for creating interactive pivot tables in JavaScript applications. It provides a core engine build using typescript for data manipulation.",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "examples/*"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mindfiredigital/PivotHead/"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "keywords": [
+    "pivothead-core",
+    "pivot",
+    "pivotTablepivot",
+    "table",
+    "spreadsheet",
+    "javascript",
+    "typescript",
+    "data-drill-down",
+    "data-analysis",
+    "data-visualization",
+    "dynamic-table",
+    "data-aggregation",
+    "data-grid",
+    "interactive-reports",
+    "data-exploration",
+    "olap",
+    "data-pivoting",
+    "data-summarization",
+    "react-pivot",
+    "business-intelligence",
+    "analytics-tool"
+  ],
   "scripts": {
-    "dev": "turbo run build && pnpm -r publish --access public",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "husky install"
+    "build": "turbo run lint && turbo run build --filter=@pivothead/core...",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "preinstall": "npx only-allow pnpm",
+    "prepare": "husky"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^8.10.0",
+    "eslint-plugin-prettier": "^4.2.1",
     "husky": "^9.1.7",
-    "turbo": "^1.10.0"
+    "turbo": "^2.3.3"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "release": {
+    "repositoryUrl": "https://github.com/mindfiredigital/PivotHead",
+    "branches": [
+      "main",
+      "next",
+      {
+        "name": "beta",
+        "prerelease": true
+      }
+    ]
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "packageManager": "pnpm@7.15.0"
 }

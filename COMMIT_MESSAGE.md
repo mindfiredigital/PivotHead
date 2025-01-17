@@ -19,8 +19,10 @@ A commit message typically consists of three parts:
 3.  **Footer (optional):** Contains any metadata related to the commit, such as issue tracker references.
 
 Here's a template for structuring commit messages:
+
 ```markdown
 <type>: <subject>
+
 <body  (optional)>
 <footer  (optional)>
 ```
@@ -29,25 +31,23 @@ Here's a template for structuring commit messages:
 
 The `<type>` should describe the purpose or category of the commit. Common types include:
 
--  `feat`: A new feature added to the codebase.
--  `fix`: A bug fix.
--  `docs`: Documentation-related changes.
--  `style`: Code style and formatting changes (no functional code changes).
--  `refactor`: Code refactoring without adding new features or fixing bugs.
--  `test`: Adding or modifying tests.
--  `chore`: Routine tasks, maintenance, or tooling changes.
+- `feat`: A new feature added to the codebase.
+- `fix`: A bug fix.
+- `docs`: Documentation-related changes.
+- `style`: Code style and formatting changes (no functional code changes).
+- `refactor`: Code refactoring without adding new features or fixing bugs.
+- `test`: Adding or modifying tests.
+- `chore`: Routine tasks, maintenance, or tooling changes.
 
 ## Subject
 
 The `<subject>` is a concise description of the commit. It should be clear and specific. Begin with a capital letter and do not end with a period.
-
 
 Examples:
 
 - `feat:[issueNumber/ticketNumber] Add user registration endpoint`
 - `fix:[issueNumber/ticketNumber] Resolve issue with login validation`
 - `MERGE:[issueNumber/ticketNumber] Merged xyz to development`
-
 
 NOTE: First letter of subject should be capital.
 
@@ -65,15 +65,18 @@ The `<body>` provides more detailed information about the changes made in the co
 The `<footer>` can include metadata, such as references to issue trackers, and should be used sparingly.
 
 ## Examples
+
 - **New Feature**
- ```shell
- ###✅ feat:[27] Implement chat functionality
+
+```shell
+###✅ feat:[27] Implement chat functionality
 This commit adds the ability for users to send and receive chat messages in real-time. It includes both server and client-side code, as well as necessary database schema changes. A WebSocket-based communication system has been integrated to achieve this.
 ```
 
 - **Bug Fix**
- ```shell
- ###✅ fix:[12] Resolve CSS alignment issue on the homepage
+
+```shell
+###✅ fix:[12] Resolve CSS alignment issue on the homepage
 The homepage had a problem with elements not aligning properly on smaller screens. This commit fixes the issue by adjusting the CSS rules for responsive design, ensuring that the page displays correctly on all devices.
 ```
 
@@ -86,4 +89,5 @@ The homepage had a problem with elements not aligning properly on smaller screen
 - Reference related issues, pull requests, or other relevant information in the commit message body or footer.
 
 ## References
+
 - [**Conventional Commits 1.0.0**](https://www.conventionalcommits.org/en/v1.0.0/)

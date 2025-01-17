@@ -12,13 +12,13 @@ body:
     attributes:
       label: Question/Topic
       description: Please describe your question or the topic you want to discuss.
-      placeholder: "Ask your question or describe the topic here..."
+      placeholder: 'Ask your question or describe the topic here...'
 
   - type: textarea
     attributes:
       label: Additional Information
       description: Provide any extra details or context that might help clarify your question or discussion.
-      placeholder: "Include any relevant context, code snippets, or screenshots."
+      placeholder: 'Include any relevant context, code snippets, or screenshots.'
 
   - type: checkbox
     attributes:
