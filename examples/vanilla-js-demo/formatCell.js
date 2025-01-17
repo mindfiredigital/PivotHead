@@ -1,9 +1,6 @@
-
 import { formatTable } from "./main.js"
 export function formatCellPopUp(config, PivotEngine) {
     const dynamicData = config.measures.filter(measure => measure.format.type === "currency");
-
-
 
     const overlay = document.createElement("div");
     overlay.style.position = "fixed";
@@ -138,7 +135,7 @@ export function formatCellPopUp(config, PivotEngine) {
         applyButton.style.backgroundColor = "#28a745";
         applyButton.style.transform = "scale(1)";
     });
-    
+
     const cancelButton = document.createElement("button");
     cancelButton.textContent = "Cancel";
     cancelButton.style.padding = "12px 24px";
@@ -159,7 +156,7 @@ export function formatCellPopUp(config, PivotEngine) {
         cancelButton.style.backgroundColor = "#dc3545";
         cancelButton.style.transform = "scale(1)";
     });
-    
+
     cancelButton.addEventListener("click", () => {
         document.body.removeChild(overlay);
     });
