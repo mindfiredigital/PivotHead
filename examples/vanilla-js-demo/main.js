@@ -746,6 +746,12 @@ function groupData(data, groupFields) {
   return result;
 }
 
+export function formatTable(config){
+  engine = new PivotEngine(config);
+  renderTable();
+}
+
+
 
 // Initialize the table when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
@@ -757,6 +763,6 @@ document.addEventListener('DOMContentLoaded', () => {
     );
     return;
   }
-  createHeader();
+  createHeader(config);
   renderTable();
 });
