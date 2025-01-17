@@ -3,7 +3,7 @@ name: Deployment Workflow
 on:
   push:
     branches:
-      - test-git-actions
+      - development  # Trigger on push to the 'development' branch
   workflow_dispatch:
 
 jobs:
@@ -36,8 +36,17 @@ jobs:
           git config --local user.email "github-actions@github.com"
           git config --local user.name "GitHub Actions"
 
+      - name: Merge development into main and push
+        run: |
+          git fetch origin main  # Fetch the latest 'main' branch to ensure it's up to date
+          git checkout main  # Switch to the 'main' branch
+          git merge development --no-ff -m "Merge development into main"  # Merge 'development' into 'main'
+          git push origin main  # Push the changes to 'main' branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Authentication token for GitHub
+
   create-github-release:
-    name: Create Github release document and publish to node
+    name: Create GitHub release document and publish to npm
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -49,7 +58,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: '20.x'
 
       - name: Install pnpm
         run: npm install -g pnpm  # Install pnpm globally
@@ -59,10 +68,10 @@ jobs:
 
       - name: Semantic Release and npm release
         run: |
-          npx semantic-release
+          npx semantic-release  # This will handle versioning, changelog, and npm publish
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}  # Authentication token for npm
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Authentication token for GitHub
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
