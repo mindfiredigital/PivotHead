@@ -3,7 +3,7 @@ name: Deployment Workflow
 on:
   push:
     branches:
-      - main
+      - test-workflow)
   workflow_dispatch:
 
 jobs:
@@ -63,9 +63,9 @@ jobs:
         run: |
           npm ci
           npx semantic-release
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # env:
+        #   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Step 4: Upload build artifacts as a ZIP file
       - name: Upload build artifact
