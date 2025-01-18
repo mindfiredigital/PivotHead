@@ -2,7 +2,7 @@
   "name": "@mindfiredigital/pivothead-core",
   "description": "PivotHead is a powerful and flexible library for creating interactive pivot tables in JavaScript applications. It provides a core engine build using typescript for data manipulation.",
   "version": "1.0.0",
-  "private": true,
+  "private": false,
   "workspaces": [
     "packages/*",
     "examples/*"
