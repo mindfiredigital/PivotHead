@@ -13,6 +13,7 @@ jobs:
     permissions:
       contents: write
       packages: read
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -37,7 +38,7 @@ jobs:
           git config --local user.name "GitHub Actions"
 
   create-github-release:
-    name: Create Github release document and publish to npm
+    name: Create GitHub release and publish to npm
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -51,24 +52,14 @@ jobs:
         with:
           node-version: 20.x
 
-      - name: Install pnpm
-        run: npm install -g pnpm  # Install pnpm globally
-
-      - name: Install semantic-release globally
-        run: npm install -g semantic-release @semantic-release/pnpm  # Install the semantic-release with the pnpm plugin
-
       - name: Install dependencies
-        run: pnpm install  # Use pnpm to install dependencies
+        run: pnpm install  # Install dependencies (pnpm should already be available)
 
-      - name: Semantic Release and npm release
-        run: |
-          # Run semantic-release using pnpm
-          cd packages/core  # Ensure we're in the correct directory for the core package
-          pnpm install --frozen-lockfile  # Ensure correct lockfile resolution
-          pnpm run semantic-release  # Run the semantic-release command using pnpm
+      - name: Run semantic-release
+        run: npx semantic-release
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub token for creating releases and commenting
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}        # NPM token for publishing to npm registry
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
