@@ -40,7 +40,7 @@
     "analytics-tool"
   ],
   "scripts": {
-    "build": "turbo run lint && turbo run build --filter=@pivothead/core...",
+    "build": "turbo run lint && turbo run build --filter=@mindfiredigital/pivot-head-core...",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "test": "turbo run test",
