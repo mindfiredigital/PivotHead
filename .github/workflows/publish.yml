@@ -36,7 +36,6 @@ jobs:
         run: |
           git config --local user.email "github-actions@github.com"
           git config --local user.name "GitHub Actions"
-
   create-github-release:
     name: Create GitHub release and publish to npm
     runs-on: ubuntu-latest
