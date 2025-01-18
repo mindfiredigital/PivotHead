@@ -37,7 +37,7 @@ jobs:
           git config --local user.name "GitHub Actions"
 
   create-github-release:
-    name: Create Github release document and publish to node
+    name: Create Github release document and publish to npm
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -54,6 +54,9 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm  # Install pnpm globally
 
+      - name: Install semantic-release globally
+        run: npm install -g semantic-release  # Ensure semantic-release is available
+
       - name: Install dependencies
         run: pnpm install  # Use pnpm to install dependencies
 
@@ -62,10 +65,7 @@ jobs:
           # Run semantic-release using pnpm
           cd packages/core  # Ensure we're in the correct directory for the core package
           pnpm install --frozen-lockfile  # Ensure correct lockfile resolution
-          pnpm semantic-release
-        # env:
-        #   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          pnpm semantic-release  # Run the semantic-release command
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
