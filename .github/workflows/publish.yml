@@ -55,7 +55,7 @@ jobs:
         run: npm install -g pnpm  # Install pnpm globally
 
       - name: Install semantic-release globally
-        run: npm install -g semantic-release  # Ensure semantic-release is available
+        run: npm install -g semantic-release @semantic-release/pnpm  # Install the semantic-release with the pnpm plugin
 
       - name: Install dependencies
         run: pnpm install  # Use pnpm to install dependencies
@@ -65,7 +65,7 @@ jobs:
           # Run semantic-release using pnpm
           cd packages/core  # Ensure we're in the correct directory for the core package
           pnpm install --frozen-lockfile  # Ensure correct lockfile resolution
-          pnpm semantic-release  # Run the semantic-release command
+          pnpm run semantic-release  # Run the semantic-release command using pnpm
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
