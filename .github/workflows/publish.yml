@@ -55,7 +55,7 @@ jobs:
         run: npm install -g pnpm  # Install pnpm globally
 
       - name: Install semantic-release globally
-        run: npm install -g semantic-release @semantic-release/pnpm  # Install semantic-release with the pnpm plugin
+        run: npm install -g semantic-release @semantic-release/pnpm  # Install the semantic-release with the pnpm plugin
 
       - name: Install dependencies
         run: pnpm install  # Use pnpm to install dependencies
