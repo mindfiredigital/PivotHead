@@ -11,6 +11,7 @@
 - **docs/\***: Documentation-related changes (e.g., README updates, new docs).
 - **other/\***: For any other changes that do not fall into the above categories.
 - **enhancement/\***: Indicates improvements that are not categorized as features or bug fixes.
+- **patch/\***: Indicates general maintenance tasks that don't fit into feature or bug fix categories but still need to be tracked and reviewed separately
 
 ## Naming Convention
 
