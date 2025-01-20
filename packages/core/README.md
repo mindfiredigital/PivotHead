@@ -1,19 +1,15 @@
 # PivotHead
 
-PivotHead is a powerful and flexible library for creating interactive pivot tables in JavaScript applications. It provides a core engine for data manipulation and upcoming React wrapper for easy integration into React applications.
+PivotHead is a powerful and flexible library for creating interactive pivot tables in JavaScript applications. It provides a core engine for data manipulation and, in the future, will be compatible with wrappers for React, Vue, Svelte, and Angular, making it easy to integrate into applications built with these frameworks.
 
 ## Table of Contents
 
 1. [Features](#features)
 2. [Installation](#installation)
 3. [Basic Usage](#basic-usage)
-4. [Package Methods and Examples](#package-methods-and-examples)
+4. [PivotEngine API](#pivotengine-api)
 5. [Advanced Features](#advanced-features)
-   - [Sorting](#sorting)
-   - [Grouping](#grouping)
-   - [Column Resizing](#column-resizing)
-   - [Drag and Drop](#drag-and-drop)
-6. [API Reference](#api-reference)
+6. [Configuration](#configuration)
 7. [Examples](#examples)
 
 ## Features
@@ -23,104 +19,140 @@ PivotHead is a powerful and flexible library for creating interactive pivot tabl
 - Grouping data by multiple fields
 - Column resizing
 - Drag and drop for rows and columns
-- React integration (Upcoming)
+- Conditional formatting
+- Custom measures and formulas
+- Responsive design
 - Customizable styling
+- React integration (Upcoming)
 
 ## Installation
 
-To install PivotHead, use pnpm:
+To install PivotHead, use npm or yarn:
 
 ```bash
-pnpm install @pivothead/core
+pnpm install @mindfiredigital/pivot-head-core
+
 ```
 
 ## Basic Usage
 
 ```javascript
-// Basic usage example
+import { PivotEngine } from '@mindfiredigital/pivot-head-core';
+
+const data = [
+  {
+    date: '2024-01-01',
+    product: 'Widget A',
+    region: 'North',
+    sales: 1000,
+    quantity: 50,
+  },
+  // ... more data
+];
+
+const config = {
+  data: data,
+  rows: [{ uniqueName: 'product', caption: 'Product' }],
+  columns: [{ uniqueName: 'region', caption: 'Region' }],
+  measures: [
+    {
+      uniqueName: 'sales',
+      caption: 'Total Sales',
+      aggregation: 'sum',
+      format: { 
+        type: 'currency', 
+        currency: 'USD',
+        locale: 'en-US',
+        decimals: 2
+      },
+    },
+    {
+      uniqueName: 'quantity',
+      caption: 'Total Quantity',
+      aggregation: 'sum',
+      format: { 
+        type: 'number',
+        decimals: 2,
+        locale: 'en-US'
+      },
+    },
+  ],
+  dimensions: [
+    { field: 'product', label: 'Product', type: 'string' },
+    { field: 'region', label: 'Region', type: 'string' },
+    { field: 'date', label: 'Date', type: 'date' },
+    { field: 'sales', label: 'Sales', type: 'number' },
+    { field: 'quantity', label: 'Quantity', type: 'number' },
+  ],
+  defaultAggregation: 'sum',
+  isResponsive: true,
+  groupConfig: {
+    rowFields: ['product'],
+    columnFields: ['region'],
+    grouper: (item, fields) => fields.map((field) => item[field]).join(' - '),
+  },
+  formatting: {
+    sales: { 
+      type: 'currency', 
+      currency: 'USD',
+      locale: 'en-US',
+      decimals: 2
+    },
+    quantity: { 
+      type: 'number',
+      decimals: 2,
+      locale: 'en-US'
+    },
+  },
+  conditionalFormatting: [
+    {
+      value: {
+        type: 'Number',
+        operator: 'Greater than',
+        value1: '1000',
+        value2: ''
+      },
+      format: {
+        font: 'Arial',
+        size: '14px',
+        color: '#ffffff',
+        backgroundColor: '#4CAF50'
+      }
+    },
+    // ... more conditional formatting rules
+  ],
+};
+
+const engine = new PivotEngine(config);
+
+// Use the engine to render your pivot table
+
+
 ```
 
-## Package Methods and Examples
+## PivotEngine API
 
-### Core Package Methods
+The `PivotEngine` class is the core of the PivotHead library. Here are its key methods:
 
-The `PivotEngine` class provides several methods for manipulating and querying the pivot table data.
+### Constructor
 
-1. **constructor(config: PivotTableConfig)**
+```typescript
+constructor(config: PivotTableConfig<T>)
+```
 
-   Creates a new instance of the PivotEngine.
+Creates a new instance of PivotEngine with the given configuration.
 
-   ```javascript
-   // Importing the Package
-   const { PivotEngine } = PivotheadCore;
+### State Management
 
-   const data = [
-     {
-       date: '2024-01-01',
-       category: 'Electronics',
-       product: 'Laptop',
-       region: 'North',
-       sales: 1000,
-       units: 5,
-       profit: 300,
-     },
-     {
-       date: '2024-01-01',
-       category: 'Furniture',
-       product: 'Desk',
-       region: 'South',
-       sales: 800,
-       units: 10,
-       profit: 200,
-     },
-     // ... more data
-   ];
+#### getState()
 
-   const config = {
-     data: data,
-     rows: [{ uniqueName: 'product', caption: 'Product' }],
-     columns: [{ uniqueName: 'region', caption: 'Region' }],
-     measures: [
-       {
-         uniqueName: 'sales',
-         caption: 'Total Sales',
-         aggregation: 'sum',
-         format: { type: 'currency', currency: 'USD' },
-       },
-       {
-         uniqueName: 'quantity',
-         caption: 'Total Quantity',
-         aggregation: 'sum',
-         format: { type: 'number' },
-       },
-       {
-         uniqueName: 'averageSale',
-         caption: 'Average Sale',
-         aggregation: 'avg',
-         format: { type: 'currency', currency: 'USD' },
-         formula: (item) => item.sales / item.quantity,
-       },
-     ],
-     dimensions: [
-       { field: 'product', label: 'Product', type: 'string' },
-       { field: 'region', label: 'Region', type: 'string' },
-       { field: 'date', label: 'Date', type: 'date' },
-       { field: 'sales', label: 'Sales', type: 'number' },
-       { field: 'quantity', label: 'Quantity', type: 'number' },
-     ],
-     defaultAggregation: 'sum',
-     isResponsive: true,
-     groupConfig: {
-       rowFields: ['product'],
-       columnFields: ['region'],
-       grouper: (item, fields) =>
-         fields.map((field) => item[field]).join(' - '),
-     },
-   };
-   const engine = new PivotEngine(config);
-   ```
+```typescript
+getState(): PivotTableState<T>
 
-2. **getState(): PivotTableState**
+```
+Example :- 
+
+- **getState(): PivotTableState**
 
    Returns the current state of the pivot table.
 
@@ -130,32 +162,20 @@ The `PivotEngine` class provides several methods for manipulating and querying t
    console.log(state.sortConfig); // Logs the current sort configuration
    ```
 
-3. **sort(field: string, direction: 'asc' | 'desc')**
 
-   Sorts the data based on the specified field and direction.
+Returns the current state of the pivot table.
 
-   ```javascript
-   engine.sort('sales', 'desc');
-   const state = engine.getState();
-   console.log(state.data); // Logs the sorted data array
-   ```
+#### reset()
 
-4. **setGroupConfig(groupConfig: GroupConfig | null)**
+ Resets the pivot table to its initial state.
 
-   Sets the grouping configuration for the pivot table.
+```typescript
+reset()
+```
 
-   ```javascript
-   engine.setGroupConfig({
-     fields: ['product'],
-     grouper: (item, fields) => item[fields[0]],
-   });
-   const state = engine.getState();
-   console.log(state.groups); // Logs the grouped data
-   ```
+Example :- 
 
-5. **reset()**
-
-   Resets the pivot table to its initial state.
+- **reset()**
 
    ```javascript
    engine.reset();
@@ -163,242 +183,282 @@ The `PivotEngine` class provides several methods for manipulating and querying t
    console.log(state); // Logs the initial state
    ```
 
-6. **resizeColumn(field: string, width: number)**
 
-   Resizes a column to the specified width.
 
-   ```javascript
-   engine.resizeColumn('product', 200);
-   const state = engine.getState();
-   console.log(state.columnSizes); // Logs the updated column sizes
-   ```
+Resets the pivot table to its initial state.
 
-7. **dragRow(fromIndex: number, toIndex: number)**
+### Data Manipulation
 
-   Moves a row from one index to another.
+#### setMeasures(measureFields: MeasureConfig[])
 
-   ```javascript
-   engine.dragRow(0, 2);
-   const state = engine.getState();
-   console.log(state.data); // Logs the reordered data array
-   ```
-
-8. **dragColumn(fromIndex: number, toIndex: number)**
-
-   Moves a column from one index to another.
-
-   ```javascript
-   engine.dragColumn(0, 2);
-   const state = engine.getState();
-   console.log(state.columns); // Logs the reordered columns array
-   ```
-
-9. **setMeasures(selectedMeasures: string[])**
-
-   Updates the selected measures for the pivot table.
-
-   ```javascript
-   const selectedMeasures = [
-     {
-       uniqueName: 'sales',
-       caption: 'Total Sales',
-       aggregation: 'sum',
-       format: { type: 'currency', currency: 'USD' },
-     },
-     {
-       uniqueName: 'quantity',
-       caption: 'Total Quantity',
-       aggregation: 'sum',
-       format: { type: 'number' },
-     },
-   ];
-   engine.setMeasures(selectedMeasures);
-   ```
-
-10. **setAggregationType(type: string)**
-
-    Sets the aggregation type for the measures.
-
-    ```javascript
-    engine.setAggregationType('avg');
-    ```
-
-11. **getGroupedData(): { rowGroups: Group[], columnGroups: Group[] }**
-
-    Returns the grouped data based on the current configuration.
-
-    ```javascript
-    const { rowGroups, columnGroups } = engine.getGroupedData();
-    ```
-
-12. **isRowExpanded(group: string): boolean**
-
-    Checks if a specific group is expanded.
-
-    ```javascript
-    const isExpanded = engine.isRowExpanded(group.key);
-    ```
-
-13. **toggleRowExpansion(group: string)**
-
-    Toggles the expansion state of a specific group.
-
-    ```javascript
-    engine.toggleRowExpansion(group.key);
-    ```
-
-14. **formatValue(value: any, type: string): string**
-
-    Formats a value based on its type. This method is typically implemented in the rendering logic:
-
-    ```javascript
-    function formatValue(value, type) {
-      if (type.includes('customerRating')) {
-        return value.toFixed(1);
-      }
-      if (type.includes('sales') || type.includes('profit')) {
-        return new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: 'USD',
-          minimumFractionDigits: 0,
-        }).format(value);
-      }
-      return new Intl.NumberFormat().format(value);
-    }
-    ```
-
-15. **updateGrouping()**
-
-    Updates the grouping based on the current row and column field selections. This method is typically used in the UI logic:
-
-    ```javascript
-    function updateGrouping() {
-      const rowFields = Array.from(
-        document.getElementById('row-groups').selectedOptions,
-      ).map((opt) => opt.value);
-      const colFields = Array.from(
-        document.getElementById('col-groups').selectedOptions,
-      ).map((opt) => opt.value);
-
-      engine.setGroupConfig({
-        rowFields,
-        columnFields: colFields,
-        grouper: (item, fields) => fields.map((f) => item[f]).join(' - '),
-      });
-
-      renderTable();
-    }
-    ```
-
-## Rendering the Pivot Table
-
-To render the pivot table, you typically follow these steps:
-
-1. Create the analysis controls (grouping, measures, aggregation type).
-2. Render the table header with column groups.
-3. Render the table body with row groups and their data.
-
-Here's a simplified example of rendering the pivot table:
-
-```javascript
-function renderTable() {
-  const state = engine.getState();
-  const container = document.getElementById('pivotTable');
-  if (!container) return;
-
-  container.innerHTML = '';
-  container.appendChild(createAnalysisControls());
-
-  const tableElement = document.createElement('table');
-
-  // Render column groups
-  const { columnGroups } = engine.getGroupedData();
-  if (columnGroups.length > 0) {
-    renderColumnGroups(tableElement, columnGroups);
-  }
-
-  // Render row groups
-  const { rowGroups } = engine.getGroupedData();
-  if (rowGroups.length > 0) {
-    renderRowGroups(tableElement, rowGroups);
-  } else {
-    renderDataRows(tableElement, state.data);
-  }
-
-  container.appendChild(tableElement);
-}
-
-// Call renderTable() whenever the pivot table state changes
+```typescript
+setMeasures(measureFields: MeasureConfig[])
 ```
 
-This structure allows for a dynamic and interactive pivot table that can be easily manipulated using the PivotEngine methods.
+Sets the measures for the pivot table.
+
+#### setDimensions(dimensionFields: Dimension[])
+
+```typescript
+setDimensions(dimensionFields: Dimension[])
+```
+
+Sets the dimensions for the pivot table.
+
+#### setAggregation(type: AggregationType)
+
+```typescript
+setAggregation(type: AggregationType)
+```
+
+Sets the aggregation type for the pivot table.
+
+### Formatting
+
+#### formatValue(value: any, field: string): string
+
+```typescript
+formatValue(value: any, field: string): string
+```
+
+Formats a value based on the specified field's format configuration.
+
+Example:
+```javascript
+const formattedValue = engine.formatValue(1000, 'sales');
+console.log(formattedValue); // "$1,000.00"
+```
+
+### Sorting and Grouping
+
+#### sort(field: string, direction: 'asc' | 'desc')
+
+```typescript
+sort(field: string, direction: 'asc' | 'desc')
+```
+
+Sorts the pivot table data.
+
+#### setGroupConfig(groupConfig: GroupConfig | null)
+
+```typescript
+setGroupConfig(groupConfig: GroupConfig | null)
+```
+
+Sets the group configuration for the pivot table.
+
+#### getGroupedData(): Group[]
+
+```typescript
+getGroupedData(): Group[]
+```
+
+Returns the grouped data.
+
+### Row and Column Manipulation
+
+#### resizeRow(index: number, height: number)
+
+```typescript
+resizeRow(index: number, height: number)
+```
+
+Resizes a specific row in the pivot table.
+
+#### toggleRowExpansion(rowId: string)
+
+```typescript
+toggleRowExpansion(rowId: string)
+```
+
+Toggles the expansion state of a row.
+
+#### isRowExpanded(rowId: string): boolean
+
+```typescript
+isRowExpanded(rowId: string): boolean
+```
+
+Checks if a specific row is expanded.
+
+#### dragRow(fromIndex: number, toIndex: number)
+
+```typescript
+dragRow(fromIndex: number, toIndex: number)
+```
+
+Handles dragging a row to a new position.
+
+#### dragColumn(fromIndex: number, toIndex: number)
+
+```typescript
+dragColumn(fromIndex: number, toIndex: number)
+```
+
+Handles dragging a column to a new position.
 
 ## Advanced Features
 
-### Sorting
+## Formatting cells
 
-The PivotEngine supports sorting data by any field in ascending or descending order. This is typically handled in the UI logic:
+PivotHead supports conditional formatting for cells like decimal values , currency symbol etc.
+
+Example configuration:
 
 ```javascript
-function handleSort(field) {
-  const currentDirection = engine.getState().sortConfig?.direction;
-  const newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
-  engine.sort(field, newDirection);
-  renderTable();
-}
+const config = {
+  // ... other configuration options
+   measures: [
+    {
+      uniqueName: 'sales',
+      caption: 'Total Sales',
+      aggregation: 'sum',
+      format: { 
+        type: 'currency', 
+        currency: 'USD',
+        locale: 'en-US',
+        decimals: 4
+      },
+    },
+    {
+      uniqueName: 'quantity',
+      caption: 'Total Quantity',
+      aggregation: 'sum',
+      format: { 
+        type: 'number',
+        decimals: 2,
+        locale: 'en-US'
+      },
+    },
+    {
+      uniqueName: 'averageSale',
+      caption: 'Average Sale',
+      aggregation: 'avg',
+      format: { 
+        type: 'currency', 
+        currency: 'USD',
+        locale: 'en-US',
+        decimals: 4
+      },
+      formula: (item) => item.sales / item.quantity,
+    },
+  ],
+  // ... other configuration options
+  formatting: {
+    sales: { 
+      type: 'currency', 
+      currency: 'USD',
+      locale: 'en-US',
+      decimals: 4
+    },
+    quantity: { 
+      type: 'number',
+      // decimals: 2,
+      // locale: 'en-US'
+    },
+    averageSale: { 
+      type: 'currency', 
+      currency: 'USD',
+      locale: 'en-US',
+      decimals: 4
+    }
+  },
+};
 ```
 
-### Grouping
 
-You can group data by multiple fields for both rows and columns. This is handled by the `setGroupConfig` method:
+### Conditional Formatting
+
+PivotHead supports conditional formatting, allowing you to apply custom styles to cells based on their values.
+
+Example configuration:
 
 ```javascript
-engine.setGroupConfig({
-  rowFields: ['category', 'product'],
-  columnFields: ['region'],
-  grouper: (item, fields) => fields.map((field) => item[field]).join(' - '),
-});
+const config = {
+  // ... other configuration options
+  conditionalFormatting: [
+    {
+      value: {
+        type: 'Number',
+        operator: 'Greater than',
+        value1: '1000',
+        value2: ''
+      },
+      format: {
+        font: 'Arial',
+        size: '14px',
+        color: '#ffffff',
+        backgroundColor: '#4CAF50'
+      }
+    },
+    // ... more conditional formatting rules
+  ]
+};
 ```
 
 ### Custom Measures
 
-Define custom measures with specific formulas and aggregations in the initial configuration:
+You can define custom measures with specific formulas:
 
 ```javascript
 const config = {
-  // ... other config options
-  aggregationFields: [
-    { field: 'sales', type: 'sum', label: 'Total Sales' },
-    { field: 'units', type: 'sum', label: 'Total Units' },
-    { field: 'profit', type: 'sum', label: 'Total Profit' },
+  // ... other configuration options
+  measures: [
     {
-      field: 'profitMargin',
-      type: 'custom',
-      label: 'Profit Margin',
-      formula: (item) => (item.profit / item.sales) * 100,
+      uniqueName: 'averageSale',
+      caption: 'Average Sale',
+      aggregation: 'avg',
+      format: { 
+        type: 'currency', 
+        currency: 'USD',
+        locale: 'en-US',
+        decimals: 2
+      },
+      formula: (item) => item.sales / item.quantity,
     },
   ],
 };
 ```
 
-## API Reference
+## Configuration
 
-- `PivotEngine`: The main class for creating and managing pivot tables.
-- `PivotTableConfig`: Configuration object for initializing the PivotEngine.
-- `PivotTableState`: Represents the current state of the pivot table.
-- `GroupConfig`: Configuration for grouping data in the pivot table.
-- `AggregationType`: Type of aggregation ('sum', 'avg', 'count', 'min', 'max').
+The `PivotTableConfig` object allows you to customize various aspects of the pivot table:
 
-For detailed API documentation, please refer to the source code and comments.
+```typescript
+interface PivotTableConfig<T> {
+  data: T[];
+  rows: { uniqueName: string; caption: string }[];
+  columns: { uniqueName: string; caption: string }[];
+  measures: MeasureConfig[];
+  dimensions: Dimension[];
+  defaultAggregation?: AggregationType;
+  isResponsive?: boolean;
+  groupConfig?: GroupConfig;
+  formatting?: Record<string, FormatConfig>;
+  conditionalFormatting?: ConditionalFormattingRule[];
+}
+```
+
+For detailed information on each configuration option, please refer to the source code and comments.
 
 ## Examples
 
 To run the examples:
 
-1. Go to the `examples/vanilla-js-demo` folder.
-2. Install dependencies with `pnpm i`.
-3. Build the project with `pnpm run build`.
-4. Start the development server with `pnpm start`.
-5. Open your browser and navigate to the local host address provided.
+1. Clone the repository
+2. Navigate to the `examples/vanilla-js-demo` folder
+3. Install dependencies with `npm install` or `yarn install`
+4. Build the project with `npm run build` or `yarn build`
+5. Start the development server with `npm start` or `yarn start`
+6. Open your browser and navigate to the local host address provided
 
-These examples demonstrate various features of the PivotHead library, including basic usage, custom measures, grouping, and more.
+These examples demonstrate various features of the PivotHead library, including:
+
+- Basic pivot table setup
+- Custom measures and formulas
+- Grouping and aggregation
+- Conditional formatting
+- Drag and drop functionality
+- Responsive design
+
+For more detailed examples and usage scenarios, please refer to the example files in the repository.

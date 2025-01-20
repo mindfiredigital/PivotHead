@@ -3,8 +3,7 @@ import { createOptionsPopup } from './optionsPopup.js';
 import { conditionFormattingPopUp } from './conditionFormattingPopUp.js';
 import { createFieldsPopup } from './fieldsPopup.js';
 
-export function createHeader() {
-  console.log('createHeader called yes');
+export function createHeader(config) {
   const header = document.createElement('div');
   header.style.display = 'flex';
   header.style.justifyContent = 'space-between';
@@ -42,7 +41,7 @@ export function createHeader() {
     const dropdown = document.createElement('div');
     dropdown.style.position = 'absolute';
     dropdown.style.top = '100%';
-    dropdown.style.left = '0';
+    dropdown.style.right = '0';
     dropdown.style.backgroundColor = '#ffffff';
     dropdown.style.border = '1px solid #d1d5db';
     dropdown.style.borderRadius = '10px';
@@ -70,7 +69,7 @@ export function createHeader() {
           console.log(optionName);
           switch (optionName) {
             case 'Format Cell':
-              formatCellPopUp();
+              formatCellPopUp(config);
               break;
             case 'Condition Formatting':
               conditionFormattingPopUp();
@@ -165,7 +164,7 @@ export function createHeader() {
       label: 'Format',
       dropdownOptions: ['Format Cell', 'Condition Formatting'],
     },
-    { icon: '⚙️', label: 'Options', dropdownOptions: [] },
+    // { icon: '⚙️', label: 'Options', dropdownOptions: [] },
     { icon: '📋', label: 'Fields', dropdownOptions: [] },
   ];
 

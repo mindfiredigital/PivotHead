@@ -1,0 +1,70 @@
+name: Deployment Workflow
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: "@mindfiredigital/pivothead_core"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install pnpm
+        run: npm install -g pnpm  # Install pnpm globally
+
+      - name: Install dependencies
+        run: pnpm install  # Use pnpm to install dependencies
+
+      - name: Build application
+        run: pnpm run build  # Use pnpm to run the build
+
+      - name: Set Git user name and email
+        run: |
+          git config --local user.email "github-actions@github.com"
+          git config --local user.name "GitHub Actions"
+  create-github-release:
+    name: Create GitHub release and publish to npm
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      - name: Install pnpm
+        run: npm install -g pnpm  # Install pnpm globally
+
+      - name: Install dependencies
+        run: pnpm install  # Install dependencies (pnpm should already be available)
+
+      - name: Run semantic-release
+        run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub token for creating releases and commenting
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}        # NPM token for publishing to npm registry
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: core-build-zip  # Name of the artifact
+          path: ./packages/core/dist  # Path to the build folder to zip and upload
