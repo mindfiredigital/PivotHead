@@ -133,7 +133,8 @@ function addCondition(container) {
   // Value row
   const valueRow = createFormRow('Value:', [
     createSelect(['All values', 'Number', 'Text']),
-    createSelect(['Greater than', 'Less than', 'Equal to']), // Add 'Between' to list in future.
+    createSelect(['Greater than', 'Less than', 'Equal to','Between']), // Add 'Between' to list in future.
+    createInput('text', ''),
     createInput('text', ''),
   ]);
 
@@ -344,7 +345,6 @@ export function conditionFormattingPopUp(config) {
 
   createConditionFormattingPopup({
     onApply: (conditions) => {
-      console.log('Applied conditions:', conditions);
       // Update the formatting configuration
       if (!config.hasOwnProperty('conditionalFormatting')) {
         config.conditionalFormatting = [];
@@ -354,7 +354,7 @@ export function conditionFormattingPopUp(config) {
       applyConditionalFormatting(config);
     },
     onCancel: () => {
-      console.log('Conditional formatting cancelled');
+      console.warn('Conditional formatting cancelled');
     },
   });
 }
