@@ -133,8 +133,9 @@ function addCondition(container) {
   // Value row
   const valueRow = createFormRow('Value:', [
     createSelect(['All values', 'Number', 'Text']),
-    createSelect(['Greater than', 'Less than', 'Equal to']), // Add 'Between' to list in future.
-    createInput('text', ''),
+    createSelect(['Greater than', 'Less than', 'Equal to','Between']), // Add 'Between' to list in future.
+    createInput('text', '', 'Enter value 1'),
+    createInput('text', '', 'For between enter value 2'),
   ]);
 
   // Add "between" input when needed
@@ -231,10 +232,11 @@ function createSelect(options) {
   return select;
 }
 
-function createInput(type, value) {
+function createInput(type, value,placeholder='') {
   const input = document.createElement('input');
   input.type = type;
   input.value = value;
+  input.placeholder = placeholder
   input.style.padding = '8px';
   input.style.border = '1px solid #d1d5db';
   input.style.borderRadius = '4px';
@@ -344,7 +346,6 @@ export function conditionFormattingPopUp(config) {
 
   createConditionFormattingPopup({
     onApply: (conditions) => {
-      console.log('Applied conditions:', conditions);
       // Update the formatting configuration
       if (!config.hasOwnProperty('conditionalFormatting')) {
         config.conditionalFormatting = [];
@@ -354,7 +355,7 @@ export function conditionFormattingPopUp(config) {
       applyConditionalFormatting(config);
     },
     onCancel: () => {
-      console.log('Conditional formatting cancelled');
+      console.warn('Conditional formatting cancelled');
     },
   });
 }
