@@ -125,6 +125,7 @@ const config = {
         locale: 'en-US',
         decimals: 4
       },
+      sortable: true,
     },
     {
       uniqueName: 'quantity',
@@ -141,12 +142,10 @@ const config = {
       caption: 'Average Sale',
       aggregation: 'avg',
       format: { 
-        type: 'currency', 
-        currency: 'USD',
-        locale: 'en-US',
-        decimals: 4
+        type: 'number'
       },
       formula: (item) => item.sales / item.quantity,
+      sortable: true,
     },
   ],
   dimensions: [
@@ -158,6 +157,15 @@ const config = {
   ],
   defaultAggregation: 'sum',
   isResponsive: true,
+  // Add initial sort configuration
+  initialSort: [
+    {
+      field: "sales",
+      direction: "desc",
+      type: "measure",
+      aggregation: "sum",
+    },
+  ],
   groupConfig: {
     rowFields: ['product'],
     columnFields: ['region'],
@@ -496,7 +504,7 @@ function renderTable() {
 
   const tbody = document.createElement('tbody');
   const rowFields = state.rows.map((r) => r.uniqueName);
-  const groupedData = groupData(data, rowFields);
+  const groupedData = groupData(state.data, rowFields);
 
   renderGroupedRows(tbody, groupedData, state, 0);
 
@@ -509,6 +517,8 @@ function renderTable() {
   tableWrapper.appendChild(table);
 
   container.appendChild(tableWrapper);
+    // Log the rendered data for debugging
+    console.log("Rendered data:", groupedData)
 }
 
 function renderGroupedRows(tbody, groups, state, level) {
@@ -688,11 +698,11 @@ function renderTableHeader(thead, state) {
     headerText.textContent = row.caption;
     headerContent.appendChild(headerText);
 
-   const sortIcon = createSortIcon(row.uniqueName, 'row');
-   headerContent.appendChild(sortIcon);
+  //  const sortIcon = createSortIcon(row.uniqueName, 'row');
+  //  headerContent.appendChild(sortIcon);
 
     th.appendChild(headerContent);
-    th.addEventListener('click', () => handleSort(row.uniqueName, 'row'));
+    //th.addEventListener('click', () => handleSort(row.uniqueName, 'row'));
     measureHeaderRow.appendChild(th);
   });
 
@@ -719,6 +729,7 @@ function renderTableHeader(thead, state) {
       headerContent.appendChild(sortIcon);
 
       th.appendChild(headerContent);
+      th.addEventListener('click', () => handleSort(measure.uniqueName));
       measureHeaderRow.appendChild(th);
     });
   });
@@ -727,17 +738,48 @@ function renderTableHeader(thead, state) {
 }
 
 
+function handleSort(field, direction) {
+  console.log(`Sorting by field: ${field}`);
+ // Get current state
+ const state = engine.getState()
+ const currentSortConfig = state.sortConfig?.[0]
+
+ // Toggle direction if clicking the same field
+ let newDirection = direction || "asc"
+ if (currentSortConfig && currentSortConfig.field === field) {
+   newDirection = currentSortConfig.direction === "asc" ? "desc" : "asc"
+ }
+
+ // Call engine's sort method
+ engine.sort(field, newDirection)
+
+ // Force a re-render of the table
+ renderTable()
+
+ // Log the sort operation for debugging
+ console.log(`Sorting by ${field} in ${newDirection} order`)
+}
+
 function createSortIcon(field, axis) {
   const icon = document.createElement('span');
-  icon.innerHTML = '&#8645;'; // Unicode for up-down arrow
+  const state = engine.getState();
+  const currentSort = state.sortConfig?.[0];
+  
+  // Set the appropriate sort icon based on current sort state
+  if (currentSort && currentSort.field === field) {
+    icon.innerHTML = currentSort.direction === 'asc' ? '&#8593;' : '&#8595;';
+  } else {
+    icon.innerHTML = '&#8645;'; // Default unsorted state
+  }
+  
   icon.style.cursor = 'pointer';
   icon.style.marginLeft = '5px';
 
-  icon.addEventListener('click', () => {
-    const currentDirection = engine.getState().sortConfig?.direction;
+  icon.addEventListener('click', (e) => {
+    e.stopPropagation(); // Prevent event bubbling
+    const currentDirection = state.sortConfig?.[0]?.direction;
     const newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
-    engine.sort(field, newDirection, axis);
-    renderTable();
+    handleSort(field, newDirection);
   });
 
   return icon;

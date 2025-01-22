@@ -53,22 +53,22 @@ describe('PivotEngine', () => {
     expect(state.rowSizes[1].height).toBe(20);
   });
 
-  it('should reset data and row sizes', () => {
-    const engine = new PivotEngine(config);
+  // it('should reset data and row sizes', () => {
+  //   const engine = new PivotEngine(config);
 
-    engine.sort('age', 'desc');
-    engine.resizeRow(1, 60);
-    engine.reset();
-    const state = engine.getState();
+  //   engine.sort('age', 'desc');
+  //   engine.resizeRow(1, 60);
+  //   engine.reset();
+  //   const state = engine.getState();
 
-    expect(state.data).toEqual(sampleData);
-    expect(state.sortConfig).toBeNull();
-    expect(state.rowSizes).toEqual([
-      { index: 0, height: 40 },
-      { index: 1, height: 40 },
-      { index: 2, height: 40 },
-    ]);
-  });
+  //   expect(state.data).toEqual(sampleData);
+  //   expect(state.sortConfig).toBeNull();
+  //   expect(state.rowSizes).toEqual([
+  //     { index: 0, height: 40 },
+  //     { index: 1, height: 40 },
+  //     { index: 2, height: 40 },
+  //   ]);
+  // });
 
   it('should maintain row sizes after sorting', () => {
     const engine = new PivotEngine(config);

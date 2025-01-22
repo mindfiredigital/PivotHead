@@ -8,9 +8,11 @@ import {
   PivotTableState,
   ProcessedData,
   RowSize,
+  SortConfig,
 } from '../types/interfaces';
 import { calculateAggregates } from './aggregator';
 import { processData } from './dataProcessor';
+import { applySort, sortGroups } from './sorter';
 
 /**
  * Creates an instance of PivotEngine.
@@ -33,7 +35,7 @@ export class PivotEngine<T extends Record<string, any>> {
       rows: config.rows || [],
       columns: config.columns || [],
       measures: config.measures || [],
-      sortConfig: null,
+      sortConfig: [],
       rowSizes: this.initializeRowSizes(config.data || []),
       expandedRows: {},
       groupConfig: config.groupConfig || null,
@@ -215,16 +217,71 @@ export class PivotEngine<T extends Record<string, any>> {
    * @public
    */
   public sort(field: string, direction: 'asc' | 'desc') {
-    this.state.sortConfig = { field, direction };
-    const { data, groups } = processData(
-      this.config,
-      this.state.sortConfig,
-      this.state.groupConfig,
-    );
-    this.state.data = data;
-    this.state.groups = groups;
+    const measure = this.state.measures.find((m) => m.uniqueName === field);
+
+    const newSortConfig: SortConfig = {
+      field,
+      direction,
+      type: measure ? 'measure' : 'dimension',
+      aggregation: measure?.aggregation,
+    };
+
+    this.state.sortConfig = [newSortConfig];
+    this.applySort();
+
+    // Log the new state for debugging
+    console.log('New state after sorting:', this.state);
+  }
+
+  private applySort() {
+    const sortedData = this.sortData(this.state.data, this.state.sortConfig[0]);
+    this.state.data = sortedData;
+
+    if (this.state.groups.length > 0) {
+      this.state.groups = this.sortGroups(
+        this.state.groups,
+        this.state.sortConfig[0],
+      );
+    }
+
     this.state.processedData = this.processData(this.state.data);
     this.updateAggregates();
+  }
+
+  private sortData(data: T[], sortConfig: SortConfig): T[] {
+    return [...data].sort((a, b) => {
+      const aValue = this.getFieldValue(a, sortConfig);
+      const bValue = this.getFieldValue(b, sortConfig);
+
+      if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+
+  private getFieldValue(item: T, sortConfig: SortConfig): number {
+    if (sortConfig.type === 'measure') {
+      const measure = this.state.measures.find(
+        (m) => m.uniqueName === sortConfig.field,
+      );
+      if (measure && measure.formula) {
+        return measure.formula(item);
+      }
+    }
+    return item[sortConfig.field] as number;
+  }
+
+  private sortGroups(groups: Group[], sortConfig: SortConfig): Group[] {
+    return [...groups].sort((a, b) => {
+      const aValue =
+        a.aggregates[`${sortConfig.aggregation}_${sortConfig.field}`] || 0;
+      const bValue =
+        b.aggregates[`${sortConfig.aggregation}_${sortConfig.field}`] || 0;
+
+      if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
   }
 
   /**
@@ -280,7 +337,7 @@ export class PivotEngine<T extends Record<string, any>> {
 
     const { data, groups } = processData(
       this.config,
-      this.state.sortConfig,
+      this.state.sortConfig[0] || null,
       this.state.groupConfig,
     );
 
@@ -398,7 +455,7 @@ export class PivotEngine<T extends Record<string, any>> {
       ...this.state,
       data: this.config.data || [],
       processedData: this.processData(this.config.data || []),
-      sortConfig: null,
+      sortConfig: [],
       rowSizes: this.initializeRowSizes(this.config.data || []),
       expandedRows: {},
       groupConfig: this.config.groupConfig || null,
