@@ -688,8 +688,8 @@ function renderTableHeader(thead, state) {
     headerText.textContent = row.caption;
     headerContent.appendChild(headerText);
 
-   // const sortIcon = createSortIcon(row.uniqueName, 'row');
-  //  headerContent.appendChild(sortIcon);
+   const sortIcon = createSortIcon(row.uniqueName, 'row');
+   headerContent.appendChild(sortIcon);
 
     th.appendChild(headerContent);
     th.addEventListener('click', () => handleSort(row.uniqueName, 'row'));
@@ -715,8 +715,8 @@ function renderTableHeader(thead, state) {
       headerText.textContent = measure.caption;
       headerContent.appendChild(headerText);
 
-      // const sortIcon = createSortIcon(measure.uniqueName, 'column');
-      // headerContent.appendChild(sortIcon);
+      const sortIcon = createSortIcon(measure.uniqueName, 'column');
+      headerContent.appendChild(sortIcon);
 
       th.appendChild(headerContent);
       measureHeaderRow.appendChild(th);
@@ -726,22 +726,22 @@ function renderTableHeader(thead, state) {
   thead.appendChild(measureHeaderRow);
 }
 
-//TODO : Uncomment when sort feature updated in pivot table
-// function createSortIcon(field, axis) {
-//   const icon = document.createElement('span');
-//   icon.innerHTML = '&#8645;'; // Unicode for up-down arrow
-//   icon.style.cursor = 'pointer';
-//   icon.style.marginLeft = '5px';
 
-//   icon.addEventListener('click', () => {
-//     const currentDirection = engine.getState().sortConfig?.direction;
-//     const newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
-//     engine.sort(field, newDirection, axis);
-//     renderTable();
-//   });
+function createSortIcon(field, axis) {
+  const icon = document.createElement('span');
+  icon.innerHTML = '&#8645;'; // Unicode for up-down arrow
+  icon.style.cursor = 'pointer';
+  icon.style.marginLeft = '5px';
 
-//   return icon;
-// }
+  icon.addEventListener('click', () => {
+    const currentDirection = engine.getState().sortConfig?.direction;
+    const newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+    engine.sort(field, newDirection, axis);
+    renderTable();
+  });
+
+  return icon;
+}
 
 
 function updateFormatting(newConfig) {
