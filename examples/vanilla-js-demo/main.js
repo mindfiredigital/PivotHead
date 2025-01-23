@@ -136,6 +136,7 @@ const config = {
         decimals: 2,
         locale: 'en-US'
       },
+      sortable: false,
     },
     {
       uniqueName: 'averageSale',
@@ -149,11 +150,11 @@ const config = {
     },
   ],
   dimensions: [
-    { field: 'product', label: 'Product', type: 'string' },
-    { field: 'region', label: 'Region', type: 'string' },
-    { field: 'date', label: 'Date', type: 'date' },
-    { field: 'sales', label: 'Sales', type: 'number' },
-    { field: 'quantity', label: 'Quantity', type: 'number' },
+    { field: 'product', label: 'Product', type: 'string', sortable: true },
+    { field: 'region', label: 'Region', type: 'string', sortable: false },
+    { field: 'date', label: 'Date', type: 'date', sortable: true },
+    { field: 'sales', label: 'Sales', type: 'number', sortable: true },
+    { field: 'quantity', label: 'Quantity', type: 'number', sortable: false },
   ],
   defaultAggregation: 'sum',
   isResponsive: true,
@@ -698,11 +699,7 @@ function renderTableHeader(thead, state) {
     headerText.textContent = row.caption;
     headerContent.appendChild(headerText);
 
-  //  const sortIcon = createSortIcon(row.uniqueName, 'row');
-  //  headerContent.appendChild(sortIcon);
-
     th.appendChild(headerContent);
-    //th.addEventListener('click', () => handleSort(row.uniqueName, 'row'));
     measureHeaderRow.appendChild(th);
   });
 
@@ -710,7 +707,6 @@ function renderTableHeader(thead, state) {
   uniqueColumnValues.forEach(() => {
     state.measures.forEach((measure) => {
       const th = document.createElement('th');
-      // th.textContent = measure.caption;
       th.style.padding = '12px';
       th.style.backgroundColor = '#f8f9fa';
       th.style.borderBottom = '2px solid #dee2e6';
@@ -725,18 +721,19 @@ function renderTableHeader(thead, state) {
       headerText.textContent = measure.caption;
       headerContent.appendChild(headerText);
 
-      const sortIcon = createSortIcon(measure.uniqueName, 'column');
-      headerContent.appendChild(sortIcon);
+      if (measure.sortable) {
+        const sortIcon = createSortIcon(measure.uniqueName, 'column');
+        headerContent.appendChild(sortIcon);
+        th.addEventListener('click', () => handleSort(measure.uniqueName));
+      }
 
       th.appendChild(headerContent);
-      th.addEventListener('click', () => handleSort(measure.uniqueName));
       measureHeaderRow.appendChild(th);
     });
   });
 
   thead.appendChild(measureHeaderRow);
 }
-
 
 function handleSort(field, direction) {
   console.log(`Sorting by field: ${field}`);
