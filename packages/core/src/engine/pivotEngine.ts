@@ -110,7 +110,22 @@ export class PivotEngine<T extends Record<string, any>> {
     return data.map((item) => [
       ...this.state.rows.map((r) => item[r.uniqueName]),
       ...this.state.columns.map((c) => item[c.uniqueName]),
+      ...this.state.measures.map((m) => this.calculateMeasureValue(item, m)),
     ]);
+  }
+
+  /**
+   * Calculates the value for a specific measure.
+   * @param {T} item - The data item.
+   * @param {MeasureConfig} measure - The measure configuration.
+   * @returns {number} The calculated measure value.
+   * @private
+   */
+  private calculateMeasureValue(item: T, measure: MeasureConfig): number {
+    if (measure.formula && typeof measure.formula === 'function') {
+      return measure.formula(item);
+    }
+    return item[measure.uniqueName] || 0;
   }
 
   /**
@@ -145,6 +160,7 @@ export class PivotEngine<T extends Record<string, any>> {
 
     return totals;
   }
+
   /**
    * Sets the measures for the pivot table.
    * @param {MeasureConfig[]} measureFields - The measure configurations to set.

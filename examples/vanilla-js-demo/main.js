@@ -605,39 +605,28 @@ function renderGroupedRows(tbody, groups, state, level) {
 
           if (columnItems.length > 0) {
             let aggregateValue;
-            if (measure.formula && typeof measure.formula === 'function') {
-              aggregateValue =
-                columnItems.reduce(
-                  (sum, item) => sum + measure.formula(item),
-                  0,
-                ) / columnItems.length;
+            if (measure.aggregation === 'max') {
+              aggregateValue = Math.max(...columnItems.map(item => engine.calculateMeasureValue(item, measure)));
+            } else if (measure.aggregation === 'min') {
+              aggregateValue = Math.min(...columnItems.map(item => engine.calculateMeasureValue(item, measure)));
+            } else if (measure.aggregation === 'count') {
+              aggregateValue = columnItems.length;
             } else {
-              if (measure.aggregation === 'max') {
-                const values = columnItems.map((item) => item[measure.uniqueName] || 0);
-                aggregateValue = Math.max(...values);
-              } else if (measure.aggregation === 'min') {
-                const values = columnItems.map((item) => item[measure.uniqueName] || 0);
-                aggregateValue = Math.min(...values);
-              } else {
-                aggregateValue = columnItems.reduce(
-                  (sum, item) => sum + (item[measure.uniqueName] || 0),
-                  0,
-                );
+              aggregateValue = columnItems.reduce(
+                (sum, item) => sum + engine.calculateMeasureValue(item, measure),
+                0,
+              );
+              if (measure.aggregation === 'avg') {
+                aggregateValue /= columnItems.length;
               }
             }
-
-            if (measure.aggregation === 'avg') {
-              aggregateValue /= columnItems.length;
-            }
-
-            console.log(`Measure: ${measure.uniqueName}, Aggregation: ${measure.aggregation}, Value: ${aggregateValue}`);
 
             td.textContent = engine.formatValue(
               aggregateValue,
               measure.uniqueName,
             );
 
-            //Apply condition formatting
+            // Apply condition formatting
             applyConditionalFormatting(td, aggregateValue, measure.uniqueName);
           } else {
             td.textContent = engine.formatValue(0, measure.uniqueName);
