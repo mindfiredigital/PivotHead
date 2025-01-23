@@ -33,6 +33,13 @@ const data = [
   {
     date: '2024-01-01',
     product: 'Widget A',
+    region: 'North',
+    sales: 300,
+    quantity: 25,
+  },
+  {
+    date: '2024-01-01',
+    product: 'Widget A',
     region: 'East',
     sales: 50,
     quantity: 10,
@@ -148,6 +155,30 @@ const config = {
       formula: (item) => item.sales / item.quantity,
       sortable: true,
     },
+    {
+      uniqueName: 'sales',
+      caption: 'Max Sale',
+      aggregation: 'max',
+      format: { 
+        type: 'currency', 
+        currency: 'USD',
+        locale: 'en-US',
+        decimals: 4
+      },
+      sortable: true,
+    },
+    {
+      uniqueName: 'sales',
+      caption: 'Min Sale',
+      aggregation: 'min',
+      format: { 
+        type: 'currency', 
+        currency: 'USD',
+        locale: 'en-US',
+        decimals: 4
+      },
+      sortable: true,
+    },
   ],
   dimensions: [
     { field: 'product', label: 'Product', type: 'string', sortable: true },
@@ -185,6 +216,18 @@ const config = {
       // locale: 'en-US'
     },
     averageSale: { 
+      type: 'currency', 
+      currency: 'USD',
+      locale: 'en-US',
+      decimals: 4
+    },
+    maxSale: { 
+      type: 'currency', 
+      currency: 'USD',
+      locale: 'en-US',
+      decimals: 4
+    },
+    minSale: { 
       type: 'currency', 
       currency: 'USD',
       locale: 'en-US',
@@ -569,15 +612,25 @@ function renderGroupedRows(tbody, groups, state, level) {
                   0,
                 ) / columnItems.length;
             } else {
-              aggregateValue = columnItems.reduce(
-                (sum, item) => sum + (item[measure.uniqueName] || 0),
-                0,
-              );
+              if (measure.aggregation === 'max') {
+                const values = columnItems.map((item) => item[measure.uniqueName] || 0);
+                aggregateValue = Math.max(...values);
+              } else if (measure.aggregation === 'min') {
+                const values = columnItems.map((item) => item[measure.uniqueName] || 0);
+                aggregateValue = Math.min(...values);
+              } else {
+                aggregateValue = columnItems.reduce(
+                  (sum, item) => sum + (item[measure.uniqueName] || 0),
+                  0,
+                );
+              }
             }
 
             if (measure.aggregation === 'avg') {
               aggregateValue /= columnItems.length;
             }
+
+            console.log(`Measure: ${measure.uniqueName}, Aggregation: ${measure.aggregation}, Value: ${aggregateValue}`);
 
             td.textContent = engine.formatValue(
               aggregateValue,

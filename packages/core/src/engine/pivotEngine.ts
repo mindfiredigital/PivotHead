@@ -121,18 +121,30 @@ export class PivotEngine<T extends Record<string, any>> {
    */
   private calculateTotals(data: T[]): Record<string, number> {
     const totals: Record<string, number> = {};
-    if (!data || !this.state.measures) {
-      return totals;
-    }
+
     this.state.measures.forEach((measure) => {
-      totals[measure.uniqueName] = data.reduce(
-        (sum, item) => sum + (Number(item[measure.uniqueName]) || 0),
-        0,
-      );
+      const { uniqueName, aggregation } = measure;
+      let total = 0;
+
+      if (aggregation === 'sum') {
+        total = data.reduce((sum, item) => sum + (item[uniqueName] || 0), 0);
+      } else if (aggregation === 'avg') {
+        total =
+          data.reduce((sum, item) => sum + (item[uniqueName] || 0), 0) /
+          data.length;
+      } else if (aggregation === 'max') {
+        total = Math.max(...data.map((item) => item[uniqueName] || 0));
+      } else if (aggregation === 'min') {
+        total = Math.min(...data.map((item) => item[uniqueName] || 0));
+      } else if (aggregation === 'count') {
+        total = data.length;
+      }
+
+      totals[uniqueName] = total;
     });
+
     return totals;
   }
-
   /**
    * Sets the measures for the pivot table.
    * @param {MeasureConfig[]} measureFields - The measure configurations to set.
