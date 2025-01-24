@@ -10,7 +10,6 @@
  * - Row reordering (drag and drop)
  */
 import { createHeader } from './header.js';
-import { conditionFormattingPopUp } from './conditionFormattingPopUp.js';
 if (typeof PivotheadCore === 'undefined') {
   console.error(
     'PivotheadCore is not defined. Make sure the library is loaded correctly.',
@@ -22,99 +21,7 @@ if (typeof PivotheadCore === 'undefined') {
 const { PivotEngine } = PivotheadCore;
 
 // Dummy data.
-const data = [
-  {
-    date: '2024-01-01',
-    product: 'Widget A',
-    region: 'North',
-    sales: 1000,
-    quantity: 50,
-  },
-  {
-    date: '2024-01-01',
-    product: 'Widget A',
-    region: 'North',
-    sales: 300,
-    quantity: 25,
-  },
-  {
-    date: '2024-01-01',
-    product: 'Widget A',
-    region: 'East',
-    sales: 50,
-    quantity: 10,
-  },
-  {
-    date: '2024-01-01',
-    product: 'Widget A',
-    region: 'West',
-    sales: 90,
-    quantity: 7,
-  },
-  {
-    date: '2024-01-01',
-    product: 'Widget B',
-    region: 'South',
-    sales: 1500,
-    quantity: 75,
-  },
-  {
-    date: '2024-01-01',
-    product: 'Widget D',
-    region: 'North',
-    sales: 1300,
-    quantity: 70,
-  },
-  {
-    date: '2024-01-02',
-    product: 'Widget A',
-    region: 'East',
-    sales: 1200,
-    quantity: 60,
-  },
-  {
-    date: '2024-01-02',
-    product: 'Widget A',
-    region: 'East',
-    sales: 100,
-    quantity: 44,
-  },
-  {
-    date: '2024-01-02',
-    product: 'Widget C',
-    region: 'West',
-    sales: 800,
-    quantity: 40,
-  },
-  {
-    date: '2024-01-03',
-    product: 'Widget B',
-    region: 'North',
-    sales: 1800,
-    quantity: 90,
-  },
-  {
-    date: '2024-01-03',
-    product: 'Widget C',
-    region: 'South',
-    sales: 1100,
-    quantity: 55,
-  },
-  {
-    date: '2024-01-04',
-    product: 'Widget A',
-    region: 'West',
-    sales: 1300,
-    quantity: 65,
-  },
-  {
-    date: '2024-01-04',
-    product: 'Widget B',
-    region: 'East',
-    sales: 1600,
-    quantity: 80,
-  },
-];
+import { data2 as data } from './utils/testData.js';
 
 // Updated configuration for the pivot table
 const config = {
