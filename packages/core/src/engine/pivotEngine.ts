@@ -110,7 +110,22 @@ export class PivotEngine<T extends Record<string, any>> {
     return data.map((item) => [
       ...this.state.rows.map((r) => item[r.uniqueName]),
       ...this.state.columns.map((c) => item[c.uniqueName]),
+      ...this.state.measures.map((m) => this.calculateMeasureValue(item, m)),
     ]);
+  }
+
+  /**
+   * Calculates the value for a specific measure.
+   * @param {T} item - The data item.
+   * @param {MeasureConfig} measure - The measure configuration.
+   * @returns {number} The calculated measure value.
+   * @private
+   */
+  private calculateMeasureValue(item: T, measure: MeasureConfig): number {
+    if (measure.formula && typeof measure.formula === 'function') {
+      return measure.formula(item);
+    }
+    return item[measure.uniqueName] || 0;
   }
 
   /**
@@ -121,15 +136,28 @@ export class PivotEngine<T extends Record<string, any>> {
    */
   private calculateTotals(data: T[]): Record<string, number> {
     const totals: Record<string, number> = {};
-    if (!data || !this.state.measures) {
-      return totals;
-    }
+
     this.state.measures.forEach((measure) => {
-      totals[measure.uniqueName] = data.reduce(
-        (sum, item) => sum + (Number(item[measure.uniqueName]) || 0),
-        0,
-      );
+      const { uniqueName, aggregation } = measure;
+      let total = 0;
+
+      if (aggregation === 'sum') {
+        total = data.reduce((sum, item) => sum + (item[uniqueName] || 0), 0);
+      } else if (aggregation === 'avg') {
+        total =
+          data.reduce((sum, item) => sum + (item[uniqueName] || 0), 0) /
+          data.length;
+      } else if (aggregation === 'max') {
+        total = Math.max(...data.map((item) => item[uniqueName] || 0));
+      } else if (aggregation === 'min') {
+        total = Math.min(...data.map((item) => item[uniqueName] || 0));
+      } else if (aggregation === 'count') {
+        total = data.length;
+      }
+
+      totals[uniqueName] = total;
     });
+
     return totals;
   }
 

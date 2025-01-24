@@ -33,6 +33,13 @@ const data = [
   {
     date: '2024-01-01',
     product: 'Widget A',
+    region: 'North',
+    sales: 300,
+    quantity: 25,
+  },
+  {
+    date: '2024-01-01',
+    product: 'Widget A',
     region: 'East',
     sales: 50,
     quantity: 10,
@@ -136,6 +143,7 @@ const config = {
         decimals: 2,
         locale: 'en-US'
       },
+      sortable: false,
     },
     {
       uniqueName: 'averageSale',
@@ -147,13 +155,37 @@ const config = {
       formula: (item) => item.sales / item.quantity,
       sortable: true,
     },
+    {
+      uniqueName: 'sales',
+      caption: 'Max Sale',
+      aggregation: 'max',
+      format: { 
+        type: 'currency', 
+        currency: 'USD',
+        locale: 'en-US',
+        decimals: 4
+      },
+      sortable: true,
+    },
+    {
+      uniqueName: 'sales',
+      caption: 'Min Sale',
+      aggregation: 'min',
+      format: { 
+        type: 'currency', 
+        currency: 'USD',
+        locale: 'en-US',
+        decimals: 4
+      },
+      sortable: true,
+    },
   ],
   dimensions: [
-    { field: 'product', label: 'Product', type: 'string' },
-    { field: 'region', label: 'Region', type: 'string' },
-    { field: 'date', label: 'Date', type: 'date' },
-    { field: 'sales', label: 'Sales', type: 'number' },
-    { field: 'quantity', label: 'Quantity', type: 'number' },
+    { field: 'product', label: 'Product', type: 'string', sortable: true },
+    { field: 'region', label: 'Region', type: 'string', sortable: false },
+    { field: 'date', label: 'Date', type: 'date', sortable: true },
+    { field: 'sales', label: 'Sales', type: 'number', sortable: true },
+    { field: 'quantity', label: 'Quantity', type: 'number', sortable: false },
   ],
   defaultAggregation: 'sum',
   isResponsive: true,
@@ -184,6 +216,18 @@ const config = {
       // locale: 'en-US'
     },
     averageSale: { 
+      type: 'currency', 
+      currency: 'USD',
+      locale: 'en-US',
+      decimals: 4
+    },
+    maxSale: { 
+      type: 'currency', 
+      currency: 'USD',
+      locale: 'en-US',
+      decimals: 4
+    },
+    minSale: { 
       type: 'currency', 
       currency: 'USD',
       locale: 'en-US',
@@ -561,21 +605,20 @@ function renderGroupedRows(tbody, groups, state, level) {
 
           if (columnItems.length > 0) {
             let aggregateValue;
-            if (measure.formula && typeof measure.formula === 'function') {
-              aggregateValue =
-                columnItems.reduce(
-                  (sum, item) => sum + measure.formula(item),
-                  0,
-                ) / columnItems.length;
+            if (measure.aggregation === 'max') {
+              aggregateValue = Math.max(...columnItems.map(item => engine.calculateMeasureValue(item, measure)));
+            } else if (measure.aggregation === 'min') {
+              aggregateValue = Math.min(...columnItems.map(item => engine.calculateMeasureValue(item, measure)));
+            } else if (measure.aggregation === 'count') {
+              aggregateValue = columnItems.length;
             } else {
               aggregateValue = columnItems.reduce(
-                (sum, item) => sum + (item[measure.uniqueName] || 0),
+                (sum, item) => sum + engine.calculateMeasureValue(item, measure),
                 0,
               );
-            }
-
-            if (measure.aggregation === 'avg') {
-              aggregateValue /= columnItems.length;
+              if (measure.aggregation === 'avg') {
+                aggregateValue /= columnItems.length;
+              }
             }
 
             td.textContent = engine.formatValue(
@@ -583,7 +626,7 @@ function renderGroupedRows(tbody, groups, state, level) {
               measure.uniqueName,
             );
 
-            //Apply condition formatting
+            // Apply condition formatting
             applyConditionalFormatting(td, aggregateValue, measure.uniqueName);
           } else {
             td.textContent = engine.formatValue(0, measure.uniqueName);
@@ -698,11 +741,7 @@ function renderTableHeader(thead, state) {
     headerText.textContent = row.caption;
     headerContent.appendChild(headerText);
 
-  //  const sortIcon = createSortIcon(row.uniqueName, 'row');
-  //  headerContent.appendChild(sortIcon);
-
     th.appendChild(headerContent);
-    //th.addEventListener('click', () => handleSort(row.uniqueName, 'row'));
     measureHeaderRow.appendChild(th);
   });
 
@@ -710,7 +749,6 @@ function renderTableHeader(thead, state) {
   uniqueColumnValues.forEach(() => {
     state.measures.forEach((measure) => {
       const th = document.createElement('th');
-      // th.textContent = measure.caption;
       th.style.padding = '12px';
       th.style.backgroundColor = '#f8f9fa';
       th.style.borderBottom = '2px solid #dee2e6';
@@ -725,18 +763,19 @@ function renderTableHeader(thead, state) {
       headerText.textContent = measure.caption;
       headerContent.appendChild(headerText);
 
-      const sortIcon = createSortIcon(measure.uniqueName, 'column');
-      headerContent.appendChild(sortIcon);
+      if (measure.sortable) {
+        const sortIcon = createSortIcon(measure.uniqueName, 'column');
+        headerContent.appendChild(sortIcon);
+        th.addEventListener('click', () => handleSort(measure.uniqueName));
+      }
 
       th.appendChild(headerContent);
-      th.addEventListener('click', () => handleSort(measure.uniqueName));
       measureHeaderRow.appendChild(th);
     });
   });
 
   thead.appendChild(measureHeaderRow);
 }
-
 
 function handleSort(field, direction) {
   console.log(`Sorting by field: ${field}`);
