@@ -1,5 +1,5 @@
 import { PivotEngine } from '../engine/pivotEngine';
-import { PivotTableConfig } from '../types/interfaces';
+import type { PivotTableConfig } from '../types/interfaces';
 
 describe('PivotEngine Draggable Feature', () => {
   let engine: PivotEngine<any>;
@@ -7,6 +7,8 @@ describe('PivotEngine Draggable Feature', () => {
 
   beforeEach(() => {
     config = {
+      dimensions: [],
+      defaultAggregation: 'sum',
       data: [
         { id: 1, name: 'John', age: 30 },
         { id: 2, name: 'Jane', age: 25 },
@@ -14,10 +16,12 @@ describe('PivotEngine Draggable Feature', () => {
         { id: 4, name: 'Alice', age: 28 },
       ],
       columns: [
-        { field: 'id', label: 'ID' },
-        { field: 'name', label: 'Name' },
-        { field: 'age', label: 'Age' },
+        { uniqueName: 'id', caption: 'ID' },
+        { uniqueName: 'name', caption: 'Name' },
+        { uniqueName: 'age', caption: 'Age' },
       ],
+      rows: [],
+      measures: [],
       groupConfig: null,
     };
     engine = new PivotEngine(config);
@@ -36,19 +40,26 @@ describe('PivotEngine Draggable Feature', () => {
     });
 
     // it('should update rowSizes when dragging rows', () => {
-    //   engine.dragRow(0, 2)
-    //   const state = engine.getState()
+    //   engine.dragRow(0, 2);
+    //   const state = engine.getState();
     //   expect(state.rowSizes).toEqual([
     //     { index: 1, height: 40 },
-    //     { index: 0, height: 40 },
     //     { index: 2, height: 40 },
+    //     { index: 0, height: 40 },
     //     { index: 3, height: 40 },
-    //   ])
-    // })
+    //   ]);
+    // });
 
     it('should not change data when dragging to the same index', () => {
       const initialState = engine.getState();
       engine.dragRow(1, 1);
+      const newState = engine.getState();
+      expect(newState.data).toEqual(initialState.data);
+    });
+
+    it('should handle invalid indices gracefully', () => {
+      const initialState = engine.getState();
+      engine.dragRow(-1, 5);
       const newState = engine.getState();
       expect(newState.data).toEqual(initialState.data);
     });
@@ -59,15 +70,22 @@ describe('PivotEngine Draggable Feature', () => {
       engine.dragColumn(0, 2);
       const state = engine.getState();
       expect(state.columns).toEqual([
-        { field: 'name', label: 'Name' },
-        { field: 'age', label: 'Age' },
-        { field: 'id', label: 'ID' },
+        { uniqueName: 'name', caption: 'Name' },
+        { uniqueName: 'age', caption: 'Age' },
+        { uniqueName: 'id', caption: 'ID' },
       ]);
     });
 
     it('should not change columns when dragging to the same index', () => {
       const initialState = engine.getState();
       engine.dragColumn(1, 1);
+      const newState = engine.getState();
+      expect(newState.columns).toEqual(initialState.columns);
+    });
+
+    it('should handle invalid indices gracefully', () => {
+      const initialState = engine.getState();
+      engine.dragColumn(-1, 5);
       const newState = engine.getState();
       expect(newState.columns).toEqual(initialState.columns);
     });
@@ -85,9 +103,9 @@ describe('PivotEngine Draggable Feature', () => {
         { id: 1, name: 'John', age: 30 },
       ]);
       expect(state.columns).toEqual([
-        { field: 'name', label: 'Name' },
-        { field: 'id', label: 'ID' },
-        { field: 'age', label: 'Age' },
+        { uniqueName: 'name', caption: 'Name' },
+        { uniqueName: 'id', caption: 'ID' },
+        { uniqueName: 'age', caption: 'Age' },
       ]);
     });
   });
@@ -102,17 +120,7 @@ describe('PivotEngine Draggable Feature', () => {
     it('should handle dragging column to end of the list', () => {
       engine.dragColumn(0, 2);
       const state = engine.getState();
-      expect(state.columns[2]).toEqual({ field: 'id', label: 'ID' });
+      expect(state.columns[2]).toEqual({ uniqueName: 'id', caption: 'ID' });
     });
-
-    // it('should handle dragging with empty data set', () => {
-    //   const emptyConfig = { ...config, data: [] }
-    //   const emptyEngine = new PivotEngine(emptyConfig)
-    //   emptyEngine.dragRow(0, 1)
-    //   emptyEngine.dragColumn(0, 1)
-    //   const state = emptyEngine.getState()
-    //   expect(state.data).toEqual([])
-    //   expect(state.columns).toEqual(config.columns)
-    // })
   });
 });
