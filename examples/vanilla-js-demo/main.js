@@ -96,6 +96,7 @@ const config = {
   ],
   defaultAggregation: 'sum',
   isResponsive: true,
+  toolbar: false,
   // Add initial sort configuration
   initialSort: [
     {
@@ -234,6 +235,13 @@ function renderTable() {
   }
 
   container.innerHTML = '';
+
+  // Control toolbar visibility
+  const toolbar = document.getElementById('toolbar');
+  console.log('toolbar', toolbar);
+  if (toolbar) {
+    toolbar.style.display = config.toolbar ? 'block' : 'none';
+  }
 
   const table = document.createElement('table');
   table.style.width = '100%';
