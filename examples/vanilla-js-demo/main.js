@@ -368,8 +368,7 @@ function renderTable() {
   tableWrapper.appendChild(table);
 
   container.appendChild(tableWrapper);
-    // Log the rendered data for debugging
-    console.log("Rendered data:", groupedData)
+
     implementDragAndDrop();
 }
 
@@ -586,7 +585,6 @@ function renderTableHeader(thead, state) {
 }
 
 function handleSort(field, direction) {
-  console.log(`Sorting by field: ${field}`);
  // Get current state
  const state = engine.getState()
  const currentSortConfig = state.sortConfig?.[0]
@@ -603,8 +601,6 @@ function handleSort(field, direction) {
  // Force a re-render of the table
  renderTable()
 
- // Log the sort operation for debugging
- console.log(`Sorting by ${field} in ${newDirection} order`)
 }
 
 function createSortIcon(field, axis) {
