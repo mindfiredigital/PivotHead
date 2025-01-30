@@ -238,7 +238,6 @@ function renderTable() {
 
   // Control toolbar visibility
   const toolbar = document.getElementById('toolbar');
-  console.log('toolbar', toolbar);
   if (toolbar) {
     toolbar.style.display = config.toolbar ? 'block' : 'none';
   }
@@ -268,8 +267,8 @@ function renderTable() {
   tableWrapper.appendChild(table);
 
   container.appendChild(tableWrapper);
-    // Log the rendered data for debugging
-    console.log("Rendered data:", groupedData)
+  // Log the rendered data for debugging
+  console.log("Rendered data:", groupedData)
 }
 
 function renderGroupedRows(tbody, groups, state, level) {
@@ -580,6 +579,9 @@ document.addEventListener('DOMContentLoaded', () => {
     );
     return;
   }
-  createHeader(config);
+  if(config.toolbar){
+    createHeader(config);
+  }
+ 
   renderTable();
 });
