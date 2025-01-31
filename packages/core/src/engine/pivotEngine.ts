@@ -12,7 +12,7 @@ import {
 } from '../types/interfaces';
 import { calculateAggregates } from './aggregator';
 import { processData } from './dataProcessor';
-import { applySort, sortGroups } from './sorter';
+// import { applySort, sortGroups } from './sorter';
 
 /**
  * Creates an instance of PivotEngine.
@@ -256,9 +256,6 @@ export class PivotEngine<T extends Record<string, any>> {
 
     this.state.sortConfig = [newSortConfig];
     this.applySort();
-
-    // Log the new state for debugging
-    console.log('New state after sorting:', this.state);
   }
 
   private applySort() {
@@ -536,35 +533,132 @@ export class PivotEngine<T extends Record<string, any>> {
    * @public
    */
   public dragRow(fromIndex: number, toIndex: number) {
+    // Prevent invalid indices
+    if (
+      fromIndex < 0 ||
+      toIndex < 0 ||
+      fromIndex >= this.state.data.length ||
+      toIndex >= this.state.data.length
+    ) {
+      console.warn('Invalid drag indices');
+      return;
+    }
+
+    // Create new data array with reordered items
     const newData = [...this.state.data];
     const [removed] = newData.splice(fromIndex, 1);
     newData.splice(toIndex, 0, removed);
+
+    // Update state
     this.state.data = newData;
-    this.state.rowSizes = this.state.rowSizes.map((size, index) => ({
+
+    // Update row sizes while maintaining references
+    const newRowSizes = [...this.state.rowSizes];
+    const [removedSize] = newRowSizes.splice(fromIndex, 1);
+    newRowSizes.splice(toIndex, 0, removedSize);
+
+    // Update indices
+    this.state.rowSizes = newRowSizes.map((size, index) => ({
       ...size,
-      index:
-        index < fromIndex || index > toIndex
-          ? index
-          : index < toIndex
-          ? index + 1
-          : index - 1,
+      index,
     }));
+
+    // If groups exist, update group order
+    if (this.state.groups.length > 0) {
+      const newGroups = [...this.state.groups];
+      const [removedGroup] = newGroups.splice(fromIndex, 1);
+      newGroups.splice(toIndex, 0, removedGroup);
+      this.state.groups = newGroups;
+    }
+
+    // Refresh processed data and aggregates
     this.state.processedData = this.processData(this.state.data);
     this.updateAggregates();
-  }
 
+    // Emit change event if needed
+    if (typeof this.config.onRowDragEnd === 'function') {
+      this.config.onRowDragEnd(fromIndex, toIndex, this.state.data);
+    }
+  }
   /**
    * Handles dragging a column to a new position.
    * @param {number} fromIndex - The original index of the column.
    * @param {number} toIndex - The new index for the column.
    * @public
    */
-  public dragColumn(fromIndex: number, toIndex: number) {
-    const newColumns = [...this.state.columns];
-    const [removed] = newColumns.splice(fromIndex, 1);
-    newColumns.splice(toIndex, 0, removed);
-    this.state.columns = newColumns;
-    this.state.processedData = this.processData(this.state.data);
-    this.updateAggregates();
+  public dragColumn(fromIndex: number, toIndex: number): void {
+    // Validate indices
+    if (
+      !this.validateDragOperation(fromIndex, toIndex, this.state.columns.length)
+    ) {
+      console.error(
+        `Invalid column drag operation: from ${fromIndex} to ${toIndex}`,
+      );
+      return;
+    }
+
+    try {
+      // Create new columns array with reordered items
+      const newColumns = [...this.state.columns];
+      const [removed] = newColumns.splice(fromIndex, 1);
+      newColumns.splice(toIndex, 0, removed);
+
+      // Update column state
+      this.state.columns = newColumns;
+
+      // Update column widths if they exist
+      if (Object.keys(this.state.columnWidths).length > 0) {
+        const newColumnWidths: Record<string, number> = {};
+        Object.keys(this.state.columnWidths).forEach((key, index) => {
+          if (index === fromIndex) {
+            newColumnWidths[newColumns[toIndex].uniqueName] =
+              this.state.columnWidths[key];
+          } else if (index === toIndex) {
+            newColumnWidths[newColumns[fromIndex].uniqueName] =
+              this.state.columnWidths[key];
+          } else {
+            newColumnWidths[key] = this.state.columnWidths[key];
+          }
+        });
+        this.state.columnWidths = newColumnWidths;
+      }
+
+      // Update column groups if they exist
+      if (this.state.columnGroups.length > 0) {
+        const newColumnGroups = [...this.state.columnGroups];
+        const [removedGroup] = newColumnGroups.splice(fromIndex, 1);
+        newColumnGroups.splice(toIndex, 0, removedGroup);
+        this.state.columnGroups = newColumnGroups;
+      }
+
+      // Refresh processed data and aggregates
+      this.state.processedData = this.processData(this.state.data);
+      this.updateAggregates();
+
+      // Emit change event if needed
+      if (typeof this.config.onColumnDragEnd === 'function') {
+        const columnsWithCaptions = this.state.columns.map((column) => ({
+          ...column,
+          caption: column.caption || column.uniqueName,
+        }));
+        this.config.onColumnDragEnd(fromIndex, toIndex, columnsWithCaptions);
+      }
+    } catch (error) {
+      console.error('Error during column drag operation:', error);
+    }
+  }
+
+  private validateDragOperation(
+    fromIndex: number,
+    toIndex: number,
+    length: number,
+  ): boolean {
+    return (
+      fromIndex >= 0 &&
+      toIndex >= 0 &&
+      fromIndex < length &&
+      toIndex < length &&
+      fromIndex !== toIndex
+    );
   }
 }

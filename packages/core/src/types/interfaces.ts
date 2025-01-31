@@ -103,6 +103,12 @@ export interface PivotTableConfig<T> {
   defaultAggregation: AggregationType;
   isResponsive?: boolean;
   initialSort?: SortConfig[];
+  onRowDragEnd?: (fromIndex: number, toIndex: number, newData: T[]) => void;
+  onColumnDragEnd?: (
+    fromIndex: number,
+    toIndex: number,
+    newColumns: { uniqueName: string; caption: string }[],
+  ) => void;
 }
 
 export interface MeasureConfig {

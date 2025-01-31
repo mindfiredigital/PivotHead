@@ -21,9 +21,82 @@ if (typeof PivotheadCore === 'undefined') {
 const { PivotEngine } = PivotheadCore;
 
 // Dummy data.
-import { data2 as data } from './utils/testData.js';
+// import { data2 as data } from './utils/testData.js';
 
 // Updated configuration for the pivot table
+const data = [
+  {
+    date: '2024-01-01',
+    product: 'Widget A',
+    region: 'North',
+    sales: 1000,
+    quantity: 50,
+  },
+  {
+    date: '2024-01-01',
+    product: 'Widget B',
+    region: 'South',
+    sales: 1500,
+    quantity: 75,
+  },
+  {
+    date: '2024-01-01',
+    product: 'Widget D',
+    region: 'North',
+    sales: 1300,
+    quantity: 70,
+  },
+  {
+    date: '2024-01-02',
+    product: 'Widget A',
+    region: 'East',
+    sales: 1200,
+    quantity: 60,
+  },
+  {
+    date: '2024-01-02',
+    product: 'Widget A',
+    region: 'East',
+    sales: 100,
+    quantity: 44,
+  },
+  {
+    date: '2024-01-02',
+    product: 'Widget C',
+    region: 'West',
+    sales: 800,
+    quantity: 40,
+  },
+  {
+    date: '2024-01-03',
+    product: 'Widget B',
+    region: 'North',
+    sales: 1800,
+    quantity: 90,
+  },
+  {
+    date: '2024-01-03',
+    product: 'Widget C',
+    region: 'South',
+    sales: 1100,
+    quantity: 55,
+  },
+  {
+    date: '2024-01-04',
+    product: 'Widget A',
+    region: 'West',
+    sales: 1300,
+    quantity: 65,
+  },
+  {
+    date: '2024-01-04',
+    product: 'Widget B',
+    region: 'East',
+    sales: 1600,
+    quantity: 80,
+  },
+];
+
 const config = {
   data: data,
   rows: [{ uniqueName: 'product', caption: 'Product' }],
@@ -200,10 +273,117 @@ const config = {
       },
     },
   ],
+  onRowDragEnd: (fromIndex, toIndex, newData) => {
+    //console.log('Row dragged:', {fromIndex, toIndex, newData});
+  },
+  onColumnDragEnd: (fromIndex, toIndex, newColumns) => {
+    //console.log('Column dragged:', {fromIndex, toIndex, newColumns});
+  }
 };
 // Initialize PivotEngine
 let engine = new PivotEngine(config);
 
+function implementDragAndDrop() {
+  const table = document.getElementById('pivotTable');
+  const tbody = table.querySelector('tbody');
+  const thead = table.querySelector('thead');
+
+  // 1. Row Dragging Implementation
+  implementRowDragging(tbody);
+  
+  // 2. Column Dragging Implementation
+  implementColumnDragging(thead);
+}
+function implementColumnDragging(thead) {
+  const headerRow = thead.querySelector('tr:last-child'); // Get measure headers row
+  
+  headerRow.querySelectorAll('th').forEach((header, index) => {
+    header.setAttribute('draggable', true);
+    
+    header.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/plain', index);
+      header.classList.add('dragging');
+    });
+    
+    header.addEventListener('dragend', () => {
+      header.classList.remove('dragging');
+    });
+    
+    header.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      const draggingHeader = headerRow.querySelector('.dragging');
+      if (draggingHeader) {
+        const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
+        const toIndex = index;
+        
+        if (fromIndex !== toIndex) {
+          // Call PivotEngine's dragColumn method
+          engine.dragColumn(fromIndex, toIndex);
+          // Refresh the table
+          renderTable();
+        }
+      }
+    });
+  });
+}
+
+// Add necessary CSS
+const style = document.createElement('style');
+style.textContent = `
+  .dragging {
+    opacity: 0.5;
+    cursor: move;
+  }
+  
+  tr[draggable=true],
+  th[draggable=true] {
+    cursor: move;
+  }
+  
+  tr[draggable=true]:hover,
+  th[draggable=true]:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+  
+  .drag-over {
+    border-top: 2px solid #2196F3;
+  }
+`;
+document.head.appendChild(style);
+
+function implementRowDragging(tbody) {
+  // Add draggable attribute to rows
+  tbody.querySelectorAll('tr').forEach(row => {
+    row.setAttribute('draggable', true);
+    
+    // Store original index
+    row.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/plain', row.rowIndex);
+      row.classList.add('dragging');
+    });
+    
+    row.addEventListener('dragend', () => {
+      row.classList.remove('dragging');
+    });
+    
+    row.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      const draggingRow = tbody.querySelector('.dragging');
+      if (draggingRow) {
+        const currentRow = row;
+        const fromIndex = parseInt(e.dataTransfer.getData('text/plain')) - 1;
+        const toIndex = currentRow.rowIndex - 1;
+        
+        if (fromIndex !== toIndex) {
+          // Call PivotEngine's dragRow method
+          engine.dragRow(fromIndex, toIndex);
+          // Refresh the table
+          renderTable();
+        }
+      }
+    });
+  });
+}
 
 export function onSectionItemDrop(droppedFields) {
   let droppedFieldsInSections=JSON.stringify({
@@ -267,8 +447,9 @@ function renderTable() {
   tableWrapper.appendChild(table);
 
   container.appendChild(tableWrapper);
-  // Log the rendered data for debugging
-  console.log("Rendered data:", groupedData)
+
+  implementDragAndDrop();
+
 }
 
 function renderGroupedRows(tbody, groups, state, level) {
@@ -484,7 +665,6 @@ function renderTableHeader(thead, state) {
 }
 
 function handleSort(field, direction) {
-  console.log(`Sorting by field: ${field}`);
  // Get current state
  const state = engine.getState()
  const currentSortConfig = state.sortConfig?.[0]
@@ -501,8 +681,6 @@ function handleSort(field, direction) {
  // Force a re-render of the table
  renderTable()
 
- // Log the sort operation for debugging
- console.log(`Sorting by ${field} in ${newDirection} order`)
 }
 
 function createSortIcon(field, axis) {
@@ -567,6 +745,20 @@ export function formatTable(config){
   renderTable();
 }
 
+// Add event listeners for drag and drop completion
+function addDragDropListeners() {
+  // Listen for row drag completion
+  engine.config.onRowDragEnd = (fromIndex, toIndex, newData) => {
+    //console.log(`Row moved from ${fromIndex} to ${toIndex}`);
+    // You can perform additional actions here
+  };
+  
+  // Listen for column drag completion
+  engine.config.onColumnDragEnd = (fromIndex, toIndex, newColumns) => {
+    //console.log(`Column moved from ${fromIndex} to ${toIndex}`);
+    // You can perform additional actions here
+  };
+}
 
 
 // Initialize the table when the DOM is fully loaded
@@ -579,6 +771,8 @@ document.addEventListener('DOMContentLoaded', () => {
     );
     return;
   }
+  addDragDropListeners();
+
   if(config.toolbar){
     createHeader(config);
   }

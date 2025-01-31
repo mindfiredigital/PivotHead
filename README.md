@@ -124,6 +124,15 @@ const config = {
     },
     // ... more conditional formatting rules
   ],
+  // Add initial sort configuration
+  initialSort: [
+    {
+      field: "sales",
+      direction: "desc",
+      type: "measure",
+      aggregation: "sum",
+    },
+  ],
 };
 
 const engine = new PivotEngine(config);
@@ -242,6 +251,11 @@ sort(field: string, direction: 'asc' | 'desc')
 
 Sorts the pivot table data.
 
+Example:
+```javascript
+engine.sort('sales', 'asc');
+```
+
 #### setGroupConfig(groupConfig: GroupConfig | null)
 
 ```typescript
@@ -302,7 +316,34 @@ Handles dragging a column to a new position.
 
 ## Advanced Features
 
-## Formatting cells
+### Sorting
+
+PivotHead supports sorting for measures and dimensions. You can configure initial sorting and handle sorting dynamically.
+
+Example configuration:
+
+```javascript
+const config = {
+  // ... other configuration options
+  initialSort: [
+    {
+      field: "sales",
+      direction: "desc",
+      type: "measure",
+      aggregation: "sum",
+    },
+  ],
+  // ... other configuration options
+};
+```
+
+To handle sorting dynamically, you can use the `sort` method:
+
+```javascript
+engine.sort('sales', 'asc');
+```
+
+### Formatting cells
 
 PivotHead supports conditional formatting for cells like decimal values , currency symbol etc.
 
