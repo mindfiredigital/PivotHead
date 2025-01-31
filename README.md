@@ -26,6 +26,7 @@ PivotHead is a headlessPivot, powerful and flexible library for creating interac
 - Responsive design
 - Customizable styling
 - React integration (Upcoming)
+- Hide and show toolbar
 
 ## Installation
 
@@ -460,6 +461,19 @@ const config = {
       formula: (item) => item.sales / item.quantity,
     },
   ],
+};
+```
+
+## Toolbar visibility
+
+Show hide the hide the visibility of tool using config.
+
+```javascript
+const config = {
+  // ... other configuration options
+ 
+  toolbar: <boolean>
+  // ... other configuration options
 };
 ```
 
