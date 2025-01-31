@@ -677,13 +677,13 @@ export function formatTable(config){
 function addDragDropListeners() {
   // Listen for row drag completion
   engine.config.onRowDragEnd = (fromIndex, toIndex, newData) => {
-    console.log(`Row moved from ${fromIndex} to ${toIndex}`);
+    //console.log(`Row moved from ${fromIndex} to ${toIndex}`);
     // You can perform additional actions here
   };
   
   // Listen for column drag completion
   engine.config.onColumnDragEnd = (fromIndex, toIndex, newColumns) => {
-    console.log(`Column moved from ${fromIndex} to ${toIndex}`);
+    //console.log(`Column moved from ${fromIndex} to ${toIndex}`);
     // You can perform additional actions here
   };
 }

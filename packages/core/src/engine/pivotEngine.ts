@@ -12,7 +12,7 @@ import {
 } from '../types/interfaces';
 import { calculateAggregates } from './aggregator';
 import { processData } from './dataProcessor';
-import { applySort, sortGroups } from './sorter';
+// import { applySort, sortGroups } from './sorter';
 
 /**
  * Creates an instance of PivotEngine.
@@ -256,9 +256,6 @@ export class PivotEngine<T extends Record<string, any>> {
 
     this.state.sortConfig = [newSortConfig];
     this.applySort();
-
-    // Log the new state for debugging
-    console.log('New state after sorting:', this.state);
   }
 
   private applySort() {
@@ -646,10 +643,6 @@ export class PivotEngine<T extends Record<string, any>> {
         }));
         this.config.onColumnDragEnd(fromIndex, toIndex, columnsWithCaptions);
       }
-
-      console.log(
-        `Column successfully dragged from ${fromIndex} to ${toIndex}`,
-      );
     } catch (error) {
       console.error('Error during column drag operation:', error);
     }
