@@ -202,10 +202,10 @@ config = {
     },
   ],
   onRowDragEnd: (fromIndex, toIndex, newData) => {
-    console.log('Row dragged:', {fromIndex, toIndex, newData});
+    //console.log('Row dragged:', {fromIndex, toIndex, newData});
   },
   onColumnDragEnd: (fromIndex, toIndex, newColumns) => {
-    console.log('Column dragged:', {fromIndex, toIndex, newColumns});
+    //console.log('Column dragged:', {fromIndex, toIndex, newColumns});
   }
 };
 // Initialize PivotEngine
