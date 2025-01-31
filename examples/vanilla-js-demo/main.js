@@ -96,6 +96,7 @@ const config = {
   ],
   defaultAggregation: 'sum',
   isResponsive: true,
+  toolbar: false,
   // Add initial sort configuration
   initialSort: [
     {
@@ -235,6 +236,12 @@ function renderTable() {
 
   container.innerHTML = '';
 
+  // Control toolbar visibility
+  const toolbar = document.getElementById('toolbar');
+  if (toolbar) {
+    toolbar.style.display = config.toolbar ? 'block' : 'none';
+  }
+
   const table = document.createElement('table');
   table.style.width = '100%';
   table.style.borderCollapse = 'collapse';
@@ -260,8 +267,8 @@ function renderTable() {
   tableWrapper.appendChild(table);
 
   container.appendChild(tableWrapper);
-    // Log the rendered data for debugging
-    console.log("Rendered data:", groupedData)
+  // Log the rendered data for debugging
+  console.log("Rendered data:", groupedData)
 }
 
 function renderGroupedRows(tbody, groups, state, level) {
@@ -572,6 +579,9 @@ document.addEventListener('DOMContentLoaded', () => {
     );
     return;
   }
-  createHeader(config);
+  if(config.toolbar){
+    createHeader(config);
+  }
+ 
   renderTable();
 });
