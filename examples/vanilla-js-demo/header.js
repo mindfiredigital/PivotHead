@@ -2,6 +2,7 @@ import { formatCellPopUp } from './formatCell.js';
 import { createOptionsPopup } from './optionsPopup.js';
 import { conditionFormattingPopUp } from './conditionFormattingPopUp.js';
 import { createFieldsPopup } from './fieldsPopup.js';
+import { dataSourceOptions } from './dataSourceOptions.js';
 
 export function createHeader(config) {
   const header = document.createElement('div');
@@ -76,6 +77,13 @@ export function createHeader(config) {
               break;
             case 'Options':
               createOptionsPopup();
+              break;
+            //TODO: Add more cases for other options
+            // case 'To Local CSV':
+            //   dataSourceOptions(config);
+            //   break;
+            case 'To Local JSON':
+              dataSourceOptions(config);
               break;
             default:
               alert(optionName);
