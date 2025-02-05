@@ -169,7 +169,7 @@ const config = {
   ],
   defaultAggregation: 'sum',
   isResponsive: true,
-  toolbar: false,
+  toolbar: true,
   // Add initial sort configuration
   initialSort: [
     {
