@@ -38,6 +38,7 @@ The `<type>` should describe the purpose or category of the commit. Common types
 - `refactor`: Code refactoring without adding new features or fixing bugs.
 - `test`: Adding or modifying tests.
 - `chore`: Routine tasks, maintenance, or tooling changes.
+- `patch`: Indicates general maintenance tasks that don't fit into feature or bug fix categories but still need to be tracked and reviewed separately
 
 ## Subject
 

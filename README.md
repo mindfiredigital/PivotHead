@@ -1,12 +1,8 @@
 # PivotHead
 
-HeadlessPivot
+PivotHead is a headlessPivot, powerful and flexible library for creating interactive pivot tables in JavaScript applications. It provides a core engine for data manipulation and, in the future, will be compatible with wrappers for React, Vue, Svelte, and Angular, making it easy to integrate into applications built with these frameworks.
 
-<br>
-
-# PivotHead
-
-PivotHead is a powerful and flexible library for creating interactive pivot tables in JavaScript applications. It provides a core engine for data manipulation and, in the future, will be compatible with wrappers for React, Vue, Svelte, and Angular, making it easy to integrate into applications built with these frameworks.
+<img width="951" alt="PivotTable" src="https://github.com/user-attachments/assets/78de8bf8-7738-4917-88ce-7cf0a16da24b" />
 
 ## Table of Contents
 
@@ -30,6 +26,7 @@ PivotHead is a powerful and flexible library for creating interactive pivot tabl
 - Responsive design
 - Customizable styling
 - React integration (Upcoming)
+- Hide and show toolbar
 
 ## Installation
 
@@ -126,6 +123,15 @@ const config = {
       }
     },
     // ... more conditional formatting rules
+  ],
+  // Add initial sort configuration
+  initialSort: [
+    {
+      field: "sales",
+      direction: "desc",
+      type: "measure",
+      aggregation: "sum",
+    },
   ],
 };
 
@@ -245,6 +251,11 @@ sort(field: string, direction: 'asc' | 'desc')
 
 Sorts the pivot table data.
 
+Example:
+```javascript
+engine.sort('sales', 'asc');
+```
+
 #### setGroupConfig(groupConfig: GroupConfig | null)
 
 ```typescript
@@ -305,7 +316,34 @@ Handles dragging a column to a new position.
 
 ## Advanced Features
 
-## Formatting cells
+### Sorting
+
+PivotHead supports sorting for measures and dimensions. You can configure initial sorting and handle sorting dynamically.
+
+Example configuration:
+
+```javascript
+const config = {
+  // ... other configuration options
+  initialSort: [
+    {
+      field: "sales",
+      direction: "desc",
+      type: "measure",
+      aggregation: "sum",
+    },
+  ],
+  // ... other configuration options
+};
+```
+
+To handle sorting dynamically, you can use the `sort` method:
+
+```javascript
+engine.sort('sales', 'asc');
+```
+
+### Formatting cells
 
 PivotHead supports conditional formatting for cells like decimal values , currency symbol etc.
 
@@ -423,6 +461,19 @@ const config = {
       formula: (item) => item.sales / item.quantity,
     },
   ],
+};
+```
+
+## Toolbar visibility
+
+Show hide the hide the visibility of tool using config.
+
+```javascript
+const config = {
+  // ... other configuration options
+ 
+  toolbar: <boolean>
+  // ... other configuration options
 };
 ```
 

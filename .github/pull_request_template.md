@@ -31,6 +31,10 @@ This pull request addresses the following issue:
 
 [Add any additional information or context about the pull request here]
 
+## Preview:
+
+[Provide preview url(if available)]
+
 ## Closing
 
 Closes #<issue_number>

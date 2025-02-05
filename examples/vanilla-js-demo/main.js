@@ -10,7 +10,6 @@
  * - Row reordering (drag and drop)
  */
 import { createHeader } from './header.js';
-import { conditionFormattingPopUp } from './conditionFormattingPopUp.js';
 if (typeof PivotheadCore === 'undefined') {
   console.error(
     'PivotheadCore is not defined. Make sure the library is loaded correctly.',
@@ -22,6 +21,9 @@ if (typeof PivotheadCore === 'undefined') {
 const { PivotEngine } = PivotheadCore;
 
 // Dummy data.
+// import { data2 as data } from './utils/testData.js';
+
+// Updated configuration for the pivot table
 const data = [
   {
     date: '2024-01-01',
@@ -95,7 +97,6 @@ const data = [
   },
 ];
 
-// Updated configuration for the pivot table
 const config = {
   data: data,
   rows: [{ uniqueName: 'product', caption: 'Product' }],
@@ -111,6 +112,7 @@ const config = {
         locale: 'en-US',
         decimals: 4
       },
+      sortable: true,
     },
     {
       uniqueName: 'quantity',
@@ -121,29 +123,62 @@ const config = {
         decimals: 2,
         locale: 'en-US'
       },
+      sortable: false,
     },
     {
       uniqueName: 'averageSale',
       caption: 'Average Sale',
       aggregation: 'avg',
       format: { 
+        type: 'number'
+      },
+      formula: (item) => item.sales / item.quantity,
+      sortable: true,
+    },
+    {
+      uniqueName: 'sales',
+      caption: 'Max Sale',
+      aggregation: 'max',
+      format: { 
         type: 'currency', 
         currency: 'USD',
         locale: 'en-US',
         decimals: 4
       },
-      formula: (item) => item.sales / item.quantity,
+      sortable: true,
+    },
+    {
+      uniqueName: 'sales',
+      caption: 'Min Sale',
+      aggregation: 'min',
+      format: { 
+        type: 'currency', 
+        currency: 'USD',
+        locale: 'en-US',
+        decimals: 4
+      },
+      sortable: true,
     },
   ],
   dimensions: [
-    { field: 'product', label: 'Product', type: 'string' },
-    { field: 'region', label: 'Region', type: 'string' },
-    { field: 'date', label: 'Date', type: 'date' },
-    { field: 'sales', label: 'Sales', type: 'number' },
-    { field: 'quantity', label: 'Quantity', type: 'number' },
+    { field: 'product', label: 'Product', type: 'string', sortable: true },
+    { field: 'region', label: 'Region', type: 'string', sortable: false },
+    { field: 'date', label: 'Date', type: 'date', sortable: true },
+    { field: 'sales', label: 'Sales', type: 'number', sortable: true },
+    { field: 'quantity', label: 'Quantity', type: 'number', sortable: false },
   ],
   defaultAggregation: 'sum',
   isResponsive: true,
+  toolbar: false,
+  // Add initial sort configuration
+  initialSort: [
+    {
+      field: "sales",
+      direction: "desc",
+      type: "measure",
+      aggregation: "sum",
+    },
+  ],
   groupConfig: {
     rowFields: ['product'],
     columnFields: ['region'],
@@ -162,6 +197,18 @@ const config = {
       // locale: 'en-US'
     },
     averageSale: { 
+      type: 'currency', 
+      currency: 'USD',
+      locale: 'en-US',
+      decimals: 4
+    },
+    maxSale: { 
+      type: 'currency', 
+      currency: 'USD',
+      locale: 'en-US',
+      decimals: 4
+    },
+    minSale: { 
       type: 'currency', 
       currency: 'USD',
       locale: 'en-US',
@@ -226,217 +273,117 @@ const config = {
       },
     },
   ],
+  onRowDragEnd: (fromIndex, toIndex, newData) => {
+    //console.log('Row dragged:', {fromIndex, toIndex, newData});
+  },
+  onColumnDragEnd: (fromIndex, toIndex, newColumns) => {
+    //console.log('Column dragged:', {fromIndex, toIndex, newColumns});
+  }
 };
 // Initialize PivotEngine
 let engine = new PivotEngine(config);
 
-function createControlPanel() {
-  const controlPanel = document.createElement('div');
-  controlPanel.className = 'control-panel';
-  controlPanel.style.display = 'flex';
-  controlPanel.style.flexWrap = 'wrap';
-  controlPanel.style.gap = '20px';
-  controlPanel.style.marginBottom = '20px';
-  controlPanel.style.padding = '10px';
-  controlPanel.style.backgroundColor = '#f8f9fa';
-  controlPanel.style.border = '1px solid #dee2e6';
-  controlPanel.style.borderRadius = '4px';
- 
-  const rowsPanel = createAxisPanel('Rows', config.dimensions);
-  const columnsPanel = createAxisPanel('Columns', config.dimensions);
-  const measuresPanel = createMeasuresPanel();
-  const aggregationPanel = createAggregationPanel();
-  // const sortPanel = createSortPanel(); 
+function implementDragAndDrop() {
+  const table = document.getElementById('pivotTable');
+  const tbody = table.querySelector('tbody');
+  const thead = table.querySelector('thead');
 
-  controlPanel.appendChild(rowsPanel);
-  controlPanel.appendChild(columnsPanel);
-  controlPanel.appendChild(measuresPanel);
-  controlPanel.appendChild(aggregationPanel);
-  // controlPanel.appendChild(sortPanel); 
-
-  return controlPanel;
+  // 1. Row Dragging Implementation
+  implementRowDragging(tbody);
+  
+  // 2. Column Dragging Implementation
+  implementColumnDragging(thead);
+}
+function implementColumnDragging(thead) {
+  const headerRow = thead.querySelector('tr:last-child'); // Get measure headers row
+  
+  headerRow.querySelectorAll('th').forEach((header, index) => {
+    header.setAttribute('draggable', true);
+    
+    header.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/plain', index);
+      header.classList.add('dragging');
+    });
+    
+    header.addEventListener('dragend', () => {
+      header.classList.remove('dragging');
+    });
+    
+    header.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      const draggingHeader = headerRow.querySelector('.dragging');
+      if (draggingHeader) {
+        const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
+        const toIndex = index;
+        
+        if (fromIndex !== toIndex) {
+          // Call PivotEngine's dragColumn method
+          engine.dragColumn(fromIndex, toIndex);
+          // Refresh the table
+          renderTable();
+        }
+      }
+    });
+  });
 }
 
-function createAxisPanel(title, options) {
-  const panel = document.createElement('div');
-  panel.className = 'axis-panel';
-  panel.style.flex = '1';
-  panel.style.minWidth = '200px';
+// Add necessary CSS
+const style = document.createElement('style');
+style.textContent = `
+  .dragging {
+    opacity: 0.5;
+    cursor: move;
+  }
+  
+  tr[draggable=true],
+  th[draggable=true] {
+    cursor: move;
+  }
+  
+  tr[draggable=true]:hover,
+  th[draggable=true]:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+  
+  .drag-over {
+    border-top: 2px solid #2196F3;
+  }
+`;
+document.head.appendChild(style);
 
-  const panelTitle = document.createElement('h3');
-  panelTitle.textContent = title;
-  panel.appendChild(panelTitle);
-
-  const select = document.createElement('select');
-  select.multiple = true;
-  select.style.width = '100%';
-  select.style.height = '100px';
-
-  options.forEach((option) => {
-    const optionElement = document.createElement('option');
-    optionElement.value = option.field;
-    optionElement.textContent = option.label;
-    select.appendChild(optionElement);
+function implementRowDragging(tbody) {
+  // Add draggable attribute to rows
+  tbody.querySelectorAll('tr').forEach(row => {
+    row.setAttribute('draggable', true);
+    
+    // Store original index
+    row.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/plain', row.rowIndex);
+      row.classList.add('dragging');
+    });
+    
+    row.addEventListener('dragend', () => {
+      row.classList.remove('dragging');
+    });
+    
+    row.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      const draggingRow = tbody.querySelector('.dragging');
+      if (draggingRow) {
+        const currentRow = row;
+        const fromIndex = parseInt(e.dataTransfer.getData('text/plain')) - 1;
+        const toIndex = currentRow.rowIndex - 1;
+        
+        if (fromIndex !== toIndex) {
+          // Call PivotEngine's dragRow method
+          engine.dragRow(fromIndex, toIndex);
+          // Refresh the table
+          renderTable();
+        }
+      }
+    });
   });
-
-  select.addEventListener('change', () => {
-    const selectedFields = Array.from(select.selectedOptions).map((option) => ({
-      uniqueName: option.value,
-      caption: option.textContent,
-    }));
-    if (title === 'Rows') {
-      engine.state.rows = selectedFields;
-    } else {
-      engine.state.columns = selectedFields;
-    }
-    renderTable();
-  });
-
-  panel.appendChild(select);
-  return panel;
 }
-
-function createMeasuresPanel() {
-  const panel = document.createElement('div');
-  panel.className = 'measures-panel';
-  panel.style.flex = '1';
-  panel.style.minWidth = '200px';
-
-  const panelTitle = document.createElement('h3');
-  panelTitle.textContent = 'Measures';
-  panel.appendChild(panelTitle);
-
-  const select = document.createElement('select');
-  select.multiple = true;
-  select.style.width = '100%';
-  select.style.height = '100px';
-
-  config.measures.forEach((measure) => {
-    const optionElement = document.createElement('option');
-    optionElement.value = measure.uniqueName;
-    optionElement.textContent = measure.caption;
-    select.appendChild(optionElement);
-  });
-
-  select.addEventListener('change', () => {
-    const selectedMeasures = Array.from(select.selectedOptions).map((option) =>
-      config.measures.find((m) => m.uniqueName === option.value),
-    );
-    engine.setMeasures(selectedMeasures);
-    renderTable();
-  });
-
-  panel.appendChild(select);
-  return panel;
-}
-
-function createAggregationPanel() {
-  const panel = document.createElement('div');
-  panel.className = 'aggregation-panel';
-  panel.style.flex = '1';
-  panel.style.minWidth = '200px';
-
-  const panelTitle = document.createElement('h3');
-  panelTitle.textContent = 'Aggregation';
-  panel.appendChild(panelTitle);
-
-  const select = document.createElement('select');
-  select.style.width = '100%';
-
-  ['sum', 'avg', 'count', 'min', 'max'].forEach((agg) => {
-    const optionElement = document.createElement('option');
-    optionElement.value = agg;
-    optionElement.textContent = agg.toUpperCase();
-    select.appendChild(optionElement);
-  });
-
-  select.addEventListener('change', (event) => {
-    engine.setAggregation(event.target.value);
-    renderTable();
-  });
-
-  panel.appendChild(select);
-  return panel;
-}
-
-//TODO: Uncomment when sort featur works.
-// function createSortPanel() {
-//   const panel = document.createElement('div');
-//   panel.className = 'sort-panel';
-//   panel.style.flex = '1';
-//   panel.style.minWidth = '200px';
-
-//   const panelTitle = document.createElement('h3');
-//   panelTitle.textContent = 'Sort';
-//   panel.appendChild(panelTitle);
-
-//   const fieldSelect = document.createElement('select');
-//   fieldSelect.id = 'sortField';
-//   fieldSelect.style.width = '100%';
-//   fieldSelect.style.marginBottom = '10px';
-
-//   const directionSelect = document.createElement('select');
-//   directionSelect.id = 'sortDirection';
-//   directionSelect.style.width = '100%';
-//   directionSelect.style.marginBottom = '10px';
-
-//   const axisSelect = document.createElement('select');
-//   axisSelect.id = 'sortAxis';
-//   axisSelect.style.width = '100%';
-//   axisSelect.style.marginBottom = '10px';
-
-//   // Populate field options
-//   config.dimensions.forEach((dim) => {
-//     const option = document.createElement('option');
-//     option.value = dim.field;
-//     option.textContent = dim.label;
-//     fieldSelect.appendChild(option);
-//   });
-
-//   // Add measure fields for sorting
-//   config.measures.forEach((measure) => {
-//     const option = document.createElement('option');
-//     option.value = measure.uniqueName;
-//     option.textContent = measure.caption;
-//     fieldSelect.appendChild(option);
-//   });
-
-//   // Populate direction options
-//   ['asc', 'desc'].forEach((dir) => {
-//     const option = document.createElement('option');
-//     option.value = dir;
-//     option.textContent = dir.toUpperCase();
-//     directionSelect.appendChild(option);
-//   });
-
-//   // Populate axis options
-//   ['row', 'column'].forEach((axis) => {
-//     const option = document.createElement('option');
-//     option.value = axis;
-//     option.textContent = axis.charAt(0).toUpperCase() + axis.slice(1);
-//     axisSelect.appendChild(option);
-//   });
-
-//   const applyButton = document.createElement('button');
-//   applyButton.textContent = 'Apply Sort';
-//   applyButton.style.width = '100%';
-//   applyButton.addEventListener('click', () => {
-//     const field = fieldSelect.value;
-//     const direction = directionSelect.value;
-//     const axis = axisSelect.value;
-//     // TODO: Implement sorting logic
-//     console.log(`Sorting ${field} ${direction} on ${axis}`);
-//     renderTable();
-//   });
-
-//   panel.appendChild(fieldSelect);
-//   panel.appendChild(directionSelect);
-//   panel.appendChild(axisSelect);
-//   panel.appendChild(applyButton);
-
-//   return panel;
-// }
-
 
 export function onSectionItemDrop(droppedFields) {
   let droppedFieldsInSections=JSON.stringify({
@@ -468,7 +415,12 @@ function renderTable() {
   }
 
   container.innerHTML = '';
-  // container.appendChild(createControlPanel());
+
+  // Control toolbar visibility
+  const toolbar = document.getElementById('toolbar');
+  if (toolbar) {
+    toolbar.style.display = config.toolbar ? 'block' : 'none';
+  }
 
   const table = document.createElement('table');
   table.style.width = '100%';
@@ -482,7 +434,7 @@ function renderTable() {
 
   const tbody = document.createElement('tbody');
   const rowFields = state.rows.map((r) => r.uniqueName);
-  const groupedData = groupData(data, rowFields);
+  const groupedData = groupData(state.data, rowFields);
 
   renderGroupedRows(tbody, groupedData, state, 0);
 
@@ -495,6 +447,9 @@ function renderTable() {
   tableWrapper.appendChild(table);
 
   container.appendChild(tableWrapper);
+
+  implementDragAndDrop();
+
 }
 
 function renderGroupedRows(tbody, groups, state, level) {
@@ -537,21 +492,20 @@ function renderGroupedRows(tbody, groups, state, level) {
 
           if (columnItems.length > 0) {
             let aggregateValue;
-            if (measure.formula && typeof measure.formula === 'function') {
-              aggregateValue =
-                columnItems.reduce(
-                  (sum, item) => sum + measure.formula(item),
-                  0,
-                ) / columnItems.length;
+            if (measure.aggregation === 'max') {
+              aggregateValue = Math.max(...columnItems.map(item => engine.calculateMeasureValue(item, measure)));
+            } else if (measure.aggregation === 'min') {
+              aggregateValue = Math.min(...columnItems.map(item => engine.calculateMeasureValue(item, measure)));
+            } else if (measure.aggregation === 'count') {
+              aggregateValue = columnItems.length;
             } else {
               aggregateValue = columnItems.reduce(
-                (sum, item) => sum + (item[measure.uniqueName] || 0),
+                (sum, item) => sum + engine.calculateMeasureValue(item, measure),
                 0,
               );
-            }
-
-            if (measure.aggregation === 'avg') {
-              aggregateValue /= columnItems.length;
+              if (measure.aggregation === 'avg') {
+                aggregateValue /= columnItems.length;
+              }
             }
 
             td.textContent = engine.formatValue(
@@ -559,7 +513,7 @@ function renderGroupedRows(tbody, groups, state, level) {
               measure.uniqueName,
             );
 
-            //Apply condition formatting
+            // Apply condition formatting
             applyConditionalFormatting(td, aggregateValue, measure.uniqueName);
           } else {
             td.textContent = engine.formatValue(0, measure.uniqueName);
@@ -659,19 +613,29 @@ function renderTableHeader(thead, state) {
 
   // Add empty cell for row headers
   state.rows.forEach((row) => {
-    const emptyMeasureCell = document.createElement('th');
-    emptyMeasureCell.textContent = row.caption;
-    emptyMeasureCell.style.padding = '12px';
-    emptyMeasureCell.style.backgroundColor = '#f8f9fa';
-    emptyMeasureCell.style.borderBottom = '2px solid #dee2e6';
-    measureHeaderRow.appendChild(emptyMeasureCell);
+    const th = document.createElement('th');
+    th.style.padding = '12px';
+    th.style.backgroundColor = '#f8f9fa';
+    th.style.borderBottom = '2px solid #dee2e6';
+    th.style.cursor = 'pointer';
+
+    const headerContent = document.createElement('div');
+    headerContent.style.display = 'flex';
+    headerContent.style.alignItems = 'center';
+    headerContent.style.justifyContent = 'space-between';
+
+    const headerText = document.createElement('span');
+    headerText.textContent = row.caption;
+    headerContent.appendChild(headerText);
+
+    th.appendChild(headerContent);
+    measureHeaderRow.appendChild(th);
   });
 
   // Add measure headers for each column value
   uniqueColumnValues.forEach(() => {
     state.measures.forEach((measure) => {
       const th = document.createElement('th');
-      // th.textContent = measure.caption;
       th.style.padding = '12px';
       th.style.backgroundColor = '#f8f9fa';
       th.style.borderBottom = '2px solid #dee2e6';
@@ -686,8 +650,11 @@ function renderTableHeader(thead, state) {
       headerText.textContent = measure.caption;
       headerContent.appendChild(headerText);
 
-      // const sortIcon = createSortIcon(measure.uniqueName, 'column');
-      // headerContent.appendChild(sortIcon);
+      if (measure.sortable) {
+        const sortIcon = createSortIcon(measure.uniqueName, 'column');
+        headerContent.appendChild(sortIcon);
+        th.addEventListener('click', () => handleSort(measure.uniqueName));
+      }
 
       th.appendChild(headerContent);
       measureHeaderRow.appendChild(th);
@@ -697,22 +664,49 @@ function renderTableHeader(thead, state) {
   thead.appendChild(measureHeaderRow);
 }
 
-//TODO : Uncomment when sort feature updated in pivot table
-// function createSortIcon(field, axis) {
-//   const icon = document.createElement('span');
-//   icon.innerHTML = '&#8645;'; // Unicode for up-down arrow
-//   icon.style.cursor = 'pointer';
-//   icon.style.marginLeft = '5px';
+function handleSort(field, direction) {
+ // Get current state
+ const state = engine.getState()
+ const currentSortConfig = state.sortConfig?.[0]
 
-//   icon.addEventListener('click', () => {
-//     const currentDirection = engine.getState().sortConfig?.direction;
-//     const newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
-//     engine.sort(field, newDirection, axis);
-//     renderTable();
-//   });
+ // Toggle direction if clicking the same field
+ let newDirection = direction || "asc"
+ if (currentSortConfig && currentSortConfig.field === field) {
+   newDirection = currentSortConfig.direction === "asc" ? "desc" : "asc"
+ }
 
-//   return icon;
-// }
+ // Call engine's sort method
+ engine.sort(field, newDirection)
+
+ // Force a re-render of the table
+ renderTable()
+
+}
+
+function createSortIcon(field, axis) {
+  const icon = document.createElement('span');
+  const state = engine.getState();
+  const currentSort = state.sortConfig?.[0];
+  
+  // Set the appropriate sort icon based on current sort state
+  if (currentSort && currentSort.field === field) {
+    icon.innerHTML = currentSort.direction === 'asc' ? '&#8593;' : '&#8595;';
+  } else {
+    icon.innerHTML = '&#8645;'; // Default unsorted state
+  }
+  
+  icon.style.cursor = 'pointer';
+  icon.style.marginLeft = '5px';
+
+  icon.addEventListener('click', (e) => {
+    e.stopPropagation(); // Prevent event bubbling
+    const currentDirection = state.sortConfig?.[0]?.direction;
+    const newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+    handleSort(field, newDirection);
+  });
+
+  return icon;
+}
 
 
 function updateFormatting(newConfig) {
@@ -751,6 +745,20 @@ export function formatTable(config){
   renderTable();
 }
 
+// Add event listeners for drag and drop completion
+function addDragDropListeners() {
+  // Listen for row drag completion
+  engine.config.onRowDragEnd = (fromIndex, toIndex, newData) => {
+    //console.log(`Row moved from ${fromIndex} to ${toIndex}`);
+    // You can perform additional actions here
+  };
+  
+  // Listen for column drag completion
+  engine.config.onColumnDragEnd = (fromIndex, toIndex, newColumns) => {
+    //console.log(`Column moved from ${fromIndex} to ${toIndex}`);
+    // You can perform additional actions here
+  };
+}
 
 
 // Initialize the table when the DOM is fully loaded
@@ -763,6 +771,11 @@ document.addEventListener('DOMContentLoaded', () => {
     );
     return;
   }
-  createHeader(config);
+  addDragDropListeners();
+
+  if(config.toolbar){
+    createHeader(config);
+  }
+ 
   renderTable();
 });
