@@ -59,21 +59,21 @@ const config = {
       uniqueName: 'sales',
       caption: 'Total Sales',
       aggregation: 'sum',
-      format: { 
-        type: 'currency', 
+      format: {
+        type: 'currency',
         currency: 'USD',
         locale: 'en-US',
-        decimals: 2
+        decimals: 2,
       },
     },
     {
       uniqueName: 'quantity',
       caption: 'Total Quantity',
       aggregation: 'sum',
-      format: { 
+      format: {
         type: 'number',
         decimals: 2,
-        locale: 'en-US'
+        locale: 'en-US',
       },
     },
   ],
@@ -92,16 +92,16 @@ const config = {
     grouper: (item, fields) => fields.map((field) => item[field]).join(' - '),
   },
   formatting: {
-    sales: { 
-      type: 'currency', 
+    sales: {
+      type: 'currency',
       currency: 'USD',
       locale: 'en-US',
-      decimals: 2
+      decimals: 2,
     },
-    quantity: { 
+    quantity: {
       type: 'number',
       decimals: 2,
-      locale: 'en-US'
+      locale: 'en-US',
     },
   },
   conditionalFormatting: [
@@ -110,14 +110,14 @@ const config = {
         type: 'Number',
         operator: 'Greater than',
         value1: '1000',
-        value2: ''
+        value2: '',
       },
       format: {
         font: 'Arial',
         size: '14px',
         color: '#ffffff',
-        backgroundColor: '#4CAF50'
-      }
+        backgroundColor: '#4CAF50',
+      },
     },
     // ... more conditional formatting rules
   ],
@@ -126,8 +126,6 @@ const config = {
 const engine = new PivotEngine(config);
 
 // Use the engine to render your pivot table
-
-
 ```
 
 ## PivotEngine API
@@ -150,40 +148,38 @@ Creates a new instance of PivotEngine with the given configuration.
 getState(): PivotTableState<T>
 
 ```
-Example :- 
+
+Example :-
 
 - **getState(): PivotTableState**
 
-   Returns the current state of the pivot table.
+  Returns the current state of the pivot table.
 
-   ```javascript
-   const state = engine.getState();
-   console.log(state.data); // Logs the current data array
-   console.log(state.sortConfig); // Logs the current sort configuration
-   ```
-
+  ```javascript
+  const state = engine.getState();
+  console.log(state.data); // Logs the current data array
+  console.log(state.sortConfig); // Logs the current sort configuration
+  ```
 
 Returns the current state of the pivot table.
 
 #### reset()
 
- Resets the pivot table to its initial state.
+Resets the pivot table to its initial state.
 
 ```typescript
-reset()
+reset();
 ```
 
-Example :- 
+Example :-
 
 - **reset()**
 
-   ```javascript
-   engine.reset();
-   const state = engine.getState();
-   console.log(state); // Logs the initial state
-   ```
-
-
+  ```javascript
+  engine.reset();
+  const state = engine.getState();
+  console.log(state); // Logs the initial state
+  ```
 
 Resets the pivot table to its initial state.
 
@@ -224,6 +220,7 @@ formatValue(value: any, field: string): string
 Formats a value based on the specified field's format configuration.
 
 Example:
+
 ```javascript
 const formattedValue = engine.formatValue(1000, 'sales');
 console.log(formattedValue); // "$1,000.00"
@@ -308,64 +305,63 @@ Example configuration:
 ```javascript
 const config = {
   // ... other configuration options
-   measures: [
+  measures: [
     {
       uniqueName: 'sales',
       caption: 'Total Sales',
       aggregation: 'sum',
-      format: { 
-        type: 'currency', 
+      format: {
+        type: 'currency',
         currency: 'USD',
         locale: 'en-US',
-        decimals: 4
+        decimals: 4,
       },
     },
     {
       uniqueName: 'quantity',
       caption: 'Total Quantity',
       aggregation: 'sum',
-      format: { 
+      format: {
         type: 'number',
         decimals: 2,
-        locale: 'en-US'
+        locale: 'en-US',
       },
     },
     {
       uniqueName: 'averageSale',
       caption: 'Average Sale',
       aggregation: 'avg',
-      format: { 
-        type: 'currency', 
+      format: {
+        type: 'currency',
         currency: 'USD',
         locale: 'en-US',
-        decimals: 4
+        decimals: 4,
       },
       formula: (item) => item.sales / item.quantity,
     },
   ],
   // ... other configuration options
   formatting: {
-    sales: { 
-      type: 'currency', 
+    sales: {
+      type: 'currency',
       currency: 'USD',
       locale: 'en-US',
-      decimals: 4
+      decimals: 4,
     },
-    quantity: { 
+    quantity: {
       type: 'number',
       // decimals: 2,
       // locale: 'en-US'
     },
-    averageSale: { 
-      type: 'currency', 
+    averageSale: {
+      type: 'currency',
       currency: 'USD',
       locale: 'en-US',
-      decimals: 4
-    }
+      decimals: 4,
+    },
   },
 };
 ```
-
 
 ### Conditional Formatting
 
@@ -382,17 +378,17 @@ const config = {
         type: 'Number',
         operator: 'Greater than',
         value1: '1000',
-        value2: ''
+        value2: '',
       },
       format: {
         font: 'Arial',
         size: '14px',
         color: '#ffffff',
-        backgroundColor: '#4CAF50'
-      }
+        backgroundColor: '#4CAF50',
+      },
     },
     // ... more conditional formatting rules
-  ]
+  ],
 };
 ```
 
@@ -408,11 +404,11 @@ const config = {
       uniqueName: 'averageSale',
       caption: 'Average Sale',
       aggregation: 'avg',
-      format: { 
-        type: 'currency', 
+      format: {
+        type: 'currency',
         currency: 'USD',
         locale: 'en-US',
-        decimals: 2
+        decimals: 2,
       },
       formula: (item) => item.sales / item.quantity,
     },
