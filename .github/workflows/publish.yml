@@ -7,8 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  ACTIONS_STEP_DEBUG: true  # Enable debug logging
-  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}  # npm auth token
+  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}  # Set authentication token globally
 
 jobs:
   build:
@@ -28,24 +27,33 @@ jobs:
           node-version: 20
           registry-url: "https://registry.npmjs.org"
 
-      - name: Check Node.js, pnpm, and npm versions
+      - name: Configure npm authentication
         run: |
-          node -v
-          pnpm -v || echo "pnpm not installed"
-          npm -v
-        shell: bash
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          cat ~/.npmrc  # Debugging: Print to check if the token is set
+
+      - name: Verify npm authentication
+        run: |
+          echo "Checking npm authentication..."
+          npm whoami || echo "Not logged into npm. Check NPM_TOKEN."
 
       - name: Install pnpm
-        run: npm install -g pnpm
-        shell: bash
+        run: |
+          npm install -g pnpm
+          pnpm -v
+          node -v
+          npm -v
 
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
-        shell: bash
+      - name: Install dependencies with pnpm (Debug)
+        run: |
+          pnpm config set registry https://registry.npmjs.org
+          pnpm config set fetch-retries 3
+          pnpm config set fetch-timeout 60000
+          pnpm config set loglevel debug
+          pnpm install --no-frozen-lockfile
 
       - name: Build application
         run: pnpm run build
-        shell: bash
 
       - name: Set Git user name and email
         run: |
@@ -68,26 +76,20 @@ jobs:
           node-version: 20
           registry-url: "https://registry.npmjs.org"
 
-      - name: Check Node.js, pnpm, and npm versions
+      - name: Configure npm authentication
         run: |
-          node -v
-          pnpm -v || echo "pnpm not installed"
-          npm -v
-        shell: bash
-
-      - name: Install pnpm
-        run: npm install -g pnpm
-        shell: bash
-
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
-        shell: bash
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
       - name: Verify npm authentication
         run: |
           echo "Checking npm authentication..."
           npm whoami || echo "Not logged into npm. Check NPM_TOKEN."
-        shell: bash
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
 
       - name: Create changeset and version packages
         run: |
@@ -96,21 +98,16 @@ jobs:
           git add .
           git commit -m "Version packages"
           git push origin main
-        shell: bash
 
       - name: Publish to npm (Dry Run)
         run: pnpm changeset publish --dry-run
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        shell: bash
 
       - name: Publish to npm (Real)
-        run: |
-          set -x
-          pnpm changeset publish
+        run: pnpm changeset publish
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        shell: bash
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
