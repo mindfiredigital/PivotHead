@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -25,15 +25,6 @@ jobs:
 
       - name: Install pnpm
         run: npm install -g pnpm@9.15.2
-
-      - name: Set up pnpm and global bin path
-        run: |
-          export SHELL=/bin/bash
-          echo "SHELL=/bin/bash" >> $GITHUB_ENV
-          pnpm setup
-          echo "PNPM_HOME=$(pnpm config get global-bin-dir)" >> $GITHUB_ENV
-          echo "$(pnpm config get global-bin-dir)" >> $GITHUB_PATH
-          echo "PNPM_HOME set to $(pnpm config get global-bin-dir)"
 
       - name: Install dependencies with pnpm
         run: pnpm install
@@ -46,8 +37,8 @@ jobs:
 
       - name: Set Git user name and email
         run: |
-          git config --local user.email "github-actions@github.com"
-          git config --local user.name "GitHub Actions"
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
 
   create-github-release:
     name: Create GitHub release and publish to npm
@@ -55,10 +46,9 @@ jobs:
     permissions:
       contents: write
     needs: build
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -68,38 +58,35 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm@9.15.2
 
-      - name: Set up pnpm and global bin path
-        run: |
-          export SHELL=/bin/bash
-          echo "SHELL=/bin/bash" >> $GITHUB_ENV
-          pnpm setup
-          echo "PNPM_HOME=$(pnpm config get global-bin-dir)" >> $GITHUB_ENV
-          echo "$(pnpm config get global-bin-dir)" >> $GITHUB_PATH
-          echo "PNPM_HOME set to $(pnpm config get global-bin-dir)"
-
-      - name: Install dependencies with pnpm
+      - name: Install dependencies
         run: pnpm install
 
-      - name: Restore changes in pnpm lock
-        run: git restore pnpm-lock.yaml
+      - name: Set Git user name and email
+        run: |
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
 
       - name: Create changeset and version packages
         run: |
-          pnpm exec changeset version
-          git add .
-          git commit -m "Version packages"
-          git push origin main
+          pnpm add -g @changesets/cli
+          if pnpm exec changeset version; then
+            git add .
+            git commit -m "Version packages" || echo "No changes to commit."
+            git push origin main || echo "No changes to push."
+          else
+            echo "No unreleased changesets found, skipping versioning."
+          fi
 
       - name: Publish to npm
-        run: pnpm exec changeset publish
+        run: pnpm changeset publish
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
         with:
-          tag_name: v${{ steps.version.outputs.newVersion }}
-          release_name: Release v${{ steps.version.outputs.newVersion }}
+          tag_name: v${{ github.run_number }}
+          release_name: Release v${{ github.run_number }}
           draft: false
           prerelease: false
         env:
