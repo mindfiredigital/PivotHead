@@ -43,15 +43,18 @@ async function generateChangeset() {
   // Generate and write changeset if valid description found
   if (description) {
     description = description.trim() || 'No description provided.';
+    // Use 'unknown' if no issue number is found
+    const changesetIssueNumber = issueNumber || 'unknown';
+
     // Generate changeset content
     const changesetContent = `---
-'@mindfiredigital/page-builder-${issueNumber || 'unknown'}': ${changeType}
+'@mindfiredigital/page-builder-${changesetIssueNumber}': ${changeType}
 ---
 ${description}`;
 
     // Write to a changeset file
     fs.writeFileSync(`.changeset/auto-${Date.now()}.md`, changesetContent);
-    console.log(`✅ Changeset file created for issue: ${issueNumber || 'unknown'}`);
+    console.log(`✅ Changeset file created for issue: ${changesetIssueNumber}`);
   } else {
     console.log('⚠️ No valid commit format found in commit message.');
   }
