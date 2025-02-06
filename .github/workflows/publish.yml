@@ -24,7 +24,12 @@ jobs:
           node-version: 20
 
       - name: Install pnpm
-        run: npm install -g pnpm@8.6.0
+        run: npm install -g pnpm@9.15.2
+
+      - name: Set up global bin directory
+        run: |
+          pnpm config set global-bin-dir ~/.pnpm-global
+          echo "~/.pnpm-global/bin" >> $GITHUB_PATH
 
       - name: Install dependencies with pnpm
         run: pnpm install
@@ -39,7 +44,7 @@ jobs:
         run: |
           git config --global user.email "github-actions@github.com"
           git config --global user.name "GitHub Actions"
-          
+
   create-github-release:
     name: Create GitHub release and publish to npm
     runs-on: ubuntu-latest
@@ -56,7 +61,12 @@ jobs:
           node-version: 20
 
       - name: Install pnpm
-        run: npm install -g pnpm@8.6.0
+        run: npm install -g pnpm@9.15.2
+
+      - name: Set up global bin directory
+        run: |
+          pnpm config set global-bin-dir ~/.pnpm-global
+          echo "~/.pnpm-global/bin" >> $GITHUB_PATH
 
       - name: Install dependencies
         run: pnpm install
@@ -65,18 +75,20 @@ jobs:
         run: |
           git config --global user.email "github-actions@github.com"
           git config --global user.name "GitHub Actions"
-          
+
+      - name: Install Changesets CLI
+        run: pnpm add -g @changesets/cli
+
       - name: Create changeset and version packages
         run: |
-          pnpm add -g @changesets/cli
           if pnpm exec changeset version; then
-            git add . 
+            git add .
             git commit -m "Version packages" || echo "No changes to commit."
             git push origin main || echo "No changes to push."
           else
             echo "No unreleased changesets found, skipping versioning."
           fi
-          
+
       - name: Publish to npm
         run: pnpm changeset publish
         env:
