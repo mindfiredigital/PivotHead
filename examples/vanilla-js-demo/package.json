@@ -1,6 +1,6 @@
 {
-  "name": "@mindfiredigital/vanilla-js-demo",
-  "private": false,
+  "name": "@pivothead/vanilla-js-demo",
+  "private": true,
   "version": "0.0.0",
   "scripts": {
     "copy-core": "mkdir -p lib && cp ../../packages/core/dist/pivothead-core.umd.js lib/pivothead-core.js",
