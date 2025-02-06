@@ -24,7 +24,7 @@ jobs:
           node-version: 20
 
       - name: Install pnpm
-        run: npm install -g pnpm@latest-10
+        run: npm install -g pnpm@8.6.0
 
       - name: Install dependencies with pnpm
         run: pnpm install
@@ -56,7 +56,7 @@ jobs:
           node-version: 20
 
       - name: Install pnpm
-        run: npm install -g pnpm@latest-10
+        run: npm install -g pnpm@8.6.0
 
       - name: Install dependencies
         run: pnpm install
