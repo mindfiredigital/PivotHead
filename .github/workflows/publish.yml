@@ -26,11 +26,6 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm@latest
 
-      - name: Set up global bin directory with pnpm
-        run: |
-          pnpm config set global-bin-dir ~/.pnpm-global
-          export PATH="$PATH:$(pnpm config get global-bin-dir)/bin"
-        
       - name: Install dependencies with pnpm
         run: pnpm install
 
@@ -63,11 +58,6 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm@latest
 
-      - name: Set up global bin directory with pnpm
-        run: |
-          pnpm config set global-bin-dir ~/.pnpm-global
-          export PATH="$PATH:$(pnpm config get global-bin-dir)/bin"
-        
       - name: Install dependencies
         run: pnpm install
 
