@@ -26,6 +26,13 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm@9.15.2
 
+      - name: Set up pnpm and global bin path
+        run: |
+          pnpm setup
+          echo "PNPM_HOME=$(pnpm config get global-bin-dir)" >> $GITHUB_ENV
+          echo "$(pnpm config get global-bin-dir)" >> $GITHUB_PATH
+          echo "PNPM_HOME set to $(pnpm config get global-bin-dir)"
+
       - name: Install dependencies with pnpm
         run: pnpm install
 
@@ -59,6 +66,13 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm@9.15.2
 
+      - name: Set up pnpm and global bin path
+        run: |
+          pnpm setup
+          echo "PNPM_HOME=$(pnpm config get global-bin-dir)" >> $GITHUB_ENV
+          echo "$(pnpm config get global-bin-dir)" >> $GITHUB_PATH
+          echo "PNPM_HOME set to $(pnpm config get global-bin-dir)"
+
       - name: Install dependencies with pnpm
         run: pnpm install
 
@@ -67,14 +81,13 @@ jobs:
 
       - name: Create changeset and version packages
         run: |
-          pnpm add -g @changesets/cli
-          pnpm changeset version
+          pnpm exec changeset version
           git add .
           git commit -m "Version packages"
           git push origin main
 
       - name: Publish to npm
-        run: pnpm changeset publish
+        run: pnpm exec changeset publish
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -89,7 +102,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4  # ✅ Updated to v4
+        uses: actions/upload-artifact@v4
         with:
           name: core-build-zip
           path: ./packages/core/dist
