@@ -28,11 +28,14 @@ jobs:
 
       - name: Set up PNPM environment
         run: |
-          export PNPM_HOME=$HOME/.pnpm
+          echo "Setting up PNPM..."
+          export PNPM_HOME=$HOME/.local/share/pnpm
           export PATH=$PNPM_HOME:$PATH
-          pnpm setup
           echo "PNPM_HOME=$PNPM_HOME" >> $GITHUB_ENV
           echo "$PNPM_HOME" >> $GITHUB_PATH
+          echo "SHELL=/bin/bash" >> $GITHUB_ENV
+          pnpm setup
+          pnpm config set shell /bin/bash
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
@@ -69,11 +72,14 @@ jobs:
 
       - name: Set up PNPM environment
         run: |
-          export PNPM_HOME=$HOME/.pnpm
+          echo "Setting up PNPM..."
+          export PNPM_HOME=$HOME/.local/share/pnpm
           export PATH=$PNPM_HOME:$PATH
-          pnpm setup
           echo "PNPM_HOME=$PNPM_HOME" >> $GITHUB_ENV
           echo "$PNPM_HOME" >> $GITHUB_PATH
+          echo "SHELL=/bin/bash" >> $GITHUB_ENV
+          pnpm setup
+          pnpm config set shell /bin/bash
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
