@@ -26,10 +26,10 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm@9.15.2
 
-      - name: Set up global bin directory
+      - name: Set up global bin directory and add to PATH
         run: |
           pnpm config set global-bin-dir ~/.pnpm-global
-          export PATH=$PATH:~/.pnpm-global/bin
+          echo "PATH=$PATH:~/.pnpm-global/bin" >> $GITHUB_ENV
           
       - name: Install dependencies with pnpm
         run: pnpm install
@@ -63,10 +63,10 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm@9.15.2
 
-      - name: Set up global bin directory
+      - name: Set up global bin directory and add to PATH
         run: |
           pnpm config set global-bin-dir ~/.pnpm-global
-          export PATH=$PATH:~/.pnpm-global/bin
+          echo "PATH=$PATH:~/.pnpm-global/bin" >> $GITHUB_ENV
 
       - name: Install dependencies
         run: pnpm install
