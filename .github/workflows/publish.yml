@@ -78,7 +78,7 @@ jobs:
 
       - name: Run custom changeset generation script
         run: |
-          node ../changeset-autogenerate.mjs  # Adjust path if necessary
+          node .github/changeset-autogenerate.mjs 
 
       - name: Commit and push changesets
         run: |
@@ -88,6 +88,7 @@ jobs:
             git add .  # Stage changes
             git commit -m "Auto-generated changeset files"
             git push origin main
+          fi
 
       - name: Publish to npm
         run: pnpm changeset publish
