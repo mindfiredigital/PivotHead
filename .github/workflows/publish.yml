@@ -6,9 +6,6 @@ on:
       - main
   workflow_dispatch:
 
-env:
-  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}  # Set authentication token globally
-
 jobs:
   build:
     name: '@mindfiredigital/pivothead_core'
@@ -25,35 +22,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          registry-url: "https://registry.npmjs.org"
-
-      - name: Configure npm authentication
-        run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-          cat ~/.npmrc  # Debugging: Print to check if the token is set
-
-      - name: Verify npm authentication
-        run: |
-          echo "Checking npm authentication..."
-          npm whoami || echo "Not logged into npm. Check NPM_TOKEN."
 
       - name: Install pnpm
-        run: |
-          npm install -g pnpm
-          pnpm -v
-          node -v
-          npm -v
+        run: npm install -g pnpm # Install pnpm globally
 
-      - name: Install dependencies with pnpm (Debug)
-        run: |
-          pnpm config set registry https://registry.npmjs.org
-          pnpm config set fetch-retries 3
-          pnpm config set fetch-timeout 60000
-          pnpm config set loglevel debug
-          pnpm install --no-frozen-lockfile
+      - name: Install dependencies
+        run: pnpm install # Use pnpm to install dependencies
 
       - name: Build application
-        run: pnpm run build
+        run: pnpm run build # Use pnpm to run the build
 
       - name: Set Git user name and email
         run: |
@@ -73,54 +50,39 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          registry-url: "https://registry.npmjs.org"
-
-      - name: Configure npm authentication
-        run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-
-      - name: Verify npm authentication
-        run: |
-          echo "Checking npm authentication..."
-          npm whoami || echo "Not logged into npm. Check NPM_TOKEN."
+          node-version: 20.x
 
       - name: Install pnpm
-        run: npm install -g pnpm
+        run: npm install -g pnpm # Install pnpm globally
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install # Install dependencies (pnpm should already be available)
 
       - name: Create changeset and version packages
         run: |
-          pnpm add -g @changesets/cli
-          pnpm changeset version
+          pnpm add -g @changesets/cli  # Install changesets CLI globally
+          pnpm changeset version       # Version packages based on changesets
           git add .
           git commit -m "Version packages"
           git push origin main
 
-      - name: Publish to npm (Dry Run)
-        run: pnpm changeset publish --dry-run
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Publish to npm (Real)
+      - name: Publish to npm
         run: pnpm changeset publish
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }} # NPM token for publishing to npm registry
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
         with:
-          tag_name: v${{ steps.version.outputs.newVersion }}
+          tag_name: v${{ steps.version.outputs.newVersion }} # Use the new version from changesets
           release_name: Release v${{ steps.version.outputs.newVersion }}
           draft: false
           prerelease: false
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub token for creating releases
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
-          name: core-build-zip
-          path: ./packages/core/dist
+          name: core-build-zip # Name of the artifact
+          path: ./packages/core/dist # Path to the build folder to zip and upload
