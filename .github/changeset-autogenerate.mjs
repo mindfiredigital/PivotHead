@@ -35,17 +35,6 @@ async function generateChangeset() {
       console.log('⚠️ Invalid commit type.');
       return;
     }
-
-    // Ensure subject (description) starts with a capital letter and doesn't end with a period
-    if (description && description[0] === description[0].toLowerCase()) {
-      console.log('⚠️ The commit subject must start with a capital letter.');
-      return;
-    }
-
-    if (description && description.endsWith('.')) {
-      console.log('⚠️ The commit subject must not end with a period.');
-      return;
-    }
   } else {
     console.log('⚠️ No valid commit format found.');
     return;
