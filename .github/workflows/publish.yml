@@ -69,17 +69,17 @@ jobs:
       - name: Publish to npm
         run: pnpm changeset publish
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}  # NPM token for publishing to npm registry
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }} # NPM token for publishing to npm registry
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
         with:
-          tag_name: v${{ steps.version.outputs.newVersion }}  # Use the new version from changesets
+          tag_name: v${{ steps.version.outputs.newVersion }} # Use the new version from changesets
           release_name: Release v${{ steps.version.outputs.newVersion }}
           draft: false
           prerelease: false
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub token for creating releases
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub token for creating releases
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
