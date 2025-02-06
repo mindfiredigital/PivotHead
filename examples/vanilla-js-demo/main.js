@@ -169,7 +169,7 @@ const config = {
   ],
   defaultAggregation: 'sum',
   isResponsive: true,
-  toolbar: false,
+  toolbar: true,
   // Add initial sort configuration
   initialSort: [
     {
@@ -771,6 +771,13 @@ document.addEventListener('DOMContentLoaded', () => {
     );
     return;
   }
+
+  const printButton = document.getElementById("printButton")
+
+  //TODO: Restructure with header menu.
+  printButton.addEventListener("click", () => {
+    window.print()
+  })
   addDragDropListeners();
 
   if(config.toolbar){

@@ -140,16 +140,16 @@ export function createHeader(config) {
       label: 'Connect',
       dropdownOptions: ['To Local CSV', 'To Local JSON'],
     },
-    {
-      icon: '📂',
-      label: 'Open',
-      dropdownOptions: ['Local Report', 'Remote Report'],
-    },
-    {
-      icon: '💾',
-      label: 'Save',
-      dropdownOptions: [],
-    },
+    // {
+    //   icon: '📂',
+    //   label: 'Open',
+    //   dropdownOptions: ['Local Report', 'Remote Report'],
+    // },
+    // {
+    //   icon: '💾',
+    //   label: 'Save',
+    //   dropdownOptions: [],
+    // },
 
     {
       icon: '📤',
@@ -168,11 +168,8 @@ export function createHeader(config) {
     { icon: '📋', label: 'Fields', dropdownOptions: [] },
   ];
 
-  // will set it to true when we develop the functionalities of left options
-  const showLeftOptions = false;
 
-  if (showLeftOptions)
-    leftOptions.forEach((option) =>
+  leftOptions.forEach((option) =>
       leftSection.appendChild(
         createOption(option.icon, option.label, option.dropdownOptions),
       ),
