@@ -88,7 +88,6 @@ jobs:
             git add .  # Stage changes
             git commit -m "Auto-generated changeset files"
             git push origin main
-          fi
 
       - name: Publish to npm
         run: pnpm changeset publish
