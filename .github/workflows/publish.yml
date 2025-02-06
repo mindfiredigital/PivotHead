@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: '@mindfiredigital/pivothead_core'
+    name: "@mindfiredigital/pivothead_core"
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -24,13 +24,13 @@ jobs:
           node-version: 20
 
       - name: Install pnpm
-        run: npm install -g pnpm # Install pnpm globally
+        run: npm install -g pnpm  # Install pnpm globally
 
       - name: Install dependencies
-        run: pnpm install # Use pnpm to install dependencies
+        run: pnpm install  # Use pnpm to install dependencies
 
       - name: Build application
-        run: pnpm run build # Use pnpm to run the build
+        run: pnpm run build  # Use pnpm to run the build
 
       - name: Set Git user name and email
         run: |
@@ -53,10 +53,10 @@ jobs:
           node-version: 20.x
 
       - name: Install pnpm
-        run: npm install -g pnpm # Install pnpm globally
+        run: npm install -g pnpm  # Install pnpm globally
 
       - name: Install dependencies
-        run: pnpm install # Install dependencies (pnpm should already be available)
+        run: pnpm install  # Install dependencies (pnpm should already be available)
 
       - name: Create changeset and version packages
         run: |
@@ -84,5 +84,5 @@ jobs:
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
-          name: core-build-zip # Name of the artifact
-          path: ./packages/core/dist # Path to the build folder to zip and upload
+          name: core-build-zip  # Name of the artifact
+          path: ./packages/core/dist  # Path to the build folder to zip and upload
