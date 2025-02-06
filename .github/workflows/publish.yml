@@ -26,6 +26,11 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm@9.15.2
 
+      - name: Set up global bin directory
+        run: |
+          pnpm config set global-bin-dir ~/.pnpm-global
+          export PATH=$PATH:~/.pnpm-global/bin
+          
       - name: Install dependencies with pnpm
         run: pnpm install
 
@@ -58,11 +63,10 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm@9.15.2
 
-      - name: Set SHELL environment variable
-        run: echo "SHELL=/bin/bash" >> $GITHUB_ENV  # Set SHELL to bash explicitly
-
       - name: Set up global bin directory
-        run: pnpm setup
+        run: |
+          pnpm config set global-bin-dir ~/.pnpm-global
+          export PATH=$PATH:~/.pnpm-global/bin
 
       - name: Install dependencies
         run: pnpm install
