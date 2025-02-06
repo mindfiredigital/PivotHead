@@ -24,24 +24,29 @@ jobs:
           node-version: 20
 
       - name: Install pnpm
-        run: npm install -g pnpm # Install pnpm globally
+        run: npm install -g pnpm@9.15.2  # Install specific pnpm version globally
 
-      - name: Install dependencies
-        run: pnpm install # Use pnpm to install dependencies
+      - name: Install dependencies with pnpm
+        run: pnpm install
+
+      - name: Restore changes in pnpm lock
+        run: git restore pnpm-lock.yaml  # Ensure lockfile isn't modified after install
 
       - name: Build application
-        run: pnpm run build # Use pnpm to run the build
+        run: pnpm run build  # Run build command
 
       - name: Set Git user name and email
         run: |
           git config --local user.email "github-actions@github.com"
           git config --local user.name "GitHub Actions"
+
   create-github-release:
     name: Create GitHub release and publish to npm
     runs-on: ubuntu-latest
     permissions:
       contents: write
     needs: build
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -49,13 +54,16 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 20
 
       - name: Install pnpm
-        run: npm install -g pnpm # Install pnpm globally
+        run: npm install -g pnpm@9.15.2  # Install the same pnpm version
 
-      - name: Install dependencies
-        run: pnpm install # Install dependencies (pnpm should already be available)
+      - name: Install dependencies with pnpm
+        run: pnpm install
+
+      - name: Restore changes in pnpm lock
+        run: git restore pnpm-lock.yaml
 
       - name: Create changeset and version packages
         run: |
@@ -64,23 +72,24 @@ jobs:
           git add .
           git commit -m "Version packages"
           git push origin main
+
       - name: Publish to npm
         run: pnpm changeset publish
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }} # NPM token for publishing to npm registry
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}  # NPM token for authentication
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
         with:
-          tag_name: v${{ steps.version.outputs.newVersion }} # Use the new version from changesets
+          tag_name: v${{ steps.version.outputs.newVersion }}
           release_name: Release v${{ steps.version.outputs.newVersion }}
           draft: false
           prerelease: false
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub token for creating releases
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
-          name: core-build-zip # Name of the artifact
-          path: ./packages/core/dist # Path to the build folder to zip and upload
+          name: core-build-zip
+          path: ./packages/core/dist
