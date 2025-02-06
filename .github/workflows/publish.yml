@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -24,18 +24,26 @@ jobs:
           node-version: 20
 
       - name: Install pnpm
-        run: npm install -g pnpm # Install pnpm globally
+        run: npm install -g pnpm@9.15.2
 
-      - name: Install dependencies
-        run: pnpm install # Use pnpm to install dependencies
+      - name: Set up global bin directory
+        run: |
+          pnpm config set global-bin-dir ~/.pnpm-global
+          echo "~/.pnpm-global/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies with pnpm
+        run: pnpm install
+
+      - name: Restore changes in pnpm lock
+        run: git restore pnpm-lock.yaml
 
       - name: Build application
-        run: pnpm run build # Use pnpm to run the build
+        run: pnpm run build
 
       - name: Set Git user name and email
         run: |
-          git config --local user.email "github-actions@github.com"
-          git config --local user.name "GitHub Actions"
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
 
   create-github-release:
     name: Create GitHub release and publish to npm
@@ -45,44 +53,60 @@ jobs:
     needs: build
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 20
 
       - name: Install pnpm
-        run: npm install -g pnpm # Install pnpm globally
+        run: npm install -g pnpm@9.15.2
+
+      - name: Set up global bin directory
+        run: |
+          pnpm config set global-bin-dir ~/.pnpm-global
+          echo "~/.pnpm-global/bin" >> $GITHUB_PATH
 
       - name: Install dependencies
-        run: pnpm install # Install dependencies (pnpm should already be available)
+        run: pnpm install
 
-      - name: Create changeset and version packages
+      - name: Set Git user name and email
         run: |
-          pnpm add -g @changesets/cli  # Install changesets CLI globally
-          pnpm changeset version       # Version packages based on changesets
-          git add .
-          git commit -m "Version packages"
-          git push origin main
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+      - name: Run custom changeset generation script
+        run: |
+          node ../changeset-autogenerate.mjs  # Adjust path if necessary
+
+      - name: Commit and push changesets
+        run: |
+          if git diff --exit-code; then
+            echo "No changesets to commit."
+          else
+            git add .  # Stage changes
+            git commit -m "Auto-generated changeset files"
+            git push origin main
+          fi
 
       - name: Publish to npm
         run: pnpm changeset publish
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }} # NPM token for publishing to npm registry
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
         with:
-          tag_name: v${{ steps.version.outputs.newVersion }} # Use the new version from changesets
-          release_name: Release v${{ steps.version.outputs.newVersion }}
+          tag_name: v${{ github.run_number }}
+          release_name: Release v${{ github.run_number }}
           draft: false
           prerelease: false
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub token for creating releases
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: core-build-zip # Name of the artifact
-          path: ./packages/core/dist # Path to the build folder to zip and upload
+          name: core-build-zip
+          path: ./packages/core/dist
