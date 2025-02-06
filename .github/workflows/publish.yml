@@ -76,18 +76,18 @@ jobs:
           git config --global user.email "github-actions@github.com"
           git config --global user.name "GitHub Actions"
 
-      - name: Install Changesets CLI
-        run: pnpm add -g @changesets/cli
-
-      - name: Create changeset and version packages
+      - name: Run custom changeset generation script
         run: |
-          if pnpm exec changeset version; then
-            git add .
-            git commit -m "Version packages" || echo "No changes to commit."
-            git push origin main || echo "No changes to push."
+          node ../changeset-autogenerate.mjs  # Adjust path if necessary
+
+      - name: Commit and push changesets
+        run: |
+          if git diff --exit-code; then
+            echo "No changesets to commit."
           else
-            echo "No unreleased changesets found, skipping versioning."
-          fi
+            git add .  # Stage changes
+            git commit -m "Auto-generated changeset files"
+            git push origin main
 
       - name: Publish to npm
         run: pnpm changeset publish
