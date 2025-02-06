@@ -26,19 +26,8 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm@9.15.2
 
-      - name: Set up PNPM environment
-        run: |
-          echo "Setting up PNPM..."
-          export PNPM_HOME=$HOME/.local/share/pnpm
-          export PATH=$PNPM_HOME:$PATH
-          echo "PNPM_HOME=$PNPM_HOME" >> $GITHUB_ENV
-          echo "$PNPM_HOME" >> $GITHUB_PATH
-          echo "SHELL=/bin/bash" >> $GITHUB_ENV
-          pnpm setup
-          pnpm config set shell /bin/bash
-
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+      - name: Install dependencies with pnpm
+        run: pnpm install
 
       - name: Restore changes in pnpm lock
         run: git restore pnpm-lock.yaml
@@ -50,14 +39,13 @@ jobs:
         run: |
           git config --global user.email "github-actions@github.com"
           git config --global user.name "GitHub Actions"
-
+          
   create-github-release:
     name: Create GitHub release and publish to npm
     runs-on: ubuntu-latest
     permissions:
       contents: write
     needs: build
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -70,33 +58,28 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm@9.15.2
 
-      - name: Set up PNPM environment
-        run: |
-          echo "Setting up PNPM..."
-          export PNPM_HOME=$HOME/.local/share/pnpm
-          export PATH=$PNPM_HOME:$PATH
-          echo "PNPM_HOME=$PNPM_HOME" >> $GITHUB_ENV
-          echo "$PNPM_HOME" >> $GITHUB_PATH
-          echo "SHELL=/bin/bash" >> $GITHUB_ENV
-          pnpm setup
-          pnpm config set shell /bin/bash
+      - name: Set up global bin directory
+        run: pnpm setup  # Ensure global bin directory is set up
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install
 
-      - name: Install Changesets CLI
-        run: pnpm add -g @changesets/cli
-
-      - name: Version and publish packages
+      - name: Set Git user name and email
         run: |
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
+          
+      - name: Create changeset and version packages
+        run: |
+          pnpm add -g @changesets/cli
           if pnpm exec changeset version; then
-            git add .
+            git add . 
             git commit -m "Version packages" || echo "No changes to commit."
             git push origin main || echo "No changes to push."
           else
             echo "No unreleased changesets found, skipping versioning."
           fi
-
+          
       - name: Publish to npm
         run: pnpm changeset publish
         env:
