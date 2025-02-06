@@ -27,7 +27,7 @@ async function generateChangeset() {
   } else if (commitPatterns.generalType.test(commitMessage)) {
     const match = commitMessage.match(commitPatterns.generalType);
     changeType = match?.[1];  // Type (e.g., feat, fix, etc.)
-    issueNumber = match?.[2];  // Extract issue number if any
+    issueNumber = match?.[2];  // Extract issue number if any (this is not required now)
     description = match?.[3];  // Extract the description
 
     // Validate the commit type
@@ -40,30 +40,18 @@ async function generateChangeset() {
     return;
   }
 
-  // Ensure we have a valid issue number for the scope
-  if (!issueNumber) {
-    console.log('⚠️ No valid issue number found in the commit message. Example: feat:[27] Add user registration endpoint');
-    return;
-  }
-
-  // Ensure the issue number is a positive integer
-  if (!/^\d+$/.test(issueNumber)) {
-    console.log('⚠️ Invalid issue number. It must be a positive integer.');
-    return;
-  }
-
-  // Generate and write changeset if valid issue number found
+  // Generate and write changeset if valid description found
   if (description) {
     description = description.trim() || 'No description provided.';
     // Generate changeset content
     const changesetContent = `---
-'@mindfiredigital/page-builder-${issueNumber}': ${changeType}
+'@mindfiredigital/page-builder-${issueNumber || 'unknown'}': ${changeType}
 ---
 ${description}`;
 
     // Write to a changeset file
     fs.writeFileSync(`.changeset/auto-${Date.now()}.md`, changesetContent);
-    console.log(`✅ Changeset file created for issue: ${issueNumber}`);
+    console.log(`✅ Changeset file created for issue: ${issueNumber || 'unknown'}`);
   } else {
     console.log('⚠️ No valid commit format found in commit message.');
   }
