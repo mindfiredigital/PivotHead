@@ -59,7 +59,9 @@ jobs:
         run: npm install -g pnpm@9.15.2
 
       - name: Set up global bin directory
-        run: pnpm setup  # Ensure global bin directory is set up
+        run: pnpm setup
+        env:
+          SHELL: /bin/bash  # Explicitly set the SHELL environment variable
 
       - name: Install dependencies
         run: pnpm install
