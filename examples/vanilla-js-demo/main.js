@@ -777,6 +777,7 @@ document.addEventListener('DOMContentLoaded', () => {
     );
     return;
   }
+
   addDragDropListeners();
 
   if(config.toolbar){

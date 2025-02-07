@@ -79,15 +79,14 @@ export function createHeader(config) {
             case 'Options':
               createOptionsPopup();
               break;
-            //TODO: Add more cases for other options
-            // case 'To Local CSV':
-            //   dataSourceOptions(config);
-            //   break;
             case 'To Local JSON':
               dataSourceOptions(config);
               break;
+            case 'Print':
+                window.print()
+                break;
             default:
-              alert(optionName);
+              alert(optionName + ` is under development`);
           }
         });
 

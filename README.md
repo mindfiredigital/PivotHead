@@ -27,6 +27,8 @@ PivotHead is a headlessPivot, powerful and flexible library for creating interac
 - Customizable styling
 - React integration (Upcoming)
 - Hide and show toolbar
+- Export by pdf
+- Provide local json file for pivoting
 
 ## Installation
 
