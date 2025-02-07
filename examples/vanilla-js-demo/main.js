@@ -286,7 +286,6 @@ export let engine = new PivotEngine(config);
 async function initializePivotEngine(config) {
   engine = new PivotEngine(config);
   await engine.loadData();
-  console.log('Data loaded in main.js:', engine.getData());
   renderTable();
 }
 
