@@ -78,7 +78,7 @@ jobs:
 
       - name: Run custom changeset generation script
         run: |
-          node ../changeset-autogenerate.mjs  # Adjust path if necessary
+          node .github/changeset-autogenerate.mjs 
 
       - name: Commit and push changesets
         run: |

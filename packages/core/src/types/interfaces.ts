@@ -3,6 +3,12 @@ export interface AxisConfig {
   caption?: string;
   sortOrder?: 'asc' | 'desc';
 }
+
+export interface DataSourceConfig {
+  type: 'local' | 'remote' | 'file';
+  url?: string; // For remote data source
+  file?: File; // For file data source
+}
 export interface Column {
   field: string;
   label: string;
@@ -94,6 +100,7 @@ export interface PivotTableState<T> {
 
 export interface PivotTableConfig<T> {
   data: T[];
+  dataSource?: DataSourceConfig;
   rows: AxisConfig[];
   columns: AxisConfig[];
   measures: MeasureConfig[];
