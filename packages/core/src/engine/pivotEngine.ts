@@ -50,12 +50,83 @@ export class PivotEngine<T extends Record<string, any>> {
       columnGroups: [],
     };
 
-    // Process data after state initialization
+    // // Process data after state initialization
+    // this.state.processedData = this.processData(this.state.data);
+
+    // if (this.state.groupConfig) {
+    //   this.applyGrouping();
+    // }
+    // Load data based on the data source type
+    this.loadData();
+  }
+
+  /**
+   * Loads data from a file or URL.
+   **/
+  private async loadData() {
+    if (this.config.dataSource) {
+      const { type, url, file } = this.config.dataSource;
+      if (type === 'remote' && url) {
+        this.state.data = await this.fetchRemoteData(url);
+      } else if (type === 'file' && file) {
+        this.state.data = await this.readFileData(file);
+      } else {
+        console.error('Invalid data source configuration');
+      }
+    } else if (this.config.data) {
+      this.state.data = this.config.data;
+    }
+
+    // Initialize row sizes
+    this.state.rowSizes = this.initializeRowSizes(this.state.data);
+
+    // Process data after loading
     this.state.processedData = this.processData(this.state.data);
 
     if (this.state.groupConfig) {
       this.applyGrouping();
     }
+  }
+
+  /**
+   * Loads data from a file or URL.
+   * @param {File | string} source - The file or URL to load data from.
+   * @public
+   * @returns {Promise<void>} A promise that resolves when the data is loaded.
+   **/
+  private async fetchRemoteData(url: string): Promise<T[]> {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch data from ${url}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching remote data:', error);
+      return [];
+    }
+  }
+
+  /**
+   *  Process the data to be displayed in the table.
+   * @param {T[]} data - The data to process.
+   * @returns {ProcessedData} The processed data including headers, rows, and totals.
+   * @private
+   **/
+  private async readFileData(file: File): Promise<T[]> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const data = JSON.parse(event.target?.result as string);
+          resolve(data);
+        } catch (error) {
+          reject(error);
+        }
+      };
+      reader.onerror = (error) => reject(error);
+      reader.readAsText(file);
+    });
   }
 
   /**

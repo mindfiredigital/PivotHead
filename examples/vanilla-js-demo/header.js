@@ -2,6 +2,8 @@ import { formatCellPopUp } from './formatCell.js';
 import { createOptionsPopup } from './optionsPopup.js';
 import { conditionFormattingPopUp } from './conditionFormattingPopUp.js';
 import { createFieldsPopup } from './fieldsPopup.js';
+import { dataSourceOptions } from './dataSourceOptions.js';
+import {  engine } from './main.js';
 
 export function createHeader(config) {
   const header = document.createElement('div');
@@ -77,6 +79,13 @@ export function createHeader(config) {
             case 'Options':
               createOptionsPopup();
               break;
+            //TODO: Add more cases for other options
+            // case 'To Local CSV':
+            //   dataSourceOptions(config);
+            //   break;
+            case 'To Local JSON':
+              dataSourceOptions(config);
+              break;
             default:
               alert(optionName);
           }
@@ -140,16 +149,17 @@ export function createHeader(config) {
       label: 'Connect',
       dropdownOptions: ['To Local CSV', 'To Local JSON'],
     },
-    {
-      icon: '📂',
-      label: 'Open',
-      dropdownOptions: ['Local Report', 'Remote Report'],
-    },
-    {
-      icon: '💾',
-      label: 'Save',
-      dropdownOptions: [],
-    },
+    // TODO: Implement open and save functionality
+    // {
+    //   icon: '📂',
+    //   label: 'Open',
+    //   dropdownOptions: ['Local Report', 'Remote Report'],
+    // },
+    // {
+    //   icon: '💾',
+    //   label: 'Save',
+    //   dropdownOptions: [],
+    // },
 
     {
       icon: '📤',
@@ -168,15 +178,13 @@ export function createHeader(config) {
     { icon: '📋', label: 'Fields', dropdownOptions: [] },
   ];
 
-  // will set it to true when we develop the functionalities of left options
-  const showLeftOptions = false;
 
-  if (showLeftOptions)
-    leftOptions.forEach((option) =>
+  leftOptions.forEach((option) =>
       leftSection.appendChild(
         createOption(option.icon, option.label, option.dropdownOptions),
       ),
     );
+
   rightOptions.forEach((option) =>
     rightSection.appendChild(
       createOption(option.icon, option.label, option.dropdownOptions),
