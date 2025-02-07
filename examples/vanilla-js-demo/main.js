@@ -281,7 +281,14 @@ const config = {
   }
 };
 // Initialize PivotEngine
-let engine = new PivotEngine(config);
+export let engine = new PivotEngine(config);
+
+async function initializePivotEngine(config) {
+  engine = new PivotEngine(config);
+  await engine.loadData();
+  console.log('Data loaded in main.js:', engine.getData());
+  renderTable();
+}
 
 function implementDragAndDrop() {
   const table = document.getElementById('pivotTable');
@@ -777,5 +784,5 @@ document.addEventListener('DOMContentLoaded', () => {
     createHeader(config);
   }
  
-  renderTable();
+  initializePivotEngine(config);
 });

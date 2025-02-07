@@ -1,6 +1,6 @@
-import { formatTable } from './main.js';
+import { engine, formatTable } from './main.js';
 
-export function dataSourceOptions(config, PivotEngine) {
+export function dataSourceOptions(config) {
   const overlay = document.createElement('div');
   overlay.style.position = 'fixed';
   overlay.style.top = '0';
@@ -90,11 +90,17 @@ export function dataSourceOptions(config, PivotEngine) {
   });
 
   applyButton.addEventListener('click', async () => {
-    alert('Apply button clicked!');
+    window.confirm('Are you sure to change the data source to JSON file!');
     const file = fileInput.files[0];
     if (file) {
-      const pivotEngine = new PivotEngine(config);
-      await pivotEngine.setDataSourceFromFile(file);
+
+      // Set the dataSource to the selected file
+      config.dataSource = {
+        type: 'file',
+        file,
+      }
+      // also update the data use core package method to read data from file
+      config.data = await engine.readFileData(config.dataSource.file);
       formatTable(config);
       document.body.removeChild(overlay);
     } else {
