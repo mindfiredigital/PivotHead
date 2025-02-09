@@ -37,7 +37,8 @@ COMMIT_PATTERN="^(feat|fix|docs|style|refactor|test|chore|patch)\([a-zA-Z0-9\-]+
 # Check for 'BREAKING CHANGE' format
 BREAKING_CHANGE_PATTERN="^BREAKING CHANGE: .+"
 
-if ! echo "$COMMIT_MSG" | grep -Eq "$COMMIT_PATTERN" && ! echo "$COMMIT_MSG" | grep -Eq "$BREAKING_CHANGE_PATTERN"; then
+# Apply the updated regex check using echo and pipes to avoid truncation issues with `grep`
+if ! echo "$COMMIT_MSG" | grep -Pq "$COMMIT_PATTERN" && ! echo "$COMMIT_MSG" | grep -Pq "$BREAKING_CHANGE_PATTERN"; then
   echo -e "${RED} ❌ Invalid commit message: '$COMMIT_MSG'${NC}"
   echo -e "${YELLOW}Commit message must be in the format: feat(scope): description or BREAKING CHANGE: description${NC}"
   echo -e "${YELLOW}Example: feat(core): add new chat component${NC}"

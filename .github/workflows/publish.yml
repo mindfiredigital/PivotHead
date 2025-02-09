@@ -3,7 +3,7 @@ name: Deployment Workflow
 on:
   push:
     branches:
-      - main
+      - feature/125-changeset-commit-restructure
   workflow_dispatch:
 
 jobs:
@@ -86,7 +86,7 @@ jobs:
             echo "No changesets to commit."
           else
             git add .  # Stage changes
-            git commit -m "Auto-generated changeset files"
+            git commit -m "auto-generated changeset files"
             git push origin main
           fi
 
