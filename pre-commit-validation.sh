@@ -31,9 +31,8 @@ COMMIT_MSG=$(echo "$COMMIT_MSG" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
 # Debugging: Print commit message after trimming spaces
 echo -e "${YELLOW}Trimmed Commit Message: '$COMMIT_MSG'${NC}"
 
-# Updated regex pattern considering the commit message format (feat(scope): description)
-# Allow spaces and a capitalized first letter
-COMMIT_PATTERN="^(feat|fix|docs|style|refactor|test|chore|patch)\([a-zA-Z0-9\-]+\): [A-Z][a-zA-Z0-9\s\-]+$"
+# Updated regex pattern to allow lowercase descriptions after colon
+COMMIT_PATTERN="^(feat|fix|docs|style|refactor|test|chore|patch)\([a-zA-Z0-9\-]+\): [a-z0-9][a-zA-Z0-9\s\-]+$"
 
 # Check for 'BREAKING CHANGE' format
 BREAKING_CHANGE_PATTERN="^BREAKING CHANGE: .+"
