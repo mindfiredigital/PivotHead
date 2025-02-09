@@ -3,7 +3,7 @@ name: Deployment Workflow
 on:
   push:
     branches:
-      - main
+      - feature/125-changeset-commit-restructure
   workflow_dispatch:
 
 jobs:
@@ -46,7 +46,7 @@ jobs:
           git config --global user.name "GitHub Actions"
 
   create-github-release:
-    name: Create GitHub release and publish to npm
+    name: Create GitHub release and simulate publishing to npm
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -90,8 +90,9 @@ jobs:
             git push origin main
           fi
 
-      - name: Publish to npm
-        run: pnpm changeset publish
+      # Simulate publishing to npm (dry run)
+      - name: Simulate publishing to npm (Dry Run)
+        run: pnpm changeset publish --dry-run
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
