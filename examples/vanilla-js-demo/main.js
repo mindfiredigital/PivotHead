@@ -16,7 +16,6 @@ if (typeof PivotheadCore === 'undefined') {
   );
 }
 
-
 // Importing the Package
 const { PivotEngine } = PivotheadCore;
 
@@ -106,11 +105,11 @@ const config = {
       uniqueName: 'sales',
       caption: 'Total Sales',
       aggregation: 'sum',
-      format: { 
-        type: 'currency', 
+      format: {
+        type: 'currency',
         currency: 'USD',
         locale: 'en-US',
-        decimals: 4
+        decimals: 4,
       },
       sortable: true,
     },
@@ -118,10 +117,10 @@ const config = {
       uniqueName: 'quantity',
       caption: 'Total Quantity',
       aggregation: 'sum',
-      format: { 
+      format: {
         type: 'number',
         decimals: 2,
-        locale: 'en-US'
+        locale: 'en-US',
       },
       sortable: false,
     },
@@ -129,8 +128,8 @@ const config = {
       uniqueName: 'averageSale',
       caption: 'Average Sale',
       aggregation: 'avg',
-      format: { 
-        type: 'number'
+      format: {
+        type: 'number',
       },
       formula: (item) => item.sales / item.quantity,
       sortable: true,
@@ -139,11 +138,11 @@ const config = {
       uniqueName: 'sales',
       caption: 'Max Sale',
       aggregation: 'max',
-      format: { 
-        type: 'currency', 
+      format: {
+        type: 'currency',
         currency: 'USD',
         locale: 'en-US',
-        decimals: 4
+        decimals: 4,
       },
       sortable: true,
     },
@@ -151,11 +150,11 @@ const config = {
       uniqueName: 'sales',
       caption: 'Min Sale',
       aggregation: 'min',
-      format: { 
-        type: 'currency', 
+      format: {
+        type: 'currency',
         currency: 'USD',
         locale: 'en-US',
-        decimals: 4
+        decimals: 4,
       },
       sortable: true,
     },
@@ -173,10 +172,10 @@ const config = {
   // Add initial sort configuration
   initialSort: [
     {
-      field: "sales",
-      direction: "desc",
-      type: "measure",
-      aggregation: "sum",
+      field: 'sales',
+      direction: 'desc',
+      type: 'measure',
+      aggregation: 'sum',
     },
   ],
   groupConfig: {
@@ -185,35 +184,35 @@ const config = {
     grouper: (item, fields) => fields.map((field) => item[field]).join(' - '),
   },
   formatting: {
-    sales: { 
-      type: 'currency', 
+    sales: {
+      type: 'currency',
       currency: 'USD',
       locale: 'en-US',
-      decimals: 4
+      decimals: 4,
     },
-    quantity: { 
+    quantity: {
       type: 'number',
       // decimals: 2,
       // locale: 'en-US'
     },
-    averageSale: { 
-      type: 'currency', 
+    averageSale: {
+      type: 'currency',
       currency: 'USD',
       locale: 'en-US',
-      decimals: 4
+      decimals: 4,
     },
-    maxSale: { 
-      type: 'currency', 
+    maxSale: {
+      type: 'currency',
       currency: 'USD',
       locale: 'en-US',
-      decimals: 4
+      decimals: 4,
     },
-    minSale: { 
-      type: 'currency', 
+    minSale: {
+      type: 'currency',
       currency: 'USD',
       locale: 'en-US',
-      decimals: 4
-    }
+      decimals: 4,
+    },
   },
   conditionalFormatting: [
     {
@@ -278,7 +277,7 @@ const config = {
   },
   onColumnDragEnd: (fromIndex, toIndex, newColumns) => {
     //console.log('Column dragged:', {fromIndex, toIndex, newColumns});
-  }
+  },
 };
 // Initialize PivotEngine
 export let engine = new PivotEngine(config);
@@ -296,32 +295,32 @@ function implementDragAndDrop() {
 
   // 1. Row Dragging Implementation
   implementRowDragging(tbody);
-  
+
   // 2. Column Dragging Implementation
   implementColumnDragging(thead);
 }
 function implementColumnDragging(thead) {
   const headerRow = thead.querySelector('tr:last-child'); // Get measure headers row
-  
+
   headerRow.querySelectorAll('th').forEach((header, index) => {
     header.setAttribute('draggable', true);
-    
+
     header.addEventListener('dragstart', (e) => {
       e.dataTransfer.setData('text/plain', index);
       header.classList.add('dragging');
     });
-    
+
     header.addEventListener('dragend', () => {
       header.classList.remove('dragging');
     });
-    
+
     header.addEventListener('dragover', (e) => {
       e.preventDefault();
       const draggingHeader = headerRow.querySelector('.dragging');
       if (draggingHeader) {
         const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
         const toIndex = index;
-        
+
         if (fromIndex !== toIndex) {
           // Call PivotEngine's dragColumn method
           engine.dragColumn(fromIndex, toIndex);
@@ -359,19 +358,19 @@ document.head.appendChild(style);
 
 function implementRowDragging(tbody) {
   // Add draggable attribute to rows
-  tbody.querySelectorAll('tr').forEach(row => {
+  tbody.querySelectorAll('tr').forEach((row) => {
     row.setAttribute('draggable', true);
-    
+
     // Store original index
     row.addEventListener('dragstart', (e) => {
       e.dataTransfer.setData('text/plain', row.rowIndex);
       row.classList.add('dragging');
     });
-    
+
     row.addEventListener('dragend', () => {
       row.classList.remove('dragging');
     });
-    
+
     row.addEventListener('dragover', (e) => {
       e.preventDefault();
       const draggingRow = tbody.querySelector('.dragging');
@@ -379,7 +378,7 @@ function implementRowDragging(tbody) {
         const currentRow = row;
         const fromIndex = parseInt(e.dataTransfer.getData('text/plain')) - 1;
         const toIndex = currentRow.rowIndex - 1;
-        
+
         if (fromIndex !== toIndex) {
           // Call PivotEngine's dragRow method
           engine.dragRow(fromIndex, toIndex);
@@ -392,24 +391,30 @@ function implementRowDragging(tbody) {
 }
 
 export function onSectionItemDrop(droppedFields) {
-  let droppedFieldsInSections=JSON.stringify({
+  let droppedFieldsInSections = JSON.stringify({
     rows: Array.from(droppedFields.rows),
     columns: Array.from(droppedFields.columns),
     values: Array.from(droppedFields.values),
-    filters: Array.from(droppedFields.filters)
+    filters: Array.from(droppedFields.filters),
   });
-  const parsedDroppedFieldsInSections=JSON.parse(droppedFieldsInSections)
+  const parsedDroppedFieldsInSections = JSON.parse(droppedFieldsInSections);
 
-  const transformedRows=parsedDroppedFieldsInSections.rows.map((rowField)=>{ return { uniqueName:rowField.toLowerCase(), caption:rowField}});
-        const transformedColumns=parsedDroppedFieldsInSections.columns.map((columnField)=>{ return { uniqueName:columnField.toLowerCase(), caption:columnField}});
-        // const transformedValues=parsedDroppedFieldsInSections.values.map((valueField)=>{ return { uniqueName:valueField.toLowerCase(), caption:valueField}})
-        // const transformedFilters=parsedDroppedFieldsInSections.filters.map((filterField)=>{ return { uniqueName:filterField.toLowerCase(), caption:filterField}})
+  const transformedRows = parsedDroppedFieldsInSections.rows.map((rowField) => {
+    return { uniqueName: rowField.toLowerCase(), caption: rowField };
+  });
+  const transformedColumns = parsedDroppedFieldsInSections.columns.map(
+    (columnField) => {
+      return { uniqueName: columnField.toLowerCase(), caption: columnField };
+    },
+  );
+  // const transformedValues=parsedDroppedFieldsInSections.values.map((valueField)=>{ return { uniqueName:valueField.toLowerCase(), caption:valueField}})
+  // const transformedFilters=parsedDroppedFieldsInSections.filters.map((filterField)=>{ return { uniqueName:filterField.toLowerCase(), caption:filterField}})
 
-        //TODO: for now only-applicable to rows and columns, will do the same for values and global filters in next iteration
-        engine.state.rows=transformedRows;
-        engine.state.columns=transformedColumns;
+  //TODO: for now only-applicable to rows and columns, will do the same for values and global filters in next iteration
+  engine.state.rows = transformedRows;
+  engine.state.columns = transformedColumns;
 
-        renderTable();
+  renderTable();
 }
 
 function renderTable() {
@@ -455,7 +460,6 @@ function renderTable() {
   container.appendChild(tableWrapper);
 
   implementDragAndDrop();
-
 }
 
 function renderGroupedRows(tbody, groups, state, level) {
@@ -499,14 +503,23 @@ function renderGroupedRows(tbody, groups, state, level) {
           if (columnItems.length > 0) {
             let aggregateValue;
             if (measure.aggregation === 'max') {
-              aggregateValue = Math.max(...columnItems.map(item => engine.calculateMeasureValue(item, measure)));
+              aggregateValue = Math.max(
+                ...columnItems.map((item) =>
+                  engine.calculateMeasureValue(item, measure),
+                ),
+              );
             } else if (measure.aggregation === 'min') {
-              aggregateValue = Math.min(...columnItems.map(item => engine.calculateMeasureValue(item, measure)));
+              aggregateValue = Math.min(
+                ...columnItems.map((item) =>
+                  engine.calculateMeasureValue(item, measure),
+                ),
+              );
             } else if (measure.aggregation === 'count') {
               aggregateValue = columnItems.length;
             } else {
               aggregateValue = columnItems.reduce(
-                (sum, item) => sum + engine.calculateMeasureValue(item, measure),
+                (sum, item) =>
+                  sum + engine.calculateMeasureValue(item, measure),
                 0,
               );
               if (measure.aggregation === 'avg') {
@@ -553,9 +566,11 @@ function renderGroupedRows(tbody, groups, state, level) {
 function applyConditionalFormatting(td, value, measureName) {
   if (config.conditionalFormatting && config.conditionalFormatting.length > 0) {
     config.conditionalFormatting.forEach((rule) => {
-      if (rule.value.type === 'All values' || 
-          (rule.value.type === 'Number' && typeof value === 'number') ||
-          (rule.value.type === 'Text' && typeof value === 'string')) {
+      if (
+        rule.value.type === 'All values' ||
+        (rule.value.type === 'Number' && typeof value === 'number') ||
+        (rule.value.type === 'Text' && typeof value === 'string')
+      ) {
         let applyFormat = false;
         switch (rule.value.operator) {
           case 'Greater than':
@@ -565,11 +580,14 @@ function applyConditionalFormatting(td, value, measureName) {
             applyFormat = value < parseFloat(rule.value.value1);
             break;
           case 'Between':
-            applyFormat = value >= parseFloat(rule.value.value1) && 
-                          value <= parseFloat(rule.value.value2);
+            applyFormat =
+              value >= parseFloat(rule.value.value1) &&
+              value <= parseFloat(rule.value.value2);
             break;
           case 'Equal to':
-            applyFormat = value === parseFloat(rule.value.value1) || value === rule.value.value1;
+            applyFormat =
+              value === parseFloat(rule.value.value1) ||
+              value === rule.value.value1;
             break;
         }
         if (applyFormat) {
@@ -671,36 +689,35 @@ function renderTableHeader(thead, state) {
 }
 
 function handleSort(field, direction) {
- // Get current state
- const state = engine.getState()
- const currentSortConfig = state.sortConfig?.[0]
+  // Get current state
+  const state = engine.getState();
+  const currentSortConfig = state.sortConfig?.[0];
 
- // Toggle direction if clicking the same field
- let newDirection = direction || "asc"
- if (currentSortConfig && currentSortConfig.field === field) {
-   newDirection = currentSortConfig.direction === "asc" ? "desc" : "asc"
- }
+  // Toggle direction if clicking the same field
+  let newDirection = direction || 'asc';
+  if (currentSortConfig && currentSortConfig.field === field) {
+    newDirection = currentSortConfig.direction === 'asc' ? 'desc' : 'asc';
+  }
 
- // Call engine's sort method
- engine.sort(field, newDirection)
+  // Call engine's sort method
+  engine.sort(field, newDirection);
 
- // Force a re-render of the table
- renderTable()
-
+  // Force a re-render of the table
+  renderTable();
 }
 
 function createSortIcon(field, axis) {
   const icon = document.createElement('span');
   const state = engine.getState();
   const currentSort = state.sortConfig?.[0];
-  
+
   // Set the appropriate sort icon based on current sort state
   if (currentSort && currentSort.field === field) {
     icon.innerHTML = currentSort.direction === 'asc' ? '&#8593;' : '&#8595;';
   } else {
     icon.innerHTML = '&#8645;'; // Default unsorted state
   }
-  
+
   icon.style.cursor = 'pointer';
   icon.style.marginLeft = '5px';
 
@@ -713,7 +730,6 @@ function createSortIcon(field, axis) {
 
   return icon;
 }
-
 
 function updateFormatting(newConfig) {
   config.conditionalFormatting = newConfig.conditionalFormatting;
@@ -746,7 +762,7 @@ function groupData(data, groupFields) {
   return result;
 }
 
-export function formatTable(config){
+export function formatTable(config) {
   engine = new PivotEngine(config);
   renderTable();
 }
@@ -758,14 +774,13 @@ function addDragDropListeners() {
     //console.log(`Row moved from ${fromIndex} to ${toIndex}`);
     // You can perform additional actions here
   };
-  
+
   // Listen for column drag completion
   engine.config.onColumnDragEnd = (fromIndex, toIndex, newColumns) => {
     //console.log(`Column moved from ${fromIndex} to ${toIndex}`);
     // You can perform additional actions here
   };
 }
-
 
 // Initialize the table when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
@@ -780,9 +795,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   addDragDropListeners();
 
-  if(config.toolbar){
+  if (config.toolbar) {
     createHeader(config);
   }
- 
+
   initializePivotEngine(config);
 });

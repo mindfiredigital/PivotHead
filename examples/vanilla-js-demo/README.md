@@ -46,24 +46,24 @@ To deploy this project to Vercel using the CLI, follow these steps:
 6. What’s your project’s name? `Enter`
 7. In which directory is your code located? ./ `Enter`
 
+## Feature
 
-## Feature 
+1. Header
 
-1. Header 
+   a. Contain menus
 
-    a. Contain menus 
-      - Format
-         - Format cells
-           
-         - Condition formatting
-            - User can render UI condition based on greater than , less than, equal to values.
-            - By setting values from this popup user can render table UI accordingly.
-            ![Screenshot from 2025-01-16 16-33-21](https://github.com/user-attachments/assets/46ed72c5-ee00-4af3-a0b9-1d67656ed8ce)
+   - Format
 
-      - Options 
+     - Format cells
+     - Condition formatting
+       - User can render UI condition based on greater than , less than, equal to values.
+       - By setting values from this popup user can render table UI accordingly.
+         ![Screenshot from 2025-01-16 16-33-21](https://github.com/user-attachments/assets/46ed72c5-ee00-4af3-a0b9-1d67656ed8ce)
 
-      - Fields
-         - User can drag field from `All fields` and drop on what axis they want to group and align the data either `Columns ` axis or   `Rows` axis.
+   - Options
 
-         ![image](https://github.com/user-attachments/assets/fa788402-845e-4931-b0d8-f0d600267926)
- 
+   - Fields
+
+     - User can drag field from `All fields` and drop on what axis they want to group and align the data either `Columns ` axis or `Rows` axis.
+
+     ![image](https://github.com/user-attachments/assets/fa788402-845e-4931-b0d8-f0d600267926)
