@@ -14,7 +14,7 @@ const validScopes = [
   'web-component',
   'release',
   'examples',
-  'examples/vanilla-js-demo',
+  'vanilla-js-demo',
 ];
 
 // Define regex patterns

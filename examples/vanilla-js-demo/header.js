@@ -3,6 +3,7 @@ import { createOptionsPopup } from './optionsPopup.js';
 import { conditionFormattingPopUp } from './conditionFormattingPopUp.js';
 import { createFieldsPopup } from './fieldsPopup.js';
 import { dataSourceOptions } from './dataSourceOptions.js';
+import { engine } from './main.js';
 
 export function createHeader(config) {
   const header = document.createElement('div');
