@@ -22,9 +22,17 @@ fi
 COMMIT_MSG_FILE=$1
 COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
 
-# Validate commit message format
-# New regex pattern considering the commit message format (feat(scope): description)
-COMMIT_PATTERN="^(feat|fix|docs|style|refactor|test|chore|patch)\([a-zA-Z0-9\-]+\): [A-Z][a-zA-Z0-9\s\-]+$"
+# Debugging: Print commit message for validation
+echo -e "${YELLOW}Original Commit Message: '$COMMIT_MSG'${NC}"
+
+# Remove any potential leading or trailing spaces
+COMMIT_MSG=$(echo "$COMMIT_MSG" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+
+# Debugging: Print commit message after trimming spaces
+echo -e "${YELLOW}Trimmed Commit Message: '$COMMIT_MSG'${NC}"
+
+# Updated regex pattern to allow lowercase descriptions after colon
+COMMIT_PATTERN="^(feat|fix|docs|style|refactor|test|chore|patch)\([a-zA-Z0-9\-]+\): [a-z0-9][a-zA-Z0-9\s\-]+$"
 
 # Check for 'BREAKING CHANGE' format
 BREAKING_CHANGE_PATTERN="^BREAKING CHANGE: .+"
