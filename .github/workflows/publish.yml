@@ -3,7 +3,7 @@ name: Deployment Workflow
 on:
   push:
     branches:
-      - feature/125-changeset-commit-restructure
+      - main
   workflow_dispatch:
 
 jobs:

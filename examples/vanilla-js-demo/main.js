@@ -168,7 +168,7 @@ const config = {
   ],
   defaultAggregation: 'sum',
   isResponsive: true,
-  toolbar: false,
+  toolbar: true,
   // Add initial sort configuration
   initialSort: [
     {
@@ -280,7 +280,13 @@ const config = {
   },
 };
 // Initialize PivotEngine
-let engine = new PivotEngine(config);
+export let engine = new PivotEngine(config);
+
+async function initializePivotEngine(config) {
+  engine = new PivotEngine(config);
+  await engine.loadData();
+  renderTable();
+}
 
 function implementDragAndDrop() {
   const table = document.getElementById('pivotTable');
@@ -786,11 +792,16 @@ document.addEventListener('DOMContentLoaded', () => {
     );
     return;
   }
+
   addDragDropListeners();
 
   if (config.toolbar) {
     createHeader(config);
   }
 
+<<<<<<< HEAD
   renderTable();
+=======
+  initializePivotEngine(config);
+>>>>>>> d55688336eda355c3a61c1726c459b5ceab7decd
 });

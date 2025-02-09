@@ -17,16 +17,18 @@ PivotHead is a headlessPivot, powerful and flexible library for creating interac
 ## Features
 
 - Flexible data pivoting and aggregation
-- Sorting and filtering capabilities
+- Sorting capabilities
 - Grouping data by multiple fields
 - Column resizing
-- Drag and drop for rows and columns
+- Drag and drop for rows
 - Conditional formatting
 - Custom measures and formulas
 - Responsive design
 - Customizable styling
 - React integration (Upcoming)
 - Hide and show toolbar
+- Export by pdf
+- Provide local json file for pivoting
 
 ## Installation
 
