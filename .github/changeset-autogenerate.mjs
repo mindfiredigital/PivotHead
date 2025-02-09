@@ -13,8 +13,6 @@ const validScopes = [
   'svelte',
   'web-component',
   'release',
-  'examples',
-  'vanilla-js-demo',
 ];
 
 // Define regex patterns
