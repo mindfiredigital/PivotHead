@@ -3,7 +3,7 @@ import { createOptionsPopup } from './optionsPopup.js';
 import { conditionFormattingPopUp } from './conditionFormattingPopUp.js';
 import { createFieldsPopup } from './fieldsPopup.js';
 import { dataSourceOptions } from './dataSourceOptions.js';
-import {  engine } from './main.js';
+import { engine } from './main.js';
 
 export function createHeader(config) {
   const header = document.createElement('div');
@@ -83,8 +83,8 @@ export function createHeader(config) {
               dataSourceOptions(config);
               break;
             case 'Print':
-                window.print()
-                break;
+              window.print();
+              break;
             default:
               alert(optionName + ` is under development`);
           }
@@ -177,12 +177,11 @@ export function createHeader(config) {
     { icon: '📋', label: 'Fields', dropdownOptions: [] },
   ];
 
-
   leftOptions.forEach((option) =>
-      leftSection.appendChild(
-        createOption(option.icon, option.label, option.dropdownOptions),
-      ),
-    );
+    leftSection.appendChild(
+      createOption(option.icon, option.label, option.dropdownOptions),
+    ),
+  );
 
   rightOptions.forEach((option) =>
     rightSection.appendChild(

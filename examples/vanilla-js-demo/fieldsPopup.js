@@ -303,16 +303,15 @@ li .field-info input {
     document.head.appendChild(style);
 
     // TODO: will add the following in next iteration once functioanlity is ready
-//     <div id="reportFilters" class="section">
-//                           <h3>Report Filters</h3>
-//                           <ul id="reportFiltersList" class="section-list"></ul>
-//                       </div>
+    //     <div id="reportFilters" class="section">
+    //                           <h3>Report Filters</h3>
+    //                           <ul id="reportFiltersList" class="section-list"></ul>
+    //                       </div>
 
-
-//  <div id="values" class="section">
-//                           <h3>Values</h3>
-//                           <ul id="valuesList" class="section-list"></ul>
-//                       </div>
+    //  <div id="values" class="section">
+    //                           <h3>Values</h3>
+    //                           <ul id="valuesList" class="section-list"></ul>
+    //                       </div>
 
     const container = document.createElement('div');
     container.innerHTML = `

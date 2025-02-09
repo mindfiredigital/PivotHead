@@ -93,12 +93,11 @@ export function dataSourceOptions(config) {
     window.confirm('Are you sure to change the data source to JSON file!');
     const file = fileInput.files[0];
     if (file) {
-
       // Set the dataSource to the selected file
       config.dataSource = {
         type: 'file',
         file,
-      }
+      };
       // also update the data use core package method to read data from file
       config.data = await engine.readFileData(config.dataSource.file);
       formatTable(config);
