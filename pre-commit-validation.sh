@@ -22,14 +22,24 @@ fi
 COMMIT_MSG_FILE=$1
 COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
 
-# Validate commit message format
-# New regex pattern considering the commit message format (feat(scope): description)
+# Debugging: Print commit message for validation
+echo -e "${YELLOW}Original Commit Message: '$COMMIT_MSG'${NC}"
+
+# Remove any potential leading or trailing spaces
+COMMIT_MSG=$(echo "$COMMIT_MSG" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+
+# Debugging: Print commit message after trimming spaces
+echo -e "${YELLOW}Trimmed Commit Message: '$COMMIT_MSG'${NC}"
+
+# Updated regex pattern considering the commit message format (feat(scope): description)
+# Allow spaces and a capitalized first letter
 COMMIT_PATTERN="^(feat|fix|docs|style|refactor|test|chore|patch)\([a-zA-Z0-9\-]+\): [A-Z][a-zA-Z0-9\s\-]+$"
 
 # Check for 'BREAKING CHANGE' format
 BREAKING_CHANGE_PATTERN="^BREAKING CHANGE: .+"
 
-if ! echo "$COMMIT_MSG" | grep -Eq "$COMMIT_PATTERN" && ! echo "$COMMIT_MSG" | grep -Eq "$BREAKING_CHANGE_PATTERN"; then
+# Apply the updated regex check using echo and pipes to avoid truncation issues with `grep`
+if ! echo "$COMMIT_MSG" | grep -Pq "$COMMIT_PATTERN" && ! echo "$COMMIT_MSG" | grep -Pq "$BREAKING_CHANGE_PATTERN"; then
   echo -e "${RED} ❌ Invalid commit message: '$COMMIT_MSG'${NC}"
   echo -e "${YELLOW}Commit message must be in the format: feat(scope): description or BREAKING CHANGE: description${NC}"
   echo -e "${YELLOW}Example: feat(core): add new chat component${NC}"
