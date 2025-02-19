@@ -1,21 +1,13 @@
 {
-  "name": "@mindfiredigital/pivothead-core",
+  "name": "@mindfiredigital/pivothead",
   "description": "PivotHead is a headless, powerful and flexible library for creating interactive pivot tables in JavaScript applications. It provides a core engine build using typescript for data manipulation.",
   "version": "1.0.0",
-  "private": false,
+  "private": true,
   "workspaces": [
     "packages/*",
     "!examples"
   ],
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/mindfiredigital/PivotHead/"
-  },
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/",
-    "access": "public"
-  },
   "keywords": [
     "pivothead-core",
     "pivot",
