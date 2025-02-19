@@ -10,7 +10,7 @@ NC='\033[0m' # No Color
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 # Validate branch name format
-BRANCH_PATTERN="^(main|development|feature|bug|fixes|hotFixes|docs|other|enhancement|patch)(/[0-9]+-[a-zA-Z0-9-]+)?$"
+BRANCH_PATTERN="^(main|dev|development|feature|bug|fixes|hotFixes|docs|other|enhancement|patch)(/[0-9]+-[a-zA-Z0-9-]+)?$"
 if ! echo "$CURRENT_BRANCH" | grep -Eq "$BRANCH_PATTERN"; then
   echo -e "${RED} ❌ Invalid branch name: '$CURRENT_BRANCH'${NC}"
   echo -e "${YELLOW}Branch name must be in the format: feature/bug/fixes/hotFixes/(issueNumber/ticketNumber)-(issue-description)${NC}"

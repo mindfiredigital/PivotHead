@@ -13,7 +13,7 @@ describe('ValidationError', () => {
     const error = new ValidationError(
       'Custom validation error',
       'CUSTOM_CODE',
-      { field: 'email' },
+      { field: 'email' }
     );
 
     expect(error.code).toBe('CUSTOM_CODE');

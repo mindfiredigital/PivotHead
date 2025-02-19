@@ -13,7 +13,7 @@ describe('InternalError', () => {
     const error = new InternalError(
       'Custom internal error',
       'CUSTOM_INTERNAL',
-      { service: 'auth' },
+      { service: 'auth' }
     );
 
     expect(error.code).toBe('CUSTOM_INTERNAL');

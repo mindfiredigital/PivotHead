@@ -84,7 +84,7 @@ describe('PivotEngine Grouping', () => {
     groupConfig: {
       rowFields: ['product'],
       columnFields: ['date'],
-      grouper: (item, fields) => fields.map((field) => item[field]).join(' - '),
+      grouper: (item, fields) => fields.map(field => item[field]).join(' - '),
     },
   };
 
@@ -93,7 +93,7 @@ describe('PivotEngine Grouping', () => {
     const groupConfig: GroupConfig = {
       rowFields: ['region'],
       columnFields: [],
-      grouper: (item, fields) => fields.map((field) => item[field]).join(' - '),
+      grouper: (item, fields) => fields.map(field => item[field]).join(' - '),
     };
     engine.setGroupConfig(groupConfig);
 
@@ -114,7 +114,7 @@ describe('PivotEngine Grouping', () => {
     const groupConfig: GroupConfig = {
       rowFields: ['date', 'region'],
       columnFields: [],
-      grouper: (item, fields) => fields.map((field) => item[field]).join(' - '),
+      grouper: (item, fields) => fields.map(field => item[field]).join(' - '),
     };
     engine.setGroupConfig(groupConfig);
 
@@ -211,7 +211,7 @@ describe('PivotEngine Grouping', () => {
       rowFields: ['nonExistentField'],
       columnFields: [],
       grouper: (item, fields) =>
-        fields.map((field) => item[field] || 'N/A').join(' - '),
+        fields.map(field => item[field] || 'N/A').join(' - '),
     };
     engine.setGroupConfig(groupConfig);
 
@@ -226,14 +226,14 @@ describe('PivotEngine Grouping', () => {
     const groupConfig: GroupConfig = {
       rowFields: ['region'],
       columnFields: [],
-      grouper: (item, fields) => fields.map((field) => item[field]).join(' - '),
+      grouper: (item, fields) => fields.map(field => item[field]).join(' - '),
     };
     engine.setGroupConfig(groupConfig);
 
     const groups = engine.getGroupedData();
     expect(groups).toHaveLength(4);
 
-    groups.forEach((group) => {
+    groups.forEach(group => {
       expect(group).toHaveProperty('aggregates');
       expect(group.aggregates).toHaveProperty('sum_sales');
       expect(group.aggregates).toHaveProperty('sum_quantity');

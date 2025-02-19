@@ -3,11 +3,11 @@ import type { AggregationType } from '../types/interfaces';
 export function calculateAggregates<T>(
   items: T[],
   field: keyof T,
-  type: AggregationType,
+  type: AggregationType
 ): number {
   if (!items || items.length === 0) return 0;
 
-  const values = items.map((item) => Number(item[field]) || 0);
+  const values = items.map(item => Number(item[field]) || 0);
 
   switch (type) {
     case 'sum':

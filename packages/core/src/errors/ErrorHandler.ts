@@ -7,7 +7,7 @@ export class BaseError extends Error {
     message: string,
     code: string,
     statusCode: number,
-    metadata: Record<string, unknown> = {},
+    metadata: Record<string, unknown> = {}
   ) {
     super(message);
     this.name = this.constructor.name;
@@ -22,7 +22,7 @@ export class ValidationError extends BaseError {
   constructor(
     message: string,
     code = 'VALIDATION_ERROR',
-    metadata: Record<string, unknown> = {},
+    metadata: Record<string, unknown> = {}
   ) {
     super(message, code, 400, metadata);
   }
@@ -32,7 +32,7 @@ export class InternalError extends BaseError {
   constructor(
     message: string,
     code = 'INTERNAL_ERROR',
-    metadata: Record<string, unknown> = {},
+    metadata: Record<string, unknown> = {}
   ) {
     super(message, code, 500, metadata);
   }

@@ -7,7 +7,7 @@ export declare class PivotEngine<T extends Record<string, any>> {
   reset(): void;
   resizeRow(index: number, height: number): void;
   setGroupConfig(
-    groupConfig: import('./types/interfaces').GroupConfig | null,
+    groupConfig: import('./types/interfaces').GroupConfig | null
   ): void;
   getGroupedData(): import('./types/interfaces').Group[];
   toggleRowExpansion(rowId: string): void;
@@ -17,5 +17,5 @@ export declare class PivotEngine<T extends Record<string, any>> {
 // Declare the applySort function
 export declare function applySort<T extends Record<string, any>>(
   data: T[],
-  sortConfig: import('./types/interfaces').SortConfig,
+  sortConfig: import('./types/interfaces').SortConfig
 ): T[];

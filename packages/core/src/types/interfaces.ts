@@ -114,7 +114,7 @@ export interface PivotTableConfig<T> {
   onColumnDragEnd?: (
     fromIndex: number,
     toIndex: number,
-    newColumns: { uniqueName: string; caption: string }[],
+    newColumns: { uniqueName: string; caption: string }[]
   ) => void;
 }
 

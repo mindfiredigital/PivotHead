@@ -89,7 +89,7 @@ const config = {
   groupConfig: {
     rowFields: ['product'],
     columnFields: ['region'],
-    grouper: (item, fields) => fields.map((field) => item[field]).join(' - '),
+    grouper: (item, fields) => fields.map(field => item[field]).join(' - '),
   },
   formatting: {
     sales: {
@@ -337,7 +337,7 @@ const config = {
         locale: 'en-US',
         decimals: 4,
       },
-      formula: (item) => item.sales / item.quantity,
+      formula: item => item.sales / item.quantity,
     },
   ],
   // ... other configuration options
@@ -410,7 +410,7 @@ const config = {
         locale: 'en-US',
         decimals: 2,
       },
-      formula: (item) => item.sales / item.quantity,
+      formula: item => item.sales / item.quantity,
     },
   ],
 };

@@ -116,7 +116,7 @@ export class PivotEngine<T extends Record<string, any>> {
   private async readFileData(file: File): Promise<T[]> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = (event) => {
+      reader.onload = event => {
         try {
           const data = JSON.parse(event.target?.result as string);
           resolve(data);
@@ -124,7 +124,7 @@ export class PivotEngine<T extends Record<string, any>> {
           reject(error);
         }
       };
-      reader.onerror = (error) => reject(error);
+      reader.onerror = error => reject(error);
       reader.readAsText(file);
     });
   }
@@ -160,10 +160,10 @@ export class PivotEngine<T extends Record<string, any>> {
    */
   private generateHeaders(): string[] {
     const rowHeaders = this.state.rows
-      ? this.state.rows.map((r) => r.caption || r.uniqueName)
+      ? this.state.rows.map(r => r.caption || r.uniqueName)
       : [];
     const columnHeaders = this.state.columns
-      ? this.state.columns.map((c) => c.caption || c.uniqueName)
+      ? this.state.columns.map(c => c.caption || c.uniqueName)
       : [];
     return [...rowHeaders, ...columnHeaders];
   }
@@ -178,10 +178,10 @@ export class PivotEngine<T extends Record<string, any>> {
     if (!data || !this.state.rows || !this.state.columns) {
       return [];
     }
-    return data.map((item) => [
-      ...this.state.rows.map((r) => item[r.uniqueName]),
-      ...this.state.columns.map((c) => item[c.uniqueName]),
-      ...this.state.measures.map((m) => this.calculateMeasureValue(item, m)),
+    return data.map(item => [
+      ...this.state.rows.map(r => item[r.uniqueName]),
+      ...this.state.columns.map(c => item[c.uniqueName]),
+      ...this.state.measures.map(m => this.calculateMeasureValue(item, m)),
     ]);
   }
 
@@ -208,7 +208,7 @@ export class PivotEngine<T extends Record<string, any>> {
   private calculateTotals(data: T[]): Record<string, number> {
     const totals: Record<string, number> = {};
 
-    this.state.measures.forEach((measure) => {
+    this.state.measures.forEach(measure => {
       const { uniqueName, aggregation } = measure;
       let total = 0;
 
@@ -219,9 +219,9 @@ export class PivotEngine<T extends Record<string, any>> {
           data.reduce((sum, item) => sum + (item[uniqueName] || 0), 0) /
           data.length;
       } else if (aggregation === 'max') {
-        total = Math.max(...data.map((item) => item[uniqueName] || 0));
+        total = Math.max(...data.map(item => item[uniqueName] || 0));
       } else if (aggregation === 'min') {
-        total = Math.min(...data.map((item) => item[uniqueName] || 0));
+        total = Math.min(...data.map(item => item[uniqueName] || 0));
       } else if (aggregation === 'count') {
         total = data.length;
       }
@@ -316,7 +316,7 @@ export class PivotEngine<T extends Record<string, any>> {
    * @public
    */
   public sort(field: string, direction: 'asc' | 'desc') {
-    const measure = this.state.measures.find((m) => m.uniqueName === field);
+    const measure = this.state.measures.find(m => m.uniqueName === field);
 
     const newSortConfig: SortConfig = {
       field,
@@ -336,7 +336,7 @@ export class PivotEngine<T extends Record<string, any>> {
     if (this.state.groups.length > 0) {
       this.state.groups = this.sortGroups(
         this.state.groups,
-        this.state.sortConfig[0],
+        this.state.sortConfig[0]
       );
     }
 
@@ -358,7 +358,7 @@ export class PivotEngine<T extends Record<string, any>> {
   private getFieldValue(item: T, sortConfig: SortConfig): number {
     if (sortConfig.type === 'measure') {
       const measure = this.state.measures.find(
-        (m) => m.uniqueName === sortConfig.field,
+        m => m.uniqueName === sortConfig.field
       );
       if (measure && measure.formula) {
         return measure.formula(item);
@@ -386,25 +386,25 @@ export class PivotEngine<T extends Record<string, any>> {
    */
   private updateAggregates() {
     const updateGroupAggregates = (group: Group) => {
-      this.state.measures.forEach((measure) => {
+      this.state.measures.forEach(measure => {
         const aggregateKey = `${this.state.selectedAggregation}_${measure.uniqueName}`;
         if (measure.formula && typeof measure.formula === 'function') {
           // Handle custom measures
-          const formulaResults = group.items.map((item) =>
-            measure.formula!(item),
+          const formulaResults = group.items.map(item =>
+            measure.formula!(item)
           );
           group.aggregates[aggregateKey] = calculateAggregates(
-            formulaResults.map((value) => ({ value })),
+            formulaResults.map(value => ({ value })),
             'value' as keyof { value: number },
             measure.aggregation ||
-              (this.state.selectedAggregation as AggregationType),
+              (this.state.selectedAggregation as AggregationType)
           );
         } else {
           group.aggregates[aggregateKey] = calculateAggregates(
             group.items,
             measure.uniqueName as keyof T,
             (measure.aggregation as AggregationType) ||
-              (this.state.selectedAggregation as AggregationType),
+              (this.state.selectedAggregation as AggregationType)
           );
         }
       });
@@ -434,7 +434,7 @@ export class PivotEngine<T extends Record<string, any>> {
     const { data, groups } = processData(
       this.config,
       this.state.sortConfig[0] || null,
-      this.state.groupConfig,
+      this.state.groupConfig
     );
 
     this.state.data = data;
@@ -454,7 +454,7 @@ export class PivotEngine<T extends Record<string, any>> {
   private createGroups(
     data: T[],
     fields: string[],
-    grouper: (item: T, fields: string[]) => string,
+    grouper: (item: T, fields: string[]) => string
   ): Group[] {
     if (!fields || fields.length === 0 || !data) {
       return [
@@ -468,7 +468,7 @@ export class PivotEngine<T extends Record<string, any>> {
 
     const groups: { [key: string]: Group } = {};
 
-    data.forEach((item) => {
+    data.forEach(item => {
       if (item && grouper) {
         const key = grouper(item, fields);
         if (!groups[key]) {
@@ -479,27 +479,27 @@ export class PivotEngine<T extends Record<string, any>> {
     });
 
     if (fields.length > 1) {
-      Object.values(groups).forEach((group) => {
+      Object.values(groups).forEach(group => {
         if (group && group.items) {
           group.subgroups = this.createGroups(
             group.items,
             fields.slice(1),
-            grouper,
+            grouper
           );
         }
       });
     }
 
     // Calculate aggregates for each group
-    Object.values(groups).forEach((group) => {
+    Object.values(groups).forEach(group => {
       if (group && group.items && this.state.measures) {
-        this.state.measures.forEach((measure) => {
+        this.state.measures.forEach(measure => {
           if (measure && measure.uniqueName) {
             const aggregateKey = `${this.state.selectedAggregation}_${measure.uniqueName}`;
             group.aggregates[aggregateKey] = calculateAggregates(
               group.items,
               measure.uniqueName as keyof T,
-              this.state.selectedAggregation as AggregationType,
+              this.state.selectedAggregation as AggregationType
             );
           }
         });
@@ -570,9 +570,7 @@ export class PivotEngine<T extends Record<string, any>> {
    * @public
    */
   public resizeRow(index: number, height: number) {
-    const rowIndex = this.state.rowSizes.findIndex(
-      (row) => row.index === index,
-    );
+    const rowIndex = this.state.rowSizes.findIndex(row => row.index === index);
     if (rowIndex !== -1) {
       this.state.rowSizes[rowIndex].height = Math.max(20, height);
     }
@@ -663,7 +661,7 @@ export class PivotEngine<T extends Record<string, any>> {
       !this.validateDragOperation(fromIndex, toIndex, this.state.columns.length)
     ) {
       console.error(
-        `Invalid column drag operation: from ${fromIndex} to ${toIndex}`,
+        `Invalid column drag operation: from ${fromIndex} to ${toIndex}`
       );
       return;
     }
@@ -708,7 +706,7 @@ export class PivotEngine<T extends Record<string, any>> {
 
       // Emit change event if needed
       if (typeof this.config.onColumnDragEnd === 'function') {
-        const columnsWithCaptions = this.state.columns.map((column) => ({
+        const columnsWithCaptions = this.state.columns.map(column => ({
           ...column,
           caption: column.caption || column.uniqueName,
         }));
@@ -722,7 +720,7 @@ export class PivotEngine<T extends Record<string, any>> {
   private validateDragOperation(
     fromIndex: number,
     toIndex: number,
-    length: number,
+    length: number
   ): boolean {
     return (
       fromIndex >= 0 &&

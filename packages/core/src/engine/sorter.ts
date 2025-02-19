@@ -3,7 +3,7 @@ import type { SortConfig, GroupConfig, Group } from '../types/interfaces';
 export function applySort<T extends Record<string, any>>(
   data: T[],
   sortConfig: SortConfig[],
-  groupConfig?: GroupConfig | null,
+  groupConfig?: GroupConfig | null
 ): T[] {
   if (!sortConfig || sortConfig.length === 0) return data;
 
@@ -40,7 +40,7 @@ export function applySort<T extends Record<string, any>>(
 function calculateMeasureValue(
   item: Record<string, any>,
   field: string,
-  aggregation?: string,
+  aggregation?: string
 ): number {
   const value = Number(item[field]) || 0;
   return value;

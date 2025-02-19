@@ -22,21 +22,21 @@ describe('processData', () => {
     const result = calculateAggregates(
       data,
       'col1' as keyof Row,
-      'sum' as AggregationType,
+      'sum' as AggregationType
     );
     expect(result).toBe(45); // 10 + 15 + 20 = 45
 
     const result2 = calculateAggregates(
       data,
       'col2' as keyof Row,
-      'sum' as AggregationType,
+      'sum' as AggregationType
     );
     expect(result2).toBe(75); // 20 + 25 + 30 = 75
 
     const result3 = calculateAggregates(
       data,
       'col3' as keyof Row,
-      'sum' as AggregationType,
+      'sum' as AggregationType
     );
     expect(result3).toBe(105); // 30 + 35 + 40 = 105
   });
@@ -45,21 +45,21 @@ describe('processData', () => {
     const result = calculateAggregates(
       data,
       'col1' as keyof Row,
-      'avg' as AggregationType,
+      'avg' as AggregationType
     );
     expect(result).toBe(15); // (10 + 15 + 20) / 3 = 15
 
     const result2 = calculateAggregates(
       data,
       'col2' as keyof Row,
-      'avg' as AggregationType,
+      'avg' as AggregationType
     );
     expect(result2).toBe(25); // (20 + 25 + 30) / 3 = 25
 
     const result3 = calculateAggregates(
       data,
       'col3' as keyof Row,
-      'avg' as AggregationType,
+      'avg' as AggregationType
     );
     expect(result3).toBe(35); // (30 + 35 + 40) / 3 = 35
   });
@@ -68,21 +68,21 @@ describe('processData', () => {
     const result = calculateAggregates(
       data,
       'col1' as keyof Row,
-      'count' as AggregationType,
+      'count' as AggregationType
     );
     expect(result).toBe(3); // Three values in col1
 
     const result2 = calculateAggregates(
       data,
       'col2' as keyof Row,
-      'count' as AggregationType,
+      'count' as AggregationType
     );
     expect(result2).toBe(3); // Three values in col2
 
     const result3 = calculateAggregates(
       data,
       'col3' as keyof Row,
-      'count' as AggregationType,
+      'count' as AggregationType
     );
     expect(result3).toBe(3); // Three values in col3
   });
@@ -91,21 +91,21 @@ describe('processData', () => {
     const result = calculateAggregates(
       data,
       'col1' as keyof Row,
-      'min' as AggregationType,
+      'min' as AggregationType
     );
     expect(result).toBe(10); // min of col1 values = 10
 
     const result2 = calculateAggregates(
       data,
       'col2' as keyof Row,
-      'min' as AggregationType,
+      'min' as AggregationType
     );
     expect(result2).toBe(20); // min of col2 values = 20
 
     const result3 = calculateAggregates(
       data,
       'col3' as keyof Row,
-      'min' as AggregationType,
+      'min' as AggregationType
     );
     expect(result3).toBe(30); // min of col3 values = 30
   });
@@ -114,21 +114,21 @@ describe('processData', () => {
     const result = calculateAggregates(
       data,
       'col1' as keyof Row,
-      'max' as AggregationType,
+      'max' as AggregationType
     );
     expect(result).toBe(20); // max of col1 values = 20
 
     const result2 = calculateAggregates(
       data,
       'col2' as keyof Row,
-      'max' as AggregationType,
+      'max' as AggregationType
     );
     expect(result2).toBe(30); // max of col2 values = 30
 
     const result3 = calculateAggregates(
       data,
       'col3' as keyof Row,
-      'max' as AggregationType,
+      'max' as AggregationType
     );
     expect(result3).toBe(40); // max of col3 values = 40
   });
@@ -143,14 +143,14 @@ describe('processData', () => {
     const result = calculateAggregates(
       dataWithNulls,
       'col1' as keyof Row,
-      'sum' as AggregationType,
+      'sum' as AggregationType
     );
     expect(result).toBe(30); // 10 + 20 = 30 (null ignored)
 
     const result2 = calculateAggregates(
       dataWithNulls,
       'col2' as keyof Row,
-      'sum' as AggregationType,
+      'sum' as AggregationType
     );
     expect(result2).toBe(25); // 25 (null and undefined ignored)
   });
@@ -160,7 +160,7 @@ describe('processData', () => {
     const result = calculateAggregates(
       emptyData,
       'col1' as keyof Row,
-      'sum' as AggregationType,
+      'sum' as AggregationType
     );
     expect(result).toBe(0);
   });
@@ -169,7 +169,7 @@ describe('processData', () => {
     const result = calculateAggregates(
       data,
       'col1' as keyof Row,
-      'unsupported' as AggregationType,
+      'unsupported' as AggregationType
     );
     expect(result).toBe(0);
   });

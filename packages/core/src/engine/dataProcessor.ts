@@ -10,7 +10,7 @@ import { applySort } from './sorter';
 export function processData<T extends Record<string, any>>(
   config: PivotTableConfig<T>,
   sortConfig: SortConfig | null = null,
-  groupConfig: GroupConfig | null = null,
+  groupConfig: GroupConfig | null = null
 ): ProcessedDataResult<T> {
   let processedData = [...config.data];
 
@@ -32,7 +32,7 @@ export function processData<T extends Record<string, any>>(
 function createGroups<T extends Record<string, any>>(
   data: T[],
   fields: string[],
-  grouper: (item: T, fields: string[]) => string,
+  grouper: (item: T, fields: string[]) => string
 ): Group[] {
   if (!fields || fields.length === 0) {
     return [{ key: 'All', items: data, subgroups: [], aggregates: {} }];
@@ -40,7 +40,7 @@ function createGroups<T extends Record<string, any>>(
 
   const groups: { [key: string]: Group } = {};
 
-  data.forEach((item) => {
+  data.forEach(item => {
     const key = grouper(item, fields);
     if (!groups[key]) {
       groups[key] = { key, items: [], subgroups: [], aggregates: {} };
@@ -49,7 +49,7 @@ function createGroups<T extends Record<string, any>>(
   });
 
   if (fields.length > 1) {
-    Object.values(groups).forEach((group) => {
+    Object.values(groups).forEach(group => {
       group.subgroups = createGroups(group.items, fields.slice(1), grouper);
     });
   }
