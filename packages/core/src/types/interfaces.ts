@@ -77,6 +77,18 @@ export interface Dimension {
   format?: FormatOptions;
 }
 
+export interface FilterConfig {
+  field: string;
+  operator: 'equals' | 'contains' | 'greaterThan' | 'lessThan' | 'between';
+  value: any;
+}
+
+export interface PaginationConfig {
+  currentPage: number;
+  pageSize: number;
+  totalPages: number;
+}
+
 export interface PivotTableState<T> {
   data: T[];
   processedData: ProcessedData;
@@ -96,6 +108,8 @@ export interface PivotTableState<T> {
   isResponsive: boolean;
   rowGroups: Group[];
   columnGroups: Group[];
+  filterConfig: FilterConfig[];
+  paginationConfig: PaginationConfig;
 }
 
 export interface PivotTableConfig<T> {
@@ -110,6 +124,7 @@ export interface PivotTableConfig<T> {
   defaultAggregation: AggregationType;
   isResponsive?: boolean;
   initialSort?: SortConfig[];
+  pageSize?: number;
   onRowDragEnd?: (fromIndex: number, toIndex: number, newData: T[]) => void;
   onColumnDragEnd?: (
     fromIndex: number,

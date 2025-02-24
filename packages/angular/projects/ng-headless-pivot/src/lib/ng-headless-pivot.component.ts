@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { GroupConfig, PivotTableState } from '@mindfiredigital/pivot-head-core';
 import { PivotEngineService } from './pivot-engine.service';

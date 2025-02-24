@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgHeadlessPivotComponent } from './ng-headless-pivot.component';

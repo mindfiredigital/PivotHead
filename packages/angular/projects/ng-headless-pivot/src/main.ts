@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { bootstrapApplication } from '@angular/platform-browser';
 import { NgHeadlessPivotComponent } from './public-api';
 
