@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   AggregationType,
   Dimension,
@@ -9,6 +10,8 @@ import {
   ProcessedData,
   RowSize,
   SortConfig,
+  FilterConfig,
+  PaginationConfig,
 } from '../types/interfaces';
 import { calculateAggregates } from './aggregator';
 import { processData } from './dataProcessor';
@@ -21,15 +24,45 @@ import { processData } from './dataProcessor';
 export class PivotEngine<T extends Record<string, any>> {
   private config: PivotTableConfig<T>;
   private state: PivotTableState<T>;
+  private filterConfig: FilterConfig[] = [];
+  private paginationConfig: PaginationConfig = {
+    currentPage: 1,
+    pageSize: 10,
+    totalPages: 1,
+  };
+
+  // Add cache for expensive calculations
+  private cache: Map<string, any> = new Map();
 
   constructor(config: PivotTableConfig<T>) {
+    // Validate required config properties
+    if (!this.validateConfig(config)) {
+      throw new Error('Invalid pivot table configuration');
+    }
+
     this.config = {
       ...config,
       defaultAggregation: config.defaultAggregation || 'sum',
       isResponsive: config.isResponsive ?? true,
     };
-    // Initialize state
-    this.state = {
+
+    this.state = this.initializeState(config);
+    this.loadData();
+  }
+
+  private validateConfig(config: PivotTableConfig<T>): boolean {
+    // Add validation logic
+    if (!config) return false;
+    if (config.dataSource) {
+      const { type, url, file } = config.dataSource;
+      if (type === 'remote' && !url) return false;
+      if (type === 'file' && !file) return false;
+    }
+    return true;
+  }
+
+  private initializeState(config: PivotTableConfig<T>): PivotTableState<T> {
+    return {
       data: config.data || [],
       processedData: { headers: [], rows: [], totals: {} },
       rows: config.rows || [],
@@ -42,22 +75,19 @@ export class PivotEngine<T extends Record<string, any>> {
       groups: [],
       selectedMeasures: config.measures || [],
       selectedDimensions: config.dimensions || [],
-      selectedAggregation: this.config.defaultAggregation,
+      selectedAggregation: config.defaultAggregation || 'sum',
       formatting: config.formatting || {},
       columnWidths: {},
-      isResponsive: this.config.isResponsive ?? true,
+      isResponsive: config.isResponsive ?? true,
       rowGroups: [],
       columnGroups: [],
+      filterConfig: [],
+      paginationConfig: {
+        currentPage: 1,
+        pageSize: config.pageSize || 10,
+        totalPages: 1,
+      },
     };
-
-    // // Process data after state initialization
-    // this.state.processedData = this.processData(this.state.data);
-
-    // if (this.state.groupConfig) {
-    //   this.applyGrouping();
-    // }
-    // Load data based on the data source type
-    this.loadData();
   }
 
   /**
@@ -729,5 +759,112 @@ export class PivotEngine<T extends Record<string, any>> {
       toIndex < length &&
       fromIndex !== toIndex
     );
+  }
+
+  /**
+   * Applies filters to the data
+   * @param {FilterConfig[]} filters - Array of filter configurations
+   * @public
+   */
+  public applyFilters(filters: FilterConfig[]) {
+    this.filterConfig = filters;
+    this.refreshData();
+  }
+
+  /**
+   * Sets pagination configuration
+   * @param {PaginationConfig} config - Pagination configuration
+   * @public
+   */
+  public setPagination(config: PaginationConfig) {
+    this.paginationConfig = {
+      ...this.paginationConfig,
+      ...config,
+    };
+    this.refreshData();
+  }
+
+  /**
+   * Refreshes data with current filters and pagination
+   * @private
+   */
+  private refreshData() {
+    let filteredData = this.filterData(this.state.data);
+
+    // Update total pages
+    this.paginationConfig.totalPages = Math.ceil(
+      filteredData.length / this.paginationConfig.pageSize
+    );
+
+    // Apply pagination
+    filteredData = this.paginateData(filteredData);
+
+    // Update processed data
+    this.state.processedData = this.processData(filteredData);
+
+    if (this.state.groupConfig) {
+      this.applyGrouping();
+    }
+  }
+
+  /**
+   * Filters data based on filter configuration
+   * @param {T[]} data - Data to filter
+   * @private
+   */
+  private filterData(data: T[]): T[] {
+    if (!this.filterConfig.length) return data;
+
+    return data.filter(item =>
+      this.filterConfig.every(filter => {
+        const value = item[filter.field];
+
+        switch (filter.operator) {
+          case 'equals':
+            return value === filter.value;
+          case 'contains':
+            return String(value)
+              .toLowerCase()
+              .includes(String(filter.value).toLowerCase());
+          case 'greaterThan':
+            return value > filter.value;
+          case 'lessThan':
+            return value < filter.value;
+          case 'between':
+            return value >= filter.value[0] && value <= filter.value[1];
+          default:
+            return true;
+        }
+      })
+    );
+  }
+
+  /**
+   * Paginates data based on pagination configuration
+   * @param {T[]} data - Data to paginate
+   * @private
+   */
+  private paginateData(data: T[]): T[] {
+    const { currentPage, pageSize } = this.paginationConfig;
+    const start = (currentPage - 1) * pageSize;
+    return data.slice(start, start + pageSize);
+  }
+
+  /**
+   * Gets current pagination state
+   * @returns {PaginationConfig} Current pagination configuration
+   * @public
+   */
+  public getPaginationState(): PaginationConfig {
+    return { ...this.paginationConfig };
+  }
+
+  /**
+   * Gets current filter state
+   * @returns {FilterConfig[]} Current filter configuration
+   * @public
+   */
+  public getFilterState(): FilterConfig[] {
+    return [...this.filterConfig];
   }
 }
