@@ -32,7 +32,7 @@ export class PivotEngine<T extends Record<string, any>> {
   };
 
   // Add cache for expensive calculations
-  private cache: Map<string, any> = new Map();
+  // private cache: Map<string, any> = new Map();
 
   constructor(config: PivotTableConfig<T>) {
     // Validate required config properties

@@ -6,15 +6,14 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      name: 'PivotheadCore',
+      name: 'PivotHeadCore',
       fileName: 'pivothead-core',
-      formats: ['umd'],
+      formats: ['es', 'umd'],
     },
     rollupOptions: {
+      external: [],
       output: {
-        globals: {
-          PivotheadCore: 'PivotheadCore',
-        },
+        globals: {},
       },
     },
   },
