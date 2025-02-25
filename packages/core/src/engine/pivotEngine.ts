@@ -789,9 +789,13 @@ export class PivotEngine<T extends Record<string, any>> {
    * @private
    */
   private refreshData() {
-    let filteredData = this.filterData(this.state.data);
+    // Store original data
+    const originalData = [...this.state.data];
 
-    // Update total pages
+    // Apply filters first
+    let filteredData = this.filterData(originalData);
+
+    // Update total pages based on filtered data
     this.paginationConfig.totalPages = Math.ceil(
       filteredData.length / this.paginationConfig.pageSize
     );
@@ -799,7 +803,7 @@ export class PivotEngine<T extends Record<string, any>> {
     // Apply pagination
     filteredData = this.paginateData(filteredData);
 
-    // Update processed data
+    // Update state with filtered and paginated data
     this.state.processedData = this.processData(filteredData);
 
     if (this.state.groupConfig) {
@@ -818,20 +822,22 @@ export class PivotEngine<T extends Record<string, any>> {
     return data.filter(item =>
       this.filterConfig.every(filter => {
         const value = item[filter.field];
+        const filterValue =
+          typeof value === 'number' ? Number(filter.value) : filter.value;
 
         switch (filter.operator) {
           case 'equals':
-            return value === filter.value;
+            return value === filterValue;
           case 'contains':
             return String(value)
               .toLowerCase()
-              .includes(String(filter.value).toLowerCase());
+              .includes(String(filterValue).toLowerCase());
           case 'greaterThan':
-            return value > filter.value;
+            return Number(value) > Number(filterValue);
           case 'lessThan':
-            return value < filter.value;
+            return Number(value) < Number(filterValue);
           case 'between':
-            return value >= filter.value[0] && value <= filter.value[1];
+            return value >= filterValue[0] && value <= filterValue[1];
           default:
             return true;
         }
