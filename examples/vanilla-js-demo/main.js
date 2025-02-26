@@ -10,14 +10,9 @@
  * - Row reordering (drag and drop)
  */
 import { createHeader } from './header.js';
-if (typeof PivotheadCore === 'undefined') {
-  console.error(
-    'PivotheadCore is not defined. Make sure the library is loaded correctly.',
-  );
-}
 
 // Importing the Package
-const { PivotEngine } = PivotheadCore;
+import { PivotEngine } from './node_modules/@mindfiredigital/pivot-head-core/dist/pivothead-core.mjs';
 
 // Dummy data.
 // import { data2 as data } from './utils/testData.js';
@@ -131,7 +126,7 @@ const config = {
       format: {
         type: 'number',
       },
-      formula: (item) => item.sales / item.quantity,
+      formula: item => item.sales / item.quantity,
       sortable: true,
     },
     {
@@ -181,7 +176,7 @@ const config = {
   groupConfig: {
     rowFields: ['product'],
     columnFields: ['region'],
-    grouper: (item, fields) => fields.map((field) => item[field]).join(' - '),
+    grouper: (item, fields) => fields.map(field => item[field]).join(' - '),
   },
   formatting: {
     sales: {
@@ -278,6 +273,15 @@ const config = {
   onColumnDragEnd: (fromIndex, toIndex, newColumns) => {
     //console.log('Column dragged:', {fromIndex, toIndex, newColumns});
   },
+  pagination: {
+    enabled: true,
+    pageSize: 5,
+    currentPage: 1,
+  },
+  dataProcessing: {
+    maintainFilteredData: true,
+    applyPaginationAfterFiltering: true,
+  },
 };
 // Initialize PivotEngine
 export let engine = new PivotEngine(config);
@@ -285,7 +289,142 @@ export let engine = new PivotEngine(config);
 async function initializePivotEngine(config) {
   engine = new PivotEngine(config);
   await engine.loadData();
+
+  // Initialize pagination state
+  const totalItems = engine.getState().data.length;
+  engine.setPagination({
+    pageSize: config.pagination.pageSize,
+    currentPage: 1,
+    totalPages: Math.ceil(totalItems / config.pagination.pageSize),
+  });
+
+  // Add filter and pagination controls
+  const controls = document.createElement('div');
+  controls.style.margin = '20px 0';
+  controls.style.padding = '15px';
+  controls.style.backgroundColor = '#f8f9fa';
+  controls.style.borderRadius = '4px';
+  controls.innerHTML = `
+    <div style="margin-bottom: 15px">
+      <select id="filterField" style="margin-right: 10px; padding: 5px">
+        ${config.dimensions
+          .map(dim => `<option value="${dim.field}">${dim.label}</option>`)
+          .join('')}
+      </select>
+      <select id="filterOperator" style="margin-right: 10px; padding: 5px">
+        <option value="equals">Equals</option>
+        <option value="contains">Contains</option>
+        <option value="greaterThan">Greater Than</option>
+        <option value="lessThan">Less Than</option>
+      </select>
+      <input type="text" id="filterValue" style="margin-right: 10px; padding: 5px">
+      <button id="applyFilter" style="padding: 5px 15px">Apply Filter</button>
+    </div>
+    <div>
+      <select id="pageSize" style="margin-right: 10px; padding: 5px">
+        <option value="5">5 per page</option>
+        <option value="10">10 per page</option>
+        <option value="20">20 per page</option>
+      </select>
+      <button id="prevPage" style="margin-right: 10px; padding: 5px 15px">Previous</button>
+      <span id="pageInfo" style="margin-right: 10px"></span>
+      <button id="nextPage" style="padding: 5px 15px">Next</button>
+    </div>
+  `;
+  document.getElementById('dropdownContainer').appendChild(controls);
+
+  // Add event listeners for filter and pagination
+  setupEventListeners();
+
+  // Initial render
   renderTable();
+}
+
+function setupEventListeners() {
+  document.getElementById('applyFilter').addEventListener('click', () => {
+    const field = document.getElementById('filterField').value;
+    const operator = document.getElementById('filterOperator').value;
+    const value = document.getElementById('filterValue').value;
+
+    console.log('Applying Filter:', { field, operator, value });
+
+    const numericValue = ['sales', 'quantity'].includes(field)
+      ? Number(value)
+      : value;
+
+    // Apply filters
+    engine.applyFilters([
+      {
+        field,
+        operator,
+        value: numericValue,
+      },
+    ]);
+
+    console.log('After Filter Applied - Engine State:', engine.getState());
+
+    // Reset pagination to first page
+    const pageSize = Number(document.getElementById('pageSize').value);
+    const filteredLength = getFilteredDataLength();
+    console.log('Filtered Data Length:', filteredLength);
+
+    engine.setPagination({
+      pageSize,
+      currentPage: 1,
+      totalPages: Math.ceil(filteredLength / pageSize),
+    });
+
+    console.log('After Pagination Set - Engine State:', engine.getState());
+    renderTable();
+  });
+
+  document.getElementById('pageSize').addEventListener('change', e => {
+    const pageSize = Number(e.target.value);
+    const filteredLength = getFilteredDataLength();
+
+    console.log('Changing Page Size:', {
+      pageSize,
+      filteredLength,
+      totalPages: Math.ceil(filteredLength / pageSize),
+    });
+
+    engine.setPagination({
+      pageSize,
+      currentPage: 1,
+      totalPages: Math.ceil(filteredLength / pageSize),
+    });
+
+    console.log('After Page Size Change - Engine State:', engine.getState());
+    renderTable();
+  });
+
+  document.getElementById('prevPage').addEventListener('click', () => {
+    const current = engine.getPaginationState();
+    console.log('Current Pagination State:', current);
+
+    if (current.currentPage > 1) {
+      engine.setPagination({
+        ...current,
+        currentPage: current.currentPage - 1,
+      });
+      console.log('After Previous Page - Engine State:', engine.getState());
+      renderTable();
+    }
+  });
+
+  document.getElementById('nextPage').addEventListener('click', () => {
+    const current = engine.getPaginationState();
+    console.log('Current Pagination State:', current);
+
+    if (current.currentPage < current.totalPages) {
+      engine.setPagination({
+        ...current,
+        currentPage: current.currentPage + 1,
+      });
+      console.log('After Next Page - Engine State:', engine.getState());
+      renderTable();
+    }
+  });
 }
 
 function implementDragAndDrop() {
@@ -305,7 +444,7 @@ function implementColumnDragging(thead) {
   headerRow.querySelectorAll('th').forEach((header, index) => {
     header.setAttribute('draggable', true);
 
-    header.addEventListener('dragstart', (e) => {
+    header.addEventListener('dragstart', e => {
       e.dataTransfer.setData('text/plain', index);
       header.classList.add('dragging');
     });
@@ -314,7 +453,7 @@ function implementColumnDragging(thead) {
       header.classList.remove('dragging');
     });
 
-    header.addEventListener('dragover', (e) => {
+    header.addEventListener('dragover', e => {
       e.preventDefault();
       const draggingHeader = headerRow.querySelector('.dragging');
       if (draggingHeader) {
@@ -358,11 +497,11 @@ document.head.appendChild(style);
 
 function implementRowDragging(tbody) {
   // Add draggable attribute to rows
-  tbody.querySelectorAll('tr').forEach((row) => {
+  tbody.querySelectorAll('tr').forEach(row => {
     row.setAttribute('draggable', true);
 
     // Store original index
-    row.addEventListener('dragstart', (e) => {
+    row.addEventListener('dragstart', e => {
       e.dataTransfer.setData('text/plain', row.rowIndex);
       row.classList.add('dragging');
     });
@@ -371,7 +510,7 @@ function implementRowDragging(tbody) {
       row.classList.remove('dragging');
     });
 
-    row.addEventListener('dragover', (e) => {
+    row.addEventListener('dragover', e => {
       e.preventDefault();
       const draggingRow = tbody.querySelector('.dragging');
       if (draggingRow) {
@@ -399,13 +538,13 @@ export function onSectionItemDrop(droppedFields) {
   });
   const parsedDroppedFieldsInSections = JSON.parse(droppedFieldsInSections);
 
-  const transformedRows = parsedDroppedFieldsInSections.rows.map((rowField) => {
+  const transformedRows = parsedDroppedFieldsInSections.rows.map(rowField => {
     return { uniqueName: rowField.toLowerCase(), caption: rowField };
   });
   const transformedColumns = parsedDroppedFieldsInSections.columns.map(
-    (columnField) => {
+    columnField => {
       return { uniqueName: columnField.toLowerCase(), caption: columnField };
-    },
+    }
   );
   // const transformedValues=parsedDroppedFieldsInSections.values.map((valueField)=>{ return { uniqueName:valueField.toLowerCase(), caption:valueField}})
   // const transformedFilters=parsedDroppedFieldsInSections.filters.map((filterField)=>{ return { uniqueName:filterField.toLowerCase(), caption:filterField}})
@@ -419,19 +558,17 @@ export function onSectionItemDrop(droppedFields) {
 
 function renderTable() {
   const state = engine.getState();
-  const container = document.getElementById('pivotTable');
-  if (!container) {
-    console.error('Container element with id "pivotTable" not found');
-    return;
-  }
+  console.log('Current Engine State:', state);
 
-  container.innerHTML = '';
+  const pivotTableContainer = document.getElementById('pivotTable');
 
-  // Control toolbar visibility
-  const toolbar = document.getElementById('toolbar');
-  if (toolbar) {
-    toolbar.style.display = config.toolbar ? 'block' : 'none';
-  }
+  // Get the processed data
+  const processedData = state.processedData;
+  console.log('Processed Data:', processedData);
+
+  // Get the data to render - use the correct data structure
+  const dataToRender = processedData.data || state.data;
+  console.log('Data being rendered:', dataToRender);
 
   const table = document.createElement('table');
   table.style.width = '100%';
@@ -440,32 +577,132 @@ function renderTable() {
   table.style.border = '1px solid #dee2e6';
 
   const thead = document.createElement('thead');
-  renderTableHeader(thead, state);
-  table.appendChild(thead);
-
   const tbody = document.createElement('tbody');
-  const rowFields = state.rows.map((r) => r.uniqueName);
-  const groupedData = groupData(state.data, rowFields);
 
-  renderGroupedRows(tbody, groupedData, state, 0);
+  // Create headers
+  renderTableHeader(thead, state);
 
+  // Create table body
+  if (state.groupConfig) {
+    const rowFields = state.rows.map(r => r.uniqueName);
+    const groupedData = groupData(dataToRender, rowFields);
+    renderGroupedRows(tbody, groupedData, state, 0);
+  } else {
+    // Get unique values for rows and columns
+    const rowField = state.rows[0]?.uniqueName;
+    const columnField = state.columns[0]?.uniqueName;
+
+    // Get unique values from the actual data
+    const uniqueRowValues = [
+      ...new Set(dataToRender.map(item => item[rowField])),
+    ];
+    const uniqueColumnValues = columnField
+      ? [...new Set(dataToRender.map(item => item[columnField]))]
+      : [];
+
+    // Create rows
+    uniqueRowValues.forEach(rowValue => {
+      const tr = document.createElement('tr');
+      tr.setAttribute('draggable', true);
+
+      // Add row header
+      const rowHeader = document.createElement('td');
+      rowHeader.textContent = rowValue;
+      rowHeader.style.fontWeight = 'bold';
+      rowHeader.style.padding = '8px';
+      rowHeader.style.borderBottom = '1px solid #dee2e6';
+      tr.appendChild(rowHeader);
+
+      // Add data cells
+      uniqueColumnValues.forEach(columnValue => {
+        // Find matching rows from the data
+        const matchingRows = dataToRender.filter(
+          item =>
+            item[rowField] === rowValue && item[columnField] === columnValue
+        );
+
+        state.measures.forEach(measure => {
+          const td = document.createElement('td');
+          td.style.padding = '8px';
+          td.style.borderBottom = '1px solid #dee2e6';
+          td.style.borderRight = '1px solid #dee2e6';
+          td.style.textAlign = 'right';
+
+          if (matchingRows.length > 0) {
+            // Calculate the aggregated value
+            let value;
+            switch (measure.aggregation) {
+              case 'sum':
+                value = matchingRows.reduce(
+                  (sum, item) => sum + item[measure.uniqueName],
+                  0
+                );
+                break;
+              case 'avg':
+                value =
+                  matchingRows.reduce(
+                    (sum, item) => sum + item[measure.uniqueName],
+                    0
+                  ) / matchingRows.length;
+                break;
+              case 'max':
+                value = Math.max(
+                  ...matchingRows.map(item => item[measure.uniqueName])
+                );
+                break;
+              case 'min':
+                value = Math.min(
+                  ...matchingRows.map(item => item[measure.uniqueName])
+                );
+                break;
+              default:
+                value = matchingRows[0][measure.uniqueName];
+            }
+
+            td.textContent = engine.formatValue(value, measure.uniqueName);
+            applyConditionalFormatting(td, value, measure.uniqueName);
+          } else {
+            td.textContent = engine.formatValue(0, measure.uniqueName);
+          }
+
+          tr.appendChild(td);
+        });
+      });
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  table.appendChild(thead);
   table.appendChild(tbody);
 
-  const tableWrapper = document.createElement('div');
-  tableWrapper.style.overflowX = 'auto';
-  tableWrapper.style.maxWidth = '100%';
+  // Clear and append the new table
+  pivotTableContainer.innerHTML = '';
+  pivotTableContainer.appendChild(table);
 
-  tableWrapper.appendChild(table);
+  // Update pagination info
+  const paginationState = engine.getPaginationState();
+  const pageInfo = document.getElementById('pageInfo');
+  if (pageInfo) {
+    pageInfo.textContent = `Page ${paginationState.currentPage} of ${paginationState.totalPages}`;
 
-  container.appendChild(tableWrapper);
+    // Update button states
+    document.getElementById('prevPage').disabled =
+      paginationState.currentPage <= 1;
+    document.getElementById('nextPage').disabled =
+      paginationState.currentPage >= paginationState.totalPages;
+  }
 
-  implementDragAndDrop();
+  // Implement drag and drop after rendering
+  if (config.isResponsive) {
+    implementDragAndDrop();
+  }
 }
 
 function renderGroupedRows(tbody, groups, state, level) {
   const columnField = state.columns[0]?.uniqueName;
   const uniqueColumnValues = columnField
-    ? [...new Set(data.map((item) => item[columnField]))]
+    ? [...new Set(data.map(item => item[columnField]))]
     : [];
 
   Object.entries(groups).forEach(([key, value]) => {
@@ -487,12 +724,12 @@ function renderGroupedRows(tbody, groups, state, level) {
 
     // Add data cells for leaf nodes
     if (Array.isArray(value)) {
-      uniqueColumnValues.forEach((columnValue) => {
+      uniqueColumnValues.forEach(columnValue => {
         const columnItems = value.filter(
-          (item) => item[columnField] === columnValue,
+          item => item[columnField] === columnValue
         );
 
-        state.measures.forEach((measure) => {
+        state.measures.forEach(measure => {
           const td = document.createElement('td');
           td.style.padding = '12px';
           td.style.borderBottom = '1px solid #dee2e6';
@@ -504,15 +741,15 @@ function renderGroupedRows(tbody, groups, state, level) {
             let aggregateValue;
             if (measure.aggregation === 'max') {
               aggregateValue = Math.max(
-                ...columnItems.map((item) =>
-                  engine.calculateMeasureValue(item, measure),
-                ),
+                ...columnItems.map(item =>
+                  engine.calculateMeasureValue(item, measure)
+                )
               );
             } else if (measure.aggregation === 'min') {
               aggregateValue = Math.min(
-                ...columnItems.map((item) =>
-                  engine.calculateMeasureValue(item, measure),
-                ),
+                ...columnItems.map(item =>
+                  engine.calculateMeasureValue(item, measure)
+                )
               );
             } else if (measure.aggregation === 'count') {
               aggregateValue = columnItems.length;
@@ -520,7 +757,7 @@ function renderGroupedRows(tbody, groups, state, level) {
               aggregateValue = columnItems.reduce(
                 (sum, item) =>
                   sum + engine.calculateMeasureValue(item, measure),
-                0,
+                0
               );
               if (measure.aggregation === 'avg') {
                 aggregateValue /= columnItems.length;
@@ -529,7 +766,7 @@ function renderGroupedRows(tbody, groups, state, level) {
 
             td.textContent = engine.formatValue(
               aggregateValue,
-              measure.uniqueName,
+              measure.uniqueName
             );
 
             // Apply condition formatting
@@ -565,7 +802,7 @@ function renderGroupedRows(tbody, groups, state, level) {
 
 function applyConditionalFormatting(td, value, measureName) {
   if (config.conditionalFormatting && config.conditionalFormatting.length > 0) {
-    config.conditionalFormatting.forEach((rule) => {
+    config.conditionalFormatting.forEach(rule => {
       if (
         rule.value.type === 'All values' ||
         (rule.value.type === 'Number' && typeof value === 'number') ||
@@ -616,11 +853,11 @@ function renderTableHeader(thead, state) {
   // Get unique column values based on the configured column fields
   const columnField = state.columns[0]?.uniqueName;
   const uniqueColumnValues = columnField
-    ? [...new Set(data.map((item) => item[columnField]))]
+    ? [...new Set(state.data.map(item => item[columnField]))]
     : [];
 
   // Add column headers with colspan
-  uniqueColumnValues.forEach((value) => {
+  uniqueColumnValues.forEach(value => {
     const th = document.createElement('th');
     th.textContent = value;
     th.colSpan = state.measures.length;
@@ -636,7 +873,7 @@ function renderTableHeader(thead, state) {
   const measureHeaderRow = document.createElement('tr');
 
   // Add empty cell for row headers
-  state.rows.forEach((row) => {
+  state.rows.forEach(row => {
     const th = document.createElement('th');
     th.style.padding = '12px';
     th.style.backgroundColor = '#f8f9fa';
@@ -658,7 +895,7 @@ function renderTableHeader(thead, state) {
 
   // Add measure headers for each column value
   uniqueColumnValues.forEach(() => {
-    state.measures.forEach((measure) => {
+    state.measures.forEach(measure => {
       const th = document.createElement('th');
       th.style.padding = '12px';
       th.style.backgroundColor = '#f8f9fa';
@@ -721,7 +958,7 @@ function createSortIcon(field, axis) {
   icon.style.cursor = 'pointer';
   icon.style.marginLeft = '5px';
 
-  icon.addEventListener('click', (e) => {
+  icon.addEventListener('click', e => {
     e.stopPropagation(); // Prevent event bubbling
     const currentDirection = state.sortConfig?.[0]?.direction;
     const newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
@@ -741,7 +978,7 @@ function groupData(data, groupFields) {
 
   const result = {};
 
-  data.forEach((item) => {
+  data.forEach(item => {
     let current = result;
 
     groupFields.forEach((field, index) => {
@@ -788,7 +1025,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (!pivotTableContainer) {
     console.error(
-      'Pivot table container (#pivotTable) is missing. Ensure the HTML structure is correct.',
+      'Pivot table container (#pivotTable) is missing. Ensure the HTML structure is correct.'
     );
     return;
   }
@@ -801,3 +1038,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
   initializePivotEngine(config);
 });
+
+// Update getFilteredDataLength to use the correct data path
+function getFilteredDataLength() {
+  const state = engine.getState();
+  let length;
+
+  // First check if we have filtered data
+  if (state.processedData && state.processedData.data) {
+    length = state.processedData.data.length;
+  } else {
+    // Fallback to original data length
+    length = state.data.length;
+  }
+
+  console.log('Getting Filtered Data Length:', {
+    hasProcessedData: !!state.processedData,
+    hasFilteredData: !!(state.processedData && state.processedData.data),
+    length,
+  });
+
+  return length;
+}

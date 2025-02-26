@@ -1,0 +1,37 @@
+.controls {
+    margin: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+.filter-controls, .pagination-controls {
+    margin: 10px 0;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#pivotTable {
+    margin: 20px;
+    border-collapse: collapse;
+}
+
+#pivotTable th, #pivotTable td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+/* Add these styles for drag and drop */
+.dragging {
+  opacity: 0.5;
+  background-color: #f0f0f0;
+}
+
+.drag-over {
+  border: 2px dashed #666 !important;
+  background-color: #e9ecef !important;
+}
+
+th[draggable="true"], tr[draggable="true"] {
+  cursor: move;
+} 
