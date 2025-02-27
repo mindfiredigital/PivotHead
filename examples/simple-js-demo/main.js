@@ -1,3 +1,14 @@
+/* PivotHead Demo
+ *
+ * This file demonstrates the usage of the PivotheadCore library to create an interactive pivot table.
+ * Features include:
+ * - Sorting
+ * - Grouping
+ * - Column resizing
+ * - Column reordering (drag and drop)
+ * - Row reordering (drag and drop)
+ */
+import { createHeader } from './header.js';
 // Use PivotEngine directly from the global scope
 import { PivotEngine } from '@mindfiredigital/pivot-head-core';
 
@@ -200,7 +211,7 @@ const config = {
 };
 
 // Create a single instance of PivotEngine
-let pivotEngine;
+export let pivotEngine;
 // Store filtered data
 let filteredData = [...sampleData];
 
@@ -263,7 +274,38 @@ function getPaginatedData(data) {
   return data.slice(start, end);
 }
 
-// Improved renderTable function
+// Helper function to create sort icons
+function createSortIcon(field, currentSortConfig) {
+  const sortIcon = document.createElement('span');
+  sortIcon.style.marginLeft = '5px';
+  sortIcon.style.display = 'inline-block';
+
+  // Check if this field is currently being sorted
+  const isCurrentlySorted =
+    currentSortConfig && currentSortConfig.field === field;
+
+  if (isCurrentlySorted) {
+    // Show the appropriate icon based on sort direction
+    if (currentSortConfig.direction === 'asc') {
+      sortIcon.innerHTML = '&#9650;'; // Up arrow
+      sortIcon.title = 'Sorted ascending';
+    } else {
+      sortIcon.innerHTML = '&#9660;'; // Down arrow
+      sortIcon.title = 'Sorted descending';
+    }
+    sortIcon.style.color = '#007bff'; // Highlight the active sort
+  } else {
+    // Show a neutral icon for unsorted fields
+    sortIcon.innerHTML = '&#8693;'; // Up/down arrow
+    sortIcon.title = 'Click to sort';
+    sortIcon.style.color = '#6c757d';
+    sortIcon.style.opacity = '0.5';
+  }
+
+  return sortIcon;
+}
+
+// Update the renderTable function to include sort icons
 function renderTable() {
   try {
     const state = pivotEngine.getState();
@@ -291,145 +333,269 @@ function renderTable() {
 
     // Create table header
     const thead = document.createElement('thead');
-    const headerRow = document.createElement('tr');
 
-    // Add headers from processed data
-    state.processedData.headers.forEach((header, index) => {
+    // First header row for regions
+    const regionHeaderRow = document.createElement('tr');
+
+    // Add empty cell for top-left corner (Product/Region)
+    const cornerCell = document.createElement('th');
+    cornerCell.style.padding = '12px';
+    cornerCell.style.backgroundColor = '#f8f9fa';
+    cornerCell.style.borderBottom = '2px solid #dee2e6';
+    cornerCell.style.borderRight = '1px solid #dee2e6';
+    cornerCell.textContent = 'Product / Region';
+    regionHeaderRow.appendChild(cornerCell);
+
+    // Get unique regions
+    const uniqueRegions = [...new Set(state.data.map(item => item.region))];
+
+    // Add region headers with colspan for measures
+    uniqueRegions.forEach((region, index) => {
       const th = document.createElement('th');
+      th.textContent = region;
+      th.colSpan = state.measures.length; // Span across all measures
       th.style.padding = '12px';
       th.style.backgroundColor = '#f8f9fa';
       th.style.borderBottom = '2px solid #dee2e6';
       th.style.borderRight = '1px solid #dee2e6';
       th.style.textAlign = 'center';
+      th.dataset.index = index + 1; // +1 because first cell is corner
 
-      // Use the header text directly without trying to format it
-      th.textContent = header;
+      // Make headers draggable
+      th.setAttribute('draggable', 'true');
+      th.style.cursor = 'move';
 
-      th.dataset.index = index;
-
-      // Make headers draggable (except the first one which is usually a label)
-      if (index > 0) {
-        th.setAttribute('draggable', 'true');
-        th.style.cursor = 'move';
-      }
-
-      headerRow.appendChild(th);
+      regionHeaderRow.appendChild(th);
     });
 
-    thead.appendChild(headerRow);
+    thead.appendChild(regionHeaderRow);
+
+    // Second header row for measures
+    const measureHeaderRow = document.createElement('tr');
+
+    // Get current sort configuration
+    const currentSortConfig = state.sortConfig?.[0];
+
+    // Add product header with sort icon
+    const productHeader = document.createElement('th');
+    productHeader.style.padding = '12px';
+    productHeader.style.backgroundColor = '#f8f9fa';
+    productHeader.style.borderBottom = '2px solid #dee2e6';
+    productHeader.style.borderRight = '1px solid #dee2e6';
+    productHeader.style.cursor = 'pointer';
+
+    // Create a container for the header content to align text and icon
+    const productHeaderContent = document.createElement('div');
+    productHeaderContent.style.display = 'flex';
+    productHeaderContent.style.alignItems = 'center';
+
+    const productText = document.createElement('span');
+    productText.textContent = 'Product';
+    productHeaderContent.appendChild(productText);
+
+    // Add sort icon for product
+    const productSortIcon = createSortIcon('product', currentSortConfig);
+    productHeaderContent.appendChild(productSortIcon);
+
+    productHeader.appendChild(productHeaderContent);
+
+    // Add sort functionality to product header
+    productHeader.addEventListener('click', () => {
+      const direction =
+        currentSortConfig?.field === 'product' &&
+        currentSortConfig?.direction === 'asc'
+          ? 'desc'
+          : 'asc';
+      pivotEngine.sort('product', direction);
+      renderTable();
+    });
+
+    measureHeaderRow.appendChild(productHeader);
+
+    // Add measure headers for each region
+    uniqueRegions.forEach(region => {
+      state.measures.forEach(measure => {
+        const th = document.createElement('th');
+        th.style.padding = '12px';
+        th.style.backgroundColor = '#f8f9fa';
+        th.style.borderBottom = '2px solid #dee2e6';
+        th.style.borderRight = '1px solid #dee2e6';
+        th.style.cursor = 'pointer';
+
+        // Create a container for the header content to align text and icon
+        const headerContent = document.createElement('div');
+        headerContent.style.display = 'flex';
+        headerContent.style.alignItems = 'center';
+        headerContent.style.justifyContent = 'space-between';
+
+        const measureText = document.createElement('span');
+        measureText.textContent = measure.caption;
+        headerContent.appendChild(measureText);
+
+        // Add sort icon for measure
+        const sortIcon = createSortIcon(measure.uniqueName, currentSortConfig);
+        headerContent.appendChild(sortIcon);
+
+        th.appendChild(headerContent);
+
+        // Add sort functionality
+        th.addEventListener('click', () => {
+          const direction =
+            currentSortConfig?.field === measure.uniqueName &&
+            currentSortConfig?.direction === 'asc'
+              ? 'desc'
+              : 'asc';
+          pivotEngine.sort(measure.uniqueName, direction);
+          renderTable();
+        });
+
+        measureHeaderRow.appendChild(th);
+      });
+    });
+
+    thead.appendChild(measureHeaderRow);
     table.appendChild(thead);
 
     // Create table body
     const tbody = document.createElement('tbody');
 
-    // Add rows from processed data
-    if (state.processedData.rows.length === 0) {
-      const emptyRow = document.createElement('tr');
-      const emptyCell = document.createElement('td');
-      emptyCell.colSpan = state.processedData.headers.length;
-      emptyCell.style.textAlign = 'center';
-      emptyCell.style.padding = '12px';
-      emptyCell.textContent = 'No data found';
-      emptyRow.appendChild(emptyCell);
-      tbody.appendChild(emptyRow);
-    } else {
-      // Get paginated data if needed
-      const rowsToRender = getPaginatedData(state.processedData.rows);
+    // Get unique products
+    const uniqueProducts = [...new Set(state.data.map(item => item.product))];
 
-      rowsToRender.forEach((row, rowIndex) => {
-        const tr = document.createElement('tr');
-        tr.dataset.rowIndex = rowIndex;
-        tr.setAttribute('draggable', 'true');
-        tr.style.cursor = 'move';
+    // Add rows for each product
+    uniqueProducts.forEach((product, rowIndex) => {
+      const tr = document.createElement('tr');
+      tr.dataset.rowIndex = rowIndex;
+      tr.setAttribute('draggable', 'true');
+      tr.style.cursor = 'move';
 
-        row.forEach((cell, cellIndex) => {
+      // Add product cell
+      const productCell = document.createElement('td');
+      productCell.textContent = product;
+      productCell.style.fontWeight = 'bold';
+      productCell.style.padding = '8px';
+      productCell.style.borderBottom = '1px solid #dee2e6';
+      tr.appendChild(productCell);
+
+      // Add data cells for each region and measure
+      uniqueRegions.forEach(region => {
+        // Filter data for this product and region
+        const filteredData = state.data.filter(
+          item => item.product === product && item.region === region
+        );
+
+        // Add cells for each measure
+        state.measures.forEach(measure => {
           const td = document.createElement('td');
+          td.style.padding = '8px';
+          td.style.borderBottom = '1px solid #dee2e6';
+          td.style.borderRight = '1px solid #dee2e6';
+          td.style.textAlign = 'right';
 
-          // Style based on cell position
-          if (cellIndex === 0) {
-            // First column (row header)
-            td.style.fontWeight = 'bold';
-            td.style.padding = '8px';
-            td.style.borderBottom = '1px solid #dee2e6';
-            td.textContent = cell; // Display row header as is
-          } else {
-            // Data cells
-            td.style.padding = '8px';
-            td.style.borderBottom = '1px solid #dee2e6';
-            td.style.borderRight = '1px solid #dee2e6';
-            td.style.textAlign = 'right';
-
-            // Format the cell value if it's a measure
-            let formattedValue = cell;
-            const rawValue = parseFloat(cell);
-
-            // Only format if it's a number
-            if (!isNaN(rawValue)) {
-              const measureIndex = (cellIndex - 1) % state.measures.length;
-              const measure = state.measures[measureIndex];
-
-              if (measure) {
-                // Apply formatting
-                formattedValue = pivotEngine.formatValue(
-                  rawValue,
-                  measure.uniqueName
+          // Calculate the value based on aggregation
+          let value = 0;
+          if (filteredData.length > 0) {
+            switch (measure.aggregation) {
+              case 'sum':
+                value = filteredData.reduce(
+                  (sum, item) => sum + (item[measure.uniqueName] || 0),
+                  0
                 );
+                break;
+              case 'avg':
+                if (measure.formula) {
+                  // Use formula if provided
+                  value =
+                    filteredData.reduce(
+                      (sum, item) => sum + measure.formula(item),
+                      0
+                    ) / filteredData.length;
+                } else {
+                  value =
+                    filteredData.reduce(
+                      (sum, item) => sum + (item[measure.uniqueName] || 0),
+                      0
+                    ) / filteredData.length;
+                }
+                break;
+              case 'max':
+                value = Math.max(
+                  ...filteredData.map(item => item[measure.uniqueName] || 0)
+                );
+                break;
+              case 'min':
+                value = Math.min(
+                  ...filteredData.map(item => item[measure.uniqueName] || 0)
+                );
+                break;
+              default:
+                value = 0;
+            }
+          }
 
-                // Apply conditional formatting
-                if (
-                  config.conditionalFormatting &&
-                  Array.isArray(config.conditionalFormatting)
-                ) {
-                  config.conditionalFormatting.forEach(rule => {
-                    if (rule.value.type === 'Number' && !isNaN(rawValue)) {
-                      let applyFormat = false;
+          // Format the value
+          let formattedValue = value;
+          if (measure.format) {
+            if (measure.format.type === 'currency') {
+              formattedValue = new Intl.NumberFormat(measure.format.locale, {
+                style: 'currency',
+                currency: measure.format.currency,
+                minimumFractionDigits: measure.format.decimals,
+                maximumFractionDigits: measure.format.decimals,
+              }).format(value);
+            } else if (measure.format.type === 'number') {
+              formattedValue = new Intl.NumberFormat(measure.format.locale, {
+                minimumFractionDigits: measure.format.decimals,
+                maximumFractionDigits: measure.format.decimals,
+              }).format(value);
+            }
+          }
 
-                      switch (rule.value.operator) {
-                        case 'Greater than':
-                          applyFormat =
-                            rawValue > parseFloat(rule.value.value1);
-                          break;
-                        case 'Less than':
-                          applyFormat =
-                            rawValue < parseFloat(rule.value.value1);
-                          break;
-                        case 'Equal to':
-                          applyFormat =
-                            rawValue === parseFloat(rule.value.value1);
-                          break;
-                        case 'Between':
-                          applyFormat =
-                            rawValue >= parseFloat(rule.value.value1) &&
-                            rawValue <= parseFloat(rule.value.value2);
-                          break;
-                      }
+          td.textContent = formattedValue;
 
-                      if (applyFormat) {
-                        if (rule.format.font)
-                          td.style.fontFamily = rule.format.font;
-                        if (rule.format.size)
-                          td.style.fontSize = rule.format.size;
-                        if (rule.format.color)
-                          td.style.color = rule.format.color;
-                        if (rule.format.backgroundColor)
-                          td.style.backgroundColor =
-                            rule.format.backgroundColor;
-                      }
-                    }
-                  });
+          // Apply conditional formatting
+          if (
+            config.conditionalFormatting &&
+            Array.isArray(config.conditionalFormatting)
+          ) {
+            config.conditionalFormatting.forEach(rule => {
+              if (rule.value.type === 'Number' && !isNaN(value)) {
+                let applyFormat = false;
+
+                switch (rule.value.operator) {
+                  case 'Greater than':
+                    applyFormat = value > parseFloat(rule.value.value1);
+                    break;
+                  case 'Less than':
+                    applyFormat = value < parseFloat(rule.value.value1);
+                    break;
+                  case 'Equal to':
+                    applyFormat = value === parseFloat(rule.value.value1);
+                    break;
+                  case 'Between':
+                    applyFormat =
+                      value >= parseFloat(rule.value.value1) &&
+                      value <= parseFloat(rule.value.value2);
+                    break;
+                }
+
+                if (applyFormat) {
+                  if (rule.format.font) td.style.fontFamily = rule.format.font;
+                  if (rule.format.size) td.style.fontSize = rule.format.size;
+                  if (rule.format.color) td.style.color = rule.format.color;
+                  if (rule.format.backgroundColor)
+                    td.style.backgroundColor = rule.format.backgroundColor;
                 }
               }
-            }
-
-            td.textContent = formattedValue;
+            });
           }
 
           tr.appendChild(td);
         });
-
-        tbody.appendChild(tr);
       });
-    }
+
+      tbody.appendChild(tr);
+    });
 
     table.appendChild(tbody);
     tableContainer.appendChild(table);
@@ -485,6 +651,11 @@ function updatePagination(dataLength) {
     currentPage: 1,
     totalPages,
   });
+}
+
+export function formatTable(config) {
+  pivotEngine = new PivotEngine(config);
+  renderTable();
 }
 
 // Event Listeners
@@ -575,7 +746,7 @@ function setupEventListeners() {
   });
 }
 
-// Update the addDraggableStyles function to include drag and drop styles
+// Update the addDraggableStyles function to include styles for sort icons
 function addDraggableStyles() {
   const styleEl = document.createElement('style');
   styleEl.innerHTML = `
@@ -591,6 +762,22 @@ function addDraggableStyles() {
         
         th[draggable="true"], tr[draggable="true"] {
             cursor: move;
+        }
+        
+        /* Sort icon styles */
+        .sort-icon {
+            margin-left: 5px;
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+        
+        th:hover .sort-icon {
+            opacity: 1 !important;
+        }
+        
+        /* Header hover effect */
+        th[data-sortable="true"]:hover {
+            background-color: #e9ecef !important;
         }
         
         .controls-container {
@@ -795,12 +982,40 @@ function setupDragAndDrop() {
     });
   });
 }
+export function onSectionItemDrop(droppedFields) {
+  let droppedFieldsInSections = JSON.stringify({
+    rows: Array.from(droppedFields.rows),
+    columns: Array.from(droppedFields.columns),
+    values: Array.from(droppedFields.values),
+    filters: Array.from(droppedFields.filters),
+  });
+  const parsedDroppedFieldsInSections = JSON.parse(droppedFieldsInSections);
 
+  const transformedRows = parsedDroppedFieldsInSections.rows.map(rowField => {
+    return { uniqueName: rowField.toLowerCase(), caption: rowField };
+  });
+  const transformedColumns = parsedDroppedFieldsInSections.columns.map(
+    columnField => {
+      return { uniqueName: columnField.toLowerCase(), caption: columnField };
+    }
+  );
+  // const transformedValues=parsedDroppedFieldsInSections.values.map((valueField)=>{ return { uniqueName:valueField.toLowerCase(), caption:valueField}})
+  // const transformedFilters=parsedDroppedFieldsInSections.filters.map((filterField)=>{ return { uniqueName:filterField.toLowerCase(), caption:filterField}})
+
+  //TODO: for now only-applicable to rows and columns, will do the same for values and global filters in next iteration
+  pivotEngine.state.rows = transformedRows;
+  pivotEngine.state.columns = transformedColumns;
+
+  renderTable();
+}
 // Initialize everything when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   // Create PivotEngine instance
   pivotEngine = new PivotEngine(config);
 
+  if (config.toolbar) {
+    createHeader(config);
+  }
   // Add draggable styles
   addDraggableStyles();
 
