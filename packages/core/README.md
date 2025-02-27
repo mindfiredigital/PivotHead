@@ -10,12 +10,15 @@ PivotHead is a powerful and flexible library for creating interactive pivot tabl
 4. [PivotEngine API](#pivotengine-api)
 5. [Advanced Features](#advanced-features)
 6. [Configuration](#configuration)
-7. [Examples](#examples)
+7. [Filtering](#filtering)
+8. [Pagination](#pagination)
+9. [Examples](#examples)
 
 ## Features
 
 - Flexible data pivoting and aggregation
 - Sorting and filtering capabilities
+- Pagination support
 - Grouping data by multiple fields
 - Column resizing
 - Drag and drop for rows and columns
@@ -31,7 +34,6 @@ To install PivotHead, use npm or yarn:
 
 ```bash
 pnpm install @mindfiredigital/pivot-head-core
-
 ```
 
 ## Basic Usage
@@ -86,6 +88,7 @@ const config = {
   ],
   defaultAggregation: 'sum',
   isResponsive: true,
+  pageSize: 10, // Default page size for pagination
   groupConfig: {
     rowFields: ['product'],
     columnFields: ['region'],
@@ -146,10 +149,9 @@ Creates a new instance of PivotEngine with the given configuration.
 
 ```typescript
 getState(): PivotTableState<T>
-
 ```
 
-Example :-
+Example:
 
 - **getState(): PivotTableState**
 
@@ -171,7 +173,7 @@ Resets the pivot table to its initial state.
 reset();
 ```
 
-Example :-
+Example:
 
 - **reset()**
 
@@ -294,11 +296,45 @@ dragColumn(fromIndex: number, toIndex: number)
 
 Handles dragging a column to a new position.
 
+### Filtering and Pagination
+
+#### applyFilters(filters: FilterConfig[])
+
+```typescript
+applyFilters(filters: FilterConfig[])
+```
+
+Applies filters to the data based on the provided filter configurations.
+
+#### setPagination(config: PaginationConfig)
+
+```typescript
+setPagination(config: PaginationConfig)
+```
+
+Sets the pagination configuration for the pivot table.
+
+#### getFilterState(): FilterConfig[]
+
+```typescript
+getFilterState(): FilterConfig[]
+```
+
+Returns the current filter configuration.
+
+#### getPaginationState(): PaginationConfig
+
+```typescript
+getPaginationState(): PaginationConfig
+```
+
+Returns the current pagination configuration.
+
 ## Advanced Features
 
-## Formatting cells
+### Formatting cells
 
-PivotHead supports conditional formatting for cells like decimal values , currency symbol etc.
+PivotHead supports conditional formatting for cells like decimal values, currency symbol etc.
 
 Example configuration:
 
@@ -429,13 +465,148 @@ interface PivotTableConfig<T> {
   dimensions: Dimension[];
   defaultAggregation?: AggregationType;
   isResponsive?: boolean;
+  pageSize?: number; // Default page size for pagination
   groupConfig?: GroupConfig;
   formatting?: Record<string, FormatConfig>;
   conditionalFormatting?: ConditionalFormattingRule[];
+  dataSource?: {
+    type: 'remote' | 'file';
+    url?: string;
+    file?: File;
+  };
+  onRowDragEnd?: (fromIndex: number, toIndex: number, data: T[]) => void;
+  onColumnDragEnd?: (
+    fromIndex: number,
+    toIndex: number,
+    columns: Array<{ uniqueName: string; caption: string }>
+  ) => void;
 }
 ```
 
 For detailed information on each configuration option, please refer to the source code and comments.
+
+## Filtering
+
+PivotHead provides robust filtering capabilities through the `FilterConfig` interface. Filters can be applied to any field in your data with various operators.
+
+### Filter Configuration
+
+```typescript
+interface FilterConfig {
+  field: string;
+  operator: 'equals' | 'contains' | 'greaterThan' | 'lessThan' | 'between';
+  value: any; // Can be a single value or an array for 'between' operator
+}
+```
+
+### Basic Filtering Example
+
+```javascript
+// Apply filters to show only data for the North region with sales greater than 500
+const filters = [
+  {
+    field: 'region',
+    operator: 'equals',
+    value: 'North',
+  },
+  {
+    field: 'sales',
+    operator: 'greaterThan',
+    value: 500,
+  },
+];
+
+engine.applyFilters(filters);
+```
+
+### Filter Operators
+
+- **equals**: Exact match comparison
+- **contains**: String contains check (case-insensitive)
+- **greaterThan**: Numeric greater than comparison
+- **lessThan**: Numeric less than comparison
+- **between**: Value is within a range (requires an array of two values)
+
+### Range Filter Example
+
+```javascript
+// Filter sales between 500 and 1500
+const rangeFilter = [
+  {
+    field: 'sales',
+    operator: 'between',
+    value: [500, 1500],
+  },
+];
+
+engine.applyFilters(rangeFilter);
+```
+
+### Retrieving Current Filters
+
+```javascript
+const currentFilters = engine.getFilterState();
+console.log(currentFilters); // Array of current FilterConfig objects
+```
+
+## Pagination
+
+PivotHead includes built-in pagination capabilities to handle large datasets efficiently.
+
+### Pagination Configuration
+
+```typescript
+interface PaginationConfig {
+  currentPage: number;
+  pageSize: number;
+  totalPages?: number; // Read-only, calculated internally
+}
+```
+
+### Setting Up Pagination
+
+Pagination can be configured during initialization:
+
+```javascript
+const config = {
+  // ... other configuration
+  pageSize: 25, // Show 25 items per page
+};
+
+const engine = new PivotEngine(config);
+```
+
+### Changing Pagination During Runtime
+
+```javascript
+// Change to page 3 with 50 items per page
+engine.setPagination({
+  currentPage: 3,
+  pageSize: 50,
+});
+```
+
+### Getting Current Pagination State
+
+```javascript
+const paginationInfo = engine.getPaginationState();
+console.log(
+  `Page ${paginationInfo.currentPage} of ${paginationInfo.totalPages}`
+);
+console.log(`Showing ${paginationInfo.pageSize} items per page`);
+```
+
+### Combining Pagination with Filters
+
+Pagination works seamlessly with filters. When filters are applied, the pagination is automatically adjusted based on the filtered dataset:
+
+```javascript
+// Apply filters first
+engine.applyFilters([{ field: 'region', operator: 'equals', value: 'North' }]);
+
+// Then update pagination if needed
+engine.setPagination({ currentPage: 1 }); // Go to first page of filtered results
+```
 
 ## Examples
 
@@ -456,5 +627,43 @@ These examples demonstrate various features of the PivotHead library, including:
 - Conditional formatting
 - Drag and drop functionality
 - Responsive design
+- Filtering and pagination
+
+### Filter and Pagination Example
+
+```javascript
+import { PivotEngine } from '@mindfiredigital/pivot-head-core';
+
+// Initialize the engine with your data and configuration
+const engine = new PivotEngine(config);
+
+// Apply filters to show only high-value sales in the North region
+engine.applyFilters([
+  { field: 'region', operator: 'equals', value: 'North' },
+  { field: 'sales', operator: 'greaterThan', value: 1000 },
+]);
+
+// Set up pagination to show 10 items per page and display the second page
+engine.setPagination({
+  currentPage: 2,
+  pageSize: 10,
+});
+
+// Get pagination info to update UI
+const paginationInfo = engine.getPaginationState();
+updatePaginationControls(paginationInfo);
+
+// Function to handle page navigation
+function goToPage(pageNumber) {
+  engine.setPagination({
+    currentPage: pageNumber,
+    pageSize: paginationInfo.pageSize,
+  });
+
+  // Get updated state and re-render your UI
+  const state = engine.getState();
+  renderPivotTable(state);
+}
+```
 
 For more detailed examples and usage scenarios, please refer to the example files in the repository.
