@@ -1,4 +1,4 @@
-import { formatTable } from '../main.js';
+import { formatTable } from '../index.js';
 export function formatCellPopUp(config, PivotEngine) {
   const dynamicData = config.measures.filter(
     measure => measure.format.type === 'currency'

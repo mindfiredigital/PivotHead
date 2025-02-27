@@ -1,4 +1,4 @@
-import { pivotEngine, formatTable } from '../main.js';
+import { pivotEngine, formatTable } from '../index.js';
 
 export function dataSourceOptions(config) {
   const overlay = document.createElement('div');

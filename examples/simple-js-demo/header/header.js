@@ -3,7 +3,7 @@ import { createOptionsPopup } from '../services/optionsPopup.js';
 import { conditionFormattingPopUp } from '../services/conditionFormattingPopUp.js';
 import { createFieldsPopup } from '../services/fieldsPopup.js';
 import { dataSourceOptions } from '../services/dataSourceOptions.js';
-import { pivotEngine } from '../main.js';
+import { pivotEngine } from '../index.js';
 
 export function createHeader(config) {
   const header = document.createElement('div');
