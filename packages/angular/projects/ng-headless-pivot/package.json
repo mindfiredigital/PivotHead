@@ -1,6 +1,7 @@
 {
-  "name": "ng-headless-pivot",
+  "name": "@mindfiredigital/pivot-head-angular",
   "version": "0.0.1",
+  "private": true,
   "peerDependencies": {
     "@angular/common": "^19.1.0",
     "@angular/core": "^19.1.0"
