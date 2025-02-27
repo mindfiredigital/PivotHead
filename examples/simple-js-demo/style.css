@@ -1,24 +1,26 @@
 .controls {
-    margin: 20px;
-    padding: 10px;
-    border: 1px solid #ddd;
+  margin: 20px;
+  padding: 10px;
+  margin-top: 60px;
 }
 
-.filter-controls, .pagination-controls {
-    margin: 10px 0;
-    display: flex;
-    gap: 10px;
-    align-items: center;
+.filter-controls,
+.pagination-controls {
+  margin: 10px 0;
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
 #pivotTable {
-    margin: 20px;
-    border-collapse: collapse;
+  margin: 20px;
+  border-collapse: collapse;
 }
 
-#pivotTable th, #pivotTable td {
-    border: 1px solid #ddd;
-    padding: 8px;
+#pivotTable th,
+#pivotTable td {
+  border: 1px solid #ddd;
+  padding: 8px;
 }
 
 /* Add these styles for drag and drop */
@@ -32,6 +34,7 @@
   background-color: #e9ecef !important;
 }
 
-th[draggable="true"], tr[draggable="true"] {
+th[draggable='true'],
+tr[draggable='true'] {
   cursor: move;
-} 
+}

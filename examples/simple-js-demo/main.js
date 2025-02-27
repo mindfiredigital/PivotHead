@@ -827,6 +827,10 @@ function addDraggableStyles() {
 
 // Add HTML for filter and pagination controls
 function addControlsHTML() {
+  // Check if controls already exist
+  if (document.querySelector('.controls-container')) {
+    return; // Controls already added, don't add again
+  }
   const container = document.createElement('div');
   container.className = 'controls-container';
   container.innerHTML = `
@@ -840,10 +844,10 @@ function addControlsHTML() {
         <div class="pagination-container">
             <label>Items per page:</label>
             <select id="pageSize">
-                <option value="5">5</option>
-                <option value="10" selected>10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
             </select>
             <button id="prevPage">Previous</button>
             <span id="pageInfo">Page 1 of 1</span>

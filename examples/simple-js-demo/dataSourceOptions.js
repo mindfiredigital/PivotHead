@@ -99,7 +99,7 @@ export function dataSourceOptions(config) {
         file,
       };
       // also update the data use core package method to read data from file
-      config.data = await PivotEngine.readFileData(config.dataSource.file);
+      config.data = await pivotEngine.readFileData(config.dataSource.file);
       formatTable(config);
       document.body.removeChild(overlay);
     } else {
