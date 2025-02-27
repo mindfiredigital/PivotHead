@@ -8,7 +8,7 @@
  * - Column reordering (drag and drop)
  * - Row reordering (drag and drop)
  */
-import { createHeader } from './header.js';
+import { createHeader } from './header/header.js';
 // Use PivotEngine directly from the global scope
 import { PivotEngine } from '@mindfiredigital/pivot-head-core';
 

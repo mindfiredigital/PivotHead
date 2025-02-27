@@ -1,9 +1,9 @@
-import { formatCellPopUp } from './formatCell.js';
-import { createOptionsPopup } from './optionsPopup.js';
-import { conditionFormattingPopUp } from './conditionFormattingPopUp.js';
-import { createFieldsPopup } from './fieldsPopup.js';
-import { dataSourceOptions } from './dataSourceOptions.js';
-import { pivotEngine } from './main.js';
+import { formatCellPopUp } from '../services/formatCell.js';
+import { createOptionsPopup } from '../services/optionsPopup.js';
+import { conditionFormattingPopUp } from '../services/conditionFormattingPopUp.js';
+import { createFieldsPopup } from '../services/fieldsPopup.js';
+import { dataSourceOptions } from '../services/dataSourceOptions.js';
+import { pivotEngine } from '../main.js';
 
 export function createHeader(config) {
   const header = document.createElement('div');

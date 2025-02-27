@@ -1,4 +1,4 @@
-import { onSectionItemDrop } from './main.js';
+import { onSectionItemDrop } from '../main.js';
 
 const droppedFields = {
   rows: new Set(),
