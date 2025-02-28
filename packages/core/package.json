@@ -8,6 +8,8 @@
   "files": [
     "dist"
   ],
+  "author": "Mindfiredigital",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/mindfiredigital/PivotHead/"

@@ -7,6 +7,7 @@
     "packages/*",
     "examples/*"
   ],
+  "author": "Mindfiredigital",
   "license": "MIT",
   "keywords": [
     "pivothead-core",
