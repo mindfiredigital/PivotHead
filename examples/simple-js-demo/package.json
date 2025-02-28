@@ -6,8 +6,7 @@
     "@mindfiredigital/pivothead": "workspace:*"
   },
   "scripts": {
-    "dev": "vite",
-    "build": "vite build"
+    "dev": "vite"
   },
   "devDependencies": {
     "vite": "^4.3.9"
