@@ -23,7 +23,7 @@ const commitPatterns = {
 };
 
 // Identify type, package, and description
-let packageName = null;
+let packageScope = null;
 let changeType = null;
 let description = null;
 
@@ -34,21 +34,21 @@ if (commitPatterns.major.test(commitMessage)) {
   const scope = commitMessage.match(commitPatterns.minor)?.[1];
   if (validScopes.includes(scope)) {
     changeType = 'minor';
-    packageName = scope;
+    packageScope = scope;
     description = commitMessage.match(commitPatterns.minor)?.[2];
   }
 } else if (commitPatterns.patch.test(commitMessage)) {
   const scope = commitMessage.match(commitPatterns.patch)?.[1];
   if (validScopes.includes(scope)) {
     changeType = 'patch';
-    packageName = scope;
+    packageScope = scope;
     description = commitMessage.match(commitPatterns.patch)?.[2];
   }
 }
 
 // Generate and write changeset if valid package found
-if (packageName) {
-  packageName = packageName.trim();
+if (packageScope) {
+  packageScope = packageScope.trim();
   description = description?.trim() || 'No description provided.';
 
   // Determine the full package name based on scope
