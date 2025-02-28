@@ -1,3 +1,16 @@
 packages:
   - 'packages/*'
   - 'examples/*'
+
+    
+  # Exclude directories
+  - '!**/dist'             # Exclude all dist directories
+  - '!**/build'            # Exclude all build directories
+  - '!**/node_modules'     # Exclude all node_modules directories
+  - '!**/test'             # Exclude test directories from workspace
+  
+# To prevent hoisting, ensure no shared node_modules at the root
+hoist-pattern: []
+
+# This will ensure isolated node_modules for each package
+store: ~/.pnpm-store
