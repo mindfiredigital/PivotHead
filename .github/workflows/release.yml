@@ -74,7 +74,7 @@ jobs:
         run: |
           # Run version command to see if there are actual changes
           npx changeset version
-          
+
           # Check if there are any changes after versioning
           git diff --exit-code || echo "HAS_CHANGES=true" >> $GITHUB_OUTPUT
 
@@ -157,7 +157,7 @@ jobs:
         run: |
           # Run version command to see if there are actual changes from changesets
           npx changeset version
-          
+
           # Check if there are any changes after versioning
           git diff --exit-code || echo "HAS_CHANGES=true" >> $GITHUB_OUTPUT
 
