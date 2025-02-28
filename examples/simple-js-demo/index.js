@@ -10,7 +10,7 @@
  */
 import { createHeader } from './header/header.js';
 // Use PivotEngine directly from the global scope
-import { PivotEngine } from '@mindfiredigital/pivot-head-core';
+import { PivotEngine } from '@mindfiredigital/pivothead';
 
 const sampleData = [
   {

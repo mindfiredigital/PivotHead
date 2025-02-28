@@ -33,13 +33,13 @@ PivotHead is a powerful and flexible library for creating interactive pivot tabl
 To install PivotHead, use npm or yarn:
 
 ```bash
-pnpm install @mindfiredigital/pivot-head-core
+pnpm install @mindfiredigital/pivothead
 ```
 
 ## Basic Usage
 
 ```javascript
-import { PivotEngine } from '@mindfiredigital/pivot-head-core';
+import { PivotEngine } from '@mindfiredigital/pivothead';
 
 const data = [
   {
@@ -632,7 +632,7 @@ These examples demonstrate various features of the PivotHead library, including:
 ### Filter and Pagination Example
 
 ```javascript
-import { PivotEngine } from '@mindfiredigital/pivot-head-core';
+import { PivotEngine } from '@mindfiredigital/pivothead';
 
 // Initialize the engine with your data and configuration
 const engine = new PivotEngine(config);

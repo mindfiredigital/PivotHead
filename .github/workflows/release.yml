@@ -20,7 +20,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -44,46 +43,8 @@ jobs:
       - name: Generate Changeset from commit messages
         run: pnpm changeset:autogenerate
 
-      - name: Check branches status
-        id: branch-check
-        run: |
-          # Fetch all remote branches
-          git fetch origin
-
-          # Check if changeset branch exists
-          if git ls-remote --heads origin changeset-release/main | grep changeset-release/main; then
-            echo "CHANGESET_BRANCH_EXISTS=true" >> $GITHUB_OUTPUT
-            
-            # Compare main and changeset-release/main branches
-            DIFF_COUNT=$(git rev-list --count main...origin/changeset-release/main)
-            if [ "$DIFF_COUNT" -eq "0" ]; then
-              echo "BRANCHES_IDENTICAL=true" >> $GITHUB_OUTPUT
-              echo "No differences between main and changeset-release/main"
-            else
-              echo "BRANCHES_IDENTICAL=false" >> $GITHUB_OUTPUT
-              echo "Found differences between main and changeset-release/main"
-            fi
-          else
-            echo "CHANGESET_BRANCH_EXISTS=false" >> $GITHUB_OUTPUT
-            echo "BRANCHES_IDENTICAL=false" >> $GITHUB_OUTPUT
-            echo "Changeset branch doesn't exist yet"
-          fi
-
-      - name: Apply version changes locally
-        id: local-version
-        run: |
-          # Run version command to see if there are actual changes
-          npx changeset version
-
-          # Check if there are any changes after versioning
-          git diff --exit-code || echo "HAS_CHANGES=true" >> $GITHUB_OUTPUT
-
       - name: Create Release Pull Request or Publish to npm
         id: changesets
-        if: |
-          steps.local-version.outputs.HAS_CHANGES == 'true' || 
-          (steps.branch-check.outputs.CHANGESET_BRANCH_EXISTS == 'false') ||
-          (steps.branch-check.outputs.BRANCHES_IDENTICAL == 'false')
         uses: changesets/action@v1.4.1
         with:
           commit: 'chore(release): version packages'
@@ -92,41 +53,18 @@ jobs:
           publish: npx changeset publish
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-
-      - name: Direct publish if no PR created
-        if: |
-          steps.local-version.outputs.HAS_CHANGES == 'true' && 
-          steps.changesets.outputs.pullRequestNumber == ''
-        run: |
-          echo "Running direct publish as no PR was created but changes exist"
-          npx changeset publish
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Auto-merge release PR
         if: steps.changesets.outputs.pullRequestNumber != ''
         run: |
-          # Try to merge with auto flag first
-          if gh pr merge ${{ steps.changesets.outputs.pullRequestNumber }} --squash --delete-branch --auto; then
-            echo "Successfully merged PR with --auto flag"
-          # If that fails, try with admin flag
-          elif gh pr merge ${{ steps.changesets.outputs.pullRequestNumber }} --squash --delete-branch --admin; then
-            echo "Successfully merged PR with --admin flag"
-          else
-            echo "Failed to merge PR automatically. Manual intervention required."
-            exit 1
-          fi
+          gh pr merge ${{ steps.changesets.outputs.pullRequestNumber }} --squash --delete-branch
         env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish:
     needs: build
-    if: |
-      github.event_name == 'push' && 
-      github.ref == 'refs/heads/main' && 
-      !contains(github.event.head_commit.message, 'chore(release): version packages')
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -134,13 +72,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.ADMIN_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
-        with:
-          node-version: 20
 
       - name: Enable Corepack
         run: npm install -g pnpm
@@ -152,18 +86,17 @@ jobs:
         run: |
           git pull origin main
 
-      - name: Apply version changes locally
-        id: local-version
-        run: |
-          # Run version command to see if there are actual changes from changesets
-          npx changeset version
-
-          # Check if there are any changes after versioning
-          git diff --exit-code || echo "HAS_CHANGES=true" >> $GITHUB_OUTPUT
-
-      - name: Publish to npm if changes exist
-        if: steps.local-version.outputs.HAS_CHANGES == 'true'
-        run: npx changeset publish
+      - name: Publish to npm
+        id: changesets
+        uses: changesets/action@v1.4.1
+        with:
+          run: |
+            git checkout main
+            git pull origin main
+          commit: 'chore(release): version packages'
+          title: 'chore(release): version packages'
+          version: node .github/changeset-version.js
+          publish: npx changeset publish
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.ADMIN_TOKEN || secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
