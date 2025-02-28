@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "dependencies": {
-    "@mindfiredigital/pivot-head-core": "workspace:*"
+    "@mindfiredigital/pivothead": "workspace:*"
   },
   "scripts": {
     "dev": "vite",

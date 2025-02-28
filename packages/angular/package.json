@@ -1,13 +1,11 @@
 {
-  "name": "@mindfiredigital/pivot-head-core",
+  "name": "@mindfiredigital/pivothead-angular",
   "version": "0.0.0",
   "private": true,
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "watch": "ng build --watch --configuration development"
   },
   "dependencies": {
     "@angular/animations": "^19.1.0",
@@ -18,7 +16,7 @@
     "@angular/platform-browser": "^19.1.0",
     "@angular/platform-browser-dynamic": "^19.1.0",
     "@angular/router": "^19.1.0",
-    "@mindfiredigital/pivot-head-core": "workspace:*",
+    "@mindfiredigital/pivothead": "workspace:*",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
