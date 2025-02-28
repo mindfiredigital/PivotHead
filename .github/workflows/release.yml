@@ -20,6 +20,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.ADMIN_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -43,8 +44,20 @@ jobs:
       - name: Generate Changeset from commit messages
         run: pnpm changeset:autogenerate
 
+      - name: Check for changeset files
+        id: check-changesets
+        run: |
+          if [ -n "$(find .changeset -name "*.md" -not -name "README.md" -not -name "config.json" 2>/dev/null)" ]; then
+            echo "HAS_CHANGESETS=true" >> $GITHUB_OUTPUT
+            echo "Changesets found, will proceed with version/publish"
+          else
+            echo "HAS_CHANGESETS=false" >> $GITHUB_OUTPUT
+            echo "No changesets found, skipping version/publish"
+          fi
+
       - name: Create Release Pull Request or Publish to npm
         id: changesets
+        if: steps.check-changesets.outputs.HAS_CHANGESETS == 'true'
         uses: changesets/action@v1.4.1
         with:
           commit: 'chore(release): version packages'
@@ -53,7 +66,7 @@ jobs:
           publish: npx changeset publish
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ADMIN_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Auto-merge release PR
         if: steps.changesets.outputs.pullRequestNumber != ''
@@ -68,8 +81,8 @@ jobs:
             echo "Failed to merge PR automatically. Manual intervention required."
             exit 1
           fi
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.ADMIN_TOKEN || secrets.GITHUB_TOKEN }}
 
   publish:
     needs: build
@@ -81,9 +94,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.ADMIN_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
       - name: Enable Corepack
         run: npm install -g pnpm
@@ -95,17 +112,23 @@ jobs:
         run: |
           git pull origin main
 
+      - name: Check for published versions
+        id: check-published
+        run: |
+          # Check if there are no .md files in .changeset directory (excluding README and config)
+          if [ -z "$(find .changeset -name "*.md" -not -name "README.md" -not -name "config.json" 2>/dev/null)" ]; then
+            echo "ALREADY_PUBLISHED=true" >> $GITHUB_OUTPUT
+            echo "No changesets found, packages were likely published in previous step"
+          else
+            echo "ALREADY_PUBLISHED=false" >> $GITHUB_OUTPUT
+            echo "Changesets found, will proceed with publish"
+          fi
+
       - name: Publish to npm
-        id: changesets
+        if: steps.check-published.outputs.ALREADY_PUBLISHED == 'false'
         uses: changesets/action@v1.4.1
         with:
-          run: |
-            git checkout main
-            git pull origin main
-          commit: 'chore(release): version packages'
-          title: 'chore(release): version packages'
-          version: node .github/changeset-version.js
           publish: npx changeset publish
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ADMIN_TOKEN || secrets.GITHUB_TOKEN }}
