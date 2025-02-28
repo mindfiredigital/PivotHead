@@ -44,7 +44,7 @@ importers:
 
   examples/simple-js-demo:
     dependencies:
-      '@mindfiredigital/pivothead':
+      '@mindfiredigital/pivothead-core':
         specifier: workspace:*
         version: link:../../packages/core
     devDependencies:
@@ -78,7 +78,7 @@ importers:
       '@angular/router':
         specifier: ^19.1.0
         version: 19.2.0(@angular/common@19.2.0(@angular/core@19.2.0(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@19.2.0(rxjs@7.8.2)(zone.js@0.15.0))(@angular/platform-browser@19.2.0(@angular/animations@19.2.0(@angular/core@19.2.0(rxjs@7.8.2)(zone.js@0.15.0)))(@angular/common@19.2.0(@angular/core@19.2.0(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@19.2.0(rxjs@7.8.2)(zone.js@0.15.0)))(rxjs@7.8.2)
-      '@mindfiredigital/pivothead':
+      '@mindfiredigital/pivothead-core':
         specifier: workspace:*
         version: link:../core
       rxjs:

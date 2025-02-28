@@ -53,7 +53,7 @@ if (packageName) {
 
   // Generate changeset content
   const changesetContent = `---
-'@mindfiredigital/pivothead-core-${packageName}': ${changeType}
+'@mindfiredigital/pivothead-${packageName}': ${changeType}
 ---
 ${description}
 `;
@@ -61,7 +61,7 @@ ${description}
   // Write to a changeset file
   fs.writeFileSync(`.changeset/auto-${Date.now()}.md`, changesetContent);
   console.log(
-    `✅ Changeset file created for package: pivothead-core-${packageName}`,
+    `✅ Changeset file created for package: pivothead-${packageName}`,
   );
 } else {
   console.log(

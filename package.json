@@ -42,6 +42,7 @@
     "prepare": "husky",
     "changeset": "changeset",
     "version-packages": "changeset version",
+    "changeset:autogenerate": "node .github/changeset-autogenerate.mjs",
     "release": "changeset publish"
   },
   "devDependencies": {
