@@ -12,7 +12,6 @@ const validScopes = [
   'vue',
   'svelte',
   'web-component',
-  'release',
 ];
 
 // Define regex patterns
