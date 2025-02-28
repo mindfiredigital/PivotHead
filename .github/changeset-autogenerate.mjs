@@ -51,20 +51,24 @@ if (packageName) {
   packageName = packageName.trim();
   description = description?.trim() || 'No description provided.';
 
+  // Determine the full package name based on scope
+  const packageName =
+    packageScope === 'core'
+      ? '@mindfiredigital/pivothead'
+      : `@mindfiredigital/pivothead-${packageScope}`;
+
   // Generate changeset content
   const changesetContent = `---
-'@mindfiredigital/pivothead-${packageName}': ${changeType}
----
-${description}
-`;
+  '${packageName}': ${changeType}
+  ---
+  ${description}
+  `;
 
   // Write to a changeset file
   fs.writeFileSync(`.changeset/auto-${Date.now()}.md`, changesetContent);
-  console.log(
-    `✅ Changeset file created for package: pivothead-${packageName}`,
-  );
+  console.log(`✅ Changeset file created for package: ${packageName}`);
 } else {
   console.log(
-    '⚠️ No valid package scope found in commit message. Valid scopes are: core, react, angular, vue, svelte, web-component',
+    '⚠️ No valid package scope found in commit message. Valid scopes are: core, react, angular, vue, svelte, web-component'
   );
 }

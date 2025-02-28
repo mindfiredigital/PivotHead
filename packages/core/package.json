@@ -1,5 +1,5 @@
 {
-  "name": "@mindfiredigital/pivothead-core",
+  "name": "@mindfiredigital/pivothead",
   "version": "1.0.0",
   "private": false,
   "main": "./dist/pivothead-core.umd.js",
