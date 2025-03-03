@@ -319,7 +319,7 @@ function renderTable() {
     console.log('Processed Data Headers:', state.processedData.headers);
     console.log('Processed Data Rows:', state.processedData.rows);
 
-    const tableContainer = document.getElementById('pivotTable');
+    const tableContainer = document.getElementById('myTable');
 
     // Clear previous content
     tableContainer.innerHTML = '';
@@ -619,7 +619,7 @@ function renderTable() {
     console.error('Error rendering table:', error);
 
     // Display error message to user
-    const tableContainer = document.getElementById('pivotTable');
+    const tableContainer = document.getElementById('myTable');
     tableContainer.innerHTML = `<div style="color: red; padding: 20px;">Error rendering table: ${error.message}</div>`;
   }
 }
@@ -795,7 +795,7 @@ function addDraggableStyles() {
         }
         
         /* Make sure table is responsive */
-        #pivotTable {
+        #myTable {
             overflow-x: auto;
             width: 100%;
         }
@@ -856,8 +856,8 @@ function addControlsHTML() {
     `;
 
   // Insert before the table
-  const pivotTable = document.getElementById('pivotTable');
-  pivotTable.parentNode.insertBefore(container, pivotTable);
+  const myTable = document.getElementById('myTable');
+  myTable.parentNode.insertBefore(container, myTable);
 }
 
 // Add this function to set up drag and drop functionality
