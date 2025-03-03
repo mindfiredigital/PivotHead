@@ -11,204 +11,8 @@
 import { createHeader } from './header/header.js';
 // Use PivotEngine directly from the global scope
 import { PivotEngine } from '@mindfiredigital/pivothead';
-
-const sampleData = [
-  {
-    date: '2024-01-01',
-    product: 'Widget A',
-    region: 'North',
-    sales: 1000,
-    quantity: 50,
-  },
-  {
-    date: '2024-01-01',
-    product: 'Widget B',
-    region: 'South',
-    sales: 1500,
-    quantity: 75,
-  },
-  {
-    date: '2024-01-01',
-    product: 'Widget D',
-    region: 'North',
-    sales: 1300,
-    quantity: 70,
-  },
-  {
-    date: '2024-01-02',
-    product: 'Widget A',
-    region: 'East',
-    sales: 1200,
-    quantity: 60,
-  },
-  {
-    date: '2024-01-02',
-    product: 'Widget A',
-    region: 'East',
-    sales: 100,
-    quantity: 44,
-  },
-  {
-    date: '2024-01-02',
-    product: 'Widget C',
-    region: 'West',
-    sales: 800,
-    quantity: 40,
-  },
-  {
-    date: '2024-01-03',
-    product: 'Widget B',
-    region: 'North',
-    sales: 1800,
-    quantity: 90,
-  },
-  {
-    date: '2024-01-03',
-    product: 'Widget C',
-    region: 'South',
-    sales: 1100,
-    quantity: 55,
-  },
-  {
-    date: '2024-01-04',
-    product: 'Widget A',
-    region: 'West',
-    sales: 1300,
-    quantity: 65,
-  },
-  {
-    date: '2024-01-04',
-    product: 'Widget B',
-    region: 'East',
-    sales: 1600,
-    quantity: 80,
-  },
-];
-
-const config = {
-  data: sampleData,
-  rows: [{ uniqueName: 'product', caption: 'Product' }],
-  columns: [{ uniqueName: 'region', caption: 'Region' }],
-  measures: [
-    {
-      uniqueName: 'sales',
-      caption: 'Total Sales',
-      aggregation: 'sum',
-      format: {
-        type: 'currency',
-        currency: 'USD',
-        locale: 'en-US',
-        decimals: 2,
-      },
-      sortable: true,
-    },
-    {
-      uniqueName: 'quantity',
-      caption: 'Total Quantity',
-      aggregation: 'sum',
-      format: {
-        type: 'number',
-        decimals: 0,
-        locale: 'en-US',
-      },
-      sortable: false,
-    },
-    {
-      uniqueName: 'averageSale',
-      caption: 'Average Sale',
-      aggregation: 'avg',
-      format: {
-        type: 'currency',
-        currency: 'USD',
-        locale: 'en-US',
-        decimals: 2,
-      },
-      formula: item => item.sales / item.quantity,
-      sortable: true,
-    },
-  ],
-  dimensions: [
-    { field: 'product', label: 'Product', type: 'string', sortable: true },
-    { field: 'region', label: 'Region', type: 'string', sortable: false },
-    { field: 'date', label: 'Date', type: 'date', sortable: true },
-    { field: 'sales', label: 'Sales', type: 'number', sortable: true },
-    { field: 'quantity', label: 'Quantity', type: 'number', sortable: false },
-  ],
-  defaultAggregation: 'sum',
-  isResponsive: true,
-  toolbar: true,
-  // Add initial sort configuration
-  initialSort: [
-    {
-      field: 'sales',
-      direction: 'desc',
-      type: 'measure',
-      aggregation: 'sum',
-    },
-  ],
-  groupConfig: {
-    rowFields: ['product'],
-    columnFields: ['region'],
-    grouper: (item, fields) => fields.map(field => item[field]).join(' - '),
-  },
-  formatting: {
-    sales: {
-      type: 'currency',
-      currency: 'USD',
-      locale: 'en-US',
-      decimals: 2,
-    },
-    quantity: {
-      type: 'number',
-      decimals: 0,
-      locale: 'en-US',
-    },
-    averageSale: {
-      type: 'currency',
-      currency: 'USD',
-      locale: 'en-US',
-      decimals: 2,
-    },
-  },
-  conditionalFormatting: [
-    {
-      value: {
-        type: 'Number',
-        operator: 'Greater than',
-        value1: '1000',
-        value2: '',
-      },
-      format: {
-        font: 'Arial',
-        size: '14px',
-        color: '#ffffff',
-        backgroundColor: '#4CAF50',
-      },
-    },
-    {
-      value: {
-        type: 'Number',
-        operator: 'Less than',
-        value1: '500',
-        value2: '',
-      },
-      format: {
-        font: 'Arial',
-        size: '14px',
-        color: '#ffffff',
-        backgroundColor: '#F44336',
-      },
-    },
-  ],
-  onRowDragEnd: (fromIndex, toIndex, newData) => {
-    console.log('Row dragged:', { fromIndex, toIndex, newData });
-    renderTable();
-  },
-  onColumnDragEnd: (fromIndex, toIndex, newColumns) => {
-    console.log('Column dragged:', { fromIndex, toIndex, newColumns });
-    renderTable();
-  },
-};
+import { sampleData } from './config/config.js';
+import { config } from './config/config.js';
 
 // Create a single instance of PivotEngine
 export let pivotEngine;
@@ -863,18 +667,23 @@ function addControlsHTML() {
 // Add this function to set up drag and drop functionality
 function setupDragAndDrop() {
   // Set up column drag and drop
-  const headers = document.querySelectorAll('th');
+  const headers = document.querySelectorAll('th[draggable="true"]');
   let draggedColumnIndex = null;
 
-  headers.forEach((header, index) => {
-    if (index === 0) return; // Skip the first header (Product / Region)
+  // Get the state to understand column structure
+  const state = pivotEngine.getState();
+  const uniqueRegions = [...new Set(state.data.map(item => item.region))];
+  const measuresPerRegion = state.measures.length;
 
-    header.setAttribute('draggable', 'true');
-    header.style.cursor = 'move';
+  headers.forEach(header => {
+    // Use dataset.index if available, otherwise fallback to calculating index
+    const headerIndex = header.dataset.index
+      ? parseInt(header.dataset.index)
+      : null;
 
     header.addEventListener('dragstart', e => {
-      draggedColumnIndex = index;
-      e.dataTransfer.setData('text/plain', index);
+      draggedColumnIndex = headerIndex;
+      e.dataTransfer.setData('text/plain', headerIndex);
       setTimeout(() => header.classList.add('dragging'), 0);
     });
 
@@ -890,8 +699,8 @@ function setupDragAndDrop() {
       e.preventDefault();
       if (
         draggedColumnIndex !== null &&
-        draggedColumnIndex !== index &&
-        index > 0
+        draggedColumnIndex !== headerIndex &&
+        headerIndex !== null
       ) {
         header.classList.add('drag-over');
       }
@@ -907,20 +716,36 @@ function setupDragAndDrop() {
 
       if (
         draggedColumnIndex !== null &&
-        draggedColumnIndex !== index &&
-        index > 0
+        draggedColumnIndex !== headerIndex &&
+        headerIndex !== null
       ) {
-        console.log(`Moving column from ${draggedColumnIndex} to ${index}`);
+        console.log(
+          `Moving column from ${draggedColumnIndex} to ${headerIndex}`
+        );
 
-        // Adjust indices to account for the first column (Product / Region)
-        const fromIndex = draggedColumnIndex - 1;
-        const toIndex = index - 1;
+        // Adjust indices for the pivot engine's internal column structure
+        // Convert UI header index to pivot engine column index (0-based)
+        const fromIndex = draggedColumnIndex;
+        const toIndex = headerIndex;
 
-        // Call the PivotEngine's column drag method
-        pivotEngine.dragColumn(fromIndex, toIndex);
+        // Validate indices are within range
+        if (fromIndex >= 0 && toIndex >= 0) {
+          try {
+            // Call the PivotEngine's column drag method
+            pivotEngine.dragColumn(fromIndex, toIndex);
 
-        // Re-render the table
-        renderTable();
+            // Re-render the table
+            renderTable();
+          } catch (error) {
+            console.error('Error during drag operation:', error);
+          }
+        } else {
+          console.warn(
+            'Invalid column indices for drag operation:',
+            fromIndex,
+            toIndex
+          );
+        }
       }
       draggedColumnIndex = null;
     });
@@ -931,8 +756,6 @@ function setupDragAndDrop() {
   let draggedRowIndex = null;
 
   rows.forEach((row, index) => {
-    if (index === rows.length - 1) return; // Skip the last row (Grand Total)
-
     row.setAttribute('draggable', 'true');
     row.style.cursor = 'move';
 
@@ -955,7 +778,7 @@ function setupDragAndDrop() {
       if (
         draggedRowIndex !== null &&
         draggedRowIndex !== index &&
-        index < rows.length - 1
+        index < rows.length
       ) {
         row.classList.add('drag-over');
       }
@@ -972,7 +795,7 @@ function setupDragAndDrop() {
       if (
         draggedRowIndex !== null &&
         draggedRowIndex !== index &&
-        index < rows.length - 1
+        index < rows.length
       ) {
         console.log(`Moving row from ${draggedRowIndex} to ${index}`);
 
