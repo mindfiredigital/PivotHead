@@ -12,13 +12,13 @@
   align-items: center;
 }
 
-#pivotTable {
+#myTable {
   margin: 20px;
   border-collapse: collapse;
 }
 
-#pivotTable th,
-#pivotTable td {
+#myTable th,
+#myTable td {
   border: 1px solid #ddd;
   padding: 8px;
 }

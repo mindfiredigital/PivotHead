@@ -361,7 +361,7 @@ export function conditionFormattingPopUp(config) {
 }
 
 function applyConditionalFormatting(config) {
-  const table = document.querySelector('#pivotTable table');
+  const table = document.querySelector('#myTable table');
   if (!table) {
     console.error('Pivot table not found');
     return;

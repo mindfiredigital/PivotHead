@@ -315,8 +315,8 @@ li .field-info input {
 
     const container = document.createElement('div');
     container.innerHTML = `
-      <div id="pivotTableContainer">
-          <table id="pivotTable" class="pivot-table"></table>
+      <div id="myTableContainer">
+          <table id="myTable" class="pivot-table"></table>
       </div>
 
       <div id="fieldSettingsPopup" class="popup">
