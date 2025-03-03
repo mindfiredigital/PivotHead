@@ -1,6 +1,6 @@
 {
   "name": "@mindfiredigital/pivothead",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "private": false,
   "main": "./dist/pivothead-core.umd.js",
   "module": "./dist/pivothead-core.mjs",
