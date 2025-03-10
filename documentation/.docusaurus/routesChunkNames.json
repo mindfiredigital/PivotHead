@@ -1,0 +1,114 @@
+{
+  "/pivothead/__docusaurus/debug-da8": {
+    "__comp": "__comp---theme-debug-config-23-a-2ff",
+    "__context": {
+      "plugin": "plugin---document-editor-docusaurus-debug-7-d-2-6b6"
+    }
+  },
+  "/pivothead/__docusaurus/debug/config-4e9": {
+    "__comp": "__comp---theme-debug-config-23-a-2ff",
+    "__context": {
+      "plugin": "plugin---document-editor-docusaurus-debug-7-d-2-6b6"
+    }
+  },
+  "/pivothead/__docusaurus/debug/content-98b": {
+    "__comp": "__comp---theme-debug-contentba-8-ce7",
+    "__context": {
+      "plugin": "plugin---document-editor-docusaurus-debug-7-d-2-6b6"
+    },
+    "allContent": "allContent---document-editor-docusaurus-debug-content-246-b2c"
+  },
+  "/pivothead/__docusaurus/debug/globalData-b55": {
+    "__comp": "__comp---theme-debug-global-dataede-0fa",
+    "__context": {
+      "plugin": "plugin---document-editor-docusaurus-debug-7-d-2-6b6"
+    }
+  },
+  "/pivothead/__docusaurus/debug/metadata-21f": {
+    "__comp": "__comp---theme-debug-site-metadata-68-e-3d4",
+    "__context": {
+      "plugin": "plugin---document-editor-docusaurus-debug-7-d-2-6b6"
+    }
+  },
+  "/pivothead/__docusaurus/debug/registry-448": {
+    "__comp": "__comp---theme-debug-registry-679-501",
+    "__context": {
+      "plugin": "plugin---document-editor-docusaurus-debug-7-d-2-6b6"
+    }
+  },
+  "/pivothead/__docusaurus/debug/routes-4c8": {
+    "__comp": "__comp---theme-debug-routes-946-699",
+    "__context": {
+      "plugin": "plugin---document-editor-docusaurus-debug-7-d-2-6b6"
+    }
+  },
+  "/pivothead/markdown-page-fc2": {
+    "__comp": "__comp---theme-mdx-page-1-f-3-b90",
+    "__context": {
+      "plugin": "plugin---document-editor-markdown-page-369-d87"
+    },
+    "content": "content---document-editor-markdown-page-393-aad"
+  },
+  "/pivothead/docs-035": {
+    "__comp": "__comp---theme-doc-page-1-be-9be",
+    "__context": {
+      "plugin": "plugin---document-editor-docs-0-eb-639"
+    },
+    "versionMetadata": "versionMetadata---document-editor-docs-935-bba"
+  },
+  "/pivothead/docs/category/contribution-guide-991": {
+    "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
+    "categoryGeneratedIndex": "categoryGeneratedIndex---pivothead-docs-category-contribution-guidec-53-c20"
+  },
+  "/pivothead/docs/category/tutorials-087": {
+    "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
+    "categoryGeneratedIndex": "categoryGeneratedIndex---pivothead-docs-category-tutorials-644-544"
+  },
+  "/pivothead/docs/contributors/-d08": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---document-editor-docs-contributors-6-f-4-c6c"
+  },
+  "/pivothead/docs/contributors/code-of-conduct-3c8": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---document-editor-docs-contributors-code-of-conductf-3-e-9fa"
+  },
+  "/pivothead/docs/contributors/how-to-contribute-dab": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---document-editor-docs-contributors-how-to-contribute-42-f-1de"
+  },
+  "/pivothead/docs/Installation-2e8": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---document-editor-docs-installation-1-ff-df7"
+  },
+  "/pivothead/docs/tutorial-basics/api-reference-37c": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---document-editor-docs-tutorial-basics-api-reference-2-b-0-383"
+  },
+  "/pivothead/docs/tutorial-basics/core-concepts-7af": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---document-editor-docs-tutorial-basics-core-concepts-012-65f"
+  },
+  "/pivothead/docs/tutorial-basics/examples-858": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---document-editor-docs-tutorial-basics-examples-550-ec7"
+  },
+  "/pivothead/docs/tutorial-basics/troubleshooting-3c6": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---document-editor-docs-tutorial-basics-troubleshooting-18-f-8cb"
+  },
+  "/pivothead/docs/what-is-pivothead-746": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---document-editor-docs-what-is-pivothead-4-ce-df1"
+  },
+  "/pivothead/docs/Why-we-use-pivothead-861": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---document-editor-docs-why-we-use-pivotheada-8-b-875"
+  },
+  "/pivothead/-504": {
+    "__comp": "__comp---site-src-pages-index-jsc-4-f-f99",
+    "__context": {
+      "plugin": "plugin---document-editor-markdown-page-369-d87"
+    },
+    "config": "config---document-editor-5-e-9-85e"
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "docusaurus-plugin-content-docs": {
+    "default": {
+      "path": "/pivothead/docs",
+      "versions": [
+        {
+          "name": "current",
+          "label": "Next",
+          "isLast": true,
+          "path": "/pivothead/docs",
+          "mainDocId": "what-is-pivothead",
+          "docs": [
+            {
+              "id": "contributors/code-of-conduct",
+              "path": "/pivothead/docs/contributors/code-of-conduct",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "contributors/contributors",
+              "path": "/pivothead/docs/contributors/",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "contributors/how-to-contribute",
+              "path": "/pivothead/docs/contributors/how-to-contribute",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "Installation",
+              "path": "/pivothead/docs/Installation",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "tutorial-basics/api-reference",
+              "path": "/pivothead/docs/tutorial-basics/api-reference",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "tutorial-basics/core-concepts",
+              "path": "/pivothead/docs/tutorial-basics/core-concepts",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "tutorial-basics/examples",
+              "path": "/pivothead/docs/tutorial-basics/examples",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "tutorial-basics/troubleshooting",
+              "path": "/pivothead/docs/tutorial-basics/troubleshooting",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "what-is-pivothead",
+              "path": "/pivothead/docs/what-is-pivothead",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "Why-we-use-pivothead",
+              "path": "/pivothead/docs/Why-we-use-pivothead",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "/category/tutorials",
+              "path": "/pivothead/docs/category/tutorials",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "/category/contribution-guide",
+              "path": "/pivothead/docs/category/contribution-guide",
+              "sidebar": "tutorialSidebar"
+            }
+          ],
+          "draftIds": [],
+          "sidebars": {
+            "tutorialSidebar": {
+              "link": {
+                "path": "/pivothead/docs/what-is-pivothead",
+                "label": "what-is-pivothead"
+              }
+            }
+          }
+        }
+      ],
+      "breadcrumbs": true
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "unversionedId": "tutorial-basics/examples",
+  "id": "tutorial-basics/examples",
+  "title": "Examples & Usage",
+  "description": "Examples & Usage of PivotHead",
+  "source": "@site/docs/tutorial-basics/examples.md",
+  "sourceDirName": "tutorial-basics",
+  "slug": "/tutorial-basics/examples",
+  "permalink": "/pivothead/docs/tutorial-basics/examples",
+  "draft": false,
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 3,
+  "frontMatter": {
+    "sidebar_position": 3,
+    "title": "Examples & Usage",
+    "description": "Examples & Usage of PivotHead"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Api Reference",
+    "permalink": "/pivothead/docs/tutorial-basics/api-reference"
+  },
+  "next": {
+    "title": "Troubleshooting",
+    "permalink": "/pivothead/docs/tutorial-basics/troubleshooting"
+  }
+}

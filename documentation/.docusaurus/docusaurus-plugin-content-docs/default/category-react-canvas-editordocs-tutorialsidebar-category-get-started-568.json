@@ -1,0 +1,15 @@
+{
+  "title": "Get Started",
+  "slug": "/category/get-started",
+  "permalink": "/react-canvas-editor/docs/category/get-started",
+  "navigation": {
+    "previous": {
+      "title": "Why Canvas Editor",
+      "permalink": "/react-canvas-editor/docs/Why-we-use-canvas/"
+    },
+    "next": {
+      "title": "Installation",
+      "permalink": "/react-canvas-editor/docs/Get-started/Installation"
+    }
+  }
+}

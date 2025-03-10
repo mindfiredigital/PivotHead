@@ -1,0 +1,15 @@
+{
+  "title": "Release",
+  "slug": "/category/release",
+  "permalink": "/document-editor/docs/category/release",
+  "navigation": {
+    "previous": {
+      "title": "Code of conduct",
+      "permalink": "/document-editor/docs/contributors/code-of-conduct"
+    },
+    "next": {
+      "title": "Change logs",
+      "permalink": "/document-editor/docs/release/change-logs"
+    }
+  }
+}

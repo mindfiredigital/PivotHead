@@ -1,0 +1,28 @@
+{
+  "unversionedId": "tutorial-basics/api-reference",
+  "id": "tutorial-basics/api-reference",
+  "title": "Api Reference",
+  "description": "Understanding the Api References of PivotHead",
+  "source": "@site/docs/tutorial-basics/api-reference.md",
+  "sourceDirName": "tutorial-basics",
+  "slug": "/tutorial-basics/api-reference",
+  "permalink": "/pivothead/docs/tutorial-basics/api-reference",
+  "draft": false,
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 2,
+  "frontMatter": {
+    "sidebar_position": 2,
+    "title": "Api Reference",
+    "description": "Understanding the Api References of PivotHead"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Core Concepts",
+    "permalink": "/pivothead/docs/tutorial-basics/core-concepts"
+  },
+  "next": {
+    "title": "Examples & Usage",
+    "permalink": "/pivothead/docs/tutorial-basics/examples"
+  }
+}
