@@ -4,13 +4,13 @@
  * Modify the docusaurus.config.js file at your site's root instead.
  */
 export default {
-  "title": "PivotHead",
-  "tagline": "PivotHead is a headlessPivot, powerful and flexible library for creating interactive pivot tables in JavaScript applications.",
+  "title": "PivotHead Documentation",
+  "tagline": "Documentation for the PivotHead project",
   "favicon": "img/mindfire.ico",
   "url": "https://mindfiredigital.github.io",
   "baseUrl": "/pivothead/",
   "organizationName": "mindfiredigital",
-  "projectName": "pivothead",
+  "projectName": "PivotHead",
   "onBrokenLinks": "throw",
   "onBrokenMarkdownLinks": "warn",
   "i18n": {
@@ -26,7 +26,12 @@ export default {
       "classic",
       {
         "docs": {
-          "sidebarPath": "D:\\PivotHead\\documentation\\sidebars.js"
+          "sidebarPath": "D:\\PivotHead\\documentation\\sidebars.js",
+          "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/"
+        },
+        "blog": {
+          "showReadingTime": true,
+          "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/"
         },
         "theme": {
           "customCss": "D:\\PivotHead\\documentation\\src\\css\\custom.css"
@@ -37,22 +42,18 @@ export default {
   "themeConfig": {
     "image": "img/docusaurus-social-card.jpg",
     "navbar": {
-      "title": "",
-      "logo": {
-        "alt": "My Site Logo",
-        "src": "img/logo.webp"
-      },
+      "title": "PivotHead",
       "items": [
-        {
-          "to": "/",
-          "label": "Home",
-          "position": "right"
-        },
         {
           "type": "docSidebar",
           "sidebarId": "tutorialSidebar",
+          "position": "left",
+          "label": "Documentation"
+        },
+        {
+          "href": "https://www.npmjs.com/package/@mindfiredigital/pivothead",
           "position": "right",
-          "label": "Tutorials"
+          "html": "\n              <a href=\"https://www.npmjs.com/package/@mindfiredigital/pivothead\" style=\"display: flex; align-items: center;\">\n                <img src=\"https://img.shields.io/npm/v/@mindfiredigital/pivothead.svg\" alt=\"npm version\" style=\"vertical-align: middle; margin-right: 5px;\" />\n                <img src=\"https://img.shields.io/npm/dt/@mindfiredigital/pivothead.svg\" alt=\"total downloads\" style=\"vertical-align: middle;\" />\n              </a>\n            "
         },
         {
           "href": "https://github.com/mindfiredigital/PivotHead",
@@ -64,8 +65,8 @@ export default {
     },
     "footer": {
       "style": "dark",
-      "links": [],
-      "copyright": "Copyright © 2025 Mindfire Digital LLP"
+      "copyright": "Copyright © 2025 MindfireDigital",
+      "links": []
     },
     "prism": {
       "theme": {

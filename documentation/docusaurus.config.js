@@ -6,9 +6,8 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'PivotHead',
-  tagline:
-    'PivotHead is a headlessPivot, powerful and flexible library for creating interactive pivot tables in JavaScript applications.',
+  title: 'PivotHead Documentation',
+  tagline: 'Documentation for the PivotHead project',
   favicon: 'img/mindfire.ico',
 
   // Set the production url of your site here
@@ -20,7 +19,7 @@ const config = {
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: 'mindfiredigital', // Usually your GitHub org/user name.
-  projectName: 'pivothead', // Usually your repo name.
+  projectName: 'PivotHead', // Usually your repo name.
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -42,6 +41,15 @@ const config = {
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
+          editUrl:
+            'https://github.com/mindfiredigital/PivotHead/tree/main/documentation/',
+        },
+        blog: {
+          showReadingTime: true,
+          // Please change this to your repo.
+          // Remove this to remove the "edit this page" links.
+          editUrl:
+            'https://github.com/mindfiredigital/PivotHead/tree/main/documentation/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
@@ -56,18 +64,24 @@ const config = {
       // Replace with your project's social card
       image: 'img/docusaurus-social-card.jpg',
       navbar: {
-        title: '',
-        logo: {
-          alt: 'My Site Logo',
-          src: 'img/logo.webp',
-        },
+        title: 'PivotHead',
+
         items: [
-          { to: '/', label: 'Home', position: 'right' },
           {
             type: 'docSidebar',
             sidebarId: 'tutorialSidebar',
+            position: 'left',
+            label: 'Documentation',
+          },
+          {
+            href: 'https://www.npmjs.com/package/@mindfiredigital/pivothead',
             position: 'right',
-            label: 'Tutorials',
+            html: `
+              <a href="https://www.npmjs.com/package/@mindfiredigital/pivothead" style="display: flex; align-items: center;">
+                <img src="https://img.shields.io/npm/v/@mindfiredigital/pivothead.svg" alt="npm version" style="vertical-align: middle; margin-right: 5px;" />
+                <img src="https://img.shields.io/npm/dt/@mindfiredigital/pivothead.svg" alt="total downloads" style="vertical-align: middle;" />
+              </a>
+            `,
           },
           {
             href: 'https://github.com/mindfiredigital/PivotHead',
@@ -78,8 +92,8 @@ const config = {
       },
       footer: {
         style: 'dark',
-        links: [],
-        copyright: `Copyright © ${new Date().getFullYear()} Mindfire Digital LLP`,
+
+        copyright: `Copyright © ${new Date().getFullYear()} MindfireDigital`,
       },
       prism: {
         theme: lightCodeTheme,

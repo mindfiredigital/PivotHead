@@ -87,10 +87,10 @@ export default {
     '@theme/MDXPage',
     require.resolveWeak('@theme/MDXPage'),
   ],
-  'allContent---document-editor-docusaurus-debug-content-246-b2c': [
+  'allContent---docusaurus-debug-content-246-9aa': [
     () =>
       import(
-        /* webpackChunkName: 'allContent---document-editor-docusaurus-debug-content-246-b2c' */ '~debug/default/docusaurus-debug-all-content-673.json'
+        /* webpackChunkName: 'allContent---docusaurus-debug-content-246-9aa' */ '~debug/default/docusaurus-debug-all-content-673.json'
       ),
     '~debug/default/docusaurus-debug-all-content-673.json',
     require.resolveWeak('~debug/default/docusaurus-debug-all-content-673.json'),
@@ -116,136 +116,136 @@ export default {
       '~docs/default/category-pivotheaddocs-tutorialsidebar-category-tutorials-792.json'
     ),
   ],
-  'config---document-editor-5-e-9-85e': [
+  'config---5-e-9-4f3': [
     () =>
       import(
-        /* webpackChunkName: 'config---document-editor-5-e-9-85e' */ '@generated/docusaurus.config'
+        /* webpackChunkName: 'config---5-e-9-4f3' */ '@generated/docusaurus.config'
       ),
     '@generated/docusaurus.config',
     require.resolveWeak('@generated/docusaurus.config'),
   ],
-  'content---document-editor-docs-contributors-6-f-4-c6c': [
+  'content---docs-contributors-6-f-4-03b': [
     () =>
       import(
-        /* webpackChunkName: 'content---document-editor-docs-contributors-6-f-4-c6c' */ '@site/docs/contributors/contributors.md'
+        /* webpackChunkName: 'content---docs-contributors-6-f-4-03b' */ '@site/docs/contributors/contributors.md'
       ),
     '@site/docs/contributors/contributors.md',
     require.resolveWeak('@site/docs/contributors/contributors.md'),
   ],
-  'content---document-editor-docs-contributors-code-of-conductf-3-e-9fa': [
+  'content---docs-contributors-code-of-conductf-3-e-9c7': [
     () =>
       import(
-        /* webpackChunkName: 'content---document-editor-docs-contributors-code-of-conductf-3-e-9fa' */ '@site/docs/contributors/code-of-conduct.md'
+        /* webpackChunkName: 'content---docs-contributors-code-of-conductf-3-e-9c7' */ '@site/docs/contributors/code-of-conduct.md'
       ),
     '@site/docs/contributors/code-of-conduct.md',
     require.resolveWeak('@site/docs/contributors/code-of-conduct.md'),
   ],
-  'content---document-editor-docs-contributors-how-to-contribute-42-f-1de': [
+  'content---docs-contributors-how-to-contribute-42-f-3b3': [
     () =>
       import(
-        /* webpackChunkName: 'content---document-editor-docs-contributors-how-to-contribute-42-f-1de' */ '@site/docs/contributors/how-to-contribute.md'
+        /* webpackChunkName: 'content---docs-contributors-how-to-contribute-42-f-3b3' */ '@site/docs/contributors/how-to-contribute.md'
       ),
     '@site/docs/contributors/how-to-contribute.md',
     require.resolveWeak('@site/docs/contributors/how-to-contribute.md'),
   ],
-  'content---document-editor-docs-installation-1-ff-df7': [
+  'content---docs-installation-1-ff-9fd': [
     () =>
       import(
-        /* webpackChunkName: 'content---document-editor-docs-installation-1-ff-df7' */ '@site/docs/Installation.md'
+        /* webpackChunkName: 'content---docs-installation-1-ff-9fd' */ '@site/docs/Installation.md'
       ),
     '@site/docs/Installation.md',
     require.resolveWeak('@site/docs/Installation.md'),
   ],
-  'content---document-editor-docs-tutorial-basics-api-reference-2-b-0-383': [
+  'content---docs-tutorial-basics-api-reference-2-b-0-76c': [
     () =>
       import(
-        /* webpackChunkName: 'content---document-editor-docs-tutorial-basics-api-reference-2-b-0-383' */ '@site/docs/tutorial-basics/api-reference.md'
+        /* webpackChunkName: 'content---docs-tutorial-basics-api-reference-2-b-0-76c' */ '@site/docs/tutorial-basics/api-reference.md'
       ),
     '@site/docs/tutorial-basics/api-reference.md',
     require.resolveWeak('@site/docs/tutorial-basics/api-reference.md'),
   ],
-  'content---document-editor-docs-tutorial-basics-core-concepts-012-65f': [
+  'content---docs-tutorial-basics-core-concepts-012-333': [
     () =>
       import(
-        /* webpackChunkName: 'content---document-editor-docs-tutorial-basics-core-concepts-012-65f' */ '@site/docs/tutorial-basics/core-concepts.md'
+        /* webpackChunkName: 'content---docs-tutorial-basics-core-concepts-012-333' */ '@site/docs/tutorial-basics/core-concepts.md'
       ),
     '@site/docs/tutorial-basics/core-concepts.md',
     require.resolveWeak('@site/docs/tutorial-basics/core-concepts.md'),
   ],
-  'content---document-editor-docs-tutorial-basics-examples-550-ec7': [
+  'content---docs-tutorial-basics-examples-550-368': [
     () =>
       import(
-        /* webpackChunkName: 'content---document-editor-docs-tutorial-basics-examples-550-ec7' */ '@site/docs/tutorial-basics/examples.md'
+        /* webpackChunkName: 'content---docs-tutorial-basics-examples-550-368' */ '@site/docs/tutorial-basics/examples.md'
       ),
     '@site/docs/tutorial-basics/examples.md',
     require.resolveWeak('@site/docs/tutorial-basics/examples.md'),
   ],
-  'content---document-editor-docs-tutorial-basics-troubleshooting-18-f-8cb': [
+  'content---docs-tutorial-basics-troubleshooting-18-f-988': [
     () =>
       import(
-        /* webpackChunkName: 'content---document-editor-docs-tutorial-basics-troubleshooting-18-f-8cb' */ '@site/docs/tutorial-basics/troubleshooting.md'
+        /* webpackChunkName: 'content---docs-tutorial-basics-troubleshooting-18-f-988' */ '@site/docs/tutorial-basics/troubleshooting.md'
       ),
     '@site/docs/tutorial-basics/troubleshooting.md',
     require.resolveWeak('@site/docs/tutorial-basics/troubleshooting.md'),
   ],
-  'content---document-editor-docs-what-is-pivothead-4-ce-df1': [
+  'content---docs-what-is-pivothead-4-ce-6de': [
     () =>
       import(
-        /* webpackChunkName: 'content---document-editor-docs-what-is-pivothead-4-ce-df1' */ '@site/docs/what-is-pivothead.md'
+        /* webpackChunkName: 'content---docs-what-is-pivothead-4-ce-6de' */ '@site/docs/what-is-pivothead.md'
       ),
     '@site/docs/what-is-pivothead.md',
     require.resolveWeak('@site/docs/what-is-pivothead.md'),
   ],
-  'content---document-editor-docs-why-we-use-pivotheada-8-b-875': [
+  'content---docs-why-we-use-pivotheada-8-b-5bc': [
     () =>
       import(
-        /* webpackChunkName: 'content---document-editor-docs-why-we-use-pivotheada-8-b-875' */ '@site/docs/Why-we-use-pivothead.md'
+        /* webpackChunkName: 'content---docs-why-we-use-pivotheada-8-b-5bc' */ '@site/docs/Why-we-use-pivothead.md'
       ),
     '@site/docs/Why-we-use-pivothead.md',
     require.resolveWeak('@site/docs/Why-we-use-pivothead.md'),
   ],
-  'content---document-editor-markdown-page-393-aad': [
+  'content---markdown-page-393-028': [
     () =>
       import(
-        /* webpackChunkName: 'content---document-editor-markdown-page-393-aad' */ '@site/src/pages/markdown-page.md'
+        /* webpackChunkName: 'content---markdown-page-393-028' */ '@site/src/pages/markdown-page.md'
       ),
     '@site/src/pages/markdown-page.md',
     require.resolveWeak('@site/src/pages/markdown-page.md'),
   ],
-  'plugin---document-editor-docs-0-eb-639': [
+  'plugin---docs-0-eb-762': [
     () =>
       import(
-        /* webpackChunkName: 'plugin---document-editor-docs-0-eb-639' */ 'D:\\PivotHead\\documentation\\.docusaurus\\docusaurus-plugin-content-docs\\default\\plugin-route-context-module-100.json'
+        /* webpackChunkName: 'plugin---docs-0-eb-762' */ 'D:\\PivotHead\\documentation\\.docusaurus\\docusaurus-plugin-content-docs\\default\\plugin-route-context-module-100.json'
       ),
     'D:\\PivotHead\\documentation\\.docusaurus\\docusaurus-plugin-content-docs\\default\\plugin-route-context-module-100.json',
     require.resolveWeak(
       'D:\\PivotHead\\documentation\\.docusaurus\\docusaurus-plugin-content-docs\\default\\plugin-route-context-module-100.json'
     ),
   ],
-  'plugin---document-editor-docusaurus-debug-7-d-2-6b6': [
+  'plugin---docusaurus-debug-7-d-2-da0': [
     () =>
       import(
-        /* webpackChunkName: 'plugin---document-editor-docusaurus-debug-7-d-2-6b6' */ 'D:\\PivotHead\\documentation\\.docusaurus\\docusaurus-plugin-debug\\default\\plugin-route-context-module-100.json'
+        /* webpackChunkName: 'plugin---docusaurus-debug-7-d-2-da0' */ 'D:\\PivotHead\\documentation\\.docusaurus\\docusaurus-plugin-debug\\default\\plugin-route-context-module-100.json'
       ),
     'D:\\PivotHead\\documentation\\.docusaurus\\docusaurus-plugin-debug\\default\\plugin-route-context-module-100.json',
     require.resolveWeak(
       'D:\\PivotHead\\documentation\\.docusaurus\\docusaurus-plugin-debug\\default\\plugin-route-context-module-100.json'
     ),
   ],
-  'plugin---document-editor-markdown-page-369-d87': [
+  'plugin---markdown-page-369-d43': [
     () =>
       import(
-        /* webpackChunkName: 'plugin---document-editor-markdown-page-369-d87' */ 'D:\\PivotHead\\documentation\\.docusaurus\\docusaurus-plugin-content-pages\\default\\plugin-route-context-module-100.json'
+        /* webpackChunkName: 'plugin---markdown-page-369-d43' */ 'D:\\PivotHead\\documentation\\.docusaurus\\docusaurus-plugin-content-pages\\default\\plugin-route-context-module-100.json'
       ),
     'D:\\PivotHead\\documentation\\.docusaurus\\docusaurus-plugin-content-pages\\default\\plugin-route-context-module-100.json',
     require.resolveWeak(
       'D:\\PivotHead\\documentation\\.docusaurus\\docusaurus-plugin-content-pages\\default\\plugin-route-context-module-100.json'
     ),
   ],
-  'versionMetadata---document-editor-docs-935-bba': [
+  'versionMetadata---docs-935-398': [
     () =>
       import(
-        /* webpackChunkName: 'versionMetadata---document-editor-docs-935-bba' */ '~docs/default/version-current-metadata-prop-751.json'
+        /* webpackChunkName: 'versionMetadata---docs-935-398' */ '~docs/default/version-current-metadata-prop-751.json'
       ),
     '~docs/default/version-current-metadata-prop-751.json',
     require.resolveWeak('~docs/default/version-current-metadata-prop-751.json'),
