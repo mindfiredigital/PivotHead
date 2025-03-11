@@ -330,13 +330,4 @@ Here's a complete example that you can copy and paste into an HTML file to get s
 </html>
 ```
 
-## Next Steps
-
-Now that you have a basic understanding of how to set up PivotHead, you can:
-
-1. Explore the [Core Concepts](./core-concepts) to understand the fundamental building blocks
-2. Learn about [Advanced Features](./advanced-features) like conditional formatting and custom measures
-3. Check out the [API Reference](./api-reference) for detailed documentation on available methods
-4. See the [Examples](./examples) section for practical use cases and code samples
-
 With these basics in place, you're ready to start building powerful data visualization tools with PivotHead!

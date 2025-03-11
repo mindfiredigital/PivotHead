@@ -142,5 +142,3 @@ const state = engine.getState();
 ## Conclusion
 
 PivotHead combines the power of traditional pivot tables with the flexibility and performance of modern JavaScript. Whether you're building internal dashboards, customer-facing analytics tools, or complex reporting systems, PivotHead provides the features and performance you need to turn data into insights.
-
-Ready to get started? Check out our [Getting Started Guide](./getting-started) or dive into the [API Reference](./api-reference) to learn more.
