@@ -8,7 +8,7 @@ export default {
   "tagline": "Documentation for the PivotHead",
   "favicon": "img/mindfire.ico",
   "url": "https://mindfiredigital.github.io",
-  "baseUrl": "/pivothead/",
+  "baseUrl": "/PivotHead/",
   "organizationName": "mindfiredigital",
   "projectName": "PivotHead",
   "onBrokenLinks": "throw",

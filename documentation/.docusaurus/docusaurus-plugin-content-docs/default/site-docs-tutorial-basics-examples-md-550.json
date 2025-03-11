@@ -6,7 +6,7 @@
   "source": "@site/docs/tutorial-basics/examples.md",
   "sourceDirName": "tutorial-basics",
   "slug": "/tutorial-basics/examples",
-  "permalink": "/pivothead/docs/tutorial-basics/examples",
+  "permalink": "/PivotHead/docs/tutorial-basics/examples",
   "draft": false,
   "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorial-basics/examples.md",
   "tags": [],
@@ -20,10 +20,10 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "Api Reference",
-    "permalink": "/pivothead/docs/tutorial-basics/api-reference"
+    "permalink": "/PivotHead/docs/tutorial-basics/api-reference"
   },
   "next": {
     "title": "Troubleshooting",
-    "permalink": "/pivothead/docs/tutorial-basics/troubleshooting"
+    "permalink": "/PivotHead/docs/tutorial-basics/troubleshooting"
   }
 }

@@ -6,7 +6,7 @@
   "source": "@site/docs/tutorial-basics/core-concepts.md",
   "sourceDirName": "tutorial-basics",
   "slug": "/tutorial-basics/core-concepts",
-  "permalink": "/pivothead/docs/tutorial-basics/core-concepts",
+  "permalink": "/PivotHead/docs/tutorial-basics/core-concepts",
   "draft": false,
   "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorial-basics/core-concepts.md",
   "tags": [],
@@ -20,10 +20,10 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "Tutorials",
-    "permalink": "/pivothead/docs/category/tutorials"
+    "permalink": "/PivotHead/docs/category/tutorials"
   },
   "next": {
     "title": "Api Reference",
-    "permalink": "/pivothead/docs/tutorial-basics/api-reference"
+    "permalink": "/PivotHead/docs/tutorial-basics/api-reference"
   }
 }

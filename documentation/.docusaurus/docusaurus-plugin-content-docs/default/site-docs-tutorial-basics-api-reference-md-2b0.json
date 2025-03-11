@@ -6,7 +6,7 @@
   "source": "@site/docs/tutorial-basics/api-reference.md",
   "sourceDirName": "tutorial-basics",
   "slug": "/tutorial-basics/api-reference",
-  "permalink": "/pivothead/docs/tutorial-basics/api-reference",
+  "permalink": "/PivotHead/docs/tutorial-basics/api-reference",
   "draft": false,
   "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorial-basics/api-reference.md",
   "tags": [],
@@ -20,10 +20,10 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "Core Concepts",
-    "permalink": "/pivothead/docs/tutorial-basics/core-concepts"
+    "permalink": "/PivotHead/docs/tutorial-basics/core-concepts"
   },
   "next": {
     "title": "Examples & Usage",
-    "permalink": "/pivothead/docs/tutorial-basics/examples"
+    "permalink": "/PivotHead/docs/tutorial-basics/examples"
   }
 }
