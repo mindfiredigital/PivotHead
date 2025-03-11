@@ -35,7 +35,7 @@ PivotHead is a headlessPivot, powerful and flexible library for creating interac
 To install PivotHead, use npm or yarn:
 
 ```bash
-pnpm install @mindfiredigital/pivothead
+npm install @mindfiredigital/pivothead
 
 ```
 
