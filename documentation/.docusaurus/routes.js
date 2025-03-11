@@ -3,153 +3,153 @@ import ComponentCreator from '@docusaurus/ComponentCreator';
 
 export default [
   {
-    path: '/pivothead/__docusaurus/debug',
-    component: ComponentCreator('/pivothead/__docusaurus/debug', 'da8'),
+    path: '/PivotHead/__docusaurus/debug',
+    component: ComponentCreator('/PivotHead/__docusaurus/debug', '968'),
     exact: true,
   },
   {
-    path: '/pivothead/__docusaurus/debug/config',
-    component: ComponentCreator('/pivothead/__docusaurus/debug/config', '4e9'),
+    path: '/PivotHead/__docusaurus/debug/config',
+    component: ComponentCreator('/PivotHead/__docusaurus/debug/config', '96d'),
     exact: true,
   },
   {
-    path: '/pivothead/__docusaurus/debug/content',
-    component: ComponentCreator('/pivothead/__docusaurus/debug/content', '98b'),
+    path: '/PivotHead/__docusaurus/debug/content',
+    component: ComponentCreator('/PivotHead/__docusaurus/debug/content', '174'),
     exact: true,
   },
   {
-    path: '/pivothead/__docusaurus/debug/globalData',
+    path: '/PivotHead/__docusaurus/debug/globalData',
     component: ComponentCreator(
-      '/pivothead/__docusaurus/debug/globalData',
-      'b55'
+      '/PivotHead/__docusaurus/debug/globalData',
+      'a5a'
     ),
     exact: true,
   },
   {
-    path: '/pivothead/__docusaurus/debug/metadata',
+    path: '/PivotHead/__docusaurus/debug/metadata',
     component: ComponentCreator(
-      '/pivothead/__docusaurus/debug/metadata',
-      '21f'
+      '/PivotHead/__docusaurus/debug/metadata',
+      '4c7'
     ),
     exact: true,
   },
   {
-    path: '/pivothead/__docusaurus/debug/registry',
+    path: '/PivotHead/__docusaurus/debug/registry',
     component: ComponentCreator(
-      '/pivothead/__docusaurus/debug/registry',
-      '448'
+      '/PivotHead/__docusaurus/debug/registry',
+      '682'
     ),
     exact: true,
   },
   {
-    path: '/pivothead/__docusaurus/debug/routes',
-    component: ComponentCreator('/pivothead/__docusaurus/debug/routes', '4c8'),
+    path: '/PivotHead/__docusaurus/debug/routes',
+    component: ComponentCreator('/PivotHead/__docusaurus/debug/routes', 'bcd'),
     exact: true,
   },
   {
-    path: '/pivothead/markdown-page',
-    component: ComponentCreator('/pivothead/markdown-page', 'fc2'),
+    path: '/PivotHead/markdown-page',
+    component: ComponentCreator('/PivotHead/markdown-page', 'c5b'),
     exact: true,
   },
   {
-    path: '/pivothead/docs',
-    component: ComponentCreator('/pivothead/docs', '035'),
+    path: '/PivotHead/docs',
+    component: ComponentCreator('/PivotHead/docs', 'a25'),
     routes: [
       {
-        path: '/pivothead/docs/category/contribution-guide',
+        path: '/PivotHead/docs/category/contribution-guide',
         component: ComponentCreator(
-          '/pivothead/docs/category/contribution-guide',
-          '991'
+          '/PivotHead/docs/category/contribution-guide',
+          '9c0'
         ),
         exact: true,
         sidebar: 'tutorialSidebar',
       },
       {
-        path: '/pivothead/docs/category/tutorials',
+        path: '/PivotHead/docs/category/tutorials',
         component: ComponentCreator(
-          '/pivothead/docs/category/tutorials',
-          '087'
+          '/PivotHead/docs/category/tutorials',
+          '061'
         ),
         exact: true,
         sidebar: 'tutorialSidebar',
       },
       {
-        path: '/pivothead/docs/contributors/',
-        component: ComponentCreator('/pivothead/docs/contributors/', 'd08'),
+        path: '/PivotHead/docs/contributors/',
+        component: ComponentCreator('/PivotHead/docs/contributors/', 'da1'),
         exact: true,
         sidebar: 'tutorialSidebar',
       },
       {
-        path: '/pivothead/docs/contributors/code-of-conduct',
+        path: '/PivotHead/docs/contributors/code-of-conduct',
         component: ComponentCreator(
-          '/pivothead/docs/contributors/code-of-conduct',
+          '/PivotHead/docs/contributors/code-of-conduct',
+          'ea0'
+        ),
+        exact: true,
+        sidebar: 'tutorialSidebar',
+      },
+      {
+        path: '/PivotHead/docs/contributors/how-to-contribute',
+        component: ComponentCreator(
+          '/PivotHead/docs/contributors/how-to-contribute',
+          '3df'
+        ),
+        exact: true,
+        sidebar: 'tutorialSidebar',
+      },
+      {
+        path: '/PivotHead/docs/Installation',
+        component: ComponentCreator('/PivotHead/docs/Installation', '05f'),
+        exact: true,
+        sidebar: 'tutorialSidebar',
+      },
+      {
+        path: '/PivotHead/docs/tutorial-basics/api-reference',
+        component: ComponentCreator(
+          '/PivotHead/docs/tutorial-basics/api-reference',
+          'e89'
+        ),
+        exact: true,
+        sidebar: 'tutorialSidebar',
+      },
+      {
+        path: '/PivotHead/docs/tutorial-basics/core-concepts',
+        component: ComponentCreator(
+          '/PivotHead/docs/tutorial-basics/core-concepts',
           '3c8'
         ),
         exact: true,
         sidebar: 'tutorialSidebar',
       },
       {
-        path: '/pivothead/docs/contributors/how-to-contribute',
+        path: '/PivotHead/docs/tutorial-basics/examples',
         component: ComponentCreator(
-          '/pivothead/docs/contributors/how-to-contribute',
-          'dab'
+          '/PivotHead/docs/tutorial-basics/examples',
+          '0e5'
         ),
         exact: true,
         sidebar: 'tutorialSidebar',
       },
       {
-        path: '/pivothead/docs/Installation',
-        component: ComponentCreator('/pivothead/docs/Installation', '2e8'),
-        exact: true,
-        sidebar: 'tutorialSidebar',
-      },
-      {
-        path: '/pivothead/docs/tutorial-basics/api-reference',
+        path: '/PivotHead/docs/tutorial-basics/troubleshooting',
         component: ComponentCreator(
-          '/pivothead/docs/tutorial-basics/api-reference',
-          '37c'
+          '/PivotHead/docs/tutorial-basics/troubleshooting',
+          '29e'
         ),
         exact: true,
         sidebar: 'tutorialSidebar',
       },
       {
-        path: '/pivothead/docs/tutorial-basics/core-concepts',
-        component: ComponentCreator(
-          '/pivothead/docs/tutorial-basics/core-concepts',
-          '7af'
-        ),
+        path: '/PivotHead/docs/what-is-pivothead',
+        component: ComponentCreator('/PivotHead/docs/what-is-pivothead', '00a'),
         exact: true,
         sidebar: 'tutorialSidebar',
       },
       {
-        path: '/pivothead/docs/tutorial-basics/examples',
+        path: '/PivotHead/docs/Why-we-use-pivothead',
         component: ComponentCreator(
-          '/pivothead/docs/tutorial-basics/examples',
-          '858'
-        ),
-        exact: true,
-        sidebar: 'tutorialSidebar',
-      },
-      {
-        path: '/pivothead/docs/tutorial-basics/troubleshooting',
-        component: ComponentCreator(
-          '/pivothead/docs/tutorial-basics/troubleshooting',
-          '3c6'
-        ),
-        exact: true,
-        sidebar: 'tutorialSidebar',
-      },
-      {
-        path: '/pivothead/docs/what-is-pivothead',
-        component: ComponentCreator('/pivothead/docs/what-is-pivothead', '746'),
-        exact: true,
-        sidebar: 'tutorialSidebar',
-      },
-      {
-        path: '/pivothead/docs/Why-we-use-pivothead',
-        component: ComponentCreator(
-          '/pivothead/docs/Why-we-use-pivothead',
-          '861'
+          '/PivotHead/docs/Why-we-use-pivothead',
+          '40b'
         ),
         exact: true,
         sidebar: 'tutorialSidebar',
@@ -157,8 +157,8 @@ export default [
     ],
   },
   {
-    path: '/pivothead/',
-    component: ComponentCreator('/pivothead/', '504'),
+    path: '/PivotHead/',
+    component: ComponentCreator('/PivotHead/', '939'),
     exact: true,
   },
   {

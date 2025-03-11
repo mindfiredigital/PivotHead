@@ -6,7 +6,7 @@
   "source": "@site/docs/contributors/code-of-conduct.md",
   "sourceDirName": "contributors",
   "slug": "/contributors/code-of-conduct",
-  "permalink": "/pivothead/docs/contributors/code-of-conduct",
+  "permalink": "/PivotHead/docs/contributors/code-of-conduct",
   "draft": false,
   "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/contributors/code-of-conduct.md",
   "tags": [],
@@ -18,6 +18,6 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "How to Contribute",
-    "permalink": "/pivothead/docs/contributors/how-to-contribute"
+    "permalink": "/PivotHead/docs/contributors/how-to-contribute"
   }
 }

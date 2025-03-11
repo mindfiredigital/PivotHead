@@ -6,7 +6,7 @@
   "source": "@site/docs/Why-we-use-pivothead.md",
   "sourceDirName": ".",
   "slug": "/Why-we-use-pivothead",
-  "permalink": "/pivothead/docs/Why-we-use-pivothead",
+  "permalink": "/PivotHead/docs/Why-we-use-pivothead",
   "draft": false,
   "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/Why-we-use-pivothead.md",
   "tags": [],
@@ -20,10 +20,10 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "Getting Started",
-    "permalink": "/pivothead/docs/Installation"
+    "permalink": "/PivotHead/docs/Installation"
   },
   "next": {
     "title": "Tutorials",
-    "permalink": "/pivothead/docs/category/tutorials"
+    "permalink": "/PivotHead/docs/category/tutorials"
   }
 }

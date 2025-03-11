@@ -8,7 +8,7 @@ export default {
   "tagline": "Documentation for the PivotHead",
   "favicon": "img/mindfire.ico",
   "url": "https://mindfiredigital.github.io",
-  "baseUrl": "/pivothead/",
+  "baseUrl": "/PivotHead/",
   "organizationName": "mindfiredigital",
   "projectName": "PivotHead",
   "onBrokenLinks": "throw",
@@ -43,6 +43,10 @@ export default {
     "image": "img/docusaurus-social-card.jpg",
     "navbar": {
       "title": "PivotHead",
+      "logo": {
+        "alt": "eslint-plugin-hub Logo",
+        "src": "img/logo.svg"
+      },
       "items": [
         {
           "type": "docSidebar",

@@ -1,5 +1,17 @@
 # @mindfiredigital/pivothead
 
+## 1.0.7
+
+### Patch Changes
+
+- fix the meta data and add animation in docs
+
+## 1.0.6
+
+### Patch Changes
+
+- fix the use case of core package and remove angular
+
 ## 1.0.5
 
 ### Patch Changes

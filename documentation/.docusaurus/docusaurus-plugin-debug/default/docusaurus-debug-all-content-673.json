@@ -9,8 +9,8 @@
           "badge": false,
           "noIndex": false,
           "className": "docs-version-current",
-          "path": "/pivothead/docs",
-          "tagsPath": "/pivothead/docs/tags",
+          "path": "/PivotHead/docs",
+          "tagsPath": "/PivotHead/docs/tags",
           "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs",
           "editUrlLocalized": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/i18n/en/docusaurus-plugin-content-docs/current",
           "isLast": true,
@@ -27,7 +27,7 @@
               "source": "@site/docs/contributors/code-of-conduct.md",
               "sourceDirName": "contributors",
               "slug": "/contributors/code-of-conduct",
-              "permalink": "/pivothead/docs/contributors/code-of-conduct",
+              "permalink": "/PivotHead/docs/contributors/code-of-conduct",
               "draft": false,
               "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/contributors/code-of-conduct.md",
               "tags": [],
@@ -39,7 +39,7 @@
               "sidebar": "tutorialSidebar",
               "previous": {
                 "title": "How to Contribute",
-                "permalink": "/pivothead/docs/contributors/how-to-contribute"
+                "permalink": "/PivotHead/docs/contributors/how-to-contribute"
               }
             },
             {
@@ -50,7 +50,7 @@
               "source": "@site/docs/contributors/contributors.md",
               "sourceDirName": "contributors",
               "slug": "/contributors/",
-              "permalink": "/pivothead/docs/contributors/",
+              "permalink": "/PivotHead/docs/contributors/",
               "draft": false,
               "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/contributors/contributors.md",
               "tags": [],
@@ -62,11 +62,11 @@
               "sidebar": "tutorialSidebar",
               "previous": {
                 "title": "Contribution Guide",
-                "permalink": "/pivothead/docs/category/contribution-guide"
+                "permalink": "/PivotHead/docs/category/contribution-guide"
               },
               "next": {
                 "title": "How to Contribute",
-                "permalink": "/pivothead/docs/contributors/how-to-contribute"
+                "permalink": "/PivotHead/docs/contributors/how-to-contribute"
               }
             },
             {
@@ -77,7 +77,7 @@
               "source": "@site/docs/contributors/how-to-contribute.md",
               "sourceDirName": "contributors",
               "slug": "/contributors/how-to-contribute",
-              "permalink": "/pivothead/docs/contributors/how-to-contribute",
+              "permalink": "/PivotHead/docs/contributors/how-to-contribute",
               "draft": false,
               "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/contributors/how-to-contribute.md",
               "tags": [],
@@ -89,11 +89,11 @@
               "sidebar": "tutorialSidebar",
               "previous": {
                 "title": "Contributors",
-                "permalink": "/pivothead/docs/contributors/"
+                "permalink": "/PivotHead/docs/contributors/"
               },
               "next": {
                 "title": "Code of conduct",
-                "permalink": "/pivothead/docs/contributors/code-of-conduct"
+                "permalink": "/PivotHead/docs/contributors/code-of-conduct"
               }
             },
             {
@@ -104,7 +104,7 @@
               "source": "@site/docs/Installation.md",
               "sourceDirName": ".",
               "slug": "/Installation",
-              "permalink": "/pivothead/docs/Installation",
+              "permalink": "/PivotHead/docs/Installation",
               "draft": false,
               "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/Installation.md",
               "tags": [],
@@ -118,11 +118,11 @@
               "sidebar": "tutorialSidebar",
               "previous": {
                 "title": "What is PivotHead",
-                "permalink": "/pivothead/docs/what-is-pivothead"
+                "permalink": "/PivotHead/docs/what-is-pivothead"
               },
               "next": {
                 "title": "Why Use PivotHead",
-                "permalink": "/pivothead/docs/Why-we-use-pivothead"
+                "permalink": "/PivotHead/docs/Why-we-use-pivothead"
               }
             },
             {
@@ -133,7 +133,7 @@
               "source": "@site/docs/tutorial-basics/api-reference.md",
               "sourceDirName": "tutorial-basics",
               "slug": "/tutorial-basics/api-reference",
-              "permalink": "/pivothead/docs/tutorial-basics/api-reference",
+              "permalink": "/PivotHead/docs/tutorial-basics/api-reference",
               "draft": false,
               "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorial-basics/api-reference.md",
               "tags": [],
@@ -147,11 +147,11 @@
               "sidebar": "tutorialSidebar",
               "previous": {
                 "title": "Core Concepts",
-                "permalink": "/pivothead/docs/tutorial-basics/core-concepts"
+                "permalink": "/PivotHead/docs/tutorial-basics/core-concepts"
               },
               "next": {
                 "title": "Examples & Usage",
-                "permalink": "/pivothead/docs/tutorial-basics/examples"
+                "permalink": "/PivotHead/docs/tutorial-basics/examples"
               }
             },
             {
@@ -162,7 +162,7 @@
               "source": "@site/docs/tutorial-basics/core-concepts.md",
               "sourceDirName": "tutorial-basics",
               "slug": "/tutorial-basics/core-concepts",
-              "permalink": "/pivothead/docs/tutorial-basics/core-concepts",
+              "permalink": "/PivotHead/docs/tutorial-basics/core-concepts",
               "draft": false,
               "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorial-basics/core-concepts.md",
               "tags": [],
@@ -176,11 +176,11 @@
               "sidebar": "tutorialSidebar",
               "previous": {
                 "title": "Tutorials",
-                "permalink": "/pivothead/docs/category/tutorials"
+                "permalink": "/PivotHead/docs/category/tutorials"
               },
               "next": {
                 "title": "Api Reference",
-                "permalink": "/pivothead/docs/tutorial-basics/api-reference"
+                "permalink": "/PivotHead/docs/tutorial-basics/api-reference"
               }
             },
             {
@@ -191,7 +191,7 @@
               "source": "@site/docs/tutorial-basics/examples.md",
               "sourceDirName": "tutorial-basics",
               "slug": "/tutorial-basics/examples",
-              "permalink": "/pivothead/docs/tutorial-basics/examples",
+              "permalink": "/PivotHead/docs/tutorial-basics/examples",
               "draft": false,
               "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorial-basics/examples.md",
               "tags": [],
@@ -205,11 +205,11 @@
               "sidebar": "tutorialSidebar",
               "previous": {
                 "title": "Api Reference",
-                "permalink": "/pivothead/docs/tutorial-basics/api-reference"
+                "permalink": "/PivotHead/docs/tutorial-basics/api-reference"
               },
               "next": {
                 "title": "Troubleshooting",
-                "permalink": "/pivothead/docs/tutorial-basics/troubleshooting"
+                "permalink": "/PivotHead/docs/tutorial-basics/troubleshooting"
               }
             },
             {
@@ -220,7 +220,7 @@
               "source": "@site/docs/tutorial-basics/troubleshooting.md",
               "sourceDirName": "tutorial-basics",
               "slug": "/tutorial-basics/troubleshooting",
-              "permalink": "/pivothead/docs/tutorial-basics/troubleshooting",
+              "permalink": "/PivotHead/docs/tutorial-basics/troubleshooting",
               "draft": false,
               "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorial-basics/troubleshooting.md",
               "tags": [],
@@ -234,11 +234,11 @@
               "sidebar": "tutorialSidebar",
               "previous": {
                 "title": "Examples & Usage",
-                "permalink": "/pivothead/docs/tutorial-basics/examples"
+                "permalink": "/PivotHead/docs/tutorial-basics/examples"
               },
               "next": {
                 "title": "Contribution Guide",
-                "permalink": "/pivothead/docs/category/contribution-guide"
+                "permalink": "/PivotHead/docs/category/contribution-guide"
               }
             },
             {
@@ -249,7 +249,7 @@
               "source": "@site/docs/what-is-pivothead.md",
               "sourceDirName": ".",
               "slug": "/what-is-pivothead",
-              "permalink": "/pivothead/docs/what-is-pivothead",
+              "permalink": "/PivotHead/docs/what-is-pivothead",
               "draft": false,
               "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/what-is-pivothead.md",
               "tags": [],
@@ -263,7 +263,7 @@
               "sidebar": "tutorialSidebar",
               "next": {
                 "title": "Getting Started",
-                "permalink": "/pivothead/docs/Installation"
+                "permalink": "/PivotHead/docs/Installation"
               }
             },
             {
@@ -274,7 +274,7 @@
               "source": "@site/docs/Why-we-use-pivothead.md",
               "sourceDirName": ".",
               "slug": "/Why-we-use-pivothead",
-              "permalink": "/pivothead/docs/Why-we-use-pivothead",
+              "permalink": "/PivotHead/docs/Why-we-use-pivothead",
               "draft": false,
               "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/Why-we-use-pivothead.md",
               "tags": [],
@@ -288,11 +288,11 @@
               "sidebar": "tutorialSidebar",
               "previous": {
                 "title": "Getting Started",
-                "permalink": "/pivothead/docs/Installation"
+                "permalink": "/PivotHead/docs/Installation"
               },
               "next": {
                 "title": "Tutorials",
-                "permalink": "/pivothead/docs/category/tutorials"
+                "permalink": "/PivotHead/docs/category/tutorials"
               }
             }
           ],
@@ -337,7 +337,7 @@
                 "link": {
                   "type": "generated-index",
                   "slug": "/category/tutorials",
-                  "permalink": "/pivothead/docs/category/tutorials"
+                  "permalink": "/PivotHead/docs/category/tutorials"
                 }
               },
               {
@@ -362,7 +362,7 @@
                 "link": {
                   "type": "generated-index",
                   "slug": "/category/contribution-guide",
-                  "permalink": "/pivothead/docs/category/contribution-guide"
+                  "permalink": "/PivotHead/docs/category/contribution-guide"
                 }
               }
             ]
@@ -377,7 +377,7 @@
       "blogPosts": [],
       "blogListPaginated": [],
       "blogTags": {},
-      "blogTagsListPath": "/pivothead/blog/tags",
+      "blogTagsListPath": "/PivotHead/blog/tags",
       "blogTagsPaginated": []
     }
   },
@@ -385,12 +385,12 @@
     "default": [
       {
         "type": "jsx",
-        "permalink": "/pivothead/",
+        "permalink": "/PivotHead/",
         "source": "@site/src/pages/index.js"
       },
       {
         "type": "mdx",
-        "permalink": "/pivothead/markdown-page",
+        "permalink": "/PivotHead/markdown-page",
         "source": "@site/src/pages/markdown-page.md",
         "title": "Markdown page example",
         "description": "You don't need React to write simple standalone pages.",

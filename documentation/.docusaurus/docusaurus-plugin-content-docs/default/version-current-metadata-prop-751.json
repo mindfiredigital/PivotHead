@@ -12,19 +12,19 @@
       {
         "type": "link",
         "label": "What is PivotHead",
-        "href": "/pivothead/docs/what-is-pivothead",
+        "href": "/PivotHead/docs/what-is-pivothead",
         "docId": "what-is-pivothead"
       },
       {
         "type": "link",
         "label": "Getting Started",
-        "href": "/pivothead/docs/Installation",
+        "href": "/PivotHead/docs/Installation",
         "docId": "Installation"
       },
       {
         "type": "link",
         "label": "Why Use PivotHead",
-        "href": "/pivothead/docs/Why-we-use-pivothead",
+        "href": "/PivotHead/docs/Why-we-use-pivothead",
         "docId": "Why-we-use-pivothead"
       },
       {
@@ -36,29 +36,29 @@
           {
             "type": "link",
             "label": "Core Concepts",
-            "href": "/pivothead/docs/tutorial-basics/core-concepts",
+            "href": "/PivotHead/docs/tutorial-basics/core-concepts",
             "docId": "tutorial-basics/core-concepts"
           },
           {
             "type": "link",
             "label": "Api Reference",
-            "href": "/pivothead/docs/tutorial-basics/api-reference",
+            "href": "/PivotHead/docs/tutorial-basics/api-reference",
             "docId": "tutorial-basics/api-reference"
           },
           {
             "type": "link",
             "label": "Examples & Usage",
-            "href": "/pivothead/docs/tutorial-basics/examples",
+            "href": "/PivotHead/docs/tutorial-basics/examples",
             "docId": "tutorial-basics/examples"
           },
           {
             "type": "link",
             "label": "Troubleshooting",
-            "href": "/pivothead/docs/tutorial-basics/troubleshooting",
+            "href": "/PivotHead/docs/tutorial-basics/troubleshooting",
             "docId": "tutorial-basics/troubleshooting"
           }
         ],
-        "href": "/pivothead/docs/category/tutorials"
+        "href": "/PivotHead/docs/category/tutorials"
       },
       {
         "type": "category",
@@ -69,23 +69,23 @@
           {
             "type": "link",
             "label": "Contributors",
-            "href": "/pivothead/docs/contributors/",
+            "href": "/PivotHead/docs/contributors/",
             "docId": "contributors/contributors"
           },
           {
             "type": "link",
             "label": "How to Contribute",
-            "href": "/pivothead/docs/contributors/how-to-contribute",
+            "href": "/PivotHead/docs/contributors/how-to-contribute",
             "docId": "contributors/how-to-contribute"
           },
           {
             "type": "link",
             "label": "Code of conduct",
-            "href": "/pivothead/docs/contributors/code-of-conduct",
+            "href": "/PivotHead/docs/contributors/code-of-conduct",
             "docId": "contributors/code-of-conduct"
           }
         ],
-        "href": "/pivothead/docs/category/contribution-guide"
+        "href": "/PivotHead/docs/category/contribution-guide"
       }
     ]
   },

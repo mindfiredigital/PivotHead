@@ -25,3 +25,7 @@
   --ifm-color-primary-lighter: #ff2626;
   --ifm-color-primary-lightest: #ff4d4d;
 }
+
+.navbar__title {
+  color: red;
+}

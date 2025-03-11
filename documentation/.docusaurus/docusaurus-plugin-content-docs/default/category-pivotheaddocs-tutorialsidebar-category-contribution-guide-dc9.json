@@ -1,15 +1,15 @@
 {
   "title": "Contribution Guide",
   "slug": "/category/contribution-guide",
-  "permalink": "/pivothead/docs/category/contribution-guide",
+  "permalink": "/PivotHead/docs/category/contribution-guide",
   "navigation": {
     "previous": {
       "title": "Troubleshooting",
-      "permalink": "/pivothead/docs/tutorial-basics/troubleshooting"
+      "permalink": "/PivotHead/docs/tutorial-basics/troubleshooting"
     },
     "next": {
       "title": "Contributors",
-      "permalink": "/pivothead/docs/contributors/"
+      "permalink": "/PivotHead/docs/contributors/"
     }
   }
 }

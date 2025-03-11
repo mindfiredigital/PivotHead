@@ -6,7 +6,7 @@
   "source": "@site/docs/contributors/contributors.md",
   "sourceDirName": "contributors",
   "slug": "/contributors/",
-  "permalink": "/pivothead/docs/contributors/",
+  "permalink": "/PivotHead/docs/contributors/",
   "draft": false,
   "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/contributors/contributors.md",
   "tags": [],
@@ -18,10 +18,10 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "Contribution Guide",
-    "permalink": "/pivothead/docs/category/contribution-guide"
+    "permalink": "/PivotHead/docs/category/contribution-guide"
   },
   "next": {
     "title": "How to Contribute",
-    "permalink": "/pivothead/docs/contributors/how-to-contribute"
+    "permalink": "/PivotHead/docs/contributors/how-to-contribute"
   }
 }

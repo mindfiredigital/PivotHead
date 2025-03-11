@@ -6,7 +6,7 @@
   "source": "@site/docs/contributors/how-to-contribute.md",
   "sourceDirName": "contributors",
   "slug": "/contributors/how-to-contribute",
-  "permalink": "/pivothead/docs/contributors/how-to-contribute",
+  "permalink": "/PivotHead/docs/contributors/how-to-contribute",
   "draft": false,
   "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/contributors/how-to-contribute.md",
   "tags": [],
@@ -18,10 +18,10 @@
   "sidebar": "tutorialSidebar",
   "previous": {
     "title": "Contributors",
-    "permalink": "/pivothead/docs/contributors/"
+    "permalink": "/PivotHead/docs/contributors/"
   },
   "next": {
     "title": "Code of conduct",
-    "permalink": "/pivothead/docs/contributors/code-of-conduct"
+    "permalink": "/PivotHead/docs/contributors/code-of-conduct"
   }
 }

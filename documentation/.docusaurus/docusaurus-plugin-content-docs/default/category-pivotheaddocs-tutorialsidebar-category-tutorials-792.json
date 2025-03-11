@@ -1,15 +1,15 @@
 {
   "title": "Tutorials",
   "slug": "/category/tutorials",
-  "permalink": "/pivothead/docs/category/tutorials",
+  "permalink": "/PivotHead/docs/category/tutorials",
   "navigation": {
     "previous": {
       "title": "Why Use PivotHead",
-      "permalink": "/pivothead/docs/Why-we-use-pivothead"
+      "permalink": "/PivotHead/docs/Why-we-use-pivothead"
     },
     "next": {
       "title": "Core Concepts",
-      "permalink": "/pivothead/docs/tutorial-basics/core-concepts"
+      "permalink": "/PivotHead/docs/tutorial-basics/core-concepts"
     }
   }
 }
