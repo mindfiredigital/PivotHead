@@ -1,5 +1,11 @@
 # @mindfiredigital/pivothead
 
+## 1.0.7
+
+### Patch Changes
+
+- fix the meta data and add animation in docs
+
 ## 1.0.6
 
 ### Patch Changes
