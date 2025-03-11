@@ -148,17 +148,6 @@ export function createHeader(config) {
       label: 'Connect',
       dropdownOptions: ['To Local CSV', 'To Local JSON'],
     },
-    // TODO: Implement open and save functionality
-    // {
-    //   icon: '📂',
-    //   label: 'Open',
-    //   dropdownOptions: ['Local Report', 'Remote Report'],
-    // },
-    // {
-    //   icon: '💾',
-    //   label: 'Save',
-    //   dropdownOptions: [],
-    // },
 
     {
       icon: '📤',

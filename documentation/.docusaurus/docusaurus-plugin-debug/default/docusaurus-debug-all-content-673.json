@@ -1,0 +1,407 @@
+{
+  "docusaurus-plugin-content-docs": {
+    "default": {
+      "loadedVersions": [
+        {
+          "versionName": "current",
+          "label": "Next",
+          "banner": null,
+          "badge": false,
+          "noIndex": false,
+          "className": "docs-version-current",
+          "path": "/pivothead/docs",
+          "tagsPath": "/pivothead/docs/tags",
+          "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs",
+          "editUrlLocalized": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/i18n/en/docusaurus-plugin-content-docs/current",
+          "isLast": true,
+          "routePriority": -1,
+          "sidebarFilePath": "D:\\PivotHead\\documentation\\sidebars.js",
+          "contentPath": "D:\\PivotHead\\documentation\\docs",
+          "contentPathLocalized": "D:\\PivotHead\\documentation\\i18n\\en\\docusaurus-plugin-content-docs\\current",
+          "docs": [
+            {
+              "unversionedId": "contributors/code-of-conduct",
+              "id": "contributors/code-of-conduct",
+              "title": "Code of conduct",
+              "description": "As contributors and maintainers of the pivothead package, we are dedicated to demonstrating respect to all individuals who contribute to this project. This respect encompasses actions such as posting issues, updating documentation, submitting pull requests, providing constructive feedback in comments, and engaging in any other project-related activities.",
+              "source": "@site/docs/contributors/code-of-conduct.md",
+              "sourceDirName": "contributors",
+              "slug": "/contributors/code-of-conduct",
+              "permalink": "/pivothead/docs/contributors/code-of-conduct",
+              "draft": false,
+              "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/contributors/code-of-conduct.md",
+              "tags": [],
+              "version": "current",
+              "sidebarPosition": 2,
+              "frontMatter": {
+                "sidebar_position": 2
+              },
+              "sidebar": "tutorialSidebar",
+              "previous": {
+                "title": "How to Contribute",
+                "permalink": "/pivothead/docs/contributors/how-to-contribute"
+              }
+            },
+            {
+              "unversionedId": "contributors/contributors",
+              "id": "contributors/contributors",
+              "title": "Contributors",
+              "description": "- Anand Kumar",
+              "source": "@site/docs/contributors/contributors.md",
+              "sourceDirName": "contributors",
+              "slug": "/contributors/",
+              "permalink": "/pivothead/docs/contributors/",
+              "draft": false,
+              "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/contributors/contributors.md",
+              "tags": [],
+              "version": "current",
+              "sidebarPosition": 1,
+              "frontMatter": {
+                "sidebar_position": 1
+              },
+              "sidebar": "tutorialSidebar",
+              "previous": {
+                "title": "Contribution Guide",
+                "permalink": "/pivothead/docs/category/contribution-guide"
+              },
+              "next": {
+                "title": "How to Contribute",
+                "permalink": "/pivothead/docs/contributors/how-to-contribute"
+              }
+            },
+            {
+              "unversionedId": "contributors/how-to-contribute",
+              "id": "contributors/how-to-contribute",
+              "title": "How to Contribute",
+              "description": "We genuinely appreciate your interest in contributing to the React Document Editor project. Your invaluable contributions play a pivotal role in enhancing this project. Before you embark on your journey, please take a moment to familiarize yourself with the following guidelines:",
+              "source": "@site/docs/contributors/how-to-contribute.md",
+              "sourceDirName": "contributors",
+              "slug": "/contributors/how-to-contribute",
+              "permalink": "/pivothead/docs/contributors/how-to-contribute",
+              "draft": false,
+              "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/contributors/how-to-contribute.md",
+              "tags": [],
+              "version": "current",
+              "sidebarPosition": 1,
+              "frontMatter": {
+                "sidebar_position": 1
+              },
+              "sidebar": "tutorialSidebar",
+              "previous": {
+                "title": "Contributors",
+                "permalink": "/pivothead/docs/contributors/"
+              },
+              "next": {
+                "title": "Code of conduct",
+                "permalink": "/pivothead/docs/contributors/code-of-conduct"
+              }
+            },
+            {
+              "unversionedId": "Installation",
+              "id": "Installation",
+              "title": "Getting Started",
+              "description": "Learn how to install and set up PivotHead in your project",
+              "source": "@site/docs/Installation.md",
+              "sourceDirName": ".",
+              "slug": "/Installation",
+              "permalink": "/pivothead/docs/Installation",
+              "draft": false,
+              "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/Installation.md",
+              "tags": [],
+              "version": "current",
+              "sidebarPosition": 2,
+              "frontMatter": {
+                "sidebar_position": 2,
+                "title": "Getting Started",
+                "description": "Learn how to install and set up PivotHead in your project"
+              },
+              "sidebar": "tutorialSidebar",
+              "previous": {
+                "title": "What is PivotHead",
+                "permalink": "/pivothead/docs/what-is-pivothead"
+              },
+              "next": {
+                "title": "Why Use PivotHead",
+                "permalink": "/pivothead/docs/Why-we-use-pivothead"
+              }
+            },
+            {
+              "unversionedId": "tutorial-basics/api-reference",
+              "id": "tutorial-basics/api-reference",
+              "title": "Api Reference",
+              "description": "Understanding the Api References of PivotHead",
+              "source": "@site/docs/tutorial-basics/api-reference.md",
+              "sourceDirName": "tutorial-basics",
+              "slug": "/tutorial-basics/api-reference",
+              "permalink": "/pivothead/docs/tutorial-basics/api-reference",
+              "draft": false,
+              "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorial-basics/api-reference.md",
+              "tags": [],
+              "version": "current",
+              "sidebarPosition": 2,
+              "frontMatter": {
+                "sidebar_position": 2,
+                "title": "Api Reference",
+                "description": "Understanding the Api References of PivotHead"
+              },
+              "sidebar": "tutorialSidebar",
+              "previous": {
+                "title": "Core Concepts",
+                "permalink": "/pivothead/docs/tutorial-basics/core-concepts"
+              },
+              "next": {
+                "title": "Examples & Usage",
+                "permalink": "/pivothead/docs/tutorial-basics/examples"
+              }
+            },
+            {
+              "unversionedId": "tutorial-basics/core-concepts",
+              "id": "tutorial-basics/core-concepts",
+              "title": "Core Concepts",
+              "description": "Understanding the fundamental building blocks of PivotHead",
+              "source": "@site/docs/tutorial-basics/core-concepts.md",
+              "sourceDirName": "tutorial-basics",
+              "slug": "/tutorial-basics/core-concepts",
+              "permalink": "/pivothead/docs/tutorial-basics/core-concepts",
+              "draft": false,
+              "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorial-basics/core-concepts.md",
+              "tags": [],
+              "version": "current",
+              "sidebarPosition": 1,
+              "frontMatter": {
+                "sidebar_position": 1,
+                "title": "Core Concepts",
+                "description": "Understanding the fundamental building blocks of PivotHead"
+              },
+              "sidebar": "tutorialSidebar",
+              "previous": {
+                "title": "Tutorials",
+                "permalink": "/pivothead/docs/category/tutorials"
+              },
+              "next": {
+                "title": "Api Reference",
+                "permalink": "/pivothead/docs/tutorial-basics/api-reference"
+              }
+            },
+            {
+              "unversionedId": "tutorial-basics/examples",
+              "id": "tutorial-basics/examples",
+              "title": "Examples & Usage",
+              "description": "Examples & Usage of PivotHead",
+              "source": "@site/docs/tutorial-basics/examples.md",
+              "sourceDirName": "tutorial-basics",
+              "slug": "/tutorial-basics/examples",
+              "permalink": "/pivothead/docs/tutorial-basics/examples",
+              "draft": false,
+              "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorial-basics/examples.md",
+              "tags": [],
+              "version": "current",
+              "sidebarPosition": 3,
+              "frontMatter": {
+                "sidebar_position": 3,
+                "title": "Examples & Usage",
+                "description": "Examples & Usage of PivotHead"
+              },
+              "sidebar": "tutorialSidebar",
+              "previous": {
+                "title": "Api Reference",
+                "permalink": "/pivothead/docs/tutorial-basics/api-reference"
+              },
+              "next": {
+                "title": "Troubleshooting",
+                "permalink": "/pivothead/docs/tutorial-basics/troubleshooting"
+              }
+            },
+            {
+              "unversionedId": "tutorial-basics/troubleshooting",
+              "id": "tutorial-basics/troubleshooting",
+              "title": "Troubleshooting",
+              "description": "Troubleshooting and Best Practices of PivotHead",
+              "source": "@site/docs/tutorial-basics/troubleshooting.md",
+              "sourceDirName": "tutorial-basics",
+              "slug": "/tutorial-basics/troubleshooting",
+              "permalink": "/pivothead/docs/tutorial-basics/troubleshooting",
+              "draft": false,
+              "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorial-basics/troubleshooting.md",
+              "tags": [],
+              "version": "current",
+              "sidebarPosition": 4,
+              "frontMatter": {
+                "sidebar_position": 4,
+                "title": "Troubleshooting",
+                "description": "Troubleshooting and Best Practices of PivotHead"
+              },
+              "sidebar": "tutorialSidebar",
+              "previous": {
+                "title": "Examples & Usage",
+                "permalink": "/pivothead/docs/tutorial-basics/examples"
+              },
+              "next": {
+                "title": "Contribution Guide",
+                "permalink": "/pivothead/docs/category/contribution-guide"
+              }
+            },
+            {
+              "unversionedId": "what-is-pivothead",
+              "id": "what-is-pivothead",
+              "title": "What is PivotHead",
+              "description": "Introduction to the PivotHead library and its capabilities",
+              "source": "@site/docs/what-is-pivothead.md",
+              "sourceDirName": ".",
+              "slug": "/what-is-pivothead",
+              "permalink": "/pivothead/docs/what-is-pivothead",
+              "draft": false,
+              "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/what-is-pivothead.md",
+              "tags": [],
+              "version": "current",
+              "sidebarPosition": 1,
+              "frontMatter": {
+                "sidebar_position": 1,
+                "title": "What is PivotHead",
+                "description": "Introduction to the PivotHead library and its capabilities"
+              },
+              "sidebar": "tutorialSidebar",
+              "next": {
+                "title": "Getting Started",
+                "permalink": "/pivothead/docs/Installation"
+              }
+            },
+            {
+              "unversionedId": "Why-we-use-pivothead",
+              "id": "Why-we-use-pivothead",
+              "title": "Why Use PivotHead",
+              "description": "Discover the advantages of using PivotHead for your data visualization needs",
+              "source": "@site/docs/Why-we-use-pivothead.md",
+              "sourceDirName": ".",
+              "slug": "/Why-we-use-pivothead",
+              "permalink": "/pivothead/docs/Why-we-use-pivothead",
+              "draft": false,
+              "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/Why-we-use-pivothead.md",
+              "tags": [],
+              "version": "current",
+              "sidebarPosition": 3,
+              "frontMatter": {
+                "sidebar_position": 3,
+                "title": "Why Use PivotHead",
+                "description": "Discover the advantages of using PivotHead for your data visualization needs"
+              },
+              "sidebar": "tutorialSidebar",
+              "previous": {
+                "title": "Getting Started",
+                "permalink": "/pivothead/docs/Installation"
+              },
+              "next": {
+                "title": "Tutorials",
+                "permalink": "/pivothead/docs/category/tutorials"
+              }
+            }
+          ],
+          "drafts": [],
+          "sidebars": {
+            "tutorialSidebar": [
+              {
+                "type": "doc",
+                "id": "what-is-pivothead"
+              },
+              {
+                "type": "doc",
+                "id": "Installation"
+              },
+              {
+                "type": "doc",
+                "id": "Why-we-use-pivothead"
+              },
+              {
+                "type": "category",
+                "label": "Tutorials",
+                "collapsible": true,
+                "collapsed": true,
+                "items": [
+                  {
+                    "type": "doc",
+                    "id": "tutorial-basics/core-concepts"
+                  },
+                  {
+                    "type": "doc",
+                    "id": "tutorial-basics/api-reference"
+                  },
+                  {
+                    "type": "doc",
+                    "id": "tutorial-basics/examples"
+                  },
+                  {
+                    "type": "doc",
+                    "id": "tutorial-basics/troubleshooting"
+                  }
+                ],
+                "link": {
+                  "type": "generated-index",
+                  "slug": "/category/tutorials",
+                  "permalink": "/pivothead/docs/category/tutorials"
+                }
+              },
+              {
+                "type": "category",
+                "label": "Contribution Guide",
+                "collapsible": true,
+                "collapsed": true,
+                "items": [
+                  {
+                    "type": "doc",
+                    "id": "contributors/contributors"
+                  },
+                  {
+                    "type": "doc",
+                    "id": "contributors/how-to-contribute"
+                  },
+                  {
+                    "type": "doc",
+                    "id": "contributors/code-of-conduct"
+                  }
+                ],
+                "link": {
+                  "type": "generated-index",
+                  "slug": "/category/contribution-guide",
+                  "permalink": "/pivothead/docs/category/contribution-guide"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "docusaurus-plugin-content-blog": {
+    "default": {
+      "blogSidebarTitle": "Recent posts",
+      "blogPosts": [],
+      "blogListPaginated": [],
+      "blogTags": {},
+      "blogTagsListPath": "/pivothead/blog/tags",
+      "blogTagsPaginated": []
+    }
+  },
+  "docusaurus-plugin-content-pages": {
+    "default": [
+      {
+        "type": "jsx",
+        "permalink": "/pivothead/",
+        "source": "@site/src/pages/index.js"
+      },
+      {
+        "type": "mdx",
+        "permalink": "/pivothead/markdown-page",
+        "source": "@site/src/pages/markdown-page.md",
+        "title": "Markdown page example",
+        "description": "You don't need React to write simple standalone pages.",
+        "frontMatter": {
+          "title": "Markdown page example"
+        }
+      }
+    ]
+  },
+  "docusaurus-plugin-debug": {},
+  "docusaurus-theme-classic": {},
+  "docusaurus-bootstrap-plugin": {},
+  "docusaurus-mdx-fallback-plugin": {}
+}

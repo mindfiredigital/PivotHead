@@ -1,0 +1,15 @@
+{
+  "title": "Why we use Canvas",
+  "slug": "/category/why-we-use-canvas",
+  "permalink": "/document-editor/docs/category/why-we-use-canvas",
+  "navigation": {
+    "previous": {
+      "title": "What is React Document Editor?",
+      "permalink": "/document-editor/docs/what-is-document-editor"
+    },
+    "next": {
+      "title": "Why Canvas Editor",
+      "permalink": "/document-editor/docs/Why-we-use-canvas/"
+    }
+  }
+}

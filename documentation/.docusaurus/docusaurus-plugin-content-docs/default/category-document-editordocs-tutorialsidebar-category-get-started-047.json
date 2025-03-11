@@ -1,0 +1,15 @@
+{
+  "title": "Get Started",
+  "slug": "/category/get-started",
+  "permalink": "/document-editor/docs/category/get-started",
+  "navigation": {
+    "previous": {
+      "title": "Why Canvas Editor",
+      "permalink": "/document-editor/docs/Why-we-use-canvas/"
+    },
+    "next": {
+      "title": "Installation",
+      "permalink": "/document-editor/docs/Get-started/Installation"
+    }
+  }
+}
