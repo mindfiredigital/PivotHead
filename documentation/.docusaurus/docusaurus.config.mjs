@@ -43,6 +43,10 @@ export default {
     "image": "img/docusaurus-social-card.jpg",
     "navbar": {
       "title": "PivotHead",
+      "logo": {
+        "alt": "eslint-plugin-hub Logo",
+        "src": "img/logo.svg"
+      },
       "items": [
         {
           "type": "docSidebar",
