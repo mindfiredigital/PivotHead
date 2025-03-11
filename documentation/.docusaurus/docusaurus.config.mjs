@@ -4,8 +4,8 @@
  * Modify the docusaurus.config.js file at your site's root instead.
  */
 export default {
-  "title": "PivotHead Documentation",
-  "tagline": "Documentation for the PivotHead project",
+  "title": "PivotHead",
+  "tagline": "Documentation for the PivotHead",
   "favicon": "img/mindfire.ico",
   "url": "https://mindfiredigital.github.io",
   "baseUrl": "/pivothead/",

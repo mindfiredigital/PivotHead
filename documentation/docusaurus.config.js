@@ -6,8 +6,8 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'PivotHead Documentation',
-  tagline: 'Documentation for the PivotHead project',
+  title: 'PivotHead',
+  tagline: 'Documentation for the PivotHead',
   favicon: 'img/mindfire.ico',
 
   // Set the production url of your site here
