@@ -124,6 +124,22 @@ export default {
     '@generated/docusaurus.config',
     require.resolveWeak('@generated/docusaurus.config'),
   ],
+  'content---pivot-head-docs-contributors-monorepo-setup-78-c-bb8': [
+    () =>
+      import(
+        /* webpackChunkName: 'content---pivot-head-docs-contributors-monorepo-setup-78-c-bb8' */ '@site/docs/contributors/monorepo-setup.md'
+      ),
+    '@site/docs/contributors/monorepo-setup.md',
+    require.resolveWeak('@site/docs/contributors/monorepo-setup.md'),
+  ],
+  'content---pivot-head-docs-contributors-quick-startbb-9-9e6': [
+    () =>
+      import(
+        /* webpackChunkName: 'content---pivot-head-docs-contributors-quick-startbb-9-9e6' */ '@site/docs/contributors/quick-start.md'
+      ),
+    '@site/docs/contributors/quick-start.md',
+    require.resolveWeak('@site/docs/contributors/quick-start.md'),
+  ],
   'content---pivothead-docs-contributors-6-f-4-0a4': [
     () =>
       import(

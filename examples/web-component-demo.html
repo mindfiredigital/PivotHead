@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PivotHead Web Component Demo</title>
+    <script type="module" src="../src/web-components/pivot-head.js"></script>
+    <style>
+        .container {
+            width: 100%;
+            height: 600px;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <pivot-head
+            data='[
+                {"Category": "Furniture", "SubCategory": "Chairs", "Sales": 1200},
+                {"Category": "Furniture", "SubCategory": "Tables", "Sales": 1500},
+                {"Category": "Electronics", "SubCategory": "Phones", "Sales": 3000},
+                {"Category": "Electronics", "SubCategory": "Laptops", "Sales": 4500}
+            ]'
+            options='{
+                "rows": ["Category"],
+                "cols": ["SubCategory"],
+                "vals": ["Sales"],
+                "aggregatorName": "Sum",
+                "rendererName": "Table"
+            }'
+        ></pivot-head>
+    </div>
+
+    <script>
+        // Example of dynamically updating the data
+        const pivotHead = document.querySelector('pivot-head');
+        
+        // You can update the data programmatically like this:
+        setTimeout(() => {
+            const newData = [
+                {"Category": "Furniture", "SubCategory": "Chairs", "Sales": 1500},
+                {"Category": "Furniture", "SubCategory": "Tables", "Sales": 2000},
+                {"Category": "Electronics", "SubCategory": "Phones", "Sales": 3500},
+                {"Category": "Electronics", "SubCategory": "Laptops", "Sales": 5000}
+            ];
+            pivotHead.setAttribute('data', JSON.stringify(newData));
+        }, 5000);
+    </script>
+</body>
+</html> 

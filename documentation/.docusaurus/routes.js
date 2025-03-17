@@ -53,7 +53,7 @@ export default [
   },
   {
     path: '/PivotHead/docs',
-    component: ComponentCreator('/PivotHead/docs', 'a25'),
+    component: ComponentCreator('/PivotHead/docs', '46b'),
     routes: [
       {
         path: '/PivotHead/docs/category/contribution-guide',
@@ -93,6 +93,24 @@ export default [
         component: ComponentCreator(
           '/PivotHead/docs/contributors/how-to-contribute',
           '3df'
+        ),
+        exact: true,
+        sidebar: 'tutorialSidebar',
+      },
+      {
+        path: '/PivotHead/docs/contributors/monorepo-setup',
+        component: ComponentCreator(
+          '/PivotHead/docs/contributors/monorepo-setup',
+          '3e5'
+        ),
+        exact: true,
+        sidebar: 'tutorialSidebar',
+      },
+      {
+        path: '/PivotHead/docs/contributors/quick-start',
+        component: ComponentCreator(
+          '/PivotHead/docs/contributors/quick-start',
+          '566'
         ),
         exact: true,
         sidebar: 'tutorialSidebar',

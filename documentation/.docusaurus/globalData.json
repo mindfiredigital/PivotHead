@@ -26,6 +26,16 @@
               "sidebar": "tutorialSidebar"
             },
             {
+              "id": "contributors/monorepo-setup",
+              "path": "/PivotHead/docs/contributors/monorepo-setup",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "contributors/quick-start",
+              "path": "/PivotHead/docs/contributors/quick-start",
+              "sidebar": "tutorialSidebar"
+            },
+            {
               "id": "Installation",
               "path": "/PivotHead/docs/Installation",
               "sidebar": "tutorialSidebar"

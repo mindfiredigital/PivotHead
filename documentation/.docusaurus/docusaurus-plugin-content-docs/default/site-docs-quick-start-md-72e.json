@@ -1,0 +1,20 @@
+{
+  "unversionedId": "quick-start",
+  "id": "quick-start",
+  "title": "Quick Start Guide",
+  "description": "Get started with our monorepo setup in 5 minutes.",
+  "source": "@site/docs/quick-start.md",
+  "sourceDirName": ".",
+  "slug": "/quick-start",
+  "permalink": "/PivotHead/docs/quick-start",
+  "draft": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/quick-start.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Monorepo Setup Guide",
+    "permalink": "/PivotHead/docs/contributors/monorepo-setup"
+  }
+}
