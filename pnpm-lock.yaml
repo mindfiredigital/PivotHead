@@ -73,7 +73,7 @@ importers:
         specifier: ^0.32.0
         version: 0.32.4(less@4.2.2)(sass@1.85.1)(terser@5.39.0)
 
-  packages/web-components:
+  packages/web-component:
     dependencies:
       '@mindfiredigital/pivothead':
         specifier: workspace:*

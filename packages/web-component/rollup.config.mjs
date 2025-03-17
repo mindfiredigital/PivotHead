@@ -8,21 +8,21 @@ export default defineConfig({
     {
       file: 'dist/pivot-head.js',
       format: 'esm',
-      sourcemap: true,
+      sourcemap: true
     },
     {
       file: 'dist/pivot-head.mjs',
       format: 'esm',
-      sourcemap: true,
-    },
+      sourcemap: true
+    }
   ],
   plugins: [
     resolve(),
     typescript({
       tsconfig: './tsconfig.json',
       declaration: true,
-      declarationDir: './dist',
-    }),
+      declarationDir: './dist'
+    })
   ],
-  external: ['@mindfiredigital/pivothead'],
-});
+  external: ['@mindfiredigital/pivothead']
+}); 
