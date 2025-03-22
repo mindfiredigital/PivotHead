@@ -4,6 +4,11 @@ import { conditionFormattingPopUp } from '../services/conditionFormattingPopUp.j
 import { createFieldsPopup } from '../services/fieldsPopup.js';
 import { dataSourceOptions } from '../services/dataSourceOptions.js';
 import { pivotEngine } from '../index.js';
+import {
+  exportToHTML,
+  exportToExcel,
+  exportToPDF,
+} from '../services/exportService.js';
 
 export function createHeader(config) {
   const header = document.createElement('div');
@@ -83,7 +88,20 @@ export function createHeader(config) {
               dataSourceOptions(config);
               break;
             case 'Print':
+              dropdown.style.display = 'none';
               window.print();
+              break;
+            case 'To HTML':
+              dropdown.style.display = 'none';
+              exportToHTML(pivotEngine);
+              break;
+            case 'To Excel':
+              dropdown.style.display = 'none';
+              exportToExcel(pivotEngine);
+              break;
+            case 'To PDF':
+              dropdown.style.display = 'none';
+              exportToPDF(pivotEngine);
               break;
             default:
               alert(optionName + ` is under development`);

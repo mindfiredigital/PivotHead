@@ -3,7 +3,10 @@
   "private": true,
   "version": "1.0.5",
   "dependencies": {
-    "@mindfiredigital/pivothead": "workspace:*"
+    "@mindfiredigital/pivothead": "workspace:*",
+    "jspdf": "^3.0.1",
+    "jspdf-autotable": "^5.0.2",
+    "xlsx": "^0.18.5"
   },
   "scripts": {
     "dev": "vite"
