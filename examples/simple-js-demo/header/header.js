@@ -8,6 +8,7 @@ import {
   exportToHTML,
   exportToExcel,
   exportToPDF,
+  openPrintDialog,
 } from '../services/exportService.js';
 
 export function createHeader(config) {
@@ -89,7 +90,7 @@ export function createHeader(config) {
               break;
             case 'Print':
               dropdown.style.display = 'none';
-              window.print();
+              openPrintDialog(pivotEngine);
               break;
             case 'To HTML':
               dropdown.style.display = 'none';
