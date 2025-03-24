@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PivotHead Vanilla JS Demo</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .controls {
+      margin: 20px 0;
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      padding: 8px 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .custom-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+
+    .custom-table th,
+    .custom-table td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+
+    .custom-table th {
+      background-color: #f8f9fa;
+      font-weight: bold;
+    }
+
+    .debug-view {
+      margin-top: 20px;
+    }
+
+    .debug-view pre {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 4px;
+      overflow: auto;
+      max-height: 300px;
+    }
+  </style>
+</head>
+<body>
+  <h1>PivotHead Vanilla JS Demo</h1>
+
+  <div class="controls">
+    <button onclick="handleSort()">Sort by Sales (DESC)</button>
+    <button onclick="handleFilter()">Filter Electronics</button>
+  </div>
+
+  <pivot-head id="pivotTable"></pivot-head>
+
+  <div id="customView">
+    <h2>Custom Rendering</h2>
+    <div id="customTable"></div>
+  </div>
+
+  <div class="debug-view">
+    <h3>Current State:</h3>
+    <pre id="stateDebug"></pre>
+  </div>
+
+  <script type="module">
+    import '@mindfiredigital/pivothead-web-component';
+
+    // Sample data
+    const data = [
+      { Category: "Furniture", SubCategory: "Chairs", Sales: 1200, Region: "North" },
+      { Category: "Furniture", SubCategory: "Tables", Sales: 1500, Region: "South" },
+      { Category: "Electronics", SubCategory: "Phones", Sales: 3000, Region: "East" },
+      { Category: "Electronics", SubCategory: "Laptops", Sales: 4500, Region: "West" }
+    ];
+
+    // PivotHead configuration
+    const options = {
+      rows: ["Category"],
+      columns: ["SubCategory"],
+      measures: [
+        {
+          uniqueName: "Sales",
+          aggregation: "sum",
+          caption: "Total Sales"
+        }
+      ],
+      dimensions: [
+        {
+          uniqueName: "Region",
+          caption: "Region"
+        }
+      ]
+    };
+
+    // Initialize PivotHead
+    const pivotTable = document.getElementById('pivotTable');
+    pivotTable.setAttribute('data', JSON.stringify(data));
+    pivotTable.setAttribute('options', JSON.stringify(options));
+
+    // Listen for state changes
+    pivotTable.addEventListener('stateChange', (e) => {
+      const state = e.detail;
+      updateCustomView(state);
+      updateDebugView(state);
+    });
+
+    // Handle sorting
+    window.handleSort = () => {
+      pivotTable.sort('Sales', 'desc');
+    };
+
+    // Handle filtering
+    window.handleFilter = () => {
+      const filters = [
+        {
+          field: 'Category',
+          operator: 'equals',
+          value: 'Electronics'
+        }
+      ];
+      pivotTable.setAttribute('filters', JSON.stringify(filters));
+    };
+
+    // Update custom view
+    function updateCustomView(state) {
+      if (!state?.processedData) return;
+
+      const { headers, rows } = state.processedData;
+      const customTable = document.getElementById('customTable');
+
+      const table = document.createElement('table');
+      table.className = 'custom-table';
+
+      // Create header
+      const thead = document.createElement('thead');
+      const headerRow = document.createElement('tr');
+      headers.forEach(header => {
+        const th = document.createElement('th');
+        th.textContent = header;
+        headerRow.appendChild(th);
+      });
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      // Create body
+      const tbody = document.createElement('tbody');
+      rows.forEach(row => {
+        const tr = document.createElement('tr');
+        row.forEach(cell => {
+          const td = document.createElement('td');
+          td.textContent = cell;
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+
+      // Replace existing table
+      customTable.innerHTML = '';
+      customTable.appendChild(table);
+    }
+
+    // Update debug view
+    function updateDebugView(state) {
+      const debugElement = document.getElementById('stateDebug');
+      debugElement.textContent = JSON.stringify(state, null, 2);
+    }
+  </script>
+</body>
+</html> 

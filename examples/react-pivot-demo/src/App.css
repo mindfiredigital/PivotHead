@@ -1,0 +1,63 @@
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.controls {
+  margin: 20px 0;
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+.custom-table th,
+.custom-table td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.custom-table th {
+  background-color: #f8f9fa;
+  font-weight: bold;
+}
+
+.custom-table tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+.custom-table tr:hover {
+  background-color: #f2f2f2;
+}
+
+.custom-view,
+.debug-view {
+  margin-top: 40px;
+}
+
+.debug-view pre {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 4px;
+  overflow: auto;
+  max-height: 300px;
+} 
