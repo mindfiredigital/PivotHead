@@ -1,0 +1,39 @@
+{
+  "name": "@mindfiredigital/pivothead-web-component",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Web Component implementation of PivotHead for use in any JavaScript framework",
+  "main": "dist/pivot-head.js",
+  "module": "dist/pivot-head.mjs",
+  "types": "dist/pivot-head.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "clean": "rimraf dist"
+  },
+  "keywords": [
+    "pivothead",
+    "web-components",
+    "pivot-table",
+    "framework-agnostic",
+    "custom-elements"
+  ],
+  "author": "Mindfiredigital",
+  "license": "MIT",
+  "dependencies": {
+    "@mindfiredigital/pivothead": "workspace:*"
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.0.0",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "rimraf": "^5.0.0",
+    "rollup": "^3.0.0",
+    "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "@webcomponents/webcomponentsjs": "^2.8.0"
+  }
+}

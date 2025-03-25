@@ -1,0 +1,27 @@
+{
+  "unversionedId": "contributors/monorepo-setup",
+  "id": "contributors/monorepo-setup",
+  "title": "Monorepo Setup Guide",
+  "description": "This guide explains how to set up and manage a monorepo using pnpm workspaces, Turborepo, and Changesets.",
+  "source": "@site/docs/contributors/monorepo-setup.md",
+  "sourceDirName": "contributors",
+  "slug": "/contributors/monorepo-setup",
+  "permalink": "/PivotHead/docs/contributors/monorepo-setup",
+  "draft": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/contributors/monorepo-setup.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 3,
+  "frontMatter": {
+    "sidebar_position": 3
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Code of conduct",
+    "permalink": "/PivotHead/docs/contributors/code-of-conduct"
+  },
+  "next": {
+    "title": "Quick Start Guide",
+    "permalink": "/PivotHead/docs/contributors/quick-start"
+  }
+}

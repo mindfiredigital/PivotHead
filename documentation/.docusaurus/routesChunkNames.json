@@ -49,7 +49,7 @@
     },
     "content": "content---pivothead-markdown-page-393-f77"
   },
-  "/PivotHead/docs-a25": {
+  "/PivotHead/docs-46b": {
     "__comp": "__comp---theme-doc-page-1-be-9be",
     "__context": {
       "plugin": "plugin---pivothead-docs-0-eb-3d7"
@@ -75,6 +75,14 @@
   "/PivotHead/docs/contributors/how-to-contribute-3df": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---pivothead-docs-contributors-how-to-contribute-42-f-8a7"
+  },
+  "/PivotHead/docs/contributors/monorepo-setup-3e5": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-contributors-monorepo-setup-78-c-bb8"
+  },
+  "/PivotHead/docs/contributors/quick-start-566": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-contributors-quick-startbb-9-9e6"
   },
   "/PivotHead/docs/Installation-05f": {
     "__comp": "__comp---theme-doc-item-178-a40",

@@ -19,5 +19,9 @@
   "previous": {
     "title": "How to Contribute",
     "permalink": "/PivotHead/docs/contributors/how-to-contribute"
+  },
+  "next": {
+    "title": "Monorepo Setup Guide",
+    "permalink": "/PivotHead/docs/contributors/monorepo-setup"
   }
 }

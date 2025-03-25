@@ -83,6 +83,18 @@
             "label": "Code of conduct",
             "href": "/PivotHead/docs/contributors/code-of-conduct",
             "docId": "contributors/code-of-conduct"
+          },
+          {
+            "type": "link",
+            "label": "Monorepo Setup Guide",
+            "href": "/PivotHead/docs/contributors/monorepo-setup",
+            "docId": "contributors/monorepo-setup"
+          },
+          {
+            "type": "link",
+            "label": "Quick Start Guide",
+            "href": "/PivotHead/docs/contributors/quick-start",
+            "docId": "contributors/quick-start"
           }
         ],
         "href": "/PivotHead/docs/category/contribution-guide"
@@ -106,6 +118,18 @@
       "id": "contributors/how-to-contribute",
       "title": "How to Contribute",
       "description": "We genuinely appreciate your interest in contributing to the React Document Editor project. Your invaluable contributions play a pivotal role in enhancing this project. Before you embark on your journey, please take a moment to familiarize yourself with the following guidelines:",
+      "sidebar": "tutorialSidebar"
+    },
+    "contributors/monorepo-setup": {
+      "id": "contributors/monorepo-setup",
+      "title": "Monorepo Setup Guide",
+      "description": "This guide explains how to set up and manage a monorepo using pnpm workspaces, Turborepo, and Changesets.",
+      "sidebar": "tutorialSidebar"
+    },
+    "contributors/quick-start": {
+      "id": "contributors/quick-start",
+      "title": "Quick Start Guide",
+      "description": "Get started with our monorepo setup in 5 minutes.",
       "sidebar": "tutorialSidebar"
     },
     "Installation": {
