@@ -15,6 +15,7 @@ import {
 } from '../types/interfaces';
 import { calculateAggregates } from './aggregator';
 import { processData } from './dataProcessor';
+import { PivotExportService } from './exportService';
 // import { applySort, sortGroups } from './sorter';
 
 /**
@@ -872,5 +873,40 @@ export class PivotEngine<T extends Record<string, any>> {
    */
   public getFilterState(): FilterConfig[] {
     return [...this.filterConfig];
+  }
+
+  /**
+   * Exports the pivot table data to HTML and downloads the file.
+   * @param {string} fileName - The name of the downloaded file (without extension).
+   * @public
+   */
+  public exportToHTML(fileName = 'pivot-table'): void {
+    PivotExportService.exportToHTML(this.getState(), fileName);
+  }
+
+  /**
+   * Exports the pivot table data to PDF and downloads the file.
+   * @param {string} fileName - The name of the downloaded file (without extension).
+   * @public
+   */
+  public exportToPDF(fileName = 'pivot-table'): void {
+    PivotExportService.exportToPDF(this.getState(), fileName);
+  }
+
+  /**
+   * Exports the pivot table data to Excel and downloads the file.
+   * @param {string} fileName - The name of the downloaded file (without extension).
+   * @public
+   */
+  public exportToExcel(fileName = 'pivot-table'): void {
+    PivotExportService.exportToExcel(this.getState(), fileName);
+  }
+
+  /**
+   * Opens a print dialog with the formatted pivot table.
+   * @public
+   */
+  public openPrintDialog(): void {
+    PivotExportService.openPrintDialog(this.getState());
   }
 }
