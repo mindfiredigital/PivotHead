@@ -3,22 +3,13 @@ import '@mindfiredigital/pivothead-web-component';
 import './App.css';
 import React from 'react';
 
-// Declare the custom element type
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace JSX {
-    interface IntrinsicElements {
-      'pivot-head': React.DetailedHTMLProps<
-        React.HTMLAttributes<HTMLElement> & {
-          data?: string;
-          options?: string;
-          filters?: string;
-          pagination?: string;
-          onStateChange?: (e: CustomEvent) => void;
-        },
-        HTMLElement
-      >;
-    }
+declare module 'react' {
+  interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
+    data?: string;
+    options?: string;
+    filters?: string;
+    pagination?: string;
+    onStateChange?: (e: CustomEvent) => void;
   }
 }
 
