@@ -26,7 +26,7 @@ Here are some ways you can contribute to the project:
 
 6. **Push** your branch to your GitHub repository: `git push origin <type>/<issue-id>-<description>`.
 
-7. Create a **Pull Request (PR)** from your branch to the original repository's `main` or `master` branch.
+7. Create a **Pull Request** from your branch to the original repository's `dev`
 
 ## Branching Strategy
 
@@ -42,6 +42,11 @@ Here are some ways you can contribute to the project:
 - **other/\***: For any other changes that do not fall into the above categories.
 - **enhancement/\***: Improvements that are not categorized as features or bug fixes.
 - **patch/\***: General maintenance tasks that don't fit into feature or bug fix categories.
+
+### Branching Guidelines
+
+- Always create a new branch from the **dev** branch.
+- When raising a pull request (PR), it should always be merged into the **dev** branch.
 
 ### Naming Convention
 
