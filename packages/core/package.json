@@ -59,6 +59,7 @@
     "vitest": "^0.32.0"
   },
   "dependencies": {
+    "jsdom": "^26.0.0",
     "jspdf": "^3.0.1",
     "jspdf-autotable": "^5.0.2",
     "xlsx": "^0.18.5"

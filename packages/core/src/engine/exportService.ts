@@ -18,6 +18,10 @@ export class PivotExportService {
   ): string {
     const { rows, columns, selectedMeasures, formatting, groups, data } = state;
 
+    if (data.length === 0) {
+      return '<div>No data to display</div>';
+    }
+
     if (!rows.length || !columns.length) {
       return '<div>No data to display</div>';
     }
