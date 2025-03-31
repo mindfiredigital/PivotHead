@@ -366,6 +366,77 @@ console.log(
 );
 ```
 
+### Export Features
+
+#### exportToHTML()
+
+```typescript
+exportToHTML(fileName?: string): void
+```
+
+Exports the pivot table to an HTML file with the given name.
+
+**Example:**
+
+```javascript
+// Export with default name 'pivot-table.html'
+engine.exportToHTML();
+
+// Export with custom name
+engine.exportToHTML('q1-sales-report');
+```
+
+#### exportToExcel()
+
+```typescript
+exportToExcel(fileName?: string): void
+```
+
+Exports the pivot table to an Excel file with the given name.
+
+**Example:**
+
+```javascript
+// Export with default name 'pivot-table.xlsx'
+engine.exportToExcel();
+
+// Export with custom name
+engine.exportToExcel('quarterly-sales-analysis');
+```
+
+#### exportToPDF()
+
+```typescript
+exportToPDF(fileName?: string): void
+```
+
+Exports the pivot table to a PDF file with the given name.
+
+**Example:**
+
+```javascript
+// Export with default name 'pivot-table.pdf'
+engine.exportToPDF();
+
+// Export with custom name
+engine.exportToPDF('sales-presentation');
+```
+
+#### openPrintDialog()
+
+```typescript
+openPrintDialog(): void
+```
+
+Opens the browser's print dialog to print the current pivot table.
+
+**Example:**
+
+```javascript
+// Open print dialog to print the pivot table
+engine.openPrintDialog();
+```
+
 ## Configuration Interfaces
 
 ### PivotTableConfig
