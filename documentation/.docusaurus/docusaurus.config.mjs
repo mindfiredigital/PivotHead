@@ -40,11 +40,11 @@ export default {
     ]
   ],
   "themeConfig": {
-    "image": "img/docusaurus-social-card.jpg",
+    "image": "img/pivothead.webp",
     "navbar": {
       "title": "PivotHead",
       "logo": {
-        "alt": "eslint-plugin-hub Logo",
+        "alt": "PivotHead Logo",
         "src": "img/logo.svg"
       },
       "items": [
