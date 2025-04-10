@@ -1,5 +1,11 @@
 # @mindfiredigital/pivothead
 
+## 1.2.0
+
+### Minor Changes
+
+- remove unwanted keywords
+
 ## 1.1.0
 
 ### Minor Changes
