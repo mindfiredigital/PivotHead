@@ -1,7 +1,7 @@
 {
   "name": "simple-js-demo",
   "private": true,
-  "version": "1.0.7",
+  "version": "1.0.8",
   "dependencies": {
     "@mindfiredigital/pivothead": "workspace:*"
   },
