@@ -1,5 +1,11 @@
 # @mindfiredigital/pivothead
 
+## 1.1.1
+
+### Patch Changes
+
+- add types and update readme
+
 ## 1.1.0
 
 ### Minor Changes
