@@ -1,4 +1,4 @@
-import { PivotEngine } from '@mindfiredigital/pivothead';
+import { PivotEngine, applySort } from '@mindfiredigital/pivothead';
 import type {
   PivotTableConfig,
   FilterConfig,
@@ -7,6 +7,10 @@ import type {
   Measure,
   Dimension,
   GroupConfig,
+  RowSize,
+  SortConfig,
+  Group,
+  ExpandedState,
 } from '@mindfiredigital/pivothead';
 
 interface EnhancedPivotEngine<T extends Record<string, any>>
@@ -20,13 +24,17 @@ interface EnhancedPivotEngine<T extends Record<string, any>>
   reset(): void;
   sort(field: string, direction: 'asc' | 'desc'): void;
   setGroupConfig(config: GroupConfig | null): void;
+  resizeRow(index: number, height: number): void;
+  toggleRowExpansion(rowId: string): void;
+  isRowExpanded(rowId: string): boolean;
+  getGroupedData(): Group[];
 }
 
 export class PivotHeadElement extends HTMLElement {
   private engine!: EnhancedPivotEngine<any>;
 
   static get observedAttributes() {
-    return ['data', 'options', 'filters', 'pagination'];
+    return ['data', 'options'];
   }
 
   constructor() {
@@ -56,7 +64,9 @@ export class PivotHeadElement extends HTMLElement {
   }
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
-    if (oldValue !== newValue) {
+    if (oldValue === newValue) return;
+
+    try {
       switch (name) {
         case 'data':
         case 'options':
@@ -68,7 +78,18 @@ export class PivotHeadElement extends HTMLElement {
         case 'pagination':
           this.updatePagination(newValue);
           break;
+        case 'measures':
+          this.updateMeasures(newValue);
+          break;
+        case 'dimensions':
+          this.updateDimensions(newValue);
+          break;
+        case 'groupconfig':
+          this.updateGroupConfig(newValue);
+          break;
       }
+    } catch (error) {
+      console.error(`Error processing attribute ${name}:`, error);
     }
   }
 
@@ -109,11 +130,69 @@ export class PivotHeadElement extends HTMLElement {
     }
   }
 
+  private updateMeasures(measuresJson: string) {
+    try {
+      const measures: Measure[] = JSON.parse(measuresJson);
+      this.engine.setMeasures(measures);
+      this.notifyStateChange();
+    } catch (error) {
+      console.error('Error updating measures:', error);
+    }
+  }
+
+  private updateDimensions(dimensionsJson: string) {
+    try {
+      const dimensions: Dimension[] = JSON.parse(dimensionsJson);
+      this.engine.setDimensions(dimensions);
+      this.notifyStateChange();
+    } catch (error) {
+      console.error('Error updating dimensions:', error);
+    }
+  }
+
+  private updateGroupConfig(groupConfigJson: string) {
+    try {
+      const groupConfig: GroupConfig | null = groupConfigJson
+        ? JSON.parse(groupConfigJson)
+        : null;
+      this.engine.setGroupConfig(groupConfig);
+      this.notifyStateChange();
+    } catch (error) {
+      console.error('Error while updating Group Config:', error);
+    }
+  }
+
+  private handleRowResize(event: CustomEvent) {
+    const { index, height } = event.detail;
+    this.engine.resizeRow(index, height);
+    this.notifyStateChange();
+  }
+
+  private handleRowExpand(event: CustomEvent) {
+    const { rowId } = event.detail;
+    this.engine.toggleRowExpansion(rowId);
+    this.notifyStateChange();
+  }
+
+  private handleSortChange(event: CustomEvent) {
+    const { field, direction } = event.detail;
+    this.engine.sort(field, direction);
+    this.notifyStateChange();
+  }
+
   private notifyStateChange() {
     const state = this.engine.getState();
     this.dispatchEvent(
       new CustomEvent('stateChange', {
         detail: state,
+        bubbles: true,
+        composed: true,
+      })
+    );
+
+    this.dispatchEvent(
+      new CustomEvent('dataChange', {
+        detail: { data: state.data, processedData: state.processedData },
         bubbles: true,
         composed: true,
       })
@@ -132,6 +211,16 @@ export class PivotHeadElement extends HTMLElement {
 
   public sort(field: string, direction: 'asc' | 'desc'): void {
     this.engine.sort(field, direction);
+    this.notifyStateChange();
+  }
+
+  public applyFilters(filters: FilterConfig[]): void {
+    this.engine.applyFilters(filters);
+    this.notifyStateChange();
+  }
+
+  public setPagination(config: PaginationConfig): void {
+    this.engine.setPagination(config);
     this.notifyStateChange();
   }
 
@@ -164,6 +253,39 @@ export class PivotHeadElement extends HTMLElement {
 
   public getProcessedData(): any {
     return this.engine.getState().processedData;
+  }
+
+  public getGroupedData(): Group[] {
+    return this.engine.getGroupedData();
+  }
+
+  public resizeRow(index: number, height: number): void {
+    this.engine.resizeRow(index, height);
+    this.notifyStateChange();
+  }
+
+  public toggleRowExpansion(rowId: string): void {
+    this.engine.toggleRowExpansion(rowId);
+    this.notifyStateChange();
+  }
+
+  public isRowExpanded(rowId: string): boolean {
+    return this.engine.isRowExpanded(rowId);
+  }
+
+  public getExpandedState(): ExpandedState {
+    return this.engine.getState().expandedRows;
+  }
+
+  // Add a method to apply a full sort configuration
+  public applySortConfig(sortConfig: SortConfig): void {
+    this.engine.sort(sortConfig.field, sortConfig.direction);
+    this.notifyStateChange();
+  }
+
+  // Add a method to export the current state as JSON
+  public exportStateAsJson(): string {
+    return JSON.stringify(this.engine.getState());
   }
 }
 
