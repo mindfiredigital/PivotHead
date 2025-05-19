@@ -11,6 +11,7 @@ import type {
   SortConfig,
   Group,
   ExpandedState,
+  AggregationType,
 } from '@mindfiredigital/pivothead';
 
 interface EnhancedPivotEngine<T extends Record<string, any>>
@@ -52,6 +53,11 @@ export class PivotHeadElement extends HTMLElement {
 
     const config: PivotTableConfig<any> = {
       data,
+      defaultAggregation: 'sum',
+      rows: [],
+      columns: [],
+      measures: [],
+      dimensions: [],
       ...options,
     };
 
@@ -72,21 +78,6 @@ export class PivotHeadElement extends HTMLElement {
         case 'options':
           this.updateConfig();
           break;
-        case 'filters':
-          this.updateFilters(newValue);
-          break;
-        case 'pagination':
-          this.updatePagination(newValue);
-          break;
-        case 'measures':
-          this.updateMeasures(newValue);
-          break;
-        case 'dimensions':
-          this.updateDimensions(newValue);
-          break;
-        case 'groupconfig':
-          this.updateGroupConfig(newValue);
-          break;
       }
     } catch (error) {
       console.error(`Error processing attribute ${name}:`, error);
@@ -103,80 +94,15 @@ export class PivotHeadElement extends HTMLElement {
 
     const config: PivotTableConfig<any> = {
       data,
+      defaultAggregation: 'sum',
+      rows: [],
+      columns: [],
+      measures: [],
+      dimensions: [],
       ...options,
     };
 
     this.engine = new PivotEngine(config) as EnhancedPivotEngine<any>;
-    this.notifyStateChange();
-  }
-
-  private updateFilters(filtersJson: string) {
-    try {
-      const filters: FilterConfig[] = JSON.parse(filtersJson);
-      this.engine.applyFilters(filters);
-      this.notifyStateChange();
-    } catch (error) {
-      console.error('Error updating filters:', error);
-    }
-  }
-
-  private updatePagination(paginationJson: string) {
-    try {
-      const pagination: PaginationConfig = JSON.parse(paginationJson);
-      this.engine.setPagination(pagination);
-      this.notifyStateChange();
-    } catch (error) {
-      console.error('Error updating pagination:', error);
-    }
-  }
-
-  private updateMeasures(measuresJson: string) {
-    try {
-      const measures: Measure[] = JSON.parse(measuresJson);
-      this.engine.setMeasures(measures);
-      this.notifyStateChange();
-    } catch (error) {
-      console.error('Error updating measures:', error);
-    }
-  }
-
-  private updateDimensions(dimensionsJson: string) {
-    try {
-      const dimensions: Dimension[] = JSON.parse(dimensionsJson);
-      this.engine.setDimensions(dimensions);
-      this.notifyStateChange();
-    } catch (error) {
-      console.error('Error updating dimensions:', error);
-    }
-  }
-
-  private updateGroupConfig(groupConfigJson: string) {
-    try {
-      const groupConfig: GroupConfig | null = groupConfigJson
-        ? JSON.parse(groupConfigJson)
-        : null;
-      this.engine.setGroupConfig(groupConfig);
-      this.notifyStateChange();
-    } catch (error) {
-      console.error('Error while updating Group Config:', error);
-    }
-  }
-
-  private handleRowResize(event: CustomEvent) {
-    const { index, height } = event.detail;
-    this.engine.resizeRow(index, height);
-    this.notifyStateChange();
-  }
-
-  private handleRowExpand(event: CustomEvent) {
-    const { rowId } = event.detail;
-    this.engine.toggleRowExpansion(rowId);
-    this.notifyStateChange();
-  }
-
-  private handleSortChange(event: CustomEvent) {
-    const { field, direction } = event.detail;
-    this.engine.sort(field, direction);
     this.notifyStateChange();
   }
 
@@ -215,36 +141,69 @@ export class PivotHeadElement extends HTMLElement {
   }
 
   public applyFilters(filters: FilterConfig[]): void {
-    this.engine.applyFilters(filters);
-    this.notifyStateChange();
+    this.updateOptionAndRefresh('filterConfig', filters);
   }
 
   public setPagination(config: PaginationConfig): void {
-    this.engine.setPagination(config);
-    this.notifyStateChange();
+    this.updateOptionAndRefresh('paginationConfig', config);
   }
 
   public setMeasures(measures: Measure[]): void {
-    this.engine.setMeasures(measures);
-    this.notifyStateChange();
+    this.updateOptionAndRefresh('measures', measures);
   }
 
   public setDimensions(dimensions: Dimension[]): void {
-    this.engine.setDimensions(dimensions);
-    this.notifyStateChange();
+    this.updateOptionAndRefresh('dimensions', dimensions);
   }
 
   public setGroupConfig(groupConfig: GroupConfig | null): void {
-    this.engine.setGroupConfig(groupConfig);
-    this.notifyStateChange();
+    this.updateOptionAndRefresh('groupConfig', groupConfig);
+  }
+
+  private updateOptionAndRefresh(optionName: string, value: any): void {
+    const options = this.getAttribute('options')
+      ? JSON.parse(this.getAttribute('options')!)
+      : {};
+
+    options[optionName] = value;
+    this.setAttribute('options', JSON.stringify(options));
+  }
+
+  // Utility method to get a specific option
+  public getOption<T>(optionName: string, defaultValue?: T): T {
+    const options = this.getAttribute('options')
+      ? JSON.parse(this.getAttribute('options')!)
+      : {};
+
+    return options[optionName] !== undefined
+      ? options[optionName]
+      : defaultValue;
+  }
+
+  // Method to update multiple options at once
+  public updateOptions(newOptions: Partial<PivotTableConfig<any>>): void {
+    const options = this.getAttribute('options')
+      ? JSON.parse(this.getAttribute('options')!)
+      : {};
+
+    const updatedOptions = {
+      ...options,
+      ...newOptions,
+    };
+
+    this.setAttribute('options', JSON.stringify(updatedOptions));
   }
 
   public getFilters(): FilterConfig[] {
-    return this.engine.getFilterState();
+    return this.getOption<FilterConfig[]>('filterConfig', []);
   }
 
   public getPagination(): PaginationConfig {
-    return this.engine.getPaginationState();
+    return this.getOption<PaginationConfig>('paginationConfig', {
+      currentPage: 1,
+      pageSize: 10,
+      totalPages: 1,
+    });
   }
 
   public getData(): any[] {
@@ -286,6 +245,25 @@ export class PivotHeadElement extends HTMLElement {
   // Add a method to export the current state as JSON
   public exportStateAsJson(): string {
     return JSON.stringify(this.engine.getState());
+  }
+
+  // Add methods to specifically get measures and dimensions from options
+  public getMeasures(): Measure[] {
+    return this.getOption<Measure[]>('measures', []);
+  }
+
+  public getDimensions(): Dimension[] {
+    return this.getOption<Dimension[]>('dimensions', []);
+  }
+
+  // Get default aggregation type
+  public getDefaultAggregationType(): AggregationType {
+    return this.getOption<AggregationType>('defaultAggregation', 'sum');
+  }
+
+  // Set default aggregation type
+  public setDefaultAggregationType(aggregationType: AggregationType): void {
+    this.updateOptionAndRefresh('defaultAggregation', aggregationType);
   }
 }
 
