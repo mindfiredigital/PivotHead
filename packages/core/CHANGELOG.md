@@ -1,5 +1,17 @@
 # @mindfiredigital/pivothead
 
+## 1.1.0
+
+### Minor Changes
+
+- update keywords
+
+## 1.0.8
+
+### Patch Changes
+
+- update build script
+
 ## 1.0.7
 
 ### Patch Changes

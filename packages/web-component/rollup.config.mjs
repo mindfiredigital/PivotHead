@@ -3,7 +3,7 @@ import typescript from '@rollup/plugin-typescript';
 import { defineConfig } from 'rollup';
 
 export default defineConfig({
-  input: 'src/pivot-head.ts',
+  input: 'src/index.ts',
   output: [
     {
       file: 'dist/pivot-head.js',

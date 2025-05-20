@@ -1,6 +1,6 @@
 {
   "name": "@mindfiredigital/pivothead",
-  "version": "1.0.7",
+  "version": "1.1.0",
   "private": false,
   "main": "./dist/pivothead-core.umd.js",
   "module": "./dist/pivothead-core.mjs",
@@ -30,8 +30,6 @@
     "javascript",
     "npm-package",
     "spreadsheet",
-    "javascript",
-    "typescript",
     "data-drill-down",
     "data-analysis",
     "data-visualization",
@@ -61,7 +59,8 @@
     "eslint",
     "web",
     "webpack",
-    "css"
+    "css",
+    "html"
   ],
   "scripts": {
     "build": "vite build",
