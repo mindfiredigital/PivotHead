@@ -13,7 +13,6 @@ export function processData<T extends Record<string, any>>(
   groupConfig: GroupConfig | null = null
 ): ProcessedDataResult<T> {
   let processedData = [...config.data];
-
   if (sortConfig) {
     processedData = applySort(processedData, [sortConfig]);
   }
