@@ -452,7 +452,7 @@ export class PivotEngine<T extends Record<string, any>> {
    * Applies grouping to the pivot table data.
    * @private
    */
-  private applyGrouping() {
+  private applyGrouping(dataOverride?: T[]) {
     if (!this.state.groupConfig) return;
 
     const { rowFields, columnFields, grouper } = this.state.groupConfig;
@@ -462,8 +462,16 @@ export class PivotEngine<T extends Record<string, any>> {
       return;
     }
 
+    // Use provided data or fall back to config data
+    const dataToUse = dataOverride || this.config.data || [];
+
+    const tempConfig = {
+      ...this.config,
+      data: dataToUse,
+    };
+
     const { data, groups } = processData(
-      this.config,
+      tempConfig,
       this.state.sortConfig[0] || null,
       this.state.groupConfig
     );
@@ -792,10 +800,8 @@ export class PivotEngine<T extends Record<string, any>> {
   private refreshData() {
     // Store original data
     const originalData = [...this.state.data];
-
     // Apply filters first
     let filteredData = this.filterData(originalData);
-
     // Update total pages based on filtered data
     this.paginationConfig.totalPages = Math.ceil(
       filteredData.length / this.paginationConfig.pageSize
@@ -803,12 +809,12 @@ export class PivotEngine<T extends Record<string, any>> {
 
     // Apply pagination
     filteredData = this.paginateData(filteredData);
-
     // Update state with filtered and paginated data
     this.state.processedData = this.processData(filteredData);
 
     if (this.state.groupConfig) {
-      this.applyGrouping();
+      // Pass the filtered data to grouping instead of using config
+      this.applyGrouping(filteredData);
     }
   }
 
