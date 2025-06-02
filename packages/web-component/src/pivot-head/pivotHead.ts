@@ -25,6 +25,8 @@ interface EnhancedPivotEngine<T extends Record<string, any>>
 export class PivotHeadElement extends HTMLElement {
   private engine!: EnhancedPivotEngine<any>;
   private initialized = false;
+  private _data: any[] = [];
+  private _options: any = {};
 
   static get observedAttributes() {
     return ['data', 'options', 'filters', 'pagination'];
@@ -32,6 +34,24 @@ export class PivotHeadElement extends HTMLElement {
 
   constructor() {
     super();
+  }
+
+  set data(value: any[]) {
+    this._data = value;
+    this.reinitialize();
+  }
+
+  get data(): any[] {
+    return this._data;
+  }
+
+  set options(value: any) {
+    this._options = value;
+    this.reinitialize();
+  }
+
+  get options(): any {
+    return this._options;
   }
 
   private initializeWhenReady() {
@@ -45,24 +65,47 @@ export class PivotHeadElement extends HTMLElement {
   }
 
   private initialize() {
-    const data = this.getAttribute('data')
-      ? JSON.parse(this.getAttribute('data')!)
-      : [];
-    const options = this.getAttribute('options')
-      ? JSON.parse(this.getAttribute('options')!)
-      : {};
+    const rawData = this.getAttribute('data');
+    if (rawData && !this._data.length) {
+      this._data = JSON.parse(rawData);
+    }
 
-    const config: PivotTableConfig<any> = {
-      data,
-      ...options,
-    };
+    const rawOptions = this.getAttribute('options');
+    if (rawOptions && Object.keys(this._options).length === 0) {
+      this._options = JSON.parse(rawOptions);
+    }
 
-    this.engine = new PivotEngine(config) as EnhancedPivotEngine<any>;
-    this.notifyStateChange();
+    // Initialize toolbar visibility
+    const showToolbarAttr = this.getAttribute('show-toolbar');
+    if (showToolbarAttr !== null) {
+      this._showToolbar = showToolbarAttr === 'true';
+    }
+
+    // Initialize responsive setting
+    const responsiveAttr = this.getAttribute('responsive');
+    if (responsiveAttr !== null) {
+      this._isResponsive = responsiveAttr === 'true';
+    }
+
+    this.reinitialize();
+  }
+
+  private reinitialize() {
+    if (this._data && this._options) {
+      const config: PivotTableConfig<any> = {
+        data: this._data,
+        filters: this._filters,
+        isResponsive: this._isResponsive,
+        ...this._options,
+      };
+
+      this.engine = new PivotEngine(config) as EnhancedPivotEngine<any>;
+      this.notifyStateChange();
+    }
   }
 
   connectedCallback() {
-    this.notifyStateChange();
+    this.initializeWhenReady();
   }
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
@@ -83,20 +126,17 @@ export class PivotHeadElement extends HTMLElement {
   }
 
   private updateConfig() {
-    const data = this.getAttribute('data')
-      ? JSON.parse(this.getAttribute('data')!)
-      : [];
-    const options = this.getAttribute('options')
-      ? JSON.parse(this.getAttribute('options')!)
-      : {};
+    const rawData = this.getAttribute('data');
+    if (rawData && !this._data.length) {
+      this._data = JSON.parse(rawData);
+    }
 
-    const config: PivotTableConfig<any> = {
-      data,
-      ...options,
-    };
+    const rawOptions = this.getAttribute('options');
+    if (rawOptions && Object.keys(this._options).length === 0) {
+      this._options = JSON.parse(rawOptions);
+    }
 
-    this.engine = new PivotEngine(config) as EnhancedPivotEngine<any>;
-    this.notifyStateChange();
+    this.reinitialize();
   }
 
   private updateFilters(filtersJson: string) {
