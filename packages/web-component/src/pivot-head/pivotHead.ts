@@ -24,6 +24,7 @@ interface EnhancedPivotEngine<T extends Record<string, any>>
 
 export class PivotHeadElement extends HTMLElement {
   private engine!: EnhancedPivotEngine<any>;
+  private initialized = false;
 
   static get observedAttributes() {
     return ['data', 'options', 'filters', 'pagination'];
@@ -31,7 +32,16 @@ export class PivotHeadElement extends HTMLElement {
 
   constructor() {
     super();
-    this.initialize();
+  }
+
+  private initializeWhenReady() {
+    const dataAttr = this.getAttribute('data');
+    const optionsAttr = this.getAttribute('options');
+
+    if (dataAttr && optionsAttr) {
+      this.initialize();
+      this.initialized = true;
+    }
   }
 
   private initialize() {
