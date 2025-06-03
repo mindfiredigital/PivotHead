@@ -4,14 +4,16 @@
     "module": "ESNext",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "declaration": true,
-    "declarationDir": "./dist",
+    // "declarationDir": "./dist",
+    "outDir": "./dist",
+    "rootDir": "./src",
     "strict": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "outDir": "./dist"
+    "forceConsistentCasingInFileNames": true
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]
+  // "files": ["src/index.ts"]
 }

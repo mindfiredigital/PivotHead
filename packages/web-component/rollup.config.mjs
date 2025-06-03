@@ -3,7 +3,7 @@ import typescript from '@rollup/plugin-typescript';
 import { defineConfig } from 'rollup';
 
 export default defineConfig({
-  input: 'src/pivot-head.ts',
+  input: 'src/index.ts',
   output: [
     {
       file: 'dist/pivot-head.js',
@@ -20,8 +20,15 @@ export default defineConfig({
     resolve(),
     typescript({
       tsconfig: './tsconfig.json',
-      declaration: true,
-      declarationDir: './dist'
+      // declaration: true,
+      // declarationDir: './dist',
+      // outDir: './dist',
+      // compilerOptions: {
+      //   rootDir: './src',
+      //   declarationDir: './dist',
+      //   outDir: './dist'
+      // },
+      exclude: ['node_modules/**', 'dist/**']
     })
   ],
   external: ['@mindfiredigital/pivothead']
