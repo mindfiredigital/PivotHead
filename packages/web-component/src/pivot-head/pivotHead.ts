@@ -66,7 +66,6 @@ export class PivotHeadElement extends HTMLElement {
   private initializeWhenReady() {
     const dataAttr = this.getAttribute('data');
     const optionsAttr = this.getAttribute('options');
-
     if (dataAttr && optionsAttr) {
       this.initialize();
       this.initialized = true;
@@ -148,7 +147,6 @@ export class PivotHeadElement extends HTMLElement {
     if (responsiveAttr !== null) {
       this._isResponsive = responsiveAttr === 'true';
     }
-
     this.reinitialize();
   }
 
@@ -157,9 +155,6 @@ export class PivotHeadElement extends HTMLElement {
   }
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
-    console.log('Old Value', oldValue);
-    console.log('New Value', newValue);
-
     if (oldValue !== newValue) {
       switch (name) {
         case 'data':
