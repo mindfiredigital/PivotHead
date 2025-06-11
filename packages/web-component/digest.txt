@@ -1,0 +1,1058 @@
+Directory structure:
+└── web-component/
+    ├── README.md
+    ├── CHANGELOG.md
+    ├── package.json
+    ├── rollup.config.mjs
+    ├── tsconfig.json
+    ├── src/
+    │   ├── index.ts
+    │   ├── pivot-head/
+    │   │   └── pivotHead.ts
+    │   └── types/
+    │       └── types.ts
+    └── .turbo/
+
+================================================
+File: README.md
+================================================
+# PivotHead Headless Web Component
+
+A headless web component implementation of PivotHead that provides core pivot table functionality without any UI opinions. This allows you to build your own UI while leveraging the powerful PivotHead engine.
+
+## Installation
+
+```bash
+npm install @mindfiredigital/pivothead-web-component
+```
+
+## Core Concepts
+
+This is a headless component, meaning it:
+
+- Provides all data processing functionality
+- Handles state management
+- Emits state changes
+- Leaves UI rendering completely up to you
+
+## Usage
+
+### Basic Usage with Custom Rendering
+
+```javascript
+import '@mindfiredigital/pivothead-web-component';
+
+// Your custom rendering function
+function renderPivotTable(state) {
+  const { headers, rows, totals } = state.processedData;
+  // Implement your own rendering logic
+  // Return your custom UI elements
+}
+
+// Initialize the component
+const pivot = document.createElement('pivot-head');
+pivot.setAttribute('data', JSON.stringify(yourData));
+pivot.setAttribute('options', JSON.stringify(yourOptions));
+
+// Listen for state changes
+pivot.addEventListener('stateChange', e => {
+  const state = e.detail;
+  const yourUI = renderPivotTable(state);
+  // Update your UI with the new state
+});
+```
+
+### React Example
+
+```tsx
+import { useEffect, useRef, useState } from 'react';
+import '@mindfiredigital/pivothead-web-component';
+import type { PivotTableState } from '@mindfiredigital/pivothead';
+
+function YourPivotTable() {
+  const pivotRef = useRef<HTMLElement>(null);
+  const [state, setState] = useState<PivotTableState<any>>();
+
+  useEffect(() => {
+    const pivot = pivotRef.current;
+    if (pivot) {
+      pivot.addEventListener('stateChange', (e: CustomEvent) => {
+        setState(e.detail);
+      });
+    }
+  }, []);
+
+  // Your custom rendering logic
+  const renderTable = () => {
+    if (!state) return null;
+
+    const { headers, rows, totals } = state.processedData;
+    return (
+      <table className="your-table-class">
+        <thead>
+          <tr>
+            {headers.map(header => (
+              <th key={header}>{header}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row, i) => (
+            <tr key={i}>
+              {row.map((cell, j) => (
+                <td key={j}>{cell}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  };
+
+  return (
+    <div>
+      <pivot-head
+        ref={pivotRef}
+        data={JSON.stringify(yourData)}
+        options={JSON.stringify(yourOptions)}
+      />
+      {renderTable()}
+    </div>
+  );
+}
+```
+
+### Vue Example
+
+```vue
+<template>
+  <div>
+    <pivot-head
+      ref="pivotRef"
+      :data="JSON.stringify(data)"
+      :options="JSON.stringify(options)"
+      @stateChange="handleStateChange"
+    />
+    <!-- Your custom UI -->
+    <table v-if="state">
+      <thead>
+        <tr>
+          <th v-for="header in state.processedData.headers" :key="header">
+            {{ header }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(row, i) in state.processedData.rows" :key="i">
+          <td v-for="(cell, j) in row" :key="j">{{ cell }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</template>
+
+<script>
+import '@mindfiredigital/pivothead-web-component';
+
+export default {
+  name: 'PivotTable',
+  data() {
+    return {
+      data: yourData,
+      options: yourOptions,
+      state: null,
+    };
+  },
+  methods: {
+    handleStateChange(e) {
+      this.state = e.detail;
+    },
+  },
+};
+</script>
+```
+
+## API Reference
+
+### Properties
+
+| Property   | Type          | Description              |
+| ---------- | ------------- | ------------------------ |
+| data       | string (JSON) | The data to be processed |
+| options    | string (JSON) | Configuration options    |
+| filters    | string (JSON) | Filter configuration     |
+| pagination | string (JSON) | Pagination configuration |
+
+### Events
+
+| Event       | Detail          | Description                                 |
+| ----------- | --------------- | ------------------------------------------- |
+| stateChange | PivotTableState | Emitted whenever the internal state changes |
+
+### Methods
+
+| Method                    | Description                   |
+| ------------------------- | ----------------------------- |
+| getState()                | Get current state             |
+| refresh()                 | Reset and refresh the engine  |
+| sort(field, direction)    | Sort data by field            |
+| setMeasures(measures)     | Update measures               |
+| setDimensions(dimensions) | Update dimensions             |
+| setGroupConfig(config)    | Update grouping configuration |
+| getFilters()              | Get current filters           |
+| getPagination()           | Get pagination state          |
+| getData()                 | Get raw data                  |
+| getProcessedData()        | Get processed data            |
+
+## State Interface
+
+```typescript
+interface PivotTableState<T> {
+  data: T[];
+  processedData: {
+    headers: string[];
+    rows: any[][];
+    totals: Record<string, number>;
+  };
+  // ... other state properties
+}
+```
+
+## Examples
+
+### Custom Sorting
+
+```javascript
+const pivot = document.querySelector('pivot-head');
+pivot.sort('Sales', 'desc');
+```
+
+### Custom Filtering
+
+```javascript
+const filters = [{ field: 'Category', operator: 'equals', value: 'Furniture' }];
+pivot.setAttribute('filters', JSON.stringify(filters));
+```
+
+### Custom Pagination
+
+```javascript
+const pagination = {
+  currentPage: 1,
+  pageSize: 10,
+};
+pivot.setAttribute('pagination', JSON.stringify(pagination));
+```
+
+## TypeScript Support
+
+The package includes TypeScript definitions for all APIs and events.
+
+
+
+================================================
+File: CHANGELOG.md
+================================================
+# @mindfiredigital/pivothead-web-component
+
+## 1.0.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.1.0
+
+## 1.0.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.0.8
+
+
+
+================================================
+File: package.json
+================================================
+{
+  "name": "@mindfiredigital/pivothead-web-component",
+  "version": "1.0.2",
+  "private": true,
+  "type": "module",
+  "description": "Web Component implementation of PivotHead for use in any JavaScript framework",
+  "main": "dist/pivot-head.js",
+  "module": "dist/pivot-head.mjs",
+  "types": "dist/pivot-head.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rimraf dist && rollup -c",
+    "dev": "rollup -c -w",
+    "clean": "rimraf dist"
+  },
+  "keywords": [
+    "pivothead",
+    "web-components",
+    "pivot-table",
+    "framework-agnostic",
+    "custom-elements"
+  ],
+  "author": "Mindfiredigital",
+  "license": "MIT",
+  "dependencies": {
+    "@mindfiredigital/pivothead": "workspace:*"
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.0.0",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "rimraf": "^5.0.0",
+    "rollup": "^3.0.0",
+    "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "@webcomponents/webcomponentsjs": "^2.8.0"
+  }
+}
+
+
+
+================================================
+File: rollup.config.mjs
+================================================
+import resolve from '@rollup/plugin-node-resolve';
+import typescript from '@rollup/plugin-typescript';
+import { defineConfig } from 'rollup';
+
+export default defineConfig({
+  input: 'src/index.ts',
+  output: [
+    {
+      file: 'dist/pivot-head.js',
+      format: 'esm',
+      sourcemap: true
+    },
+    {
+      file: 'dist/pivot-head.mjs',
+      format: 'esm',
+      sourcemap: true
+    }
+  ],
+  plugins: [
+    resolve(),
+    typescript({
+      tsconfig: './tsconfig.json',
+      // declaration: true,
+      // declarationDir: './dist',
+      // outDir: './dist',
+      // compilerOptions: {
+      //   rootDir: './src',
+      //   declarationDir: './dist',
+      //   outDir: './dist'
+      // },
+      exclude: ['node_modules/**', 'dist/**']
+    })
+  ],
+  external: ['@mindfiredigital/pivothead']
+}); 
+
+
+
+================================================
+File: tsconfig.json
+================================================
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "declaration": true,
+    // "declarationDir": "./dist",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+  // "files": ["src/index.ts"]
+}
+
+
+
+================================================
+File: src/index.ts
+================================================
+import './pivot-head/pivotHead';
+import type { EnhancedPivotEngine } from './types/types';
+export { EnhancedPivotEngine };
+
+
+
+================================================
+File: src/pivot-head/pivotHead.ts
+================================================
+import { PivotEngine } from '@mindfiredigital/pivothead';
+import type {
+  PivotTableConfig,
+  FilterConfig,
+  PaginationConfig,
+  PivotTableState,
+  Measure,
+  Dimension,
+  GroupConfig,
+  MeasureConfig,
+  AggregationType,
+  Group,
+} from '@mindfiredigital/pivothead';
+
+interface EnhancedPivotEngine<T extends Record<string, any>>
+  extends PivotEngine<T> {
+  applyFilters(filters: FilterConfig[]): void;
+  setPagination(config: PaginationConfig): void;
+  setMeasures(measures: MeasureConfig[]): void;
+  setDimensions(dimensions: Dimension[]): void;
+  getFilterState(): FilterConfig[];
+  getPaginationState(): PaginationConfig;
+  reset(): void;
+  sort(field: string, direction: 'asc' | 'desc'): void;
+  setGroupConfig(config: GroupConfig | null): void;
+  setAggregation(type: AggregationType): void;
+  formatValue(value: any, field: string): string;
+  resizeRow(index: number, height: number): void;
+  toggleRowExpansion(rowId: string): void;
+  isRowExpanded(rowId: string): boolean;
+  dragRow(fromIndex: number, toIndex: number): void;
+  dragColumn(fromIndex: number, toIndex: number): void;
+  getGroupedData(): Group[];
+  exportToHTML(fileName: string): void;
+  exportToPDF(fileName: string): void;
+  exportToExcel(fileName: string): void;
+  openPrintDialog(): void;
+}
+
+export class PivotHeadElement extends HTMLElement {
+  private engine!: EnhancedPivotEngine<any>;
+  private initialized = false;
+  private _filters: FilterConfig[] = [];
+  private _showToolbar = true;
+  private _isResponsive = true;
+  private _columnWidths: Record<string, number> = {};
+  private _expandedRows: Record<string, boolean> = {};
+
+  static get observedAttributes() {
+    return [
+      'data',
+      'options',
+      'filters',
+      'pagination',
+      'show-toolbar',
+      'responsive',
+      'column-widths',
+      'expanded-rows',
+    ];
+  }
+
+  constructor() {
+    super();
+  }
+
+  private initializeWhenReady() {
+    const dataAttr = this.getAttribute('data');
+    const optionsAttr = this.getAttribute('options');
+    if (dataAttr && optionsAttr) {
+      this.initialize();
+      this.initialized = true;
+    }
+  }
+
+  private _data: any[] = [];
+  private _options: any = {};
+
+  set data(value: any[]) {
+    this._data = value;
+    this.reinitialize();
+  }
+
+  get data(): any[] {
+    return this._data;
+  }
+
+  set options(value: any) {
+    this._options = value;
+    this.reinitialize();
+  }
+
+  get options(): any {
+    return this._options;
+  }
+
+  set showToolbar(value: boolean) {
+    this._showToolbar = value;
+    this.setAttribute('show-toolbar', String(value));
+  }
+
+  get showToolbar(): boolean {
+    return this._showToolbar;
+  }
+
+  set responsive(value: boolean) {
+    this._isResponsive = value;
+    this.setAttribute('responsive', String(value));
+  }
+
+  get responsive(): boolean {
+    return this._isResponsive;
+  }
+
+  private reinitialize() {
+    if (this._data && this._options) {
+      const config: PivotTableConfig<any> = {
+        data: this._data,
+        filters: this._filters,
+        isResponsive: this._isResponsive,
+        ...this._options,
+      };
+
+      this.engine = new PivotEngine(config) as EnhancedPivotEngine<any>;
+      this.notifyStateChange();
+    }
+  }
+
+  private initialize() {
+    const rawData = this.getAttribute('data');
+    if (rawData && !this._data.length) {
+      this._data = JSON.parse(rawData);
+    }
+
+    const rawOptions = this.getAttribute('options');
+    if (rawOptions && Object.keys(this._options).length === 0) {
+      this._options = JSON.parse(rawOptions);
+    }
+
+    // Initialize toolbar visibility
+    const showToolbarAttr = this.getAttribute('show-toolbar');
+    if (showToolbarAttr !== null) {
+      this._showToolbar = showToolbarAttr === 'true';
+    }
+
+    // Initialize responsive setting
+    const responsiveAttr = this.getAttribute('responsive');
+    if (responsiveAttr !== null) {
+      this._isResponsive = responsiveAttr === 'true';
+    }
+    this.reinitialize();
+  }
+
+  connectedCallback() {
+    console.log("connectedCallBack")
+    this.initializeWhenReady();
+  }
+
+  attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+    if (oldValue !== newValue) {
+      switch (name) {
+        case 'data':
+        case 'options':
+          if (!this.initialized) {
+            this.initializeWhenReady();
+          } else {
+            this.updateConfig();
+          }
+          break;
+        case 'filters':
+          this.updateFilters(newValue); 
+          break;
+        case 'pagination':
+          this.updatePagination(newValue);
+          break;
+        case 'show-toolbar':
+          this._showToolbar = newValue === 'true';
+          this.notifyStateChange();
+          break;
+        case 'responsive':
+          this._isResponsive = newValue === 'true';
+          if (this.engine) {
+            this.reinitialize();
+          }
+          break;
+        case 'column-widths':
+          this.updateColumnWidths(newValue);
+          break;
+        case 'expanded-rows':
+          this.updateExpandedRows(newValue);
+          break;
+      }
+    }
+  }
+
+  private updateConfig() {
+    const rawData = this.getAttribute('data');
+    if (rawData && !this._data.length) {
+      this._data = JSON.parse(rawData);
+    }
+
+    const rawOptions = this.getAttribute('options');
+    if (rawOptions && Object.keys(this._options).length === 0) {
+      this._options = JSON.parse(rawOptions);
+    }
+
+    this.reinitialize();
+  }
+
+  private updateFilters(filtersJson: string) {
+    try {
+      this._filters = JSON.parse(filtersJson);
+      if (this.engine) {
+        this.engine.applyFilters(this._filters);
+        this.notifyStateChange();
+      }
+    } catch (error) {
+      console.error('Error updating filters:', error);
+    }
+    console.log('Update Filters', this._filters);
+  }
+
+  private updatePagination(paginationJson: string) {
+    try {
+      const pagination: PaginationConfig = JSON.parse(paginationJson);
+      if (this.engine) {
+        this.engine.setPagination(pagination);
+        this.notifyStateChange();
+      }
+    } catch (error) {
+      console.error('Error updating pagination:', error);
+    }
+  }
+
+  private updateColumnWidths(columnWidthsJson: string) {
+    try {
+      this._columnWidths = JSON.parse(columnWidthsJson);
+      this.notifyStateChange();
+    } catch (error) {
+      console.error('Error updating column widths:', error);
+    }
+  }
+
+  private updateExpandedRows(expandedRowsJson: string) {
+    try {
+      this._expandedRows = JSON.parse(expandedRowsJson);
+      this.notifyStateChange();
+    } catch (error) {
+      console.error('Error updating expanded rows:', error);
+    }
+  }
+
+  private notifyStateChange() {
+    if (!this.engine) return;
+
+    const state = this.engine.getState();
+    const enhancedState = {
+      ...state,
+      showToolbar: this._showToolbar,
+      columnWidths: this._columnWidths,
+      expandedRows: this._expandedRows,
+    };
+
+    this.dispatchEvent(
+      new CustomEvent('stateChange', {
+        detail: enhancedState,
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
+  // Public API methods
+  public getState(): PivotTableState<any> {
+    if (!this.engine) {
+      throw new Error('Engine not initialized');
+    }
+    return this.engine.getState();
+  }
+
+  public refresh(): void {
+    if (!this.engine) {
+      console.error('Engine not initialized');
+      return;
+    }
+
+    this._filters = [];
+    this.engine.applyFilters([]);
+    this.engine.reset();
+    this.removeAttribute('filters');
+    console.log('Refresh Filters', this._filters);
+    this.notifyStateChange();
+  }
+
+  public sort(field: string, direction: 'asc' | 'desc'): void {
+    if (!this.engine) {
+      console.error('Engine not initialized');
+      return;
+    }
+
+    console.log('Sort is getting called', field, direction);
+    this.engine.sort(field, direction);
+    this.notifyStateChange();
+  }
+
+  public setMeasures(measures: MeasureConfig[]): void {
+    if (!this.engine) {
+      console.error('Engine not initialized');
+      return;
+    }
+
+    this.engine.setMeasures(measures);
+    this.notifyStateChange();
+  }
+
+  public setDimensions(dimensions: Dimension[]): void {
+    if (!this.engine) {
+      console.error('Engine not initialized');
+      return;
+    }
+
+    this.engine.setDimensions(dimensions);
+    this.notifyStateChange();
+  }
+
+  public setGroupConfig(groupConfig: GroupConfig | null): void {
+    if (!this.engine) {
+      console.error('Engine not initialized');
+      return;
+    }
+
+    this.engine.setGroupConfig(groupConfig);
+    this.notifyStateChange();
+  }
+
+  public setAggregation(type: AggregationType): void {
+    if (!this.engine) {
+      console.error('Engine not initialized');
+      return;
+    }
+
+    this.engine.setAggregation(type);
+    this.notifyStateChange();
+  }
+
+  public formatValue(value: any, field: string): string {
+    if (!this.engine) {
+      console.error('Engine not initialized');
+      return String(value);
+    }
+
+    return this.engine.formatValue(value, field);
+  }
+
+  public resizeRow(index: number, height: number): void {
+    if (!this.engine) {
+      console.error('Engine not initialized');
+      return;
+    }
+
+    this.engine.resizeRow(index, height);
+    this.notifyStateChange();
+  }
+
+  public toggleRowExpansion(rowId: string): void {
+    if (!this.engine) {
+      console.error('Engine not initialized');
+      return;
+    }
+
+    this.engine.toggleRowExpansion(rowId);
+    this._expandedRows[rowId] = this.engine.isRowExpanded(rowId);
+    this.setAttribute('expanded-rows', JSON.stringify(this._expandedRows));
+    this.notifyStateChange();
+  }
+
+  public isRowExpanded(rowId: string): boolean {
+    if (!this.engine) {
+      console.error('Engine not initialized');
+      return false;
+    }
+
+    return this.engine.isRowExpanded(rowId);
+  }
+
+  public dragRow(fromIndex: number, toIndex: number): void {
+    if (!this.engine) {
+      console.error('Engine not initialized');
+      return;
+    }
+
+    this.engine.dragRow(fromIndex, toIndex);
+    this.notifyStateChange();
+  }
+
+  public dragColumn(fromIndex: number, toIndex: number): void {
+    if (!this.engine) {
+      console.error('Engine not initialized');
+      return;
+    }
+
+    this.engine.dragColumn(fromIndex, toIndex);
+    this.notifyStateChange();
+  }
+
+  public getGroupedData(): Group[] {
+    if (!this.engine) {
+      console.error('Engine not initialized');
+      return [];
+    }
+
+    return this.engine.getGroupedData();
+  }
+
+  public getFilters(): FilterConfig[] {
+    if (!this.engine) {
+      console.error('Engine not initialized');
+      return [];
+    }
+
+    return this.engine.getFilterState();
+  }
+
+  public getPagination(): PaginationConfig {
+    if (!this.engine) {
+      console.error('Engine not initialized');
+      throw new Error('Engine not initialized');
+    }
+
+    return this.engine.getPaginationState();
+  }
+
+  public getData(): any[] {
+    if (!this.engine) {
+      console.error('Engine not initialized');
+      return [];
+    }
+
+    return this.engine.getState().data;
+  }
+
+  public getProcessedData(): any {
+    if (!this.engine) {
+      console.error('Engine not initialized');
+      return null;
+    }
+
+    return this.engine.getState().processedData;
+  }
+
+  // File handling methods
+  public loadFromFile(file: File): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = event => {
+        try {
+          const data = JSON.parse(event.target?.result as string);
+          this.data = data;
+          resolve();
+        } catch (error) {
+          reject(error);
+        }
+      };
+      reader.onerror = error => reject(error);
+      reader.readAsText(file);
+    });
+  }
+
+  public loadFromUrl(url: string): Promise<void> {
+    return fetch(url)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Failed to fetch data from ${url}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        this.data = data;
+      });
+  }
+
+  // Export methods
+  public exportToHTML(fileName = 'pivot-table'): void {
+    if (!this.engine) {
+      console.error('Engine not initialized. Cannot export to HTML.');
+      return;
+    }
+    this.engine.exportToHTML(fileName);
+  }
+
+  public exportToPDF(fileName = 'pivot-table'): void {
+    if (!this.engine) {
+      console.error('Engine not initialized. Cannot export to PDF.');
+      return;
+    }
+    this.engine.exportToPDF(fileName);
+  }
+
+  public exportToExcel(fileName = 'pivot-table'): void {
+    if (!this.engine) {
+      console.error('Engine not initialized. Cannot export to Excel.');
+      return;
+    }
+    this.engine.exportToExcel(fileName);
+  }
+
+  public openPrintDialog(): void {
+    if (!this.engine) {
+      console.error('Engine not initialized. Cannot open print dialog.');
+      return;
+    }
+    this.engine.openPrintDialog();
+  }
+
+  // Utility methods
+  public toggleToolbar(): void {
+    this.showToolbar = !this.showToolbar;
+  }
+
+  public setColumnWidth(columnName: string, width: number): void {
+    this._columnWidths[columnName] = width;
+    this.setAttribute('column-widths', JSON.stringify(this._columnWidths));
+    this.notifyStateChange();
+  }
+
+  public getColumnWidth(columnName: string): number | undefined {
+    return this._columnWidths[columnName];
+  }
+
+  public expandAllRows(): void {
+    if (!this.engine) {
+      console.error('Engine not initialized');
+      return;
+    }
+
+    const state = this.engine.getState();
+    state.processedData.rows.forEach((_, index) => {
+      const rowId = `row-${index}`;
+      if (!this.engine.isRowExpanded(rowId)) {
+        this.engine.toggleRowExpansion(rowId);
+        this._expandedRows[rowId] = true;
+      }
+    });
+
+    this.setAttribute('expanded-rows', JSON.stringify(this._expandedRows));
+    this.notifyStateChange();
+  }
+
+  public collapseAllRows(): void {
+    if (!this.engine) {
+      console.error('Engine not initialized');
+      return;
+    }
+
+    Object.keys(this._expandedRows).forEach(rowId => {
+      if (this.engine.isRowExpanded(rowId)) {
+        this.engine.toggleRowExpansion(rowId);
+      }
+    });
+
+    this._expandedRows = {};
+    this.setAttribute('expanded-rows', JSON.stringify(this._expandedRows));
+    this.notifyStateChange();
+  }
+
+  // Event dispatchers for better integration
+  private dispatchSortEvent(field: string, direction: 'asc' | 'desc') {
+    this.dispatchEvent(
+      new CustomEvent('sort', {
+        detail: { field, direction },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
+  private dispatchFilterEvent(filters: FilterConfig[]) {
+    this.dispatchEvent(
+      new CustomEvent('filter', {
+        detail: { filters },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
+  private dispatchRowDragEvent(fromIndex: number, toIndex: number) {
+    this.dispatchEvent(
+      new CustomEvent('rowDrag', {
+        detail: { fromIndex, toIndex },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
+  private dispatchColumnDragEvent(fromIndex: number, toIndex: number) {
+    this.dispatchEvent(
+      new CustomEvent('columnDrag', {
+        detail: { fromIndex, toIndex },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
+  // Enhanced public methods with event dispatching
+  public sortWithEvent(field: string, direction: 'asc' | 'desc'): void {
+    this.sort(field, direction);
+    this.dispatchSortEvent(field, direction);
+  }
+
+  public applyFiltersWithEvent(filters: FilterConfig[]): void {
+    this._filters = filters;
+    if (this.engine) {
+      this.engine.applyFilters(filters);
+      this.notifyStateChange();
+      this.dispatchFilterEvent(filters);
+    }
+  }
+
+  public dragRowWithEvent(fromIndex: number, toIndex: number): void {
+    this.dragRow(fromIndex, toIndex);
+    this.dispatchRowDragEvent(fromIndex, toIndex);
+  }
+
+  public dragColumnWithEvent(fromIndex: number, toIndex: number): void {
+    this.dragColumn(fromIndex, toIndex);
+    this.dispatchColumnDragEvent(fromIndex, toIndex);
+  }
+}
+
+// Register the web component
+customElements.define('pivot-head', PivotHeadElement);
+
+
+
+================================================
+File: src/types/types.ts
+================================================
+import type {
+  FilterConfig,
+  PaginationConfig,
+  Measure,
+  Dimension,
+  GroupConfig,
+} from '@mindfiredigital/pivothead';
+
+export interface EnhancedPivotEngine<T extends Record<string, any>> {
+  applyFilters(filters: FilterConfig[]): void;
+  setPagination(config: PaginationConfig): void;
+  setMeasures(measures: Measure[]): void;
+  setDimensions(dimensions: Dimension[]): void;
+  getFilterState(): FilterConfig[];
+  getPaginationState(): PaginationConfig;
+  reset(): void;
+  sort(field: string, direction: 'asc' | 'desc'): void;
+  setGroupConfig(config: GroupConfig | null): void;
+}
+
+
+
