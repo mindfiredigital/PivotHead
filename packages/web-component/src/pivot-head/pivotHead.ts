@@ -285,6 +285,7 @@ import type {
   Group,
   PaginationConfig,
 } from '@mindfiredigital/pivothead';
+import { FieldFormat } from '../types/types';
 
 /**
  * Enhanced interface extending PivotEngine with additional methods
@@ -292,6 +293,7 @@ import type {
  */
 interface EnhancedPivotEngine<T extends Record<string, any>>
   extends PivotEngine<T> {
+  state: any;
   getPagination(): PaginationConfig;
   applyFilters(filters: FilterConfig[]): void;
   setMeasures(measures: MeasureConfig[]): void;
@@ -417,7 +419,7 @@ export class PivotHeadElement extends HTMLElement {
         ...this._options,
       };
 
-      console.log('config', config);
+      console.log("Options", this._options);
       // Create or recreate the engine
       this.engine = new PivotEngine(config) as EnhancedPivotEngine<any>;
 
@@ -483,7 +485,6 @@ export class PivotHeadElement extends HTMLElement {
 
     // Parse pagination
     const rawPagination = this.getAttribute('pagination');
-    console.log('rawPagination', rawPagination);
     if (rawPagination) {
       try {
         this.pagination = { ...this._pagination, ...JSON.parse(rawPagination) };
@@ -690,6 +691,9 @@ export class PivotHeadElement extends HTMLElement {
     return this.engine.formatValue(value, field);
   }
 
+
+
+
   /**
    * Get grouped data from the pivot table
    */
@@ -834,7 +838,6 @@ export class PivotHeadElement extends HTMLElement {
       console.error('Engine not initialized');
       return;
     }
-    console.log('from Index', fromIndex, 'to Index', toIndex);
     this.engine.dragRow(fromIndex, toIndex);
     this.notifyStateChange();
   }
@@ -990,7 +993,17 @@ export class PivotHeadElement extends HTMLElement {
    * Method to reinitialize the engine
    */
   private reinitialize(): void {
+    console.log(this._options)
     this.tryInitializeEngine();
+  }
+
+  public setFormatting(field: string, format: any): void {
+    if (!this._options.formatting) {
+      this._options.formatting = {};
+    }
+ 
+    this._options.formatting[field] = format;
+    this.reinitialize();
   }
 }
 

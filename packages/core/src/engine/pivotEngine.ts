@@ -128,6 +128,7 @@ export class PivotEngine<T extends Record<string, any>> {
   private async fetchRemoteData(url: string): Promise<T[]> {
     try {
       const response = await fetch(url);
+     
       if (!response.ok) {
         throw new Error(`Failed to fetch data from ${url}`);
       }
@@ -780,7 +781,7 @@ export class PivotEngine<T extends Record<string, any>> {
       ...this.paginationConfig,
       ...config,
     };
-    console.log('Line 775 this.paginationCOnfig', this.paginationConfig);
+
     this.refreshData();
   }
 

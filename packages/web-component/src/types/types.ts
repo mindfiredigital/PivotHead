@@ -23,6 +23,13 @@ export interface EnhancedPivotEngine<T extends Record<string, any>> {
   sort(field: string, direction: 'asc' | 'desc'): void;
   setGroupConfig(config: GroupConfig | null): void;
 }
+export interface FieldFormat {
+  type: 'currency' | 'number' | 'percentage' | 'date';
+  decimals?: number;
+  locale?: string;
+  currency?: string;
+}
+
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 

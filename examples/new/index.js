@@ -146,6 +146,354 @@ window.handlePrint = () => {
   pivotTable.openPrintDialog();
 };
 
+
+
+// function renderTable(state) {
+//   try {
+//     console.log('Current Engine State:', state);
+
+//     if (!state.processedData && !state.data) {
+//       console.error('No processed data available');
+//       return;
+//     }
+
+//     const tableContainer = document.getElementById('myTable');
+
+//     // Clear previous content
+//     tableContainer.innerHTML = '';
+
+//     // Create table element
+//     const table = document.createElement('table');
+//     table.style.width = '100%';
+//     table.style.borderCollapse = 'collapse';
+//     table.style.marginTop = '20px';
+//     table.style.border = '1px solid #dee2e6';
+
+//     // Create table header
+//     const thead = document.createElement('thead');
+
+//     // First header row for regions
+//     const regionHeaderRow = document.createElement('tr');
+
+//     // Add empty cell for top-left corner (Product/Region)
+//     const cornerCell = document.createElement('th');
+//     cornerCell.style.padding = '12px';
+//     cornerCell.style.backgroundColor = '#f8f9fa';
+//     cornerCell.style.borderBottom = '2px solid #dee2e6';
+//     cornerCell.style.borderRight = '1px solid #dee2e6';
+//     cornerCell.textContent = 'Product / Region';
+//     regionHeaderRow.appendChild(cornerCell);
+
+//     // Get regions from column groups (set via setColumnGroups)
+//     const uniqueRegions =
+//       state.columnGroups && state.columnGroups.length > 0
+//         ? state.columnGroups.map(
+//             group => group.key || group.name || group.value
+//           )
+//         : [...new Set(state.data.map(item => item.region))]; // fallback
+
+//     // Add region headers with colspan for measures
+//     uniqueRegions.forEach((region, index) => {
+//       const th = document.createElement('th');
+//       th.textContent = region;
+//       th.colSpan = state.selectedMeasures ? state.selectedMeasures.length : 1;
+//       th.style.padding = '12px';
+//       th.style.backgroundColor = '#f8f9fa';
+//       th.style.borderBottom = '2px solid #dee2e6';
+//       th.style.borderRight = '1px solid #dee2e6';
+//       th.style.textAlign = 'center';
+//       th.dataset.index = index + 1;
+
+//       th.setAttribute('draggable', 'true');
+//       th.style.cursor = 'move';
+
+//       regionHeaderRow.appendChild(th);
+//     });
+
+//     thead.appendChild(regionHeaderRow);
+
+//     // Second header row for measures
+//     const measureHeaderRow = document.createElement('tr');
+
+//     // Get current sort configuration
+//     const currentSortConfig = state.sortConfig?.[0];
+
+//     // Add product header with sort icon
+//     const productHeader = document.createElement('th');
+//     productHeader.style.padding = '12px';
+//     productHeader.style.backgroundColor = '#f8f9fa';
+//     productHeader.style.borderBottom = '2px solid #dee2e6';
+//     productHeader.style.borderRight = '1px solid #dee2e6';
+//     productHeader.style.cursor = 'pointer';
+
+//     const productHeaderContent = document.createElement('div');
+//     productHeaderContent.style.display = 'flex';
+//     productHeaderContent.style.alignItems = 'center';
+
+//     const productText = document.createElement('span');
+//     productText.textContent = 'Product';
+//     productHeaderContent.appendChild(productText);
+
+//     const productSortIcon = createSortIcon('product', currentSortConfig);
+//     productHeaderContent.appendChild(productSortIcon);
+
+//     productHeader.appendChild(productHeaderContent);
+
+//     productHeader.addEventListener('click', () => {
+//       const direction =
+//         currentSortConfig?.field === 'product' &&
+//         currentSortConfig?.direction === 'asc'
+//           ? 'desc'
+//           : 'asc';
+//       pivotTable.sort('product', direction);
+//     });
+
+//     measureHeaderRow.appendChild(productHeader);
+
+//     // Add measure headers for each region
+//     if (state.selectedMeasures && state.selectedMeasures.length > 0) {
+//       uniqueRegions.forEach(region => {
+//         state.selectedMeasures.forEach(measure => {
+//           const th = document.createElement('th');
+//           th.style.padding = '12px';
+//           th.style.backgroundColor = '#f8f9fa';
+//           th.style.borderBottom = '2px solid #dee2e6';
+//           th.style.borderRight = '1px solid #dee2e6';
+//           th.style.cursor = 'pointer';
+
+//           const headerContent = document.createElement('div');
+//           headerContent.style.display = 'flex';
+//           headerContent.style.alignItems = 'center';
+//           headerContent.style.justifyContent = 'space-between';
+
+//           const measureText = document.createElement('span');
+//           measureText.textContent = measure.caption;
+//           headerContent.appendChild(measureText);
+
+//           const sortIcon = createSortIcon(
+//             measure.uniqueName,
+//             currentSortConfig
+//           );
+//           headerContent.appendChild(sortIcon);
+
+//           th.appendChild(headerContent);
+
+//           th.addEventListener('click', () => {
+//             const direction =
+//               currentSortConfig?.field === measure.uniqueName &&
+//               currentSortConfig?.direction === 'asc'
+//                 ? 'desc'
+//                 : 'asc';
+//             pivotTable.sort(measure.uniqueName, direction);
+//           });
+
+//           measureHeaderRow.appendChild(th);
+//         });
+//       });
+//     }
+
+//     thead.appendChild(measureHeaderRow);
+//     table.appendChild(thead);
+
+//     // Create table body
+//     const tbody = document.createElement('tbody');
+
+//     // Get all unique products
+
+//     const allUniqueProducts =
+//       state.rowGroups && state.rowGroups.length > 0
+//         ? state.rowGroups.map(group => group.key || group.name || group.value)
+//         : [...new Set(state.data.map(item => item.product))]; // fallback
+
+//     // Apply pagination to products
+//     const pagination = pivotTable.getPagination();
+//     const startIndex = (pagination.currentPage - 1) * pagination.pageSize;
+//     const endIndex = startIndex + pagination.pageSize;
+//     const paginatedProducts = allUniqueProducts.slice(startIndex, endIndex);
+
+//     console.log('Pagination info:', {
+//       currentPage: pagination.currentPage,
+//       pageSize: pagination.pageSize,
+//       totalProducts: allUniqueProducts.length,
+//       showingProducts: paginatedProducts.length,
+//       startIndex,
+//       endIndex,
+//     });
+
+//     // Add rows for each product
+//     paginatedProducts.forEach((product, rowIndex) => {
+//       const tr = document.createElement('tr');
+//       tr.dataset.rowIndex = rowIndex;
+//       tr.setAttribute('draggable', 'true');
+//       tr.style.cursor = 'move';
+
+//       const productCell = document.createElement('td');
+//       productCell.style.fontWeight = 'bold';
+//       productCell.style.padding = '8px';
+//       productCell.style.borderBottom = '1px solid #dee2e6';
+//       productCell.style.display = 'flex';
+//       productCell.style.alignItems = 'center';
+//       productCell.style.gap = '8px';
+
+//       const rowId = `product-${product}`;
+//       const isExpanded = pivotTable.isRowExpanded
+//         ? pivotTable.isRowExpanded(rowId)
+//         : true;
+
+//       const toggleIcon = document.createElement('span');
+//       toggleIcon.textContent = isExpanded ? '▼' : '▶';
+//       toggleIcon.style.cursor = 'pointer';
+
+//       if (pivotTable.toggleRowExpansion) {
+//         toggleIcon.addEventListener('click', () => {
+//           pivotTable.toggleRowExpansion(rowId);
+//         });
+//       }
+
+//       productCell.appendChild(toggleIcon);
+
+//       const productLabel = document.createElement('span');
+//       productLabel.textContent = product;
+//       productCell.appendChild(productLabel);
+
+//       tr.appendChild(productCell);
+
+//       // Add data cells for each region and measure
+//       uniqueRegions.forEach(region => {
+//         const filteredData = state.data.filter(
+//           item => item.product === product && item.region === region
+//         );
+
+//         const measures = state.selectedMeasures || [];
+//         measures.forEach(measure => {
+//           const td = document.createElement('td');
+//           td.style.padding = '8px';
+//           td.style.borderBottom = '1px solid #dee2e6';
+//           td.style.borderRight = '1px solid #dee2e6';
+//           td.style.textAlign = 'right';
+
+//           let value = 0;
+//           if (filteredData.length > 0) {
+//             switch (measure.aggregation) {
+//               case 'sum':
+//                 value = filteredData.reduce(
+//                   (sum, item) => sum + (item[measure.uniqueName] || 0),
+//                   0
+//                 );
+//                 break;
+//               case 'avg':
+//                 if (measure.formula) {
+//                   value =
+//                     filteredData.reduce(
+//                       (sum, item) => sum + measure.formula(item),
+//                       0
+//                     ) / filteredData.length;
+//                 } else {
+//                   value =
+//                     filteredData.reduce(
+//                       (sum, item) => sum + (item[measure.uniqueName] || 0),
+//                       0
+//                     ) / filteredData.length;
+//                 }
+//                 break;
+//               case 'max':
+//                 value = Math.max(
+//                   ...filteredData.map(item => item[measure.uniqueName] || 0)
+//                 );
+//                 break;
+//               case 'min':
+//                 value = Math.min(
+//                   ...filteredData.map(item => item[measure.uniqueName] || 0)
+//                 );
+//                 break;
+//               default:
+//                 value = 0;
+//             }
+//           }
+
+
+
+//           let formattedValue = value;
+//           if (measure.format) {
+//             if (measure.format.type === 'currency') {
+//               formattedValue = new Intl.NumberFormat(measure.format.locale, {
+//                 style: 'currency',
+//                 currency: measure.format.currency,
+//                 minimumFractionDigits: measure.format.decimals,
+//                 maximumFractionDigits: measure.format.decimals,
+//               }).format(value);
+//             } else if (measure.format.type === 'number') {
+//               formattedValue = new Intl.NumberFormat(measure.format.locale, {
+//                 minimumFractionDigits: measure.format.decimals,
+//                 maximumFractionDigits: measure.format.decimals,
+//               }).format(value);
+//             }
+//           }
+
+//           td.textContent = formattedValue;
+
+//           // Apply conditional formatting
+//           if (
+//             options.conditionalFormatting &&
+//             Array.isArray(options.conditionalFormatting)
+//           ) {
+//             options.conditionalFormatting.forEach(rule => {
+//               if (rule.value.type === 'Number' && !isNaN(value)) {
+//                 let applyFormat = false;
+
+//                 switch (rule.value.operator) {
+//                   case 'Greater than':
+//                     applyFormat = value > parseFloat(rule.value.value1);
+//                     break;
+//                   case 'Less than':
+//                     applyFormat = value < parseFloat(rule.value.value1);
+//                     break;
+//                   case 'Equal to':
+//                     applyFormat = value === parseFloat(rule.value.value1);
+//                     break;
+//                   case 'Between':
+//                     applyFormat =
+//                       value >= parseFloat(rule.value.value1) &&
+//                       value <= parseFloat(rule.value.value2);
+//                     break;
+//                 }
+
+//                 if (applyFormat) {
+//                   if (rule.format.font) td.style.fontFamily = rule.format.font;
+//                   if (rule.format.size) td.style.fontSize = rule.format.size;
+//                   if (rule.format.color) td.style.color = rule.format.color;
+//                   if (rule.format.backgroundColor)
+//                     td.style.backgroundColor = rule.format.backgroundColor;
+//                 }
+//               }
+//             });
+//           }
+
+//           tr.appendChild(td);
+//         });
+//       });
+
+//       tbody.appendChild(tr);
+//     });
+
+//     table.appendChild(tbody);
+//     tableContainer.appendChild(table);
+
+//     // Update pagination info after rendering
+//     updatePaginationInfo();
+
+//     // Set up drag and drop after rendering
+//     setupDragAndDrop(state);
+//   } catch (error) {
+//     console.error('Error rendering table:', error);
+
+//     const tableContainer = document.getElementById('myTable');
+//     tableContainer.innerHTML = `<div style="color: red; padding: 20px;">Error rendering table: ${error.message}</div>`;
+//   }
+// }
+
+// In index.js
+
 function renderTable(state) {
   try {
     console.log('Current Engine State:', state);
@@ -156,24 +504,16 @@ function renderTable(state) {
     }
 
     const tableContainer = document.getElementById('myTable');
+    tableContainer.innerHTML = ''; // Clear previous content
 
-    // Clear previous content
-    tableContainer.innerHTML = '';
-
-    // Create table element
     const table = document.createElement('table');
     table.style.width = '100%';
     table.style.borderCollapse = 'collapse';
     table.style.marginTop = '20px';
     table.style.border = '1px solid #dee2e6';
 
-    // Create table header
     const thead = document.createElement('thead');
-
-    // First header row for regions
     const regionHeaderRow = document.createElement('tr');
-
-    // Add empty cell for top-left corner (Product/Region)
     const cornerCell = document.createElement('th');
     cornerCell.style.padding = '12px';
     cornerCell.style.backgroundColor = '#f8f9fa';
@@ -182,15 +522,11 @@ function renderTable(state) {
     cornerCell.textContent = 'Product / Region';
     regionHeaderRow.appendChild(cornerCell);
 
-    // Get regions from column groups (set via setColumnGroups)
     const uniqueRegions =
       state.columnGroups && state.columnGroups.length > 0
-        ? state.columnGroups.map(
-            group => group.key || group.name || group.value
-          )
-        : [...new Set(state.data.map(item => item.region))]; // fallback
+        ? state.columnGroups.map(group => group.key || group.name || group.value)
+        : [...new Set(state.data.map(item => item.region))];
 
-    // Add region headers with colspan for measures
     uniqueRegions.forEach((region, index) => {
       const th = document.createElement('th');
       th.textContent = region;
@@ -201,22 +537,14 @@ function renderTable(state) {
       th.style.borderRight = '1px solid #dee2e6';
       th.style.textAlign = 'center';
       th.dataset.index = index + 1;
-
       th.setAttribute('draggable', 'true');
       th.style.cursor = 'move';
-
       regionHeaderRow.appendChild(th);
     });
-
     thead.appendChild(regionHeaderRow);
 
-    // Second header row for measures
     const measureHeaderRow = document.createElement('tr');
-
-    // Get current sort configuration
     const currentSortConfig = state.sortConfig?.[0];
-
-    // Add product header with sort icon
     const productHeader = document.createElement('th');
     productHeader.style.padding = '12px';
     productHeader.style.backgroundColor = '#f8f9fa';
@@ -234,21 +562,17 @@ function renderTable(state) {
 
     const productSortIcon = createSortIcon('product', currentSortConfig);
     productHeaderContent.appendChild(productSortIcon);
-
     productHeader.appendChild(productHeaderContent);
 
     productHeader.addEventListener('click', () => {
       const direction =
-        currentSortConfig?.field === 'product' &&
-        currentSortConfig?.direction === 'asc'
+        currentSortConfig?.field === 'product' && currentSortConfig?.direction === 'asc'
           ? 'desc'
           : 'asc';
       pivotTable.sort('product', direction);
     });
-
     measureHeaderRow.appendChild(productHeader);
 
-    // Add measure headers for each region
     if (state.selectedMeasures && state.selectedMeasures.length > 0) {
       uniqueRegions.forEach(region => {
         state.selectedMeasures.forEach(measure => {
@@ -268,12 +592,8 @@ function renderTable(state) {
           measureText.textContent = measure.caption;
           headerContent.appendChild(measureText);
 
-          const sortIcon = createSortIcon(
-            measure.uniqueName,
-            currentSortConfig
-          );
+          const sortIcon = createSortIcon(measure.uniqueName, currentSortConfig);
           headerContent.appendChild(sortIcon);
-
           th.appendChild(headerContent);
 
           th.addEventListener('click', () => {
@@ -284,41 +604,24 @@ function renderTable(state) {
                 : 'asc';
             pivotTable.sort(measure.uniqueName, direction);
           });
-
           measureHeaderRow.appendChild(th);
         });
       });
     }
-
     thead.appendChild(measureHeaderRow);
     table.appendChild(thead);
 
-    // Create table body
     const tbody = document.createElement('tbody');
-
-    // Get all unique products
-
     const allUniqueProducts =
       state.rowGroups && state.rowGroups.length > 0
         ? state.rowGroups.map(group => group.key || group.name || group.value)
-        : [...new Set(state.data.map(item => item.product))]; // fallback
+        : [...new Set(state.data.map(item => item.product))];
 
-    // Apply pagination to products
     const pagination = pivotTable.getPagination();
     const startIndex = (pagination.currentPage - 1) * pagination.pageSize;
     const endIndex = startIndex + pagination.pageSize;
     const paginatedProducts = allUniqueProducts.slice(startIndex, endIndex);
 
-    console.log('Pagination info:', {
-      currentPage: pagination.currentPage,
-      pageSize: pagination.pageSize,
-      totalProducts: allUniqueProducts.length,
-      showingProducts: paginatedProducts.length,
-      startIndex,
-      endIndex,
-    });
-
-    // Add rows for each product
     paginatedProducts.forEach((product, rowIndex) => {
       const tr = document.createElement('tr');
       tr.dataset.rowIndex = rowIndex;
@@ -334,34 +637,26 @@ function renderTable(state) {
       productCell.style.gap = '8px';
 
       const rowId = `product-${product}`;
-      const isExpanded = pivotTable.isRowExpanded
-        ? pivotTable.isRowExpanded(rowId)
-        : true;
-
+      const isExpanded = pivotTable.isRowExpanded ? pivotTable.isRowExpanded(rowId) : true;
       const toggleIcon = document.createElement('span');
       toggleIcon.textContent = isExpanded ? '▼' : '▶';
       toggleIcon.style.cursor = 'pointer';
-
       if (pivotTable.toggleRowExpansion) {
         toggleIcon.addEventListener('click', () => {
           pivotTable.toggleRowExpansion(rowId);
         });
       }
-
       productCell.appendChild(toggleIcon);
 
       const productLabel = document.createElement('span');
       productLabel.textContent = product;
       productCell.appendChild(productLabel);
-
       tr.appendChild(productCell);
 
-      // Add data cells for each region and measure
       uniqueRegions.forEach(region => {
         const filteredData = state.data.filter(
           item => item.product === product && item.region === region
         );
-
         const measures = state.selectedMeasures || [];
         measures.forEach(measure => {
           const td = document.createElement('td');
@@ -379,7 +674,8 @@ function renderTable(state) {
                   0
                 );
                 break;
-              case 'avg':
+              // ... other aggregation cases ...
+               case 'avg':
                 if (measure.formula) {
                   value =
                     filteredData.reduce(
@@ -409,26 +705,19 @@ function renderTable(state) {
             }
           }
 
-          let formattedValue = value;
-          if (measure.format) {
-            if (measure.format.type === 'currency') {
-              formattedValue = new Intl.NumberFormat(measure.format.locale, {
-                style: 'currency',
-                currency: measure.format.currency,
-                minimumFractionDigits: measure.format.decimals,
-                maximumFractionDigits: measure.format.decimals,
-              }).format(value);
-            } else if (measure.format.type === 'number') {
-              formattedValue = new Intl.NumberFormat(measure.format.locale, {
-                minimumFractionDigits: measure.format.decimals,
-                maximumFractionDigits: measure.format.decimals,
-              }).format(value);
-            }
-          }
+          // ==========================================================
+          // ===== THIS IS THE ONLY PART THAT HAS BEEN CHANGED ========
+          // ==========================================================
 
+          // The 'value' is already calculated. Now, format it using the component's public method.
+          // The component will delegate this call to its internal engine.
+          const formattedValue = pivotTable.formatValue(value, measure.uniqueName);
           td.textContent = formattedValue;
 
-          // Apply conditional formatting
+          // ==========================================================
+          // ==========================================================
+
+          // Apply conditional formatting (this part remains unchanged)
           if (
             options.conditionalFormatting &&
             Array.isArray(options.conditionalFormatting)
@@ -468,21 +757,16 @@ function renderTable(state) {
           tr.appendChild(td);
         });
       });
-
       tbody.appendChild(tr);
     });
 
     table.appendChild(tbody);
     tableContainer.appendChild(table);
 
-    // Update pagination info after rendering
     updatePaginationInfo();
-
-    // Set up drag and drop after rendering
     setupDragAndDrop(state);
   } catch (error) {
     console.error('Error rendering table:', error);
-
     const tableContainer = document.getElementById('myTable');
     tableContainer.innerHTML = `<div style="color: red; padding: 20px;">Error rendering table: ${error.message}</div>`;
   }
@@ -809,4 +1093,31 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
+
+  
 });
+
+window.applyFormatting = function () {
+  if (!pivotTable) return;
+ 
+  const fieldName = document.getElementById('field-select').value;
+  const formatType = document.getElementById('format-type').value;
+  const decimals = parseInt(
+    document.getElementById('decimal-places').value,
+    10
+  );
+  const locale = document.getElementById('locale-input').value || 'en-US';
+  const currency =
+    document.getElementById('currency-code').value.toUpperCase() || 'USD';
+ 
+  const newFormat = { type: formatType, decimals, locale };
+  if (formatType === 'currency') {
+    newFormat.currency = currency;
+  }
+ 
+  //  This calls the public method you added to the PivotHeadElement class
+  pivotTable.setFormatting(fieldName, newFormat);
+  closeModal('modal1');
+  renderTable(pivotTable.getState());
+  // setRowColumnGroups();
+};
