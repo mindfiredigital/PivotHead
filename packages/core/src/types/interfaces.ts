@@ -125,7 +125,12 @@ export interface PivotTableConfig<T> {
   isResponsive?: boolean;
   initialSort?: SortConfig[];
   pageSize?: number;
-  onRowDragEnd?: (fromIndex: number, toIndex: number, newData: T[]) => void;
+  // onRowDragEnd?: (fromIndex: number, toIndex: number, newData: T[]) => void;
+  onRowDragEnd?: (
+    fromIndex: number,
+    toIndex: number,
+    newOrder: Group[]
+  ) => void;
   onColumnDragEnd?: (
     fromIndex: number,
     toIndex: number,

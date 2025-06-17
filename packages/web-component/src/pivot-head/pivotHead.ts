@@ -1,274 +1,596 @@
+// import { PivotEngine } from '@mindfiredigital/pivothead';
+// import type {
+//   PivotTableConfig,
+//   FilterConfig,
+//   PivotTableState,
+//   Dimension,
+//   GroupConfig,
+//   MeasureConfig,
+//   AggregationType,
+//   Group,
+// } from '@mindfiredigital/pivothead';
+
+// /**
+//  * Enhanced interface extending PivotEngine with additional methods
+//  * This ensures type safety when casting the engine instance
+//  */
+// interface EnhancedPivotEngine<T extends Record<string, any>>
+//   extends PivotEngine<T> {
+//   applyFilters(filters: FilterConfig[]): void;
+//   setMeasures(measures: MeasureConfig[]): void;
+//   setDimensions(dimensions: Dimension[]): void;
+//   getFilterState(): FilterConfig[];
+//   reset(): void;
+//   sort(field: string, direction: 'asc' | 'desc'): void;
+//   setGroupConfig(config: GroupConfig | null): void;
+//   setAggregation(type: AggregationType): void;
+//   formatValue(value: any, field: string): string;
+//   getGroupedData(): Group[];
+//   exportToHTML(fileName: string): void;
+//   exportToPDF(fileName: string): void;
+//   exportToExcel(fileName: string): void;
+//   openPrintDialog(): void;
+//   // Drag methods from core
+//   dragRow(fromIndex: number, toIndex: number): void;
+//   dragColumn(fromIndex: number, toIndex: number): void;
+//   // New methods for group order
+//   setRowGroupOrder(order: string[]): void;
+//   setColumnGroupOrder(order: string[]): void;
+// }
+
+// /**
+//  * PivotHead Web Component
+//  * ... (omitting comment for brevity)
+//  */
+// export class PivotHeadElement extends HTMLElement {
+//   engine: any;
+//   _filters: never[] | undefined;
+//   private _data: any;
+//   private _options: any;
+//   // ... (properties remain the same)
+
+//   // ... (constructor, getters/setters, reinitialize, initialize, initializeWhenReady, connectedCallback, attributeChangedCallback, updateConfig, updateFilters remain the same)
+
+//   /**
+//    * Reinitializes the engine with current data and options
+//    */
+//   private reinitialize() {
+//     if (this._data && this._options && this._data.length > 0) { // Ensure data is present
+//       const config: PivotTableConfig<any> = {
+//         data: this._data,
+//         ...this._options,
+//       };
+
+//       // Cast to the enhanced interface to access all methods
+//       this.engine = new PivotEngine(config) as EnhancedPivotEngine<any>;
+
+//       // Apply any existing filters after engine initialization
+//       if (this._filters && this._filters.length > 0) {
+//         this.engine.applyFilters(this._filters);
+//       }
+
+//       // THIS IS THE KEY CHANGE:
+//       // Always fire a stateChange event after a successful reinitialization.
+//       // This ensures the initial render will always happen.
+//       this.notifyStateChange();
+//     }
+//   }
+
+//   // ... (initialize, initializeWhenReady, connectedCallback, etc. are the same)
+
+//   /**
+//    * Dispatches a custom event with the current state
+//    */
+//   private notifyStateChange() {
+//     // Check if the engine is actually ready before notifying.
+//     if (!this.engine) return;
+
+//     const state = this.engine.getState();
+
+//     this.dispatchEvent(
+//       new CustomEvent('stateChange', {
+//         detail: state,
+//         bubbles: true,
+//         composed: true,
+//       })
+//     );
+//   }
+
+//   // Public API methods for programmatic control
+
+//   /**
+//    * Get the current state of the pivot table
+//    */
+//   public getState(): PivotTableState<any> {
+//     if (!this.engine) {
+//       throw new Error('Engine not initialized');
+//     }
+//     return this.engine.getState();
+//   }
+
+//   /**
+//    * Reset the pivot table to its initial state
+//    */
+//   public refresh(): void {
+//     if (!this.engine) {
+//       console.error('Engine not initialized');
+//       return;
+//     }
+
+//     this._filters = [];
+//     this.engine.applyFilters([]);
+//     this.engine.reset();
+//     this.removeAttribute('filters');
+//     this.notifyStateChange();
+//   }
+
+//   /**
+//    * Sort the pivot table by a specific field
+//    */
+//   public sort(field: string, direction: 'asc' | 'desc'): void {
+//     if (!this.engine) {
+//       console.error('Engine not initialized');
+//       return;
+//     }
+
+//     this.engine.sort(field, direction);
+//     this.notifyStateChange();
+//   }
+
+//   /**
+//    * Set measures for the pivot table
+//    */
+//   public setMeasures(measures: MeasureConfig[]): void {
+//     if (!this.engine) {
+//       console.error('Engine not initialized');
+//       return;
+//     }
+
+//     this.engine.setMeasures(measures);
+//     this.notifyStateChange();
+//   }
+
+//   /**
+//    * Set dimensions for the pivot table
+//    */
+//   public setDimensions(dimensions: Dimension[]): void {
+//     if (!this.engine) {
+//       console.error('Engine not initialized');
+//       return;
+//     }
+
+//     this.engine.setDimensions(dimensions);
+//     this.notifyStateChange();
+//   }
+
+//   /**
+//    * Set grouping configuration
+//    */
+//   public setGroupConfig(groupConfig: GroupConfig | null): void {
+//     if (!this.engine) {
+//       console.error('Engine not initialized');
+//       return;
+//     }
+
+//     this.engine.setGroupConfig(groupConfig);
+//     this.notifyStateChange();
+//   }
+
+//   /**
+//    * Set aggregation type for measures
+//    */
+//   public setAggregation(type: AggregationType): void {
+//     if (!this.engine) {
+//       console.error('Engine not initialized');
+//       return;
+//     }
+
+//     this.engine.setAggregation(type);
+//     this.notifyStateChange();
+//   }
+
+//   /**
+//    * Format a value according to field formatting rules
+//    */
+//   public formatValue(value: any, field: string): string {
+//     if (!this.engine) {
+//       console.error('Engine not initialized');
+//       return String(value);
+//     }
+
+//     return this.engine.formatValue(value, field);
+//   }
+
+//   /**
+//    * Get grouped data from the pivot table
+//    */
+//   public getGroupedData(): Group[] {
+//     if (!this.engine) {
+//       console.error('Engine not initialized');
+//       return [];
+//     }
+
+//     return this.engine.getGroupedData();
+//   }
+
+//   // ... (getFilters, getData, getProcessedData, export methods, and file loading methods remain the same)
+
+//   /**
+//    * Programmatically sets the display order of row groups.
+//    */
+//   public setRowGroupOrder(order: string[]): void {
+//     if (!this.engine) {
+//       console.error('Engine not initialized');
+//       return;
+//     }
+//     this.engine.setRowGroupOrder(order);
+//     this.notifyStateChange();
+//   }
+
+//   /**
+//    * Programmatically sets the display order of column groups.
+//    */
+//   public setColumnGroupOrder(order: string[]): void {
+//     if (!this.engine) {
+//       console.error('Engine not initialized');
+//       return;
+//     }
+//     this.engine.setColumnGroupOrder(order);
+//     this.notifyStateChange();
+//   }
+
+//   // Public drag API methods
+
+//   /**
+//    * Programmatically drag a row from one position to another
+//    */
+//   public dragRow(fromIndex: number, toIndex: number): void {
+//     if (!this.engine) {
+//       console.error('Engine not initialized');
+//       return;
+//     }
+//     console.log('Dragging row from UI index', fromIndex, 'to', toIndex);
+//     this.engine.dragRow(fromIndex, toIndex);
+//     this.notifyStateChange();
+//   }
+
+//   /**
+//    * Programmatically drag a column from one position to another
+//    */
+//   public dragColumn(fromIndex: number, toIndex: number): void {
+//     if (!this.engine) {
+//       console.error('Engine not initialized');
+//       return;
+//     }
+
+//     // The UI provides 1-based indices for columns, convert to 0-based for the engine.
+//     console.log('Dragging column from UI index', fromIndex, 'to', toIndex);
+//     this.engine.dragColumn(fromIndex - 1, toIndex - 1);
+//     this.notifyStateChange();
+//   }
+// }
+
+// // Register the web component
+// customElements.define('pivot-head', PivotHeadElement);
+
 import { PivotEngine } from '@mindfiredigital/pivothead';
 import type {
   PivotTableConfig,
   FilterConfig,
-  PaginationConfig,
   PivotTableState,
-  Measure,
   Dimension,
   GroupConfig,
   MeasureConfig,
   AggregationType,
   Group,
+  PaginationConfig,
 } from '@mindfiredigital/pivothead';
+import { FieldFormat } from '../types/types';
 
+/**
+ * Enhanced interface extending PivotEngine with additional methods
+ * This ensures type safety when casting the engine instance
+ */
 interface EnhancedPivotEngine<T extends Record<string, any>>
   extends PivotEngine<T> {
+  state: any;
+  getPagination(): PaginationConfig;
   applyFilters(filters: FilterConfig[]): void;
-  setPagination(config: PaginationConfig): void;
   setMeasures(measures: MeasureConfig[]): void;
   setDimensions(dimensions: Dimension[]): void;
   getFilterState(): FilterConfig[];
-  getPaginationState(): PaginationConfig;
   reset(): void;
   sort(field: string, direction: 'asc' | 'desc'): void;
   setGroupConfig(config: GroupConfig | null): void;
   setAggregation(type: AggregationType): void;
   formatValue(value: any, field: string): string;
-  resizeRow(index: number, height: number): void;
-  toggleRowExpansion(rowId: string): void;
-  isRowExpanded(rowId: string): boolean;
-  dragRow(fromIndex: number, toIndex: number): void;
-  dragColumn(fromIndex: number, toIndex: number): void;
   getGroupedData(): Group[];
   exportToHTML(fileName: string): void;
   exportToPDF(fileName: string): void;
   exportToExcel(fileName: string): void;
   openPrintDialog(): void;
+  // Drag methods from core
+  dragRow(fromIndex: number, toIndex: number): void;
+  dragColumn(fromIndex: number, toIndex: number): void;
+  setRowGroups(rowGroups: Group[]): void;
+  setColumnGroups(columnGroups: Group[]): void;
+  toggleRowExpansion(rowId: string): void;
+  isRowExpanded(rowId: string): boolean;
+  setPagination(config: PaginationConfig): void;
+  getPaginationState(): PaginationConfig;
 }
 
 export class PivotHeadElement extends HTMLElement {
   private engine!: EnhancedPivotEngine<any>;
-  private initialized = false;
+  private _data: any[] = [];
+  private _options: any = {};
   private _filters: FilterConfig[] = [];
-  private _showToolbar = true;
-  private _isResponsive = true;
-  private _columnWidths: Record<string, number> = {};
-  private _expandedRows: Record<string, boolean> = {};
+  private _rowGroups: Group[] = [];
+  private _columnGroups: Group[] = [];
+  private _pagination: PaginationConfig = {
+    currentPage: 1,
+    pageSize: 30,
+    totalPages: 1,
+  };
 
-  static get observedAttributes() {
-    return [
-      'data',
-      'options',
-      'filters',
-      'pagination',
-      'show-toolbar',
-      'responsive',
-      'column-widths',
-      'expanded-rows',
-    ];
+  // Define observed attributes for the custom element
+  static get observedAttributes(): string[] {
+    return ['data', 'options', 'filters', 'pagination'];
   }
 
   constructor() {
     super();
   }
 
-  private initializeWhenReady() {
-    const dataAttr = this.getAttribute('data');
-    const optionsAttr = this.getAttribute('options');
-    if (dataAttr && optionsAttr) {
-      this.initialize();
-      this.initialized = true;
-    }
-  }
-
-  private _data: any[] = [];
-  private _options: any = {};
-
+  /**
+   * Data setter - automatically initializes/reinitializes when set
+   */
   set data(value: any[]) {
-    this._data = value;
-    this.reinitialize();
+    this._data = value || [];
+    this.tryInitializeEngine();
   }
 
   get data(): any[] {
     return this._data;
   }
 
+  /**
+   * Options setter - automatically initializes/reinitializes when set
+   */
   set options(value: any) {
-    this._options = value;
-    this.reinitialize();
+    this._options = value || {};
+    this.tryInitializeEngine();
   }
 
   get options(): any {
     return this._options;
   }
 
-  set showToolbar(value: boolean) {
-    this._showToolbar = value;
-    this.setAttribute('show-toolbar', String(value));
+  /**
+   * Getter and setter for filters property
+   */
+  set filters(value: FilterConfig[]) {
+    this._filters = value || [];
+    this.setAttribute('filters', JSON.stringify(value));
+    if (this.engine) {
+      this.engine.applyFilters(value);
+      this.notifyStateChange();
+    }
   }
 
-  get showToolbar(): boolean {
-    return this._showToolbar;
+  get filters(): FilterConfig[] {
+    return this._filters;
   }
 
-  set responsive(value: boolean) {
-    this._isResponsive = value;
-    this.setAttribute('responsive', String(value));
+  /**
+   * Getter and setter for pagination property
+   */
+  set pagination(value: PaginationConfig) {
+    this._pagination = { ...this._pagination, ...value };
+    this.setAttribute('pagination', JSON.stringify(this._pagination));
+    if (this.engine) {
+      this.engine.setPagination(this._pagination);
+      this.notifyStateChange();
+    }
   }
 
-  get responsive(): boolean {
-    return this._isResponsive;
+  get pagination(): PaginationConfig {
+    return this._pagination;
   }
 
-  private reinitialize() {
-    if (this._data && this._options) {
+  /**
+   * Single method to handle engine initialization
+   * Only creates engine when BOTH data and options are available
+   */
+  private tryInitializeEngine(): void {
+    // Check if we have the minimum required data
+    const hasData = this._data && this._data.length > 0;
+    const hasOptions = this._options && Object.keys(this._options).length > 0;
+    console.log('has Data', hasData, 'hasOptions', hasOptions);
+    if (!hasData || !hasOptions) {
+      return;
+    }
+
+    try {
+      // Create the engine configuration
       const config: PivotTableConfig<any> = {
         data: this._data,
-        filters: this._filters,
-        isResponsive: this._isResponsive,
+        pageSize: this._pagination.pageSize,
         ...this._options,
       };
 
+      console.log("Options", this._options);
+      // Create or recreate the engine
       this.engine = new PivotEngine(config) as EnhancedPivotEngine<any>;
-      this.notifyStateChange();
-    }
-  }
 
-  private initialize() {
-    const rawData = this.getAttribute('data');
-    if (rawData && !this._data.length) {
-      this._data = JSON.parse(rawData);
-    }
-
-    const rawOptions = this.getAttribute('options');
-    if (rawOptions && Object.keys(this._options).length === 0) {
-      this._options = JSON.parse(rawOptions);
-    }
-
-    // Initialize toolbar visibility
-    const showToolbarAttr = this.getAttribute('show-toolbar');
-    if (showToolbarAttr !== null) {
-      this._showToolbar = showToolbarAttr === 'true';
-    }
-
-    // Initialize responsive setting
-    const responsiveAttr = this.getAttribute('responsive');
-    if (responsiveAttr !== null) {
-      this._isResponsive = responsiveAttr === 'true';
-    }
-    this.reinitialize();
-  }
-
-  connectedCallback() {
-    this.initializeWhenReady();
-  }
-
-  attributeChangedCallback(name: string, oldValue: string, newValue: string) {
-    if (oldValue !== newValue) {
-      switch (name) {
-        case 'data':
-        case 'options':
-          if (!this.initialized) {
-            this.initializeWhenReady();
-          } else {
-            this.updateConfig();
-          }
-          break;
-        case 'filters':
-          this.updateFilters(newValue);
-          break;
-        case 'pagination':
-          this.updatePagination(newValue);
-          break;
-        case 'show-toolbar':
-          this._showToolbar = newValue === 'true';
-          this.notifyStateChange();
-          break;
-        case 'responsive':
-          this._isResponsive = newValue === 'true';
-          if (this.engine) {
-            this.reinitialize();
-          }
-          break;
-        case 'column-widths':
-          this.updateColumnWidths(newValue);
-          break;
-        case 'expanded-rows':
-          this.updateExpandedRows(newValue);
-          break;
-      }
-    }
-  }
-
-  private updateConfig() {
-    const rawData = this.getAttribute('data');
-    if (rawData && !this._data.length) {
-      this._data = JSON.parse(rawData);
-    }
-
-    const rawOptions = this.getAttribute('options');
-    if (rawOptions && Object.keys(this._options).length === 0) {
-      this._options = JSON.parse(rawOptions);
-    }
-
-    this.reinitialize();
-  }
-
-  private updateFilters(filtersJson: string) {
-    try {
-      this._filters = JSON.parse(filtersJson);
-      if (this.engine) {
+      // Apply existing configurations
+      if (this._filters.length > 0) {
         this.engine.applyFilters(this._filters);
-        this.notifyStateChange();
       }
-    } catch (error) {
-      console.error('Error updating filters:', error);
-    }
-    console.log('Update Filters', this._filters);
-  }
 
-  private updatePagination(paginationJson: string) {
-    try {
-      const pagination: PaginationConfig = JSON.parse(paginationJson);
-      if (this.engine) {
-        this.engine.setPagination(pagination);
-        this.notifyStateChange();
-      }
-    } catch (error) {
-      console.error('Error updating pagination:', error);
-    }
-  }
-
-  private updateColumnWidths(columnWidthsJson: string) {
-    try {
-      this._columnWidths = JSON.parse(columnWidthsJson);
+      this.engine.setPagination(this._pagination);
       this.notifyStateChange();
     } catch (error) {
-      console.error('Error updating column widths:', error);
+      console.error('Error initializing PivotEngine:', error);
     }
   }
 
-  private updateExpandedRows(expandedRowsJson: string) {
-    try {
-      this._expandedRows = JSON.parse(expandedRowsJson);
-      this.notifyStateChange();
-    } catch (error) {
-      console.error('Error updating expanded rows:', error);
+  /**
+   * Called when element is added to the DOM
+   */
+  connectedCallback(): void {
+    // Only parse attributes if properties haven't been set yet
+    if (!this._data.length && !Object.keys(this._options).length) {
+      this.parseAttributesIfNeeded();
     }
   }
 
-  private notifyStateChange() {
+  private parseAttributesIfNeeded(): void {
+    // Parse data attribute
+    const rawData = this.getAttribute('data');
+    console.log('rawData', rawData);
+    if (rawData && !this._data.length) {
+      try {
+        this.data = JSON.parse(rawData); // Use setter
+      } catch (error) {
+        console.error('Error parsing data attribute:', error);
+      }
+    }
+
+    // Parse options attribute
+    const rawOptions = this.getAttribute('options');
+    console.log('rawOptions', rawOptions);
+    if (rawOptions && !Object.keys(this._options).length) {
+      try {
+        this.options = JSON.parse(rawOptions); // Use setter
+      } catch (error) {
+        console.error('Error parsing options attribute:', error);
+      }
+    }
+
+    // Parse other attributes
+    this.parseOtherAttributes();
+  }
+
+  private parseOtherAttributes(): void {
+    // Parse filters
+    const rawFilters = this.getAttribute('filters');
+    if (rawFilters) {
+      try {
+        this.filters = JSON.parse(rawFilters);
+      } catch (error) {
+        console.error('Error parsing filters attribute:', error);
+      }
+    }
+
+    // Parse pagination
+    const rawPagination = this.getAttribute('pagination');
+    if (rawPagination) {
+      try {
+        this.pagination = { ...this._pagination, ...JSON.parse(rawPagination) };
+      } catch (error) {
+        console.error('Error parsing pagination attribute:', error);
+      }
+    }
+  }
+
+  /**
+   * Called when observed attributes change
+   */
+  attributeChangedCallback(
+    name: string,
+    oldValue: string | null,
+    newValue: string | null
+  ): void {
+    if (oldValue === newValue) return;
+
+    switch (name) {
+      case 'data':
+        if (newValue) {
+          try {
+            this.data = JSON.parse(newValue); // Use setter
+          } catch (error) {
+            console.error('Error parsing data attribute:', error);
+          }
+        }
+        break;
+
+      case 'options':
+        if (newValue) {
+          try {
+            this.options = JSON.parse(newValue); // Use setter
+          } catch (error) {
+            console.error('Error parsing options attribute:', error);
+          }
+        }
+        break;
+
+      case 'filters':
+        if (newValue) {
+          try {
+            this.filters = JSON.parse(newValue);
+          } catch (error) {
+            console.error('Error parsing filters attribute:', error);
+          }
+        } else {
+          this.filters = [];
+        }
+        break;
+
+      case 'pagination':
+        if (newValue) {
+          try {
+            this.pagination = { ...this._pagination, ...JSON.parse(newValue) };
+          } catch (error) {
+            console.error('Error parsing pagination attribute:', error);
+          }
+        } else {
+          this.pagination = { currentPage: 1, pageSize: 30, totalPages: 1 };
+        }
+        break;
+    }
+  }
+
+  /**
+   * Dispatches a custom event with the current state
+   */
+  private notifyStateChange(): void {
     if (!this.engine) return;
 
-    const state = this.engine.getState();
-    const enhancedState = {
-      ...state,
-      showToolbar: this._showToolbar,
-      columnWidths: this._columnWidths,
-      expandedRows: this._expandedRows,
-    };
-
-    this.dispatchEvent(
-      new CustomEvent('stateChange', {
-        detail: enhancedState,
-        bubbles: true,
-        composed: true,
-      })
-    );
+    try {
+      const state = this.engine.getState();
+      this.dispatchEvent(
+        new CustomEvent('stateChange', {
+          detail: state,
+          bubbles: true,
+          composed: true,
+        })
+      );
+    } catch (error) {
+      console.error('Error getting engine state:', error);
+    }
   }
 
-  // Public API methods
+  // Public API methods for programmatic control
+
+  /**
+   * Returns the raw data from the pivot table
+   */
+
+  public getRawData(): any[] {
+    return this._data;
+  }
+
+  /**
+   * Returns the pagination from the engine or local fallback
+   */
+  public getPagination(): PaginationConfig {
+    return this.engine?.getPagination?.() ?? this._pagination;
+  }
+
+  /**
+   * Get the current state of the pivot table
+   */
   public getState(): PivotTableState<any> {
     if (!this.engine) {
       throw new Error('Engine not initialized');
@@ -276,6 +598,9 @@ export class PivotHeadElement extends HTMLElement {
     return this.engine.getState();
   }
 
+  /**
+   * Reset the pivot table to its initial state
+   */
   public refresh(): void {
     if (!this.engine) {
       console.error('Engine not initialized');
@@ -286,21 +611,25 @@ export class PivotHeadElement extends HTMLElement {
     this.engine.applyFilters([]);
     this.engine.reset();
     this.removeAttribute('filters');
-    console.log('Refresh Filters', this._filters);
     this.notifyStateChange();
   }
 
+  /**
+   * Sort the pivot table by a specific field
+   */
   public sort(field: string, direction: 'asc' | 'desc'): void {
     if (!this.engine) {
       console.error('Engine not initialized');
       return;
     }
 
-    console.log('Sort is getting called', field, direction);
     this.engine.sort(field, direction);
     this.notifyStateChange();
   }
 
+  /**
+   * Set measures for the pivot table
+   */
   public setMeasures(measures: MeasureConfig[]): void {
     if (!this.engine) {
       console.error('Engine not initialized');
@@ -311,6 +640,9 @@ export class PivotHeadElement extends HTMLElement {
     this.notifyStateChange();
   }
 
+  /**
+   * Set dimensions for the pivot table
+   */
   public setDimensions(dimensions: Dimension[]): void {
     if (!this.engine) {
       console.error('Engine not initialized');
@@ -321,6 +653,9 @@ export class PivotHeadElement extends HTMLElement {
     this.notifyStateChange();
   }
 
+  /**
+   * Set grouping configuration
+   */
   public setGroupConfig(groupConfig: GroupConfig | null): void {
     if (!this.engine) {
       console.error('Engine not initialized');
@@ -331,6 +666,9 @@ export class PivotHeadElement extends HTMLElement {
     this.notifyStateChange();
   }
 
+  /**
+   * Set aggregation type for measures
+   */
   public setAggregation(type: AggregationType): void {
     if (!this.engine) {
       console.error('Engine not initialized');
@@ -341,6 +679,9 @@ export class PivotHeadElement extends HTMLElement {
     this.notifyStateChange();
   }
 
+  /**
+   * Format a value according to field formatting rules
+   */
   public formatValue(value: any, field: string): string {
     if (!this.engine) {
       console.error('Engine not initialized');
@@ -350,47 +691,160 @@ export class PivotHeadElement extends HTMLElement {
     return this.engine.formatValue(value, field);
   }
 
-  public resizeRow(index: number, height: number): void {
+
+
+
+  /**
+   * Get grouped data from the pivot table
+   */
+  public getGroupedData(): Group[] {
     if (!this.engine) {
       console.error('Engine not initialized');
+      return [];
+    }
+
+    return this.engine.getGroupedData();
+  }
+
+  /**
+   * Get current filter state
+   */
+  public getFilters(): FilterConfig[] {
+    return this._filters;
+  }
+
+  /**
+   * Get the raw data from the pivot table
+   */
+  public getData(): any[] {
+    if (!this.engine) {
+      console.error('Engine not initialized');
+      return [];
+    }
+
+    return this.engine.getState().data;
+  }
+
+  /**
+   * Get the processed data (headers, rows, totals)
+   */
+  public getProcessedData(): any {
+    if (!this.engine) {
+      console.error('Engine not initialized');
+      return null;
+    }
+
+    return this.engine.getState().processedData;
+  }
+
+  // Export methods
+
+  /**
+   * Export pivot table to HTML format
+   */
+  public exportToHTML(fileName = 'pivot-table'): void {
+    if (!this.engine) {
+      console.error('Engine not initialized. Cannot export to HTML.');
       return;
     }
-
-    this.engine.resizeRow(index, height);
-    this.notifyStateChange();
+    this.engine.exportToHTML(fileName);
   }
 
-  public toggleRowExpansion(rowId: string): void {
+  /**
+   * Export pivot table to PDF format
+   */
+  public exportToPDF(fileName = 'pivot-table'): void {
     if (!this.engine) {
-      console.error('Engine not initialized');
+      console.error('Engine not initialized. Cannot export to PDF.');
       return;
     }
-
-    this.engine.toggleRowExpansion(rowId);
-    this._expandedRows[rowId] = this.engine.isRowExpanded(rowId);
-    this.setAttribute('expanded-rows', JSON.stringify(this._expandedRows));
-    this.notifyStateChange();
+    this.engine.exportToPDF(fileName);
   }
 
-  public isRowExpanded(rowId: string): boolean {
+  /**
+   * Export pivot table to Excel format
+   */
+  public exportToExcel(fileName = 'pivot-table'): void {
     if (!this.engine) {
-      console.error('Engine not initialized');
-      return false;
+      console.error('Engine not initialized. Cannot export to Excel.');
+      return;
     }
-
-    return this.engine.isRowExpanded(rowId);
+    this.engine.exportToExcel(fileName);
   }
 
+  /**
+   * Open print dialog for the pivot table
+   */
+  public openPrintDialog(): void {
+    if (!this.engine) {
+      console.error('Engine not initialized. Cannot open print dialog.');
+      return;
+    }
+    this.engine.openPrintDialog();
+  }
+
+  // File loading methods
+
+  /**
+   * Load data from a file
+   */
+  public loadFromFile(file: File): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = event => {
+        try {
+          const result = event.target?.result;
+          if (typeof result === 'string') {
+            const data = JSON.parse(result);
+            this.data = data;
+            resolve();
+          } else {
+            reject(new Error('Failed to read file as text'));
+          }
+        } catch (error) {
+          reject(error);
+        }
+      };
+      reader.onerror = () => reject(new Error('Failed to read file'));
+      reader.readAsText(file);
+    });
+  }
+
+  /**
+   * Load data from a URL
+   */
+  public loadFromUrl(url: string): Promise<void> {
+    return fetch(url)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch data from ${url}: ${response.status} ${response.statusText}`
+          );
+        }
+        return response.json();
+      })
+      .then(data => {
+        this.data = data;
+      });
+  }
+
+  // Public drag API methods
+
+  /**
+   * Programmatically drag a row from one position to another
+   */
   public dragRow(fromIndex: number, toIndex: number): void {
     if (!this.engine) {
       console.error('Engine not initialized');
       return;
     }
-
     this.engine.dragRow(fromIndex, toIndex);
     this.notifyStateChange();
   }
 
+  /**
+   * Programmatically drag a column from one position to another
+   */
   public dragColumn(fromIndex: number, toIndex: number): void {
     if (!this.engine) {
       console.error('Engine not initialized');
@@ -401,230 +855,155 @@ export class PivotHeadElement extends HTMLElement {
     this.notifyStateChange();
   }
 
-  public getGroupedData(): Group[] {
-    if (!this.engine) {
-      console.error('Engine not initialized');
-      return [];
-    }
+  /**
+   * Set row groups for the pivot table
+   */
+  public setRowGroups(rowGroups: Group[]): void {
+    this._rowGroups = rowGroups || [];
 
-    return this.engine.getGroupedData();
-  }
-
-  public getFilters(): FilterConfig[] {
-    if (!this.engine) {
-      console.error('Engine not initialized');
-      return [];
-    }
-
-    return this.engine.getFilterState();
-  }
-
-  public getPagination(): PaginationConfig {
-    if (!this.engine) {
-      console.error('Engine not initialized');
-      throw new Error('Engine not initialized');
-    }
-
-    return this.engine.getPaginationState();
-  }
-
-  public getData(): any[] {
-    if (!this.engine) {
-      console.error('Engine not initialized');
-      return [];
-    }
-
-    return this.engine.getState().data;
-  }
-
-  public getProcessedData(): any {
-    if (!this.engine) {
-      console.error('Engine not initialized');
-      return null;
-    }
-
-    return this.engine.getState().processedData;
-  }
-
-  // File handling methods
-  public loadFromFile(file: File): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = event => {
-        try {
-          const data = JSON.parse(event.target?.result as string);
-          this.data = data;
-          resolve();
-        } catch (error) {
-          reject(error);
-        }
-      };
-      reader.onerror = error => reject(error);
-      reader.readAsText(file);
-    });
-  }
-
-  public loadFromUrl(url: string): Promise<void> {
-    return fetch(url)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`Failed to fetch data from ${url}`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        this.data = data;
-      });
-  }
-
-  // Export methods
-  public exportToHTML(fileName = 'pivot-table'): void {
-    if (!this.engine) {
-      console.error('Engine not initialized. Cannot export to HTML.');
-      return;
-    }
-    this.engine.exportToHTML(fileName);
-  }
-
-  public exportToPDF(fileName = 'pivot-table'): void {
-    if (!this.engine) {
-      console.error('Engine not initialized. Cannot export to PDF.');
-      return;
-    }
-    this.engine.exportToPDF(fileName);
-  }
-
-  public exportToExcel(fileName = 'pivot-table'): void {
-    if (!this.engine) {
-      console.error('Engine not initialized. Cannot export to Excel.');
-      return;
-    }
-    this.engine.exportToExcel(fileName);
-  }
-
-  public openPrintDialog(): void {
-    if (!this.engine) {
-      console.error('Engine not initialized. Cannot open print dialog.');
-      return;
-    }
-    this.engine.openPrintDialog();
-  }
-
-  // Utility methods
-  public toggleToolbar(): void {
-    this.showToolbar = !this.showToolbar;
-  }
-
-  public setColumnWidth(columnName: string, width: number): void {
-    this._columnWidths[columnName] = width;
-    this.setAttribute('column-widths', JSON.stringify(this._columnWidths));
-    this.notifyStateChange();
-  }
-
-  public getColumnWidth(columnName: string): number | undefined {
-    return this._columnWidths[columnName];
-  }
-
-  public expandAllRows(): void {
-    if (!this.engine) {
-      console.error('Engine not initialized');
-      return;
-    }
-
-    const state = this.engine.getState();
-    state.processedData.rows.forEach((_, index) => {
-      const rowId = `row-${index}`;
-      if (!this.engine.isRowExpanded(rowId)) {
-        this.engine.toggleRowExpansion(rowId);
-        this._expandedRows[rowId] = true;
-      }
-    });
-
-    this.setAttribute('expanded-rows', JSON.stringify(this._expandedRows));
-    this.notifyStateChange();
-  }
-
-  public collapseAllRows(): void {
-    if (!this.engine) {
-      console.error('Engine not initialized');
-      return;
-    }
-
-    Object.keys(this._expandedRows).forEach(rowId => {
-      if (this.engine.isRowExpanded(rowId)) {
-        this.engine.toggleRowExpansion(rowId);
-      }
-    });
-
-    this._expandedRows = {};
-    this.setAttribute('expanded-rows', JSON.stringify(this._expandedRows));
-    this.notifyStateChange();
-  }
-
-  // Event dispatchers for better integration
-  private dispatchSortEvent(field: string, direction: 'asc' | 'desc') {
-    this.dispatchEvent(
-      new CustomEvent('sort', {
-        detail: { field, direction },
-        bubbles: true,
-        composed: true,
-      })
-    );
-  }
-
-  private dispatchFilterEvent(filters: FilterConfig[]) {
-    this.dispatchEvent(
-      new CustomEvent('filter', {
-        detail: { filters },
-        bubbles: true,
-        composed: true,
-      })
-    );
-  }
-
-  private dispatchRowDragEvent(fromIndex: number, toIndex: number) {
-    this.dispatchEvent(
-      new CustomEvent('rowDrag', {
-        detail: { fromIndex, toIndex },
-        bubbles: true,
-        composed: true,
-      })
-    );
-  }
-
-  private dispatchColumnDragEvent(fromIndex: number, toIndex: number) {
-    this.dispatchEvent(
-      new CustomEvent('columnDrag', {
-        detail: { fromIndex, toIndex },
-        bubbles: true,
-        composed: true,
-      })
-    );
-  }
-
-  // Enhanced public methods with event dispatching
-  public sortWithEvent(field: string, direction: 'asc' | 'desc'): void {
-    this.sort(field, direction);
-    this.dispatchSortEvent(field, direction);
-  }
-
-  public applyFiltersWithEvent(filters: FilterConfig[]): void {
-    this._filters = filters;
-    if (this.engine) {
-      this.engine.applyFilters(filters);
+    // Also update the engine if it's initialized
+    if (this.engine && typeof this.engine.setRowGroups === 'function') {
+      this.engine.setRowGroups(rowGroups);
       this.notifyStateChange();
-      this.dispatchFilterEvent(filters);
+    } else {
+      // If engine not ready, reinitialize with new row groups
+      this.reinitialize();
     }
   }
 
-  public dragRowWithEvent(fromIndex: number, toIndex: number): void {
-    this.dragRow(fromIndex, toIndex);
-    this.dispatchRowDragEvent(fromIndex, toIndex);
+  /**
+   * Set column groups for the pivot table
+   */
+  public setColumnGroups(columnGroups: Group[]): void {
+    this._columnGroups = columnGroups || [];
+
+    // Also update the engine if it's initialized
+    if (this.engine && typeof this.engine.setColumnGroups === 'function') {
+      this.engine.setColumnGroups(columnGroups);
+      this.notifyStateChange();
+    } else {
+      // If engine not ready, reinitialize with new column groups
+      this.reinitialize();
+    }
   }
 
-  public dragColumnWithEvent(fromIndex: number, toIndex: number): void {
-    this.dragColumn(fromIndex, toIndex);
-    this.dispatchColumnDragEvent(fromIndex, toIndex);
+  /**
+   * Toggles the expansion state of a row via the engine.
+   * @param rowId - The unique ID of the row to toggle.
+   */
+  public toggleRowExpansion(rowId: string): void {
+    if (!this.engine || typeof this.engine.toggleRowExpansion !== 'function') {
+      console.error('Engine not initialized or method not available');
+      return;
+    }
+    this.engine.toggleRowExpansion(rowId);
+    this.notifyStateChange();
+  }
+
+  /**
+   * Checks if a row is expanded via the engine.
+   * @param rowId - The unique ID of the row.
+   * @returns boolean indicating whether the row is expanded.
+   */
+  public isRowExpanded(rowId: string): boolean {
+    if (!this.engine || typeof this.engine.isRowExpanded !== 'function') {
+      console.error('Engine not initialized or method not available');
+      return false;
+    }
+    return this.engine.isRowExpanded(rowId);
+  }
+
+  /**
+   * Set pagination configuration
+   */
+  public setPagination(config: PaginationConfig): void {
+    if (!this.engine) {
+      console.error('Engine not initialized');
+      return;
+    }
+
+    this._pagination = { ...this._pagination, ...config };
+    this.engine.setPagination(this._pagination);
+    this.setAttribute('pagination', JSON.stringify(this._pagination));
+    this.notifyStateChange();
+  }
+
+  /**
+   * Get current pagination state
+   */
+  public getPaginationState(): PaginationConfig {
+    if (!this.engine || typeof this.engine.getPaginationState !== 'function') {
+      console.error('Engine not initialized or method not available');
+      return this._pagination;
+    }
+
+    // Always return engine state, update local cache
+    const engineState = this.engine.getPaginationState();
+    this._pagination = engineState;
+    return engineState;
+  }
+
+  /**
+   * Navigate to a specific page
+   */
+  public goToPage(page: number): void {
+    const paginationState = this.getPaginationState();
+    if (page >= 1 && page <= paginationState.totalPages) {
+      this.setPagination({ ...paginationState, currentPage: page });
+    }
+  }
+
+  /**
+   * Navigate to the next page
+   */
+  public nextPage(): void {
+    const paginationState = this.getPaginationState();
+    if (paginationState.currentPage < paginationState.totalPages) {
+      this.goToPage(paginationState.currentPage + 1);
+    }
+  }
+
+  /**
+   * Navigate to the previous page
+   */
+  public previousPage(): void {
+    const paginationState = this.getPaginationState();
+    if (paginationState.currentPage > 1) {
+      this.goToPage(paginationState.currentPage - 1);
+    }
+  }
+
+  /**
+   * Change the page size
+   */
+  public setPageSize(pageSize: number): void {
+    if (pageSize <= 0) {
+      console.error('Page size must be greater than 0');
+      return;
+    }
+
+    this.setPagination({
+      ...this.getPaginationState(),
+      pageSize,
+      currentPage: 1, // Reset to first page when changing page size
+    });
+  }
+
+  /**
+   * Method to reinitialize the engine
+   */
+  private reinitialize(): void {
+    console.log(this._options)
+    this.tryInitializeEngine();
+  }
+
+  public setFormatting(field: string, format: any): void {
+    if (!this._options.formatting) {
+      this._options.formatting = {};
+    }
+ 
+    this._options.formatting[field] = format;
+    this.reinitialize();
   }
 }
 
