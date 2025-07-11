@@ -89,8 +89,12 @@ export interface PaginationConfig {
   totalPages: number;
 }
 
+export type DataHandlingMode = 'raw' | 'processed';
+
 export interface PivotTableState<T> {
-  data: T[];
+  data: any;
+  dataHandlingMode: DataHandlingMode;
+  rawData: T[];
   processedData: ProcessedData;
   sortConfig: SortConfig[];
   rows: AxisConfig[];
@@ -113,7 +117,8 @@ export interface PivotTableState<T> {
 }
 
 export interface PivotTableConfig<T> {
-  data: T[];
+  data: any;
+  rawData: T[];
   dataSource?: DataSourceConfig;
   rows: AxisConfig[];
   columns: AxisConfig[];
@@ -154,7 +159,7 @@ export interface ProcessedData {
 }
 
 export interface ProcessedDataResult<T> {
-  data: T[];
+  rawData: T[];
   groups: Group[];
 }
 

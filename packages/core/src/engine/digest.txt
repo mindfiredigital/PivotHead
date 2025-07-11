@@ -1,0 +1,1801 @@
+Directory structure:
+└── engine/
+    ├── aggregator.ts
+    ├── dataProcessor.ts
+    ├── exportService.ts
+    ├── pivotEngine.ts
+    └── sorter.ts
+
+================================================
+FILE: aggregator.ts
+================================================
+import type { AggregationType } from '../types/interfaces';
+
+export function calculateAggregates<T>(
+  items: T[],
+  field: keyof T,
+  type: AggregationType
+): number {
+  if (!items || items.length === 0) return 0;
+
+  const values = items.map(item => Number(item[field]) || 0);
+
+  switch (type) {
+    case 'sum':
+      return values.reduce((sum, val) => sum + val, 0);
+    case 'avg':
+      return values.reduce((sum, val) => sum + val, 0) / values.length;
+    case 'min':
+      return Math.min(...values);
+    case 'max':
+      return Math.max(...values);
+    case 'count':
+      return values.length;
+    default:
+      return 0;
+  }
+}
+
+// import { Row, AggregationType } from '../types/interfaces';
+
+// export function calculateAggregates<T extends Row>(
+//   items: T[],
+//   measure: keyof T,
+//   aggregationType: AggregationType,
+// ): number {
+//   if (items.length === 0) {
+//     return 0;
+//   }
+
+//   const validValues = items
+//     .map((item) => {
+//       const value = Number(item[measure]);
+//       if (isNaN(value)) {
+//         return null;
+//       }
+//       return value;
+//     })
+//     .filter((value): value is number => value !== null);
+
+//   if (validValues.length === 0) {
+//     return 0;
+//   }
+
+//   const sum = validValues.reduce((acc, value) => acc + value, 0);
+
+//   let result: number;
+
+//   switch (aggregationType) {
+//     case 'sum':
+//       result = sum;
+//       break;
+//     case 'avg':
+//       result = sum / validValues.length;
+//       break;
+//     case 'count':
+//       result = validValues.length;
+//       break;
+//     case 'min':
+//       result = Math.min(...validValues);
+//       break;
+//     case 'max':
+//       result = Math.max(...validValues);
+//       break;
+//     default:
+//       return 0;
+//   }
+//   return result;
+// }
+
+{
+  /*We'll use this function later while creating dropdown list for column */
+}
+
+// Render Multi-Select Dropdown with Checkboxes
+// function renderMultiSelectWithCheckboxes() {
+//     const container = document.getElementById('multiSelectContainer');
+//     if (!container) {
+//         console.error('Multi-select container (#multiSelectContainer) is missing.');
+//         return;
+//     }
+
+//     container.innerHTML = '';
+
+//     const inputBox = document.createElement('div');
+//     inputBox.className = 'multi-select-input';
+//     inputBox.tabIndex = 0;
+//     inputBox.style.padding = '10px';
+//     inputBox.style.border = '1px solid #ccc';
+//     inputBox.style.borderRadius = '5px';
+//     inputBox.style.cursor = 'pointer';
+//     inputBox.textContent = 'Select Columns';
+//     inputBox.onclick = () => dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+
+//     const dropdown = document.createElement('div');
+//     dropdown.className = 'multi-select-dropdown';
+//     dropdown.style.position = 'absolute';
+//     dropdown.style.background = '#fff';
+//     dropdown.style.border = '1px solid #ccc';
+//     dropdown.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.1)';
+//     dropdown.style.width = '200px';
+//     dropdown.style.maxHeight = '150px';
+//     dropdown.style.overflowY = 'auto';
+//     dropdown.style.display = 'none';
+
+//     config.columns.forEach(column => {
+//         const optionContainer = document.createElement('div');
+//         optionContainer.style.padding = '5px';
+
+//         const checkbox = document.createElement('input');
+//         checkbox.type = 'checkbox';
+//         checkbox.value = column.field;
+//         checkbox.style.marginRight = '10px';
+
+//         const label = document.createElement('label');
+//         label.textContent = column.label;
+
+//         optionContainer.appendChild(checkbox);
+//         optionContainer.appendChild(label);
+//         dropdown.appendChild(optionContainer);
+//     });
+
+//     const applyButton = document.createElement('button');
+//     applyButton.textContent = 'Apply';
+//     applyButton.style.margin = '10px';
+//     applyButton.style.padding = '5px 10px';
+//     applyButton.style.border = 'none';
+//     applyButton.style.backgroundColor = '#007BFF';
+//     applyButton.style.color = '#fff';
+//     applyButton.style.borderRadius = '5px';
+//     applyButton.style.cursor = 'pointer';
+
+//     applyButton.onclick = () => {
+//         const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]:checked');
+//         const selectedColumns = Array.from(checkboxes).map(checkbox => checkbox.value);
+//         const selectedOperation = document.getElementById('operationDropdown').value;
+
+//         if (selectedColumns.length !== 2) {
+//             alert('Please select exactly two columns to perform the operation.');
+//             return;
+//         }
+
+//         const processedData = data.map(row => {
+//             const [col1, col2] = selectedColumns;
+//             let result;
+//             switch (selectedOperation) {
+//                 case 'Sum':
+//                     result = (row[col1] || 0) + (row[col2] || 0);
+//                     break;
+//                 case 'Avg':
+//                     result = ((row[col1] || 0) + (row[col2] || 0)) / 2;
+//                     break;
+//                 case 'Count':
+//                     result = [col1, col2].reduce(
+//                         (count, col) => count + (row[col] !== undefined ? 1 : 0),
+//                         0
+//                     );
+//                     break;
+//                 case 'min':
+//                     result = Math.min(row[col1] || Infinity, row[col2] || Infinity);
+//                     break;
+//                 case 'max':
+//                     result = Math.max(row[col1] || -Infinity, item[col2] || -Infinity);
+//                     break;
+//                 default:
+//                     result = 'Invalid Operation';
+//             }
+//             return { ...row, result };
+//         });
+
+//         const updatedColumns = [
+//             ...config.columns.filter(col => col.field !== 'result'),
+//             { field: 'result', label: `${selectedOperation} of ${selectedColumns.join(' & ')}` },
+//         ];
+//         console.log(processedData)
+//         engine = new PivotEngine({ data: processedData, columns: updatedColumns });
+//         renderTable();
+//         dropdown.style.display = 'none';
+//     };
+
+//     dropdown.appendChild(applyButton);
+
+//     document.addEventListener('click', (e) => {
+//         if (!container.contains(e.target)) {
+//             dropdown.style.display = 'none';
+//         }
+//     });
+
+//     container.appendChild(inputBox);
+//     container.appendChild(dropdown);
+// }
+
+
+
+================================================
+FILE: dataProcessor.ts
+================================================
+import {
+  GroupConfig,
+  PivotTableConfig,
+  SortConfig,
+  Group,
+  ProcessedDataResult,
+} from '../types/interfaces';
+import { applySort } from './sorter';
+
+export function processData<T extends Record<string, any>>(
+  config: PivotTableConfig<T>,
+  sortConfig: SortConfig | null = null,
+  groupConfig: GroupConfig | null = null
+): ProcessedDataResult<T> {
+  let processedData = [...config.data];
+  if (sortConfig) {
+    processedData = applySort(processedData, [sortConfig]);
+  }
+
+  let groups: Group[] = [];
+
+  if (groupConfig) {
+    const { rowFields, columnFields, grouper } = groupConfig;
+    const fields = [...rowFields, ...columnFields];
+    groups = createGroups(processedData, fields, grouper);
+  }
+
+  return { data: processedData, groups };
+}
+
+function createGroups<T extends Record<string, any>>(
+  data: T[],
+  fields: string[],
+  grouper: (item: T, fields: string[]) => string
+): Group[] {
+  if (!fields || fields.length === 0) {
+    return [{ key: 'All', items: data, subgroups: [], aggregates: {} }];
+  }
+
+  const groups: { [key: string]: Group } = {};
+
+  data.forEach(item => {
+    const key = grouper(item, fields);
+    if (!groups[key]) {
+      groups[key] = { key, items: [], subgroups: [], aggregates: {} };
+    }
+    groups[key].items.push(item);
+  });
+
+  if (fields.length > 1) {
+    Object.values(groups).forEach(group => {
+      group.subgroups = createGroups(group.items, fields.slice(1), grouper);
+    });
+  }
+
+  return Object.values(groups);
+}
+
+
+
+================================================
+FILE: exportService.ts
+================================================
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import * as XLSX from 'xlsx';
+import { jsPDF } from 'jspdf';
+import { autoTable } from 'jspdf-autotable';
+import { PivotTableState } from '../types/interfaces';
+
+/**
+ * Service class for handling export operations for the PivotEngine
+ */
+export class PivotExportService {
+  /**
+   * Converts the pivot table data to HTML
+   * @param {PivotTableState<T>} state - The current state of the pivot table
+   * @returns {string} HTML string representation of the pivot table
+   */
+  public static convertToHtml<T extends Record<string, any>>(
+    state: PivotTableState<T>
+  ): string {
+    const { rows, columns, selectedMeasures, formatting, groups, data } = state;
+
+    if (data.length === 0) {
+      return '<div>No data to display</div>';
+    }
+
+    if (!rows.length || !columns.length) {
+      return '<div>No data to display</div>';
+    }
+
+    // Get unique column values
+    const uniqueColumns = [
+      ...new Set(data.map(item => item[columns[0].uniqueName])),
+    ];
+
+    // Get unique row values
+    const uniqueRows = [...new Set(data.map(item => item[rows[0].uniqueName]))];
+
+    const formatValue = (value: any, formatConfig: any): string => {
+      if (value === 0) return '$0.00';
+      if (!value && value !== 0) return '';
+
+      if (formatConfig.type === 'currency') {
+        return new Intl.NumberFormat(formatConfig.locale, {
+          style: 'currency',
+          currency: formatConfig.currency,
+          minimumFractionDigits: formatConfig.decimals,
+          maximumFractionDigits: formatConfig.decimals,
+        }).format(value);
+      } else if (formatConfig.type === 'number') {
+        return new Intl.NumberFormat(formatConfig.locale, {
+          minimumFractionDigits: formatConfig.decimals,
+          maximumFractionDigits: formatConfig.decimals,
+        }).format(value);
+      }
+
+      return String(value);
+    };
+
+    // Determine cell background based on conditional formatting (placeholder function)
+    const getCellStyle = (value: any, measureName: string): string => {
+      return '';
+    };
+
+    // Create HTML string
+    let html = `
+  <div class="pivot-export">
+    <style>
+      .pivot-table {
+        border-collapse: collapse;
+        width: 100%;
+        font-family: Arial, sans-serif;
+      }
+      .pivot-table th, .pivot-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: right;
+      }
+      .pivot-table th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+        text-align: center;
+        position: relative;
+      }
+      .pivot-table .sort-icon::after {
+        content: "↕";
+        position: absolute;
+        right: 4px;
+        opacity: 0.5;
+      }
+      .pivot-table th.region-header {
+        border-bottom: none;
+      }
+      .pivot-table th.measure-header {
+        border-top: none;
+      }
+      .pivot-table .row-header {
+        text-align: left;
+        font-weight: bold;
+        background-color: #f9f9f9;
+      }
+      .pivot-table .corner-header {
+        background-color: #f2f2f2;
+        border-bottom: 1px solid #ddd;
+      }
+      .pagination {
+        margin-top: 15px;
+        font-family: Arial, sans-serif;
+      }
+      .export-info {
+        margin-top: 15px;
+        font-size: 0.8em;
+        color: #666;
+        font-family: Arial, sans-serif;
+      }
+    </style>
+    
+    <table class="pivot-table">
+      <thead>
+        <tr>
+          <th rowspan="2" class="corner-header">${
+            rows[0]?.caption || rows[0]?.uniqueName || ''
+          } /<br>Region</th>`;
+
+    // Add region headers
+    uniqueColumns.forEach(column => {
+      html += `<th colspan="${selectedMeasures.length}" class="region-header">${column}</th>`;
+    });
+
+    html += `
+        </tr>
+        <tr>`;
+
+    // Add measure headers under each region
+    uniqueColumns.forEach(column => {
+      selectedMeasures.forEach(measure => {
+        html += `<th class="measure-header sort-icon">${
+          measure.caption || measure.uniqueName
+        }</th>`;
+      });
+    });
+
+    html += `
+        </tr>
+      </thead>
+      <tbody>`;
+
+    // Add data rows
+    uniqueRows.forEach(row => {
+      html += `<tr>
+      <td class="row-header">${row}</td>`;
+
+      // Add cells for each column (region)
+      uniqueColumns.forEach(column => {
+        // Find the group that matches this row and column
+        const group = groups.find(g => g.key === `${row} - ${column}`);
+
+        selectedMeasures.forEach(measure => {
+          const measureKey = `sum_${measure.uniqueName}`;
+          let value = group ? group.aggregates[measureKey] : 0;
+
+          // Apply conditional formatting
+          const cellStyle = getCellStyle(value, measure.uniqueName);
+
+          // Format value according to measure settings
+          const formattedValue = formatValue(
+            value,
+            formatting[measure.uniqueName]
+          );
+
+          html += `<td${cellStyle}>${formattedValue}</td>`;
+        });
+      });
+
+      html += `</tr>`;
+    });
+
+    html += `
+      </tbody>
+    </table>
+    
+    <div class="pagination">
+      Page ${state.paginationConfig?.currentPage || 1} of ${
+        state.paginationConfig?.totalPages || 1
+      }
+    </div>
+    
+    <div class="export-info">
+      <p>Generated: ${new Date().toLocaleString()}</p>
+    </div>
+  </div>`;
+
+    return html;
+  }
+
+  /**
+   * Exports the pivot table data to HTML and downloads the file
+   * @param {PivotTableState<T>} state - The current state of the pivot table
+   * @param {string} fileName - The name of the downloaded file (without extension)
+   */
+  public static exportToHTML<T extends Record<string, any>>(
+    state: PivotTableState<T>,
+    fileName = 'pivot-table'
+  ): void {
+    const htmlContent = PivotExportService.convertToHtml(state);
+
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${fileName}.html`;
+    document.body.appendChild(a);
+    a.click();
+
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  /**
+   * Exports the pivot table data to PDF and downloads the file
+   * @param {PivotTableState<T>} state - The current state of the pivot table
+   * @param {string} fileName - The name of the downloaded file (without extension)
+   */
+  public static exportToPDF<T extends Record<string, any>>(
+    state: PivotTableState<T>,
+    fileName = 'pivot-table'
+  ): void {
+    // Convert pivot data to an HTML table
+    const htmlContent = PivotExportService.convertToHtml(state);
+
+    // Create a temporary container for the HTML
+    const container = document.createElement('div');
+    container.style.position = 'absolute';
+    container.style.left = '-9999px'; // Hide off-screen
+    container.innerHTML = htmlContent;
+    document.body.appendChild(container);
+
+    // Extract the table from the container
+    const tableElement = container.querySelector('table');
+
+    if (!tableElement) {
+      console.error('No table found in the generated HTML');
+      document.body.removeChild(container);
+      return;
+    }
+
+    try {
+      // Create a new PDF document
+      const pdf = new jsPDF();
+
+      // Add title
+      pdf.setFontSize(16);
+      pdf.text(fileName, pdf.internal.pageSize.getWidth() / 2, 15, {
+        align: 'center',
+      });
+
+      // Use autoTable to convert the HTML table to PDF
+      autoTable(pdf, {
+        html: tableElement,
+        startY: 25,
+        styles: {
+          fontSize: 10,
+          cellPadding: 3,
+          overflow: 'linebreak',
+        },
+        headStyles: {
+          fillColor: [66, 139, 202],
+          textColor: 255,
+          fontStyle: 'bold',
+        },
+        columnStyles: {},
+        margin: { top: 25, right: 15, bottom: 25, left: 15 },
+        didDrawPage: (data: { pageNumber: number }) => {
+          pdf.setFontSize(10);
+          pdf.text(
+            `Page ${data.pageNumber}`,
+            pdf.internal.pageSize.getWidth() - 20,
+            pdf.internal.pageSize.getHeight() - 10
+          );
+        },
+      });
+
+      // Save the PDF
+      pdf.save(`${fileName}.pdf`);
+
+      // Clean up
+      document.body.removeChild(container);
+    } catch (error) {
+      console.error('Error exporting to PDF:', error);
+      document.body.removeChild(container);
+    }
+  }
+
+  /**
+   * Exports the pivot table data to Excel and downloads the file
+   * @param {PivotTableState<T>} state - The current state of the pivot table
+   * @param {string} fileName - The name of the downloaded file (without extension)
+   */
+  public static exportToExcel<T extends Record<string, any>>(
+    state: PivotTableState<T>,
+    fileName = 'pivot-table'
+  ): void {
+    try {
+      PivotExportService.generateExcel(state, fileName);
+    } catch (error) {
+      console.error('Error exporting to Excel:', error);
+    }
+  }
+
+  /**
+   * Generates an Excel file from the pivot table data
+   * @param {PivotTableState<T>} state - The current state of the pivot table
+   * @param {string} fileName - The name of the downloaded file (without extension)
+   */
+  private static generateExcel<T extends Record<string, any>>(
+    state: PivotTableState<T>,
+    fileName: string
+  ): void {
+    if (!state.data || state.data.length === 0) {
+      console.log('No data to export!');
+      return;
+    }
+
+    // Get dimension and measure configurations
+    const rows = state.rows || [];
+    const columns = state.columns || [];
+    const measures = state.measures || [];
+
+    // Extract unique dimension values
+    const rowDimension = rows[0]?.uniqueName;
+    const colDimension = columns[0]?.uniqueName;
+
+    if (!rowDimension || !colDimension) {
+      console.log('Missing row or column dimension');
+      return;
+    }
+
+    const uniqueRowValues = [
+      ...new Set(state.data.map(item => item[rowDimension])),
+    ];
+    const uniqueColValues = [
+      ...new Set(state.data.map(item => item[colDimension])),
+    ];
+
+    // Create header rows
+    const headerRow = [
+      rows[0]?.caption || 'Dimension',
+      ...uniqueColValues.flatMap(colValue =>
+        measures.map(
+          measure => `${colValue} - ${measure.caption || measure.uniqueName}`
+        )
+      ),
+    ];
+
+    // Create data rows
+    const dataRows = uniqueRowValues.map(rowValue => {
+      const row = [rowValue];
+
+      uniqueColValues.forEach(colValue => {
+        measures.forEach(measure => {
+          // Filter data for this row and column intersection
+          const filteredData = state.data.filter(
+            item =>
+              item[rowDimension] === rowValue && item[colDimension] === colValue
+          );
+
+          // Calculate the aggregated value
+          let value = 0;
+          if (filteredData.length > 0) {
+            switch (measure.aggregation) {
+              case 'sum':
+                value = filteredData.reduce(
+                  (sum, item) => sum + (item[measure.uniqueName] || 0),
+                  0
+                );
+                break;
+              case 'avg':
+                if (
+                  measure?.formula &&
+                  typeof measure.formula === 'function' &&
+                  filteredData.length > 0
+                ) {
+                  value =
+                    filteredData.reduce(
+                      (sum, item) => sum + (measure.formula?.(item) || 0),
+                      0
+                    ) / filteredData.length;
+                } else {
+                  value =
+                    filteredData.reduce(
+                      (sum, item) => sum + (item[measure.uniqueName] || 0),
+                      0
+                    ) / filteredData.length;
+                }
+                break;
+              case 'max':
+                value = Math.max(
+                  ...filteredData.map(item => item[measure.uniqueName] || 0)
+                );
+                break;
+              case 'min':
+                value = Math.min(
+                  ...filteredData.map(item => item[measure.uniqueName] || 0)
+                );
+                break;
+              case 'count':
+                value = filteredData.length;
+                break;
+              default:
+                value = 0;
+            }
+          }
+
+          // For Excel, we keep the raw numeric value
+          row.push(value);
+        });
+      });
+
+      return row;
+    });
+
+    // Add a totals row if available
+    if (state.processedData && state.processedData.totals) {
+      const totalsRow = ['Total'];
+
+      uniqueColValues.forEach(colValue => {
+        measures.forEach(measure => {
+          // Get total for this measure across all data
+          const totalValue =
+            state.processedData.totals[measure.uniqueName] || 0;
+          totalsRow.push(totalValue?.toString());
+        });
+      });
+
+      dataRows.push(totalsRow);
+    }
+
+    // Combine header and data rows
+    const allRows = [headerRow, ...dataRows];
+
+    // Create worksheet
+    const ws = XLSX.utils.aoa_to_sheet(allRows);
+
+    // Apply some basic styling
+    const range = XLSX.utils.decode_range(ws['!ref'] ?? 'A1:A1');
+
+    // Set column widths
+    const colWidths = [];
+    for (let i = 0; i <= range.e.c; i++) {
+      colWidths[i] = { wch: i === 0 ? 15 : 12 }; // First column wider, data columns standard
+    }
+    ws['!cols'] = colWidths;
+
+    // Apply number formatting for data cells
+    for (let row = 1; row <= dataRows.length; row++) {
+      for (
+        let col = 1;
+        col <= uniqueColValues.length * measures.length;
+        col++
+      ) {
+        const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+
+        // Find the measure for this column
+        const measureIndex = (col - 1) % measures.length;
+        const measure = measures[measureIndex];
+
+        if (measure && measure.format && ws[cellAddress]) {
+          if (measure.format.type === 'currency') {
+            // Apply currency format
+            ws[cellAddress].z =
+              measure.format.currency === 'USD'
+                ? '"$"#,##0.00'
+                : `"${measure.format.currency}"#,##0.00`;
+          } else if (
+            measure.format.type === 'number' &&
+            measure.format.decimals !== undefined
+          ) {
+            // Apply decimal format
+            const format =
+              '#,##0' +
+              (measure.format.decimals > 0
+                ? '.' + '0'.repeat(measure.format.decimals)
+                : '');
+            ws[cellAddress].z = format;
+          } else if (measure.format.type === 'percentage') {
+            ws[cellAddress].z = '0.00%';
+            // Convert decimal to percentage for display
+            if (typeof ws[cellAddress].v === 'number') {
+              ws[cellAddress].v = ws[cellAddress].v / 100;
+            }
+          }
+        }
+      }
+    }
+
+    // Create workbook and add worksheet
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Pivot Table');
+
+    // Generate Excel file and download
+    XLSX.writeFile(wb, `${fileName}.xlsx`);
+  }
+
+  /**
+   * Opens a print dialog with formatted pivot table content
+   * @param {PivotTableState<T>} state - The current state of the pivot table
+   * @param {string} title - Optional title for the printed page
+   */
+  public static openPrintDialog<T extends Record<string, any>>(
+    state: PivotTableState<T>
+  ): void {
+    const htmlContent = PivotExportService.convertToHtml(state);
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      console.error('Failed to open print dialog');
+      return;
+    }
+
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+    printWindow.print();
+  }
+}
+
+
+
+================================================
+FILE: pivotEngine.ts
+================================================
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  AggregationType,
+  Dimension,
+  Group,
+  GroupConfig,
+  MeasureConfig,
+  PivotTableConfig,
+  PivotTableState,
+  ProcessedData,
+  RowSize,
+  SortConfig,
+  FilterConfig,
+  PaginationConfig,
+} from '../types/interfaces';""
+import { calculateAggregates } from './aggregator';
+import { processData } from './dataProcessor';
+import { PivotExportService } from './exportService';
+// import { applySort, sortGroups } from './sorter';
+
+/**
+ * Creates an instance of PivotEngine.
+ * @param {PivotTableConfig<T>} config - The configuration for the pivot table.
+ */
+export class PivotEngine<T extends Record<string, any>> {
+  private config: PivotTableConfig<T>;
+  private state: PivotTableState<T>;
+  private filterConfig: FilterConfig[] = [];
+  private paginationConfig: PaginationConfig = {
+    currentPage: 1,
+    pageSize: 10,
+    totalPages: 1,
+  };
+
+  // Add cache for expensive calculations
+  // private cache: Map<string, any> = new Map();
+
+  constructor(config: PivotTableConfig<T>) {
+    // Validate required config properties
+    if (!this.validateConfig(config)) {
+      throw new Error('Invalid pivot table configuration');
+    }
+
+    this.config = {
+      ...config,
+      defaultAggregation: config.defaultAggregation || 'sum',
+      isResponsive: config.isResponsive ?? true,
+    };
+
+    this.state = this.initializeState(config);
+    this.loadData();
+  }
+
+  private validateConfig(config: PivotTableConfig<T>): boolean {
+    // Add validation logic
+    if (!config) return false;
+    if (config.dataSource) {
+      const { type, url, file } = config.dataSource;
+      if (type === 'remote' && !url) return false;
+      if (type === 'file' && !file) return false;
+    }
+    return true;
+  }
+
+  private initializeState(config: PivotTableConfig<T>): PivotTableState<T> {
+    return {
+      data: config.data || [],
+      processedData: { headers: [], rows: [], totals: {} },
+      rows: config.rows || [],
+      columns: config.columns || [],
+      measures: config.measures || [],
+      sortConfig: [],
+      rowSizes: this.initializeRowSizes(config.data || []),
+      expandedRows: {},
+      groupConfig: config.groupConfig || null,
+      groups: [],
+      selectedMeasures: config.measures || [],
+      selectedDimensions: config.dimensions || [],
+      selectedAggregation: config.defaultAggregation || 'sum',
+      formatting: config.formatting || {},
+      columnWidths: {},
+      isResponsive: config.isResponsive ?? true,
+      rowGroups: [],
+
+      columnGroups: [],
+      filterConfig: [],
+      paginationConfig: {
+        currentPage: 1,
+        pageSize: config.pageSize || 10,
+        totalPages: 1,
+      },
+    };
+  }
+  /**
+   * Loads data from a file or URL.
+   **/
+  private async loadData() {
+    if (this.config.dataSource) {
+      const { type, url, file } = this.config.dataSource;
+      if (type === 'remote' && url) {
+        this.state.data = await this.fetchRemoteData(url);
+      } else if (type === 'file' && file) {
+        this.state.data = await this.readFileData(file);
+      } else {
+        console.error('Invalid data source configuration');
+      }
+    } else if (this.config.data) {
+      this.state.data = this.config.data;
+    }
+
+    // Initialize row sizes
+    this.state.rowSizes = this.initializeRowSizes(this.state.data);
+
+    // Process data after loading
+    this.state.processedData = this.processData(this.state.data);
+
+    if (this.state.groupConfig) {
+      this.applyGrouping();
+    }
+  }
+
+  /**
+   * Loads data from a file or URL.
+   * @param {File | string} source - The file or URL to load data from.
+   * @public
+   * @returns {Promise<void>} A promise that resolves when the data is loaded.
+   **/
+  private async fetchRemoteData(url: string): Promise<T[]> {
+    try {
+      const response = await fetch(url);
+     
+      if (!response.ok) {
+        throw new Error(`Failed to fetch data from ${url}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching remote data:', error);
+      return [];
+    }
+  }
+
+  /**
+   *  Process the data to be displayed in the table.
+   * @param {T[]} data - The data to process.
+   * @returns {ProcessedData} The processed data including headers, rows, and totals.
+   * @private
+   **/
+  private async readFileData(file: File): Promise<T[]> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = event => {
+        try {
+          const data = JSON.parse(event.target?.result as string);
+          resolve(data);
+        } catch (error) {
+          reject(error);
+        }
+      };
+      reader.onerror = error => reject(error);
+      reader.readAsText(file);
+    });
+  }
+
+  /**
+   * Initializes row sizes for the pivot table.
+   * @param {T[]} data - The data to initialize row sizes for.
+   * @returns {RowSize[]} An array of row sizes.
+   * @private
+   */
+  private initializeRowSizes(data: T[]): RowSize[] {
+    return data.map((_, index) => ({ index, height: 40 }));
+  }
+
+  /**
+   * Processes the data for the pivot table.
+   * @param {T[]} data - The data to process.
+   * @returns {ProcessedData} The processed data including headers, rows, and totals.
+   * @private
+   */
+  private processData(data: T[]): ProcessedData {
+    return {
+      headers: this.generateHeaders(),
+      rows: this.generateRows(data),
+      totals: this.calculateTotals(data),
+    };
+  }
+
+  /**
+   * Generates headers for the pivot table.
+   * @returns {string[]} An array of header strings.
+   * @private
+   */
+  private generateHeaders(): string[] {
+    const rowHeaders = this.state.rows
+      ? this.state.rows.map(r => r.caption || r.uniqueName)
+      : [];
+    const columnHeaders = this.state.columns
+      ? this.state.columns.map(c => c.caption || c.uniqueName)
+      : [];
+    return [...rowHeaders, ...columnHeaders];
+  }
+
+  /**
+   * Generates rows for the pivot table.
+   * @param {T[]} data - The data to generate rows from.
+   * @returns {any[][]} A 2D array representing the rows.
+   * @private
+   */
+  private generateRows(data: T[]): any[][] {
+    if (!data || !this.state.rows || !this.state.columns) {
+      return [];
+    }
+    return data.map(item => [
+      ...this.state.rows.map(r => item[r.uniqueName]),
+      ...this.state.columns.map(c => item[c.uniqueName]),
+      ...this.state.measures.map(m => this.calculateMeasureValue(item, m)),
+    ]);
+  }
+
+  /**
+   * Calculates the value for a specific measure.
+   * @param {T} item - The data item.
+   * @param {MeasureConfig} measure - The measure configuration.
+   * @returns {number} The calculated measure value.
+   * @private
+   */
+  private calculateMeasureValue(item: T, measure: MeasureConfig): number {
+    if (measure.formula && typeof measure.formula === 'function') {
+      return measure.formula(item);
+    }
+    return item[measure.uniqueName] || 0;
+  }
+
+  /**
+   * Calculates totals for each measure in the pivot table.
+   * @param {T[]} data - The data to calculate totals from.
+   * @returns {Record<string, number>} An object with measure names as keys and their totals as values.
+   * @private
+   */
+  private calculateTotals(data: T[]): Record<string, number> {
+    const totals: Record<string, number> = {};
+
+    this.state.measures.forEach(measure => {
+      const { uniqueName, aggregation } = measure;
+      let total = 0;
+
+      if (aggregation === 'sum') {
+        total = data.reduce((sum, item) => sum + (item[uniqueName] || 0), 0);
+      } else if (aggregation === 'avg') {
+        total =
+          data.reduce((sum, item) => sum + (item[uniqueName] || 0), 0) /
+          data.length;
+      } else if (aggregation === 'max') {
+        total = Math.max(...data.map(item => item[uniqueName] || 0));
+      } else if (aggregation === 'min') {
+        total = Math.min(...data.map(item => item[uniqueName] || 0));
+      } else if (aggregation === 'count') {
+        total = data.length;
+      }
+
+      totals[uniqueName] = total;
+    });
+
+    return totals;
+  }
+
+  /**
+   * Sets the measures for the pivot table.
+   * @param {MeasureConfig[]} measureFields - The measure configurations to set.
+   * @public
+   */
+  public setMeasures(measureFields: MeasureConfig[]) {
+    this.state.selectedMeasures = measureFields;
+    this.state.processedData = this.processData(this.state.data);
+    this.updateAggregates();
+  }
+
+  /**
+   * Sets the dimensions for the pivot table.
+   * @param {Dimension[]} dimensionFields - The dimension configurations to set.
+   * @public
+   */
+  public setDimensions(dimensionFields: Dimension[]) {
+    this.state.selectedDimensions = dimensionFields;
+    this.state.processedData = this.processData(this.state.data);
+    this.updateAggregates();
+  }
+
+  /**
+   * Sets the aggregation type for the pivot table.
+   * @param {AggregationType} type - The aggregation type to set.
+   * @public
+   */
+  public setAggregation(type: AggregationType) {
+    this.state.selectedAggregation = type;
+    this.state.processedData = this.processData(this.state.data);
+    this.updateAggregates();
+    this.updateAggregates();
+  }
+
+  /**
+   * Sets the row groups for the pivot table.
+   * @param {Group[]} rowGroups - The row groups to set.
+   * @public
+   */
+  public setRowGroups(rowGroups: Group[]) {
+    this.state.rowGroups = rowGroups;
+    this.state.processedData = this.processData(this.state.data);
+    this.updateAggregates();
+  }
+
+  /**
+   * Sets the column groups for the pivot table.
+   * @param {Group[]} columnGroups - The column groups to set.
+   * @public
+   */
+  public setColumnGroups(columnGroups: Group[]) {
+    this.state.columnGroups = columnGroups;
+    this.state.processedData = this.processData(this.state.data);
+    this.updateAggregates();
+  }
+
+  /**
+   * Formats a value based on the specified field's format.
+   * @param {any} value - The value to format.
+   * @param {string} field - The field name to use for formatting.
+   * @returns {string} The formatted value as a string.
+   * @public
+   */
+  public formatValue(value: any, field: string): string {
+    const format = this.state.formatting[field];
+    if (!format) return String(value);
+
+    try {
+      switch (format.type) {
+        case 'currency':
+          return new Intl.NumberFormat(format.locale || 'en-US', {
+            style: 'currency',
+            currency: format.currency || 'USD',
+            minimumFractionDigits: format.decimals || 0,
+            maximumFractionDigits: format.decimals || 0,
+          }).format(value);
+        case 'number':
+          return new Intl.NumberFormat(format.locale || 'en-US', {
+            minimumFractionDigits: format.decimals || 0,
+            maximumFractionDigits: format.decimals || 0,
+          }).format(value);
+        case 'percentage':
+          return new Intl.NumberFormat(format.locale || 'en-US', {
+            style: 'percent',
+            minimumFractionDigits: format.decimals || 0,
+          }).format(value);
+        case 'date':
+          return new Date(value).toLocaleDateString(format.locale || 'en-US', {
+            dateStyle: 'medium',
+          });
+        default:
+          return String(value);
+      }
+    } catch (error) {
+      console.error(`Error formatting value for field ${field}:`, error);
+      return String(value);
+    }
+  }
+
+  /**
+   * Sorts the pivot table data based on the specified field and direction.
+   * @param {string} field - The field to sort by.
+   * @param {'asc' | 'desc'} direction - The sort direction.
+   * @public
+   */
+  public sort(field: string, direction: 'asc' | 'desc') {
+    const measure = this.state.measures.find(m => m.uniqueName === field);
+
+    const newSortConfig: SortConfig = {
+      field,
+      direction,
+      type: measure ? 'measure' : 'dimension',
+      aggregation: measure?.aggregation,
+    };
+
+    this.state.sortConfig = [newSortConfig];
+    this.applySort();
+  }
+
+  private applySort() {
+    const sortedData = this.sortData(this.state.data, this.state.sortConfig[0]);
+    this.state.data = sortedData;
+
+    if (this.state.groups.length > 0) {
+      this.state.groups = this.sortGroups(
+        this.state.groups,
+        this.state.sortConfig[0]
+      );
+    }
+
+    this.state.processedData = this.processData(this.state.data);
+    this.updateAggregates();
+  }
+
+  private sortData(data: T[], sortConfig: SortConfig): T[] {
+    return [...data].sort((a, b) => {
+      const aValue = this.getFieldValue(a, sortConfig);
+      const bValue = this.getFieldValue(b, sortConfig);
+
+      if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+
+  private getFieldValue(item: T, sortConfig: SortConfig): number {
+    if (sortConfig.type === 'measure') {
+      const measure = this.state.measures.find(
+        m => m.uniqueName === sortConfig.field
+      );
+      if (measure && measure.formula) {
+        return measure.formula(item);
+      }
+    }
+    return item[sortConfig.field] as number;
+  }
+
+  private sortGroups(groups: Group[], sortConfig: SortConfig): Group[] {
+    return [...groups].sort((a, b) => {
+      const aValue =
+        a.aggregates[`${sortConfig.aggregation}_${sortConfig.field}`] || 0;
+      const bValue =
+        b.aggregates[`${sortConfig.aggregation}_${sortConfig.field}`] || 0;
+
+      if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+
+  /**
+   * Updates aggregates for all groups in the pivot table.
+   * @private
+   */
+  private updateAggregates() {
+    const updateGroupAggregates = (group: Group) => {
+      this.state.measures.forEach(measure => {
+        const aggregateKey = `${this.state.selectedAggregation}_${measure.uniqueName}`;
+        if (measure.formula && typeof measure.formula === 'function') {
+          // Handle custom measures
+          const formulaResults = group.items.map(item =>
+            measure.formula!(item)
+          );
+          group.aggregates[aggregateKey] = calculateAggregates(
+            formulaResults.map(value => ({ value })),
+            'value' as keyof { value: number },
+            measure.aggregation ||
+              (this.state.selectedAggregation as AggregationType)
+          );
+        } else {
+          group.aggregates[aggregateKey] = calculateAggregates(
+            group.items,
+            measure.uniqueName as keyof T,
+            (measure.aggregation as AggregationType) ||
+              (this.state.selectedAggregation as AggregationType)
+          );
+        }
+      });
+
+      if (group.subgroups) {
+        group.subgroups.forEach(updateGroupAggregates);
+      }
+    };
+
+    this.state.groups.forEach(updateGroupAggregates);
+  }
+
+  /**
+   * Applies grouping to the pivot table data.
+   * @private
+   */
+  private applyGrouping(dataOverride?: T[]) {
+    if (!this.state.groupConfig) return;
+
+    const { rowFields, columnFields, grouper } = this.state.groupConfig;
+
+    if (!rowFields || !columnFields || !grouper) {
+      console.error('Invalid groupConfig:', this.state.groupConfig);
+      return;
+    }
+
+    // Use provided data or fall back to config data
+    const dataToUse = dataOverride || this.config.data || [];
+
+    const tempConfig = {
+      ...this.config,
+      data: dataToUse,
+    };
+
+    const { data, groups } = processData(
+      tempConfig,
+      this.state.sortConfig[0] || null,
+      this.state.groupConfig
+    );
+
+    this.state.data = data;
+    this.state.groups = groups;
+    this.updateAggregates();
+
+    this.state.processedData = this.processData(this.state.data);
+  }
+
+  /**
+   * Creates groups based on the specified fields and grouper function.
+   * @param {T[]} data - The data to group.
+   * @param {string[]} fields - The fields to group by.
+   * @param {(item: T, fields: string[]) => string} grouper - The grouping function.
+   * @returns {Group[]} An array of grouped data.
+   * @private
+   */
+  private createGroups(
+    data: T[],
+    fields: string[],
+    grouper: (item: T, fields: string[]) => string
+  ): Group[] {
+    if (!fields || fields.length === 0 || !data) {
+      return [
+        {
+          key: 'All',
+          items: data || [],
+          aggregates: {},
+        },
+      ];
+    }
+
+    const groups: { [key: string]: Group } = {};
+
+    data.forEach(item => {
+      if (item && grouper) {
+        const key = grouper(item, fields);
+        if (!groups[key]) {
+          groups[key] = { key, items: [], subgroups: [], aggregates: {} };
+        }
+        groups[key].items.push(item);
+      }
+    });
+
+    if (fields.length > 1) {
+      Object.values(groups).forEach(group => {
+        if (group && group.items) {
+          group.subgroups = this.createGroups(
+            group.items,
+            fields.slice(1),
+            grouper
+          );
+        }
+      });
+    }
+
+    // Calculate aggregates for each group
+    Object.values(groups).forEach(group => {
+      if (group && group.items && this.state.measures) {
+        this.state.measures.forEach(measure => {
+          if (measure && measure.uniqueName) {
+            const aggregateKey = `${this.state.selectedAggregation}_${measure.uniqueName}`;
+            group.aggregates[aggregateKey] = calculateAggregates(
+              group.items,
+              measure.uniqueName as keyof T,
+              this.state.selectedAggregation as AggregationType
+            );
+          }
+        });
+      }
+    });
+
+    return Object.values(groups);
+  }
+
+  /**
+   * Sets the group configuration for the pivot table.
+   * @param {GroupConfig | null} groupConfig - The group configuration to set.
+   * @public
+   */
+  public setGroupConfig(groupConfig: GroupConfig | null) {
+    this.state.groupConfig = groupConfig;
+    if (groupConfig) {
+      this.applyGrouping();
+    } else {
+      this.state.groups = [];
+      this.state.processedData = this.processData(this.state.data);
+    }
+  }
+
+  /**
+   * Returns the grouped data.
+   * @returns {Group[]} An array of grouped data.
+   * @public
+   */
+  public getGroupedData(): Group[] {
+    return this.state.groups;
+  }
+
+  /**
+   * Returns the current state of the pivot table.
+   * @returns {PivotTableState<T>} The current state of the pivot table.
+   * @public
+   */
+  public getState(): PivotTableState<T> {
+    return { ...this.state };
+  }
+
+  /**
+   * Resets the pivot table to its initial state.
+   * @public
+   */
+  public reset() {
+    this.state = {
+      ...this.state,
+      data: this.config.data || [],
+      processedData: this.processData(this.config.data || []),
+      sortConfig: [],
+      rowSizes: this.initializeRowSizes(this.config.data || []),
+      expandedRows: {},
+      groupConfig: this.config.groupConfig || null,
+      groups: [],
+    };
+
+    if (this.state.groupConfig) {
+      this.applyGrouping();
+    }
+  }
+
+  /**
+   * Resizes a specific row in the pivot table.
+   * @param {number} index - The index of the row to resize.
+   * @param {number} height - The new height for the row.
+   * @public
+   */
+  public resizeRow(index: number, height: number) {
+    const rowIndex = this.state.rowSizes.findIndex(row => row.index === index);
+    if (rowIndex !== -1) {
+      this.state.rowSizes[rowIndex].height = Math.max(20, height);
+    }
+  }
+
+  /**
+   * Toggles the expansion state of a row.
+   * @param {string} rowId - The ID of the row to toggle.
+   * @public
+   */
+  public toggleRowExpansion(rowId: string) {
+    this.state.expandedRows[rowId] = !this.state.expandedRows[rowId];
+  }
+
+  /**
+   * Checks if a row is expanded.
+   * @param {string} rowId - The ID of the row to check.
+   * @returns {boolean} True if the row is expanded, false otherwise.
+   * @public
+   */
+  public isRowExpanded(rowId: string): boolean {
+    return !!this.state.expandedRows[rowId];
+  }
+
+  /**
+   * Handles dragging a row to a new position.
+   * This method now correctly operates on state.rowGroups.
+   * @param {number} fromIndex - The original index of the row.
+   * @param {number} toIndex - The new index for the row.
+   * @public
+   */
+  public dragRow(fromIndex: number, toIndex: number) {
+    // Validate indices against the rowGroups array
+    if (
+      !this.validateDragOperation(
+        fromIndex,
+        toIndex,
+        this.state.rowGroups.length
+      )
+    ) {
+      // The validateDragOperation already logs a warning, so we can just return.
+      return;
+    }
+
+    // Create a new array from the existing row groups to avoid direct mutation
+    const newRowGroups = [...this.state.rowGroups];
+
+    // Remove the item from its original position
+    const [movedGroup] = newRowGroups.splice(fromIndex, 1);
+
+    // Insert the removed item into its new position
+    newRowGroups.splice(toIndex, 0, movedGroup);
+
+    // Update the state with the newly ordered array
+    this.state.rowGroups = newRowGroups;
+
+    // Optional: Call the onRowDragEnd callback if it's defined in the config
+    if (typeof this.config.onRowDragEnd === 'function') {
+      this.config.onRowDragEnd(fromIndex, toIndex, this.state.rowGroups);
+    }
+  }
+
+  /**
+   * Handles dragging a column to a new position.
+   * This method now correctly operates on state.columnGroups.
+   * @param {number} fromIndex - The original index of the column.
+   * @param {number} toIndex - The new index for the column.
+   * @public
+   */
+  public dragColumn(fromIndex: number, toIndex: number): void {
+    // Validate indices against the columnGroups array
+    if (
+      !this.validateDragOperation(
+        fromIndex,
+        toIndex,
+        this.state.columnGroups.length
+      )
+    ) {
+      return;
+    }
+
+    try {
+      // Create a new array from the existing column groups
+      const newColumnGroups = [...this.state.columnGroups];
+
+      // Remove the group from its original position
+      const [movedColumn] = newColumnGroups.splice(fromIndex, 1);
+
+      // Insert the removed group into its new position
+      newColumnGroups.splice(toIndex, 0, movedColumn);
+
+      // Update the state with the newly ordered array
+      this.state.columnGroups = newColumnGroups;
+
+      // Call callback if provided
+      if (typeof this.config.onColumnDragEnd === 'function') {
+        // Map Group[] to { uniqueName, caption }[] before passing to callback
+        const mappedColumnGroups = newColumnGroups.map(group => ({
+          uniqueName: (group as any).uniqueName ?? group.key ?? '',
+          caption: (group as any).caption ?? group.key ?? '',
+        }));
+        this.config.onColumnDragEnd(fromIndex, toIndex, mappedColumnGroups);
+      }
+    } catch (error) {
+      console.error('Error during column drag operation:', error);
+    }
+  }
+
+  // Ensure this validation method also prevents dragging to the same spot
+  private validateDragOperation(
+    fromIndex: number,
+    toIndex: number,
+    length: number
+  ): boolean {
+    if (fromIndex === toIndex) {
+      return false; // No operation needed, not an error
+    }
+    const isValid =
+      fromIndex >= 0 && toIndex >= 0 && fromIndex < length && toIndex < length;
+    if (!isValid) {
+      console.warn(
+        `Invalid drag indices: from ${fromIndex} to ${toIndex} with length ${length}`
+      );
+    }
+    return isValid;
+  }
+
+  /**
+   * Applies filters to the data
+   * @param {FilterConfig[]} filters - Array of filter configurations
+   * @public
+   */
+  public applyFilters(filters: FilterConfig[]) {
+    this.filterConfig = filters;
+    this.refreshData();
+  }
+
+  /**
+   * Sets pagination configuration
+   * @param {PaginationConfig} config - Pagination configuration
+   * @public
+   */
+  public setPagination(config: PaginationConfig) {
+    this.paginationConfig = {
+      ...this.paginationConfig,
+      ...config,
+    };
+
+    this.refreshData();
+  }
+
+  /**
+   * Returns the current pagination configuration
+   * @returns {PaginationConfig}
+   * @public
+   */
+  public getPagination(): PaginationConfig {
+    return this.paginationConfig;
+  }
+
+  /**
+   * Refreshes data with current filters and pagination
+   * @private
+   */
+  private refreshData() {
+    // Store original data
+    const originalData = [...this.state.data];
+    // Apply filters first
+    let filteredData = this.filterData(originalData);
+    // Update total pages based on filtered data
+    this.paginationConfig.totalPages = Math.ceil(
+      filteredData.length / this.paginationConfig.pageSize
+    );
+    // Apply pagination
+    filteredData = this.paginateData(filteredData);
+
+    // Update state with filtered and paginated data
+    this.state.processedData = this.processData(filteredData);
+    if (this.state.groupConfig) {
+      // Pass the filtered data to grouping instead of using config
+      this.applyGrouping(filteredData);
+    }
+  }
+
+  /**
+   * Filters data based on filter configuration
+   * @param {T[]} data - Data to filter
+   * @private
+   */
+  private filterData(data: T[]): T[] {
+    if (!this.filterConfig.length) return data;
+
+    return data.filter(item =>
+      this.filterConfig.every(filter => {
+        const value = item[filter.field];
+        const filterValue =
+          typeof value === 'number' ? Number(filter.value) : filter.value;
+
+        switch (filter.operator) {
+          case 'equals':
+            return value === filterValue;
+          case 'contains':
+            return String(value)
+              .toLowerCase()
+              .includes(String(filterValue).toLowerCase());
+          case 'greaterThan':
+            return Number(value) > Number(filterValue);
+          case 'lessThan':
+            return Number(value) < Number(filterValue);
+          case 'between':
+            return value >= filterValue[0] && value <= filterValue[1];
+          default:
+            return true;
+        }
+      })
+    );
+  }
+
+  /**
+   * Paginates data based on pagination configuration
+   * @param {T[]} data - Data to paginate
+   * @private
+   */
+  private paginateData(data: T[]): T[] {
+    const { currentPage, pageSize } = this.paginationConfig;
+    const start = (currentPage - 1) * pageSize;
+    return data.slice(start, start + pageSize);
+  }
+
+  /**
+   * Gets current pagination state
+   * @returns {PaginationConfig} Current pagination configuration
+   * @public
+   */
+  public getPaginationState(): PaginationConfig {
+    return { ...this.paginationConfig };
+  }
+
+  /**
+   * Gets current filter state
+   * @returns {FilterConfig[]} Current filter configuration
+   * @public
+   */
+  public getFilterState(): FilterConfig[] {
+    return [...this.filterConfig];
+  }
+
+  /**
+   * Exports the pivot table data to HTML and downloads the file.
+   * @param {string} fileName - The name of the downloaded file (without extension).
+   * @public
+   */
+  public exportToHTML(fileName = 'pivot-table'): void {
+    PivotExportService.exportToHTML(this.getState(), fileName);
+  }
+
+  /**
+   * Exports the pivot table data to PDF and downloads the file.
+   * @param {string} fileName - The name of the downloaded file (without extension).
+   * @public
+   */
+  public exportToPDF(fileName = 'pivot-table'): void {
+    PivotExportService.exportToPDF(this.getState(), fileName);
+  }
+
+  /**
+   * Exports the pivot table data to Excel and downloads the file.
+   * @param {string} fileName - The name of the downloaded file (without extension).
+   * @public
+   */
+  public exportToExcel(fileName = 'pivot-table'): void {
+    PivotExportService.exportToExcel(this.getState(), fileName);
+  }
+
+  /**
+   * Opens a print dialog with the formatted pivot table.
+   * @public
+   */
+  public openPrintDialog(): void {
+    PivotExportService.openPrintDialog(this.getState());
+  }
+}
+
+
+
+================================================
+FILE: sorter.ts
+================================================
+import type { SortConfig, GroupConfig, Group } from '../types/interfaces';
+
+export function applySort<T extends Record<string, any>>(
+  data: T[],
+  sortConfig: SortConfig[],
+  groupConfig?: GroupConfig | null
+): T[] {
+  if (!sortConfig || sortConfig.length === 0) return data;
+
+  return [...data].sort((a, b) => {
+    for (const config of sortConfig) {
+      const { field, direction, type, aggregation } = config;
+
+      if (type === 'measure') {
+        const valueA = calculateMeasureValue(a, field, aggregation);
+        const valueB = calculateMeasureValue(b, field, aggregation);
+
+        if (valueA !== valueB) {
+          return direction === 'asc' ? valueA - valueB : valueB - valueA;
+        }
+      } else {
+        const valueA = a[field];
+        const valueB = b[field];
+
+        if (valueA !== valueB) {
+          return direction === 'asc'
+            ? valueA < valueB
+              ? -1
+              : 1
+            : valueA > valueB
+            ? -1
+            : 1;
+        }
+      }
+    }
+    return 0;
+  });
+}
+
+function calculateMeasureValue(
+  item: Record<string, any>,
+  field: string,
+  aggregation?: string
+): number {
+  const value = Number(item[field]) || 0;
+  return value;
+}
+
+export function sortGroups(groups: Group[], sortConfig: SortConfig[]): Group[] {
+  if (!sortConfig || sortConfig.length === 0) return groups;
+
+  return [...groups].sort((a, b) => {
+    for (const config of sortConfig) {
+      const { field, direction } = config;
+      const aggregateKeyA = `${config.aggregation || 'sum'}_${field}`;
+      const aggregateKeyB = `${config.aggregation || 'sum'}_${field}`;
+
+      const valueA = a.aggregates[aggregateKeyA] || 0;
+      const valueB = b.aggregates[aggregateKeyB] || 0;
+
+      if (valueA !== valueB) {
+        return direction === 'asc' ? valueA - valueB : valueB - valueA;
+      }
+    }
+    return 0;
+  });
+}
+
+

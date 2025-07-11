@@ -173,7 +173,7 @@ describe('PivotEngine Grouping', () => {
 
     const groups = engine.getGroupedData();
     expect(groups).toHaveLength(0);
-    expect(engine.getState().data).toEqual(sampleData);
+    expect(engine.getState().rawData).toEqual(sampleData);
   });
 
   // it('should maintain grouping after sorting', () => {

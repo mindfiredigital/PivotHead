@@ -18,6 +18,14 @@ import { config } from './config/config.js';
 export let pivotEngine;
 // Store filtered data
 let filteredData = [...sampleData];
+let showProcessedData = true;
+
+// Manage pagination state locally
+let paginationState = {
+  currentPage: 1,
+  pageSize: 10,
+  totalPages: 1,
+};
 
 // Initialize filter fields
 function initializeFilters() {
@@ -40,8 +48,10 @@ function initializeFilters() {
 }
 
 // Apply filter to data
+
+// Replace your applyFilter function with this fixed version:
 function applyFilter(data, filter) {
-  const filteredData = data.filter(item => {
+  const newFilteredData = data.filter(item => {
     const fieldValue = item[filter.field];
 
     switch (filter.operator) {
@@ -60,19 +70,20 @@ function applyFilter(data, filter) {
     }
   });
 
+  // Update the global filteredData variable
+  filteredData = newFilteredData;
+
   // Create a new PivotEngine instance with the filtered data
-  // This is a workaround since updateData is not available
   pivotEngine = new PivotEngine({
     ...config,
-    data: filteredData,
+    data: newFilteredData,
   });
 
-  return filteredData;
+  return newFilteredData;
 }
 
 // Get paginated data
-function getPaginatedData(data) {
-  const paginationState = pivotEngine.getPaginationState();
+function getPaginatedData(data, paginationState) {
   const start = (paginationState.currentPage - 1) * paginationState.pageSize;
   const end = start + paginationState.pageSize;
   return data.slice(start, end);
@@ -109,9 +120,134 @@ function createSortIcon(field, currentSortConfig) {
   return sortIcon;
 }
 
-// Update the renderTable function to include sort icons
+function renderRawDataTable() {
+  const rawData = pivotEngine.getState().rawData;
+  const tableContainer = document.getElementById('myTable');
+  tableContainer.innerHTML = '';
+
+  const table = document.createElement('table');
+  table.style.width = '100%';
+  table.style.borderCollapse = 'collapse';
+  table.style.marginTop = '20px';
+  table.style.border = '1px solid #dee2e6';
+
+  const thead = document.createElement('thead');
+  const headerRow = document.createElement('tr');
+  const headers = Object.keys(rawData[0]);
+  headers.forEach(headerText => {
+    const th = document.createElement('th');
+    th.style.padding = '12px';
+    th.style.backgroundColor = '#f8f9fa';
+    th.style.borderBottom = '2px solid #dee2e6';
+    th.style.borderRight = '1px solid #dee2e6';
+    th.textContent = headerText;
+    headerRow.appendChild(th);
+  });
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  rawData.forEach(rowData => {
+    const tr = document.createElement('tr');
+    headers.forEach(header => {
+      const td = document.createElement('td');
+      td.style.padding = '8px';
+      td.style.borderBottom = '1px solid #dee2e6';
+      td.style.borderRight = '1px solid #dee2e6';
+      td.textContent = rowData[header];
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  tableContainer.appendChild(table);
+}
+
+// Add this new function to ensure data consistency:
+function ensureDataConsistency() {
+  const state = pivotEngine.getState();
+  console.log('Checking data consistency:');
+  console.log('- sampleData length:', sampleData.length);
+  console.log('- filteredData length:', filteredData.length);
+  console.log('- state.data length:', state.data.length);
+  console.log('- state.rawData length:', state.rawData.length);
+
+  // Check for inconsistency
+  const hasInconsistency = state.rawData.length !== filteredData.length;
+
+  if (hasInconsistency) {
+    console.log(
+      'Data inconsistency detected, preserving custom orders during reinit...'
+    );
+
+    // Preserve custom orders before reinitializing
+    const customRegionOrder =
+      pivotEngine.getCustomRegionOrder && pivotEngine.getCustomRegionOrder();
+    const preservedRegionOrder = customRegionOrder || window.swappedRegionOrder;
+
+    console.log('Preserving region order:', preservedRegionOrder);
+
+    // Reinitialize the engine
+    pivotEngine = new PivotEngine({
+      ...config,
+      data: filteredData,
+    });
+
+    // Restore custom region order if it existed
+    if (preservedRegionOrder && preservedRegionOrder.length > 0) {
+      console.log('Restoring preserved region order:', preservedRegionOrder);
+
+      // Store it in the engine state
+      if (pivotEngine.state) {
+        pivotEngine.state.customRegionOrder = preservedRegionOrder;
+      }
+
+      // Also store in window as backup
+      window.swappedRegionOrder = preservedRegionOrder;
+    }
+  }
+}
+
+function getOrderedRegions(state) {
+  // First try to get custom region order from the pivot engine
+  if (pivotEngine.getCustomRegionOrder) {
+    const customOrder = pivotEngine.getCustomRegionOrder();
+    if (customOrder && customOrder.length > 0) {
+      console.log('Using custom region order from engine:', customOrder);
+      return customOrder;
+    }
+  }
+
+  // Check if the state has custom region order
+  if (state.customRegionOrder && state.customRegionOrder.length > 0) {
+    console.log(
+      'Using custom region order from state:',
+      state.customRegionOrder
+    );
+    return state.customRegionOrder;
+  }
+
+  // Fall back to swapped region order if available
+  if (window.swappedRegionOrder && window.swappedRegionOrder.length > 0) {
+    console.log('Using swapped region order:', window.swappedRegionOrder);
+    return window.swappedRegionOrder;
+  }
+
+  const uniqueRegions = [...new Set(state.rawData.map(item => item.region))];
+  console.log('Using natural region order:', uniqueRegions);
+  return uniqueRegions;
+}
+// Update your renderTable function with data consistency check:
 function renderTable() {
+  if (!showProcessedData) {
+    renderRawDataTable();
+    return;
+  }
+
   try {
+    // CRITICAL: Ensure data consistency before rendering
+    ensureDataConsistency();
+
     const state = pivotEngine.getState();
     console.log('Current Engine State:', state);
 
@@ -119,9 +255,6 @@ function renderTable() {
       console.error('No processed data available');
       return;
     }
-
-    console.log('Processed Data Headers:', state.processedData.headers);
-    console.log('Processed Data Rows:', state.processedData.rows);
 
     const tableContainer = document.getElementById('myTable');
 
@@ -150,20 +283,21 @@ function renderTable() {
     cornerCell.textContent = 'Product / Region';
     regionHeaderRow.appendChild(cornerCell);
 
-    // Get unique regions
-    const uniqueRegions = [...new Set(state.data.map(item => item.region))];
+    // Get unique regions from current state data
+    // const uniqueRegions = [...new Set(state.rawData.map(item => item.region))];
+    const uniqueRegions = getOrderedRegions(state);
 
     // Add region headers with colspan for measures
     uniqueRegions.forEach((region, index) => {
       const th = document.createElement('th');
       th.textContent = region;
-      th.colSpan = state.measures.length; // Span across all measures
+      th.colSpan = state.measures.length;
       th.style.padding = '12px';
       th.style.backgroundColor = '#f8f9fa';
       th.style.borderBottom = '2px solid #dee2e6';
       th.style.borderRight = '1px solid #dee2e6';
       th.style.textAlign = 'center';
-      th.dataset.index = index + 1; // +1 because first cell is corner
+      th.dataset.index = index + 1;
 
       // Make headers draggable
       th.setAttribute('draggable', 'true');
@@ -263,13 +397,30 @@ function renderTable() {
     // Create table body
     const tbody = document.createElement('tbody');
 
-    // Get unique products
-    const uniqueProducts = [...new Set(state.data.map(item => item.product))];
+    // CRITICAL: Get all unique products in their current order from the engine's data
+    const allUniqueProducts = [
+      ...new Set(state.rawData.map(item => item.product)),
+    ];
 
-    // Add rows for each product
-    uniqueProducts.forEach((product, rowIndex) => {
+    // Update pagination to ensure it's based on current data
+    updatePagination(state.rawData, false);
+
+    // Get paginated products for CURRENT PAGE ONLY
+    const paginatedProducts = getPaginatedData(
+      allUniqueProducts,
+      paginationState
+    );
+
+    console.log('All unique products:', allUniqueProducts);
+    console.log('Products for current page:', paginatedProducts);
+    console.log('Current pagination state:', paginationState);
+
+    // Add rows for ONLY the paginated products
+    paginatedProducts.forEach((product, rowIndex) => {
       const tr = document.createElement('tr');
-      tr.dataset.rowIndex = rowIndex;
+      tr.dataset.rowIndex = rowIndex; // This is the row index within the current page
+      tr.dataset.product = product; // Store the product name
+      tr.dataset.globalIndex = allUniqueProducts.indexOf(product); // Store global index
       tr.setAttribute('draggable', 'true');
       tr.style.cursor = 'move';
 
@@ -279,12 +430,14 @@ function renderTable() {
       productCell.style.fontWeight = 'bold';
       productCell.style.padding = '8px';
       productCell.style.borderBottom = '1px solid #dee2e6';
+      productCell.style.borderRight = '1px solid #dee2e6';
+      productCell.className = 'product-cell'; // Add class for easy identification
       tr.appendChild(productCell);
 
       // Add data cells for each region and measure
       uniqueRegions.forEach(region => {
-        // Filter data for this product and region
-        const filteredData = state.data.filter(
+        // Filter data from state.rawData for this product and region
+        const filteredDataForProduct = state.rawData.filter(
           item => item.product === product && item.region === region
         );
 
@@ -298,38 +451,41 @@ function renderTable() {
 
           // Calculate the value based on aggregation
           let value = 0;
-          if (filteredData.length > 0) {
+          if (filteredDataForProduct.length > 0) {
             switch (measure.aggregation) {
               case 'sum':
-                value = filteredData.reduce(
+                value = filteredDataForProduct.reduce(
                   (sum, item) => sum + (item[measure.uniqueName] || 0),
                   0
                 );
                 break;
               case 'avg':
                 if (measure.formula) {
-                  // Use formula if provided
                   value =
-                    filteredData.reduce(
+                    filteredDataForProduct.reduce(
                       (sum, item) => sum + measure.formula(item),
                       0
-                    ) / filteredData.length;
+                    ) / filteredDataForProduct.length;
                 } else {
                   value =
-                    filteredData.reduce(
+                    filteredDataForProduct.reduce(
                       (sum, item) => sum + (item[measure.uniqueName] || 0),
                       0
-                    ) / filteredData.length;
+                    ) / filteredDataForProduct.length;
                 }
                 break;
               case 'max':
                 value = Math.max(
-                  ...filteredData.map(item => item[measure.uniqueName] || 0)
+                  ...filteredDataForProduct.map(
+                    item => item[measure.uniqueName] || 0
+                  )
                 );
                 break;
               case 'min':
                 value = Math.min(
-                  ...filteredData.map(item => item[measure.uniqueName] || 0)
+                  ...filteredDataForProduct.map(
+                    item => item[measure.uniqueName] || 0
+                  )
                 );
                 break;
               default:
@@ -405,16 +561,17 @@ function renderTable() {
     tableContainer.appendChild(table);
 
     // Update pagination info
-    const paginationState = pivotEngine.getPaginationState();
     const pageInfo = document.getElementById('pageInfo');
     if (pageInfo) {
       pageInfo.textContent = `Page ${paginationState.currentPage} of ${paginationState.totalPages}`;
 
       // Update button states
-      document.getElementById('prevPage').disabled =
-        paginationState.currentPage <= 1;
-      document.getElementById('nextPage').disabled =
-        paginationState.currentPage >= paginationState.totalPages;
+      const prevButton = document.getElementById('prevPage');
+      const nextButton = document.getElementById('nextPage');
+      if (prevButton) prevButton.disabled = paginationState.currentPage <= 1;
+      if (nextButton)
+        nextButton.disabled =
+          paginationState.currentPage >= paginationState.totalPages;
     }
 
     // Set up drag and drop after rendering
@@ -429,12 +586,19 @@ function renderTable() {
 }
 
 // Reset filters
+// Replace your resetFilters function with this:
 function resetFilters() {
   // Reset data to original
   filteredData = [...sampleData];
 
+  // Create a new PivotEngine instance with the original data
+  pivotEngine = new PivotEngine({
+    ...config,
+    data: sampleData, // Use original sample data
+  });
+
   // Update pagination
-  updatePagination(filteredData.length);
+  updatePagination(sampleData, true);
 
   // Reset filter inputs
   document.getElementById('filterField').selectedIndex = 0;
@@ -446,15 +610,39 @@ function resetFilters() {
 }
 
 // Update pagination based on data size
-function updatePagination(dataLength) {
-  const pageSize = Number(document.getElementById('pageSize').value);
-  const totalPages = Math.ceil(dataLength / pageSize) || 1;
+function updatePagination(data, resetPage = false) {
+  // Always get unique products from the current engine state
+  const state = pivotEngine.getState();
+  const uniqueProducts = [...new Set(state.rawData.map(item => item.product))];
 
-  pivotEngine.setPagination({
-    pageSize,
-    currentPage: 1,
-    totalPages,
-  });
+  // Get pageSize from the select element, with fallback
+  const pageSizeElement = document.getElementById('pageSize');
+  const pageSize = pageSizeElement ? Number(pageSizeElement.value) : 10;
+  const totalPages = Math.ceil(uniqueProducts.length / pageSize) || 1;
+
+  console.log(
+    'updatePagination - Total unique products:',
+    uniqueProducts.length
+  );
+  console.log('updatePagination - Page size:', pageSize);
+  console.log('updatePagination - Total pages:', totalPages);
+
+  if (resetPage) {
+    paginationState.currentPage = 1;
+  } else {
+    // Ensure current page doesn't exceed total pages
+    if (paginationState.currentPage > totalPages) {
+      paginationState.currentPage = totalPages;
+    }
+  }
+
+  paginationState.pageSize = pageSize;
+  paginationState.totalPages = totalPages;
+
+  // Keep the engine in sync
+  pivotEngine.setPagination(paginationState);
+
+  console.log('Updated pagination state:', paginationState);
 }
 
 export function formatTable(config) {
@@ -464,6 +652,10 @@ export function formatTable(config) {
 
 // Event Listeners
 function setupEventListeners() {
+  document.getElementById('switchView').addEventListener('click', () => {
+    showProcessedData = !showProcessedData;
+    renderTable();
+  });
   // Filter button
   document.getElementById('applyFilter').addEventListener('click', () => {
     const field = document.getElementById('filterField').value;
@@ -482,7 +674,7 @@ function setupEventListeners() {
     console.log('Filtered data:', filteredData);
 
     // Update pagination
-    updatePagination(filteredData.length);
+    updatePagination(filteredData, true);
 
     // Render table with the updated data
     renderTable();
@@ -500,7 +692,7 @@ function setupEventListeners() {
     });
 
     // Update pagination
-    updatePagination(filteredData.length);
+    updatePagination(filteredData, true);
 
     // Reset filter inputs
     document.getElementById('filterField').selectedIndex = 0;
@@ -513,38 +705,24 @@ function setupEventListeners() {
 
   // Page size change
   document.getElementById('pageSize').addEventListener('change', e => {
-    const pageSize = Number(e.target.value);
-    const totalPages = Math.ceil(filteredData.length / pageSize) || 1;
-
-    pivotEngine.setPagination({
-      pageSize,
-      currentPage: 1,
-      totalPages,
-    });
-
+    updatePagination(filteredData, true);
     renderTable();
   });
 
   // Previous page
   document.getElementById('prevPage').addEventListener('click', () => {
-    const current = pivotEngine.getPaginationState();
-    if (current.currentPage > 1) {
-      pivotEngine.setPagination({
-        ...current,
-        currentPage: current.currentPage - 1,
-      });
+    if (paginationState.currentPage > 1) {
+      paginationState.currentPage--;
+      pivotEngine.setPagination(paginationState);
       renderTable();
     }
   });
 
   // Next page
   document.getElementById('nextPage').addEventListener('click', () => {
-    const current = pivotEngine.getPaginationState();
-    if (current.currentPage < current.totalPages) {
-      pivotEngine.setPagination({
-        ...current,
-        currentPage: current.currentPage + 1,
-      });
+    if (paginationState.currentPage < paginationState.totalPages) {
+      paginationState.currentPage++;
+      pivotEngine.setPagination(paginationState);
       renderTable();
     }
   });
@@ -644,14 +822,16 @@ function addControlsHTML() {
             <input type="text" id="filterValue" placeholder="Filter value">
             <button id="applyFilter">Apply Filter</button>
             <button id="resetFilter">Reset</button>
+            <button id="switchView">Switch View</button>
         </div>
         <div class="pagination-container">
             <label>Items per page:</label>
             <select id="pageSize">
                 <option value="1">1</option>
-                <option value="2" selected>2</option>
+                <option value="2">2</option>
                 <option value="3">3</option>
                 <option value="4">4</option>
+                <option value="10" selected>10</option>
             </select>
             <button id="prevPage">Previous</button>
             <span id="pageInfo">Page 1 of 1</span>
@@ -665,30 +845,69 @@ function addControlsHTML() {
 }
 
 // Add this function to set up drag and drop functionality
+// Replace your setupDragAndDrop function with this version that includes column swapping:
+
+// Update your setupDragAndDrop function column section:
 function setupDragAndDrop() {
-  // Set up column drag and drop
+  // ENHANCED: Column drag and drop with SWAPPING
   const headers = document.querySelectorAll('th[draggable="true"]');
   let draggedColumnIndex = null;
+  let draggedRegionName = null;
 
-  // Get the state to understand column structure
+  console.log('Setting up drag and drop, found headers:', headers.length);
+
   const state = pivotEngine.getState();
-  const uniqueRegions = [...new Set(state.data.map(item => item.region))];
-  const measuresPerRegion = state.measures.length;
+  const uniqueRegions = getOrderedRegions(state);
 
-  headers.forEach(header => {
-    // Use dataset.index if available, otherwise fallback to calculating index
+  console.log('Current regions for drag setup:', uniqueRegions);
+
+  headers.forEach((header, headerIdx) => {
     const headerIndex = header.dataset.index
       ? parseInt(header.dataset.index)
       : null;
+    const regionName = header.textContent ? header.textContent.trim() : null;
+
+    console.log(
+      `Setting up header ${headerIdx}: index=${headerIndex}, region=${regionName}`
+    );
+
+    if (headerIndex === null || !regionName) {
+      console.warn('Header missing index or region name:', header);
+      return;
+    }
+
+    // Convert header index to region array index (subtract 1 because of corner cell)
+    const regionIndex = headerIndex - 1;
+
+    // Validate that this region exists in our current order
+    if (regionIndex < 0 || regionIndex >= uniqueRegions.length) {
+      console.warn(
+        'Region index out of bounds:',
+        regionIndex,
+        'for region:',
+        regionName
+      );
+      return;
+    }
 
     header.addEventListener('dragstart', e => {
-      draggedColumnIndex = headerIndex;
-      e.dataTransfer.setData('text/plain', headerIndex);
+      draggedColumnIndex = regionIndex;
+      draggedRegionName = regionName;
+      e.dataTransfer.setData('text/plain', regionName);
       setTimeout(() => header.classList.add('dragging'), 0);
+      console.log(
+        'Column drag started for region:',
+        regionName,
+        'Index:',
+        regionIndex
+      );
     });
 
     header.addEventListener('dragend', () => {
       header.classList.remove('dragging');
+      draggedColumnIndex = null;
+      draggedRegionName = null;
+      console.log('Column drag ended');
     });
 
     header.addEventListener('dragover', e => {
@@ -697,11 +916,7 @@ function setupDragAndDrop() {
 
     header.addEventListener('dragenter', e => {
       e.preventDefault();
-      if (
-        draggedColumnIndex !== null &&
-        draggedColumnIndex !== headerIndex &&
-        headerIndex !== null
-      ) {
+      if (draggedRegionName && draggedRegionName !== regionName) {
         header.classList.add('drag-over');
       }
     });
@@ -714,59 +929,77 @@ function setupDragAndDrop() {
       e.preventDefault();
       header.classList.remove('drag-over');
 
+      const targetRegionName = regionName;
+      const targetRegionIndex = regionIndex;
+
       if (
-        draggedColumnIndex !== null &&
-        draggedColumnIndex !== headerIndex &&
-        headerIndex !== null
+        draggedRegionName &&
+        targetRegionName &&
+        draggedRegionName !== targetRegionName
       ) {
         console.log(
-          `Moving column from ${draggedColumnIndex} to ${headerIndex}`
+          `Attempting to swap column ${draggedRegionName} (index: ${draggedColumnIndex}) with ${targetRegionName} (index: ${targetRegionIndex})`
         );
 
-        // Adjust indices for the pivot engine's internal column structure
-        // Convert UI header index to pivot engine column index (0-based)
-        const fromIndex = draggedColumnIndex;
-        const toIndex = headerIndex;
+        try {
+          // Use the core swap method
+          pivotEngine.swapDataColumns(draggedColumnIndex, targetRegionIndex);
 
-        // Validate indices are within range
-        if (fromIndex >= 0 && toIndex >= 0) {
-          try {
-            // Call the PivotEngine's column drag method
-            pivotEngine.dragColumn(fromIndex, toIndex);
+          console.log('Core column swap completed, re-rendering...');
 
-            // Re-render the table
-            renderTable();
-          } catch (error) {
-            console.error('Error during drag operation:', error);
-          }
-        } else {
-          console.warn(
-            'Invalid column indices for drag operation:',
-            fromIndex,
-            toIndex
-          );
+          // Re-render the table
+          renderTable();
+        } catch (error) {
+          console.error('Error during column swap operation:', error);
+
+          // Fallback to manual swap if core method fails
+          console.log('Falling back to manual column swap...');
+          swapRegionsInEngine(draggedColumnIndex, targetRegionIndex);
+          renderTable();
         }
+      } else {
+        console.log('Invalid column swap attempt:', {
+          draggedRegionName,
+          targetRegionName,
+          draggedColumnIndex,
+          targetRegionIndex,
+        });
       }
-      draggedColumnIndex = null;
     });
   });
 
-  // Set up row drag and drop
-  const rows = document.querySelectorAll('tbody tr');
-  let draggedRowIndex = null;
+  // Row drag and drop code (keep existing)...
+  const rows = document.querySelectorAll('tbody tr[draggable="true"]');
+  let draggedProductName = null;
+  let draggedGlobalIndex = null;
 
-  rows.forEach((row, index) => {
-    row.setAttribute('draggable', 'true');
-    row.style.cursor = 'move';
+  rows.forEach(row => {
+    const productCell = row.querySelector('.product-cell');
+    const productName = productCell ? productCell.textContent.trim() : null;
+    const globalIndex = parseInt(row.dataset.globalIndex);
+
+    if (!productName) {
+      console.warn('Product name not found for row');
+      return;
+    }
 
     row.addEventListener('dragstart', e => {
-      draggedRowIndex = index;
-      e.dataTransfer.setData('text/plain', index);
+      draggedProductName = productName;
+      draggedGlobalIndex = globalIndex;
+      e.dataTransfer.setData('text/plain', productName);
       setTimeout(() => row.classList.add('dragging'), 0);
+      console.log(
+        'Drag started for product:',
+        productName,
+        'Global index:',
+        globalIndex
+      );
     });
 
     row.addEventListener('dragend', () => {
       row.classList.remove('dragging');
+      draggedProductName = null;
+      draggedGlobalIndex = null;
     });
 
     row.addEventListener('dragover', e => {
@@ -775,11 +1008,7 @@ function setupDragAndDrop() {
 
     row.addEventListener('dragenter', e => {
       e.preventDefault();
-      if (
-        draggedRowIndex !== null &&
-        draggedRowIndex !== index &&
-        index < rows.length
-      ) {
+      if (draggedProductName && draggedProductName !== productName) {
         row.classList.add('drag-over');
       }
     });
@@ -792,23 +1021,226 @@ function setupDragAndDrop() {
       e.preventDefault();
       row.classList.remove('drag-over');
 
-      if (
-        draggedRowIndex !== null &&
-        draggedRowIndex !== index &&
-        index < rows.length
-      ) {
-        console.log(`Moving row from ${draggedRowIndex} to ${index}`);
+      const targetProductCell = row.querySelector('.product-cell');
+      const targetProductName = targetProductCell
+        ? targetProductCell.textContent.trim()
+        : null;
+      const targetGlobalIndex = parseInt(row.dataset.globalIndex);
 
-        // Call the PivotEngine's row drag method
-        pivotEngine.dragRow(draggedRowIndex, index);
-
-        // Re-render the table
-        renderTable();
+      if (!targetProductName) {
+        console.warn('Target product name not found');
+        return;
       }
-      draggedRowIndex = null;
+
+      if (
+        draggedProductName &&
+        targetProductName &&
+        draggedProductName !== targetProductName
+      ) {
+        console.log(
+          `Swapping ${draggedProductName} (global: ${draggedGlobalIndex}) with ${targetProductName} (global: ${targetGlobalIndex})`
+        );
+
+        try {
+          if (typeof pivotEngine.swapDataRows === 'function') {
+            pivotEngine.swapDataRows(draggedGlobalIndex, targetGlobalIndex);
+          } else {
+            swapProductsInEngine(draggedGlobalIndex, targetGlobalIndex);
+          }
+
+          renderTable();
+        } catch (error) {
+          console.error('Error during row swap operation:', error);
+        }
+      }
     });
   });
 }
+
+// Add this new function to handle region/column swapping:
+// Keep the manual swap function as fallback:
+function swapRegionsInEngine(fromIndex, toIndex) {
+  const state = pivotEngine.getState();
+  const currentRegions = getOrderedRegions(state);
+
+  console.log(
+    'Manual column swap - From index:',
+    fromIndex,
+    'To index:',
+    toIndex
+  );
+  console.log('Current regions:', currentRegions);
+
+  // Validate indices
+  if (
+    fromIndex < 0 ||
+    toIndex < 0 ||
+    fromIndex >= currentRegions.length ||
+    toIndex >= currentRegions.length
+  ) {
+    console.error('Invalid indices for column swap:', fromIndex, toIndex);
+    return;
+  }
+
+  if (fromIndex === toIndex) {
+    console.log('Same column, no swap needed');
+    return;
+  }
+
+  // Get the region names to swap
+  const fromRegion = currentRegions[fromIndex];
+  const toRegion = currentRegions[toIndex];
+
+  if (!fromRegion || !toRegion) {
+    console.error('Invalid regions for swap:', fromRegion, toRegion);
+    return;
+  }
+
+  // Create swapped region order
+  const swappedRegions = [...currentRegions];
+  swappedRegions[fromIndex] = toRegion;
+  swappedRegions[toIndex] = fromRegion;
+
+  console.log('After manual swap - Regions:', swappedRegions);
+
+  // Store the swapped region order in multiple places for persistence
+  window.swappedRegionOrder = swappedRegions;
+
+  // Also store in the engine state if possible
+  if (pivotEngine.state) {
+    pivotEngine.state.customRegionOrder = swappedRegions;
+  }
+
+  console.log(
+    'Manual column swap completed. New region order:',
+    swappedRegions
+  );
+}
+
+// Keep the existing swapProductsInEngine function for rows:
+function swapProductsInEngine(fromIndex, toIndex) {
+  const state = pivotEngine.getState();
+  const allUniqueProducts = [
+    ...new Set(state.rawData.map(item => item.product)),
+  ];
+
+  console.log('Manual swap - From index:', fromIndex, 'To index:', toIndex);
+  console.log('Before swap - Products:', allUniqueProducts);
+
+  // Get the product names to swap
+  const fromProduct = allUniqueProducts[fromIndex];
+  const toProduct = allUniqueProducts[toIndex];
+
+  if (!fromProduct || !toProduct) {
+    console.error('Invalid products for swap:', fromProduct, toProduct);
+    return;
+  }
+
+  // Create new data array with swapped product order
+  const newData = [...state.rawData];
+
+  // Create swapped product order
+  const swappedProducts = [...allUniqueProducts];
+  swappedProducts[fromIndex] = toProduct;
+  swappedProducts[toIndex] = fromProduct;
+
+  console.log('After swap - Products:', swappedProducts);
+
+  // Sort data according to the new product order
+  newData.sort((a, b) => {
+    const aIndex = swappedProducts.indexOf(a.product);
+    const bIndex = swappedProducts.indexOf(b.product);
+    return aIndex - bIndex;
+  });
+
+  // Update filteredData to maintain consistency
+  if (filteredData) {
+    filteredData.sort((a, b) => {
+      const aIndex = swappedProducts.indexOf(a.product);
+      const bIndex = swappedProducts.indexOf(b.product);
+      return aIndex - bIndex;
+    });
+  }
+
+  // Create new engine with swapped data
+  pivotEngine = new PivotEngine({
+    ...config,
+    data: newData,
+  });
+
+  console.log('Swap completed. New product order:', [
+    ...new Set(pivotEngine.getState().rawData.map(item => item.product)),
+  ]);
+}
+
+// Update the renderTable function to use swapped region order if available:
+// Add this to the region header generation part of your renderTable function:
+
+// In your renderTable function, replace the region header generation with this:
+// function getOrderedRegions(state) {
+//   // Use swapped region order if available, otherwise use natural order
+//   if (window.swappedRegionOrder && window.swappedRegionOrder.length > 0) {
+//     console.log('Using swapped region order:', window.swappedRegionOrder);
+//     return window.swappedRegionOrder;
+//   }
+
+//   const uniqueRegions = [...new Set(state.rawData.map(item => item.region))];
+//   console.log('Using natural region order:', uniqueRegions);
+//   return uniqueRegions;
+// }
+
+// Add this new function to handle swapping when the core engine doesn't have a swap method:
+// function swapProductsInEngine(fromIndex, toIndex) {
+//   const state = pivotEngine.getState();
+//   const allUniqueProducts = [...new Set(state.rawData.map(item => item.product))];
+
+//   console.log('Manual swap - From index:', fromIndex, 'To index:', toIndex);
+//   console.log('Before swap - Products:', allUniqueProducts);
+
+//   // Get the product names to swap
+//   const fromProduct = allUniqueProducts[fromIndex];
+//   const toProduct = allUniqueProducts[toIndex];
+
+//   if (!fromProduct || !toProduct) {
+//     console.error('Invalid products for swap:', fromProduct, toProduct);
+//     return;
+//   }
+
+//   // Create new data array with swapped product order
+//   const newData = [...state.rawData];
+
+//   // Create swapped product order
+//   const swappedProducts = [...allUniqueProducts];
+//   swappedProducts[fromIndex] = toProduct;
+//   swappedProducts[toIndex] = fromProduct;
+
+//   console.log('After swap - Products:', swappedProducts);
+
+//   // Sort data according to the new product order
+//   newData.sort((a, b) => {
+//     const aIndex = swappedProducts.indexOf(a.product);
+//     const bIndex = swappedProducts.indexOf(b.product);
+//     return aIndex - bIndex;
+//   });
+
+//   // Update filteredData to maintain consistency
+//   if (filteredData) {
+//     filteredData.sort((a, b) => {
+//       const aIndex = swappedProducts.indexOf(a.product);
+//       const bIndex = swappedProducts.indexOf(b.product);
+//       return aIndex - bIndex;
+//     });
+//   }
+
+//   // Create new engine with swapped data
+//   pivotEngine = new PivotEngine({
+//     ...config,
+//     data: newData,
+//   });
+
+//   console.log('Swap completed. New product order:', [...new Set(pivotEngine.getState().rawData.map(item => item.product))]);
+// }
+
 export function onSectionItemDrop(droppedFields) {
   let droppedFieldsInSections = JSON.stringify({
     rows: Array.from(droppedFields.rows),
@@ -836,13 +1268,26 @@ export function onSectionItemDrop(droppedFields) {
   renderTable();
 }
 // Initialize everything when the DOM is loaded
+// Replace your initialization section at the bottom with this:
 document.addEventListener('DOMContentLoaded', () => {
-  // Create PivotEngine instance
-  pivotEngine = new PivotEngine(config);
+  // CRITICAL: Ensure we start with all the original data
+  console.log('Initializing with sampleData:', sampleData.length, 'items');
+
+  // Reset filteredData to ensure we have all data
+  filteredData = [...sampleData];
+
+  // Create PivotEngine instance with all data
+  pivotEngine = new PivotEngine({
+    ...config,
+    data: sampleData, // Use original sample data, not filtered
+  });
+
+  console.log('Initial pivot engine state:', pivotEngine.getState());
 
   if (config.toolbar) {
     createHeader(config);
   }
+
   // Add draggable styles
   addDraggableStyles();
 
@@ -853,8 +1298,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeFilters();
   setupEventListeners();
 
-  // Set initial pagination
-  updatePagination(sampleData.length);
+  // CRITICAL: Set initial pagination with all sample data
+  updatePagination(sampleData, true);
 
   // Initial render
   renderTable();

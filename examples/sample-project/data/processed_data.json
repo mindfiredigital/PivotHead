@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "name": "Alice",
+    "age_group": "30-39",
+    "city": "New York",
+    "status": "active"
+  },
+  {
+    "id": 2,
+    "name": "Bob",
+    "age_group": "20-29",
+    "city": "London",
+    "status": "inactive"
+  },
+  {
+    "id": 3,
+    "name": "Charlie",
+    "age_group": "30-39",
+    "city": "Paris",
+    "status": "active"
+  },
+  {
+    "id": 4,
+    "name": "David",
+    "age_group": "20-29",
+    "city": "New York",
+    "status": "active"
+  }
+]

@@ -12,7 +12,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mindfiredigital/PivotHead/"
+    "url": "git+https://github.com/mindfiredigital/PivotHead.git"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
@@ -84,5 +84,10 @@
     "jspdf": "^3.0.1",
     "jspdf-autotable": "^5.0.2",
     "xlsx": "^0.18.5"
-  }
+  },
+  "description": "PivotHead is a powerful and flexible library for creating interactive pivot tables in JavaScript applications. It provides a core engine for data manipulation and, in the future, will be compatible with wrappers for React, Vue, Svelte, and Angular, making it easy to integrate into applications built with these frameworks.",
+  "bugs": {
+    "url": "https://github.com/mindfiredigital/PivotHead/issues"
+  },
+  "homepage": "https://github.com/mindfiredigital/PivotHead#readme"
 }

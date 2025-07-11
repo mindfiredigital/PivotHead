@@ -1,278 +1,3 @@
-// import { PivotEngine } from '@mindfiredigital/pivothead';
-// import type {
-//   PivotTableConfig,
-//   FilterConfig,
-//   PivotTableState,
-//   Dimension,
-//   GroupConfig,
-//   MeasureConfig,
-//   AggregationType,
-//   Group,
-// } from '@mindfiredigital/pivothead';
-
-// /**
-//  * Enhanced interface extending PivotEngine with additional methods
-//  * This ensures type safety when casting the engine instance
-//  */
-// interface EnhancedPivotEngine<T extends Record<string, any>>
-//   extends PivotEngine<T> {
-//   applyFilters(filters: FilterConfig[]): void;
-//   setMeasures(measures: MeasureConfig[]): void;
-//   setDimensions(dimensions: Dimension[]): void;
-//   getFilterState(): FilterConfig[];
-//   reset(): void;
-//   sort(field: string, direction: 'asc' | 'desc'): void;
-//   setGroupConfig(config: GroupConfig | null): void;
-//   setAggregation(type: AggregationType): void;
-//   formatValue(value: any, field: string): string;
-//   getGroupedData(): Group[];
-//   exportToHTML(fileName: string): void;
-//   exportToPDF(fileName: string): void;
-//   exportToExcel(fileName: string): void;
-//   openPrintDialog(): void;
-//   // Drag methods from core
-//   dragRow(fromIndex: number, toIndex: number): void;
-//   dragColumn(fromIndex: number, toIndex: number): void;
-//   // New methods for group order
-//   setRowGroupOrder(order: string[]): void;
-//   setColumnGroupOrder(order: string[]): void;
-// }
-
-// /**
-//  * PivotHead Web Component
-//  * ... (omitting comment for brevity)
-//  */
-// export class PivotHeadElement extends HTMLElement {
-//   engine: any;
-//   _filters: never[] | undefined;
-//   private _data: any;
-//   private _options: any;
-//   // ... (properties remain the same)
-
-//   // ... (constructor, getters/setters, reinitialize, initialize, initializeWhenReady, connectedCallback, attributeChangedCallback, updateConfig, updateFilters remain the same)
-
-//   /**
-//    * Reinitializes the engine with current data and options
-//    */
-//   private reinitialize() {
-//     if (this._data && this._options && this._data.length > 0) { // Ensure data is present
-//       const config: PivotTableConfig<any> = {
-//         data: this._data,
-//         ...this._options,
-//       };
-
-//       // Cast to the enhanced interface to access all methods
-//       this.engine = new PivotEngine(config) as EnhancedPivotEngine<any>;
-
-//       // Apply any existing filters after engine initialization
-//       if (this._filters && this._filters.length > 0) {
-//         this.engine.applyFilters(this._filters);
-//       }
-
-//       // THIS IS THE KEY CHANGE:
-//       // Always fire a stateChange event after a successful reinitialization.
-//       // This ensures the initial render will always happen.
-//       this.notifyStateChange();
-//     }
-//   }
-
-//   // ... (initialize, initializeWhenReady, connectedCallback, etc. are the same)
-
-//   /**
-//    * Dispatches a custom event with the current state
-//    */
-//   private notifyStateChange() {
-//     // Check if the engine is actually ready before notifying.
-//     if (!this.engine) return;
-
-//     const state = this.engine.getState();
-
-//     this.dispatchEvent(
-//       new CustomEvent('stateChange', {
-//         detail: state,
-//         bubbles: true,
-//         composed: true,
-//       })
-//     );
-//   }
-
-//   // Public API methods for programmatic control
-
-//   /**
-//    * Get the current state of the pivot table
-//    */
-//   public getState(): PivotTableState<any> {
-//     if (!this.engine) {
-//       throw new Error('Engine not initialized');
-//     }
-//     return this.engine.getState();
-//   }
-
-//   /**
-//    * Reset the pivot table to its initial state
-//    */
-//   public refresh(): void {
-//     if (!this.engine) {
-//       console.error('Engine not initialized');
-//       return;
-//     }
-
-//     this._filters = [];
-//     this.engine.applyFilters([]);
-//     this.engine.reset();
-//     this.removeAttribute('filters');
-//     this.notifyStateChange();
-//   }
-
-//   /**
-//    * Sort the pivot table by a specific field
-//    */
-//   public sort(field: string, direction: 'asc' | 'desc'): void {
-//     if (!this.engine) {
-//       console.error('Engine not initialized');
-//       return;
-//     }
-
-//     this.engine.sort(field, direction);
-//     this.notifyStateChange();
-//   }
-
-//   /**
-//    * Set measures for the pivot table
-//    */
-//   public setMeasures(measures: MeasureConfig[]): void {
-//     if (!this.engine) {
-//       console.error('Engine not initialized');
-//       return;
-//     }
-
-//     this.engine.setMeasures(measures);
-//     this.notifyStateChange();
-//   }
-
-//   /**
-//    * Set dimensions for the pivot table
-//    */
-//   public setDimensions(dimensions: Dimension[]): void {
-//     if (!this.engine) {
-//       console.error('Engine not initialized');
-//       return;
-//     }
-
-//     this.engine.setDimensions(dimensions);
-//     this.notifyStateChange();
-//   }
-
-//   /**
-//    * Set grouping configuration
-//    */
-//   public setGroupConfig(groupConfig: GroupConfig | null): void {
-//     if (!this.engine) {
-//       console.error('Engine not initialized');
-//       return;
-//     }
-
-//     this.engine.setGroupConfig(groupConfig);
-//     this.notifyStateChange();
-//   }
-
-//   /**
-//    * Set aggregation type for measures
-//    */
-//   public setAggregation(type: AggregationType): void {
-//     if (!this.engine) {
-//       console.error('Engine not initialized');
-//       return;
-//     }
-
-//     this.engine.setAggregation(type);
-//     this.notifyStateChange();
-//   }
-
-//   /**
-//    * Format a value according to field formatting rules
-//    */
-//   public formatValue(value: any, field: string): string {
-//     if (!this.engine) {
-//       console.error('Engine not initialized');
-//       return String(value);
-//     }
-
-//     return this.engine.formatValue(value, field);
-//   }
-
-//   /**
-//    * Get grouped data from the pivot table
-//    */
-//   public getGroupedData(): Group[] {
-//     if (!this.engine) {
-//       console.error('Engine not initialized');
-//       return [];
-//     }
-
-//     return this.engine.getGroupedData();
-//   }
-
-//   // ... (getFilters, getData, getProcessedData, export methods, and file loading methods remain the same)
-
-//   /**
-//    * Programmatically sets the display order of row groups.
-//    */
-//   public setRowGroupOrder(order: string[]): void {
-//     if (!this.engine) {
-//       console.error('Engine not initialized');
-//       return;
-//     }
-//     this.engine.setRowGroupOrder(order);
-//     this.notifyStateChange();
-//   }
-
-//   /**
-//    * Programmatically sets the display order of column groups.
-//    */
-//   public setColumnGroupOrder(order: string[]): void {
-//     if (!this.engine) {
-//       console.error('Engine not initialized');
-//       return;
-//     }
-//     this.engine.setColumnGroupOrder(order);
-//     this.notifyStateChange();
-//   }
-
-//   // Public drag API methods
-
-//   /**
-//    * Programmatically drag a row from one position to another
-//    */
-//   public dragRow(fromIndex: number, toIndex: number): void {
-//     if (!this.engine) {
-//       console.error('Engine not initialized');
-//       return;
-//     }
-//     console.log('Dragging row from UI index', fromIndex, 'to', toIndex);
-//     this.engine.dragRow(fromIndex, toIndex);
-//     this.notifyStateChange();
-//   }
-
-//   /**
-//    * Programmatically drag a column from one position to another
-//    */
-//   public dragColumn(fromIndex: number, toIndex: number): void {
-//     if (!this.engine) {
-//       console.error('Engine not initialized');
-//       return;
-//     }
-
-//     // The UI provides 1-based indices for columns, convert to 0-based for the engine.
-//     console.log('Dragging column from UI index', fromIndex, 'to', toIndex);
-//     this.engine.dragColumn(fromIndex - 1, toIndex - 1);
-//     this.notifyStateChange();
-//   }
-// }
-
-// // Register the web component
-// customElements.define('pivot-head', PivotHeadElement);
-
 import { PivotEngine } from '@mindfiredigital/pivothead';
 import type {
   PivotTableConfig,
@@ -340,6 +65,7 @@ export class PivotHeadElement extends HTMLElement {
 
   constructor() {
     super();
+    this.attachShadow({ mode: 'open' });
   }
 
   /**
@@ -419,7 +145,7 @@ export class PivotHeadElement extends HTMLElement {
         ...this._options,
       };
 
-      console.log("Options", this._options);
+      console.log('Options', this._options);
       // Create or recreate the engine
       this.engine = new PivotEngine(config) as EnhancedPivotEngine<any>;
 
@@ -566,9 +292,201 @@ export class PivotHeadElement extends HTMLElement {
           composed: true,
         })
       );
+      this.renderTable();
     } catch (error) {
       console.error('Error getting engine state:', error);
     }
+  }
+
+  private renderTable(): void {
+    if (!this.engine) return;
+
+    const state = this.engine.getState();
+    const { headers, rows } = state.processedData;
+
+    let html =
+      '<style>\n' +
+      '  table { width: 100%; border-collapse: collapse; }\n' +
+      '  th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }\n' +
+      '  th { background-color: #f2f2f2; cursor: grab; }\n' +
+      '  tr[draggable=\"true\"] { cursor: grab; }\n' +
+      '  .dragging { opacity: 0.5; }\n' +
+      '</style>';
+
+    html += '<table>';
+    html += '<thead><tr>';
+    headers.forEach((header, index) => {
+      html += `<th draggable=\"true\" data-column-index="${index}">${header}</th>`;
+    });
+    html += '</tr></thead>';
+
+    html += '<tbody>';
+    rows.forEach((row, rowIndex) => {
+      html += `<tr draggable=\"true\" data-row-index="${rowIndex}">`;
+      row.forEach(cell => {
+        html += `<td>${cell}</td>`;
+      });
+      html += '</tr>';
+    });
+    html += '</tbody>';
+
+    html += '</table>';
+
+    this.shadowRoot!.innerHTML = html;
+    this.addDragListeners();
+  }
+
+  private addDragListeners(): void {
+    const headers = this.shadowRoot!.querySelectorAll('th[draggable="true"]');
+    headers.forEach(header => {
+      header.addEventListener(
+        'dragstart',
+        this.handleColumnDragStart.bind(this) as EventListener
+      );
+      header.addEventListener(
+        'dragover',
+        this.handleColumnDragOver.bind(this) as EventListener
+      );
+      header.addEventListener(
+        'dragleave',
+        this.handleColumnDragLeave.bind(this) as EventListener
+      );
+      header.addEventListener(
+        'drop',
+        this.handleColumnDrop.bind(this) as EventListener
+      );
+      header.addEventListener(
+        'dragend',
+        this.handleColumnDragEnd.bind(this) as EventListener
+      );
+    });
+
+    const rows = this.shadowRoot!.querySelectorAll('tr[draggable="true"]');
+    rows.forEach(row => {
+      row.addEventListener(
+        'dragstart',
+        this.handleRowDragStart.bind(this) as EventListener
+      );
+      row.addEventListener(
+        'dragover',
+        this.handleRowDragOver.bind(this) as EventListener
+      );
+      row.addEventListener(
+        'dragleave',
+        this.handleRowDragLeave.bind(this) as EventListener
+      );
+      row.addEventListener(
+        'drop',
+        this.handleRowDrop.bind(this) as EventListener
+      );
+      row.addEventListener(
+        'dragend',
+        this.handleRowDragEnd.bind(this) as EventListener
+      );
+    });
+  }
+
+  private draggedColumn: HTMLElement | null = null;
+  private draggedRow: HTMLElement | null = null;
+
+  private handleColumnDragStart(e: DragEvent): void {
+    this.draggedColumn = e.target as HTMLElement;
+    e.dataTransfer!.effectAllowed = 'move';
+    e.dataTransfer!.setData(
+      'text/plain',
+      this.draggedColumn.dataset.columnIndex || ''
+    );
+    setTimeout(() => {
+      this.draggedColumn!.classList.add('dragging');
+    }, 0);
+  }
+
+  private handleColumnDragOver(e: DragEvent): void {
+    e.preventDefault();
+    if (e.dataTransfer!.types.includes('text/plain')) {
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'TH' && target !== this.draggedColumn) {
+        target.classList.add('drag-over');
+      }
+    }
+  }
+
+  private handleColumnDragLeave(e: DragEvent): void {
+    (e.target as HTMLElement).classList.remove('drag-over');
+  }
+
+  private handleColumnDrop(e: DragEvent): void {
+    e.preventDefault();
+    const target = e.target as HTMLElement;
+    target.classList.remove('drag-over');
+
+    if (this.draggedColumn && target.tagName === 'TH') {
+      const fromIndex = parseInt(this.draggedColumn.dataset.columnIndex || '0');
+      const toIndex = parseInt(target.dataset.columnIndex || '0');
+
+      if (fromIndex !== toIndex) {
+        this.engine.dragColumn(fromIndex, toIndex);
+        this.notifyStateChange();
+      }
+    }
+  }
+
+  private handleColumnDragEnd(e: DragEvent): void {
+    this.draggedColumn?.classList.remove('dragging');
+    this.draggedColumn = null;
+    this.shadowRoot!.querySelectorAll('.drag-over').forEach(el =>
+      el.classList.remove('drag-over')
+    );
+  }
+
+  private handleRowDragStart(e: DragEvent): void {
+    this.draggedRow = e.target as HTMLElement;
+    e.dataTransfer!.effectAllowed = 'move';
+    e.dataTransfer!.setData(
+      'text/plain',
+      this.draggedRow.dataset.rowIndex || ''
+    );
+    setTimeout(() => {
+      this.draggedRow!.classList.add('dragging');
+    }, 0);
+  }
+
+  private handleRowDragOver(e: DragEvent): void {
+    e.preventDefault();
+    if (e.dataTransfer!.types.includes('text/plain')) {
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'TR' && target !== this.draggedRow) {
+        target.classList.add('drag-over');
+      }
+    }
+  }
+
+  private handleRowDragLeave(e: DragEvent): void {
+    (e.target as HTMLElement).classList.remove('drag-over');
+  }
+
+  private handleRowDrop(e: DragEvent): void {
+    e.preventDefault();
+    const target = e.target as HTMLElement;
+    target.classList.remove('drag-over');
+
+    if (this.draggedRow && target.tagName === 'TR') {
+      const fromIndex = parseInt(this.draggedRow.dataset.rowIndex || '0');
+      const toIndex = parseInt(target.dataset.rowIndex || '0');
+
+      if (fromIndex !== toIndex) {
+        this.engine.dragRow(fromIndex, toIndex);
+        this.notifyStateChange();
+      }
+    }
+  }
+
+  private handleRowDragEnd(e: DragEvent): void {
+    this.draggedRow?.classList.remove('dragging');
+    this.draggedRow = null;
+    this.shadowRoot!.querySelectorAll('.drag-over').forEach(el =>
+      el.classList.remove('drag-over')
+    );
   }
 
   // Public API methods for programmatic control
@@ -691,9 +609,6 @@ export class PivotHeadElement extends HTMLElement {
     return this.engine.formatValue(value, field);
   }
 
-
-
-
   /**
    * Get grouped data from the pivot table
    */
@@ -722,7 +637,7 @@ export class PivotHeadElement extends HTMLElement {
       return [];
     }
 
-    return this.engine.getState().data;
+    return this.engine.getState().rawData;
   }
 
   /**
@@ -838,6 +753,7 @@ export class PivotHeadElement extends HTMLElement {
       console.error('Engine not initialized');
       return;
     }
+
     this.engine.dragRow(fromIndex, toIndex);
     this.notifyStateChange();
   }
@@ -993,7 +909,7 @@ export class PivotHeadElement extends HTMLElement {
    * Method to reinitialize the engine
    */
   private reinitialize(): void {
-    console.log(this._options)
+    console.log(this._options);
     this.tryInitializeEngine();
   }
 
@@ -1001,7 +917,7 @@ export class PivotHeadElement extends HTMLElement {
     if (!this._options.formatting) {
       this._options.formatting = {};
     }
- 
+
     this._options.formatting[field] = format;
     this.reinitialize();
   }
