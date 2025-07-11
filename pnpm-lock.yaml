@@ -57,6 +57,16 @@ importers:
         specifier: ^4.3.9
         version: 4.3.9(@types/node@22.10.1)
 
+  examples/new-js-web-component:
+    dependencies:
+      '@mindfiredigital/pivothead-web-component':
+        specifier: workspace:^1.0.2
+        version: link:../../packages/web-component
+    devDependencies:
+      vite:
+        specifier: ^6.3.5
+        version: 6.3.5(@types/node@22.10.1)
+
   examples/react-demo:
     dependencies:
       '@mindfiredigital/pivothead':
@@ -131,7 +141,23 @@ importers:
         specifier: ^6.3.5
         version: 6.3.5(@types/node@22.10.1)
 
+  examples/sample-project:
+    dependencies:
+      serve:
+        specifier: ^14.2.4
+        version: 14.2.4
+
   examples/simple-js-demo:
+    dependencies:
+      '@mindfiredigital/pivothead':
+        specifier: workspace:*
+        version: link:../../packages/core
+    devDependencies:
+      vite:
+        specifier: ^4.3.9
+        version: 4.3.9(@types/node@22.10.1)
+
+  examples/simple-js-demooo:
     dependencies:
       '@mindfiredigital/pivothead':
         specifier: workspace:*

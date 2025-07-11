@@ -10,18 +10,21 @@ describe('PivotEngine', () => {
 
   const config: PivotTableConfig<(typeof sampleData)[0]> = {
     data: sampleData,
+    rows: [],
     columns: [
-      { field: 'id', label: 'ID' },
-      { field: 'name', label: 'Name' },
-      { field: 'age', label: 'Age' },
+      { uniqueName: 'id', caption: 'ID' },
+      { uniqueName: 'name', caption: 'Name' },
+      { uniqueName: 'age', caption: 'Age' },
     ],
-    groupConfig: null,
+    measures: [],
+    dimensions: [],
+    defaultAggregation: 'sum',
   };
 
   it('should initialize with correct data and default row sizes', () => {
     const engine = new PivotEngine(config);
     const state = engine.getState();
-    expect(state.data).toEqual(sampleData);
+    expect(state.rawData).toEqual(sampleData);
     expect(state.rowSizes).toEqual([
       { index: 0, height: 40 },
       { index: 1, height: 40 },
@@ -29,15 +32,18 @@ describe('PivotEngine', () => {
     ]);
   });
 
-  // it('should sort data correctly and maintain row sizes', () => {
-  //   const engine = new PivotEngine(config);
-  //   engine.sort('age', 'asc');
-  //   const state = engine.getState();
-  //   expect(state.data[0].age).toBe(25);
-  //   expect(state.data[2].age).toBe(35);
-  //   expect(state.rowSizes).toHaveLength(3);
-  //   expect(state.rowSizes[0].height).toBe(40);
-  // });
+  it('should switch data handling mode and re-process data', () => {
+    const engine = new PivotEngine(config);
+    engine.setDataHandlingMode('raw');
+    let state = engine.getState();
+    expect(state.dataHandlingMode).toBe('raw');
+    expect(state.processedData.headers).toEqual(['id', 'name', 'age']);
+
+    engine.setDataHandlingMode('processed');
+    state = engine.getState();
+    expect(state.dataHandlingMode).toBe('processed');
+    expect(state.processedData.headers).toEqual(['ID', 'Name', 'Age']);
+  });
 
   it('should resize a row correctly', () => {
     const engine = new PivotEngine(config);
@@ -52,23 +58,6 @@ describe('PivotEngine', () => {
     const state = engine.getState();
     expect(state.rowSizes[1].height).toBe(20);
   });
-
-  // it('should reset data and row sizes', () => {
-  //   const engine = new PivotEngine(config);
-
-  //   engine.sort('age', 'desc');
-  //   engine.resizeRow(1, 60);
-  //   engine.reset();
-  //   const state = engine.getState();
-
-  //   expect(state.data).toEqual(sampleData);
-  //   expect(state.sortConfig).toBeNull();
-  //   expect(state.rowSizes).toEqual([
-  //     { index: 0, height: 40 },
-  //     { index: 1, height: 40 },
-  //     { index: 2, height: 40 },
-  //   ]);
-  // });
 
   it('should maintain row sizes after sorting', () => {
     const engine = new PivotEngine(config);

@@ -70,48 +70,6 @@ export const sampleData = [
     sales: 1600,
     quantity: 80,
   },
-  {
-    date: '2024-01-05',
-    product: 'Widget E',
-    region: 'North',
-    sales: 900,
-    quantity: 45,
-  },
-  {
-    date: '2024-01-05',
-    product: 'Widget F',
-    region: 'South',
-    sales: 1100,
-    quantity: 55,
-  },
-  {
-    date: '2024-01-06',
-    product: 'Widget G',
-    region: 'East',
-    sales: 1400,
-    quantity: 70,
-  },
-  {
-    date: '2024-01-06',
-    product: 'Widget H',
-    region: 'West',
-    sales: 1700,
-    quantity: 85,
-  },
-  {
-    date: '2024-01-07',
-    product: 'Widget I',
-    region: 'North',
-    sales: 1900,
-    quantity: 95,
-  },
-  {
-    date: '2024-01-07',
-    product: 'Widget J',
-    region: 'South',
-    sales: 2000,
-    quantity: 100,
-  },
 ];
 
 // Pivot table configuration

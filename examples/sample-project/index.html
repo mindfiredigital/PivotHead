@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data View Pivot Table</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Data View Pivot Table</h1>
+  <div class="view-controls">
+    <button id="raw-data-btn" class="active">Raw Data View</button>
+    <button id="processed-data-btn">Processed Data View</button>
+  </div>
+  <div class="current-view">
+    <p>Current View: <span id="current-view-mode">Raw Data</span> | User: user123 | Total Switches: <span id="switch-count">0</span></p>
+  </div>
+  <h2 id="pivot-table-title">Raw Data Pivot</h2>
+  <pivot-head id="pivot-table-container"></pivot-head>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

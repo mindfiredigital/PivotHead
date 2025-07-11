@@ -28,11 +28,17 @@ export class PivotExportService {
 
     // Get unique column values
     const uniqueColumns = [
-      ...new Set(data.map(item => item[columns[0].uniqueName])),
+      ...new Set(
+        data.map((item: { [x: string]: any }) => item[columns[0].uniqueName])
+      ),
     ];
 
     // Get unique row values
-    const uniqueRows = [...new Set(data.map(item => item[rows[0].uniqueName]))];
+    const uniqueRows = [
+      ...new Set(
+        data.map((item: { [x: string]: any }) => item[rows[0].uniqueName])
+      ),
+    ];
 
     const formatValue = (value: any, formatConfig: any): string => {
       if (value === 0) return '$0.00';
@@ -335,10 +341,14 @@ export class PivotExportService {
     }
 
     const uniqueRowValues = [
-      ...new Set(state.data.map(item => item[rowDimension])),
+      ...new Set(
+        state.data.map((item: { [x: string]: any }) => item[rowDimension])
+      ),
     ];
     const uniqueColValues = [
-      ...new Set(state.data.map(item => item[colDimension])),
+      ...new Set(
+        state.data.map((item: { [x: string]: any }) => item[colDimension])
+      ),
     ];
 
     // Create header rows
@@ -359,7 +369,7 @@ export class PivotExportService {
         measures.forEach(measure => {
           // Filter data for this row and column intersection
           const filteredData = state.data.filter(
-            item =>
+            (item: { [x: string]: unknown }) =>
               item[rowDimension] === rowValue && item[colDimension] === colValue
           );
 
@@ -369,7 +379,8 @@ export class PivotExportService {
             switch (measure.aggregation) {
               case 'sum':
                 value = filteredData.reduce(
-                  (sum, item) => sum + (item[measure.uniqueName] || 0),
+                  (sum: any, item: { [x: string]: any }) =>
+                    sum + (item[measure.uniqueName] || 0),
                   0
                 );
                 break;
@@ -381,25 +392,33 @@ export class PivotExportService {
                 ) {
                   value =
                     filteredData.reduce(
-                      (sum, item) => sum + (measure.formula?.(item) || 0),
+                      (sum: number, item: any) =>
+                        sum + (measure.formula?.(item) || 0),
                       0
                     ) / filteredData.length;
                 } else {
                   value =
                     filteredData.reduce(
-                      (sum, item) => sum + (item[measure.uniqueName] || 0),
+                      (sum: any, item: { [x: string]: any }) =>
+                        sum + (item[measure.uniqueName] || 0),
                       0
                     ) / filteredData.length;
                 }
                 break;
               case 'max':
                 value = Math.max(
-                  ...filteredData.map(item => item[measure.uniqueName] || 0)
+                  ...filteredData.map(
+                    (item: { [x: string]: any }) =>
+                      item[measure.uniqueName] || 0
+                  )
                 );
                 break;
               case 'min':
                 value = Math.min(
-                  ...filteredData.map(item => item[measure.uniqueName] || 0)
+                  ...filteredData.map(
+                    (item: { [x: string]: any }) =>
+                      item[measure.uniqueName] || 0
+                  )
                 );
                 break;
               case 'count':

@@ -146,8 +146,6 @@ window.handlePrint = () => {
   pivotTable.openPrintDialog();
 };
 
-
-
 // function renderTable(state) {
 //   try {
 //     console.log('Current Engine State:', state);
@@ -411,8 +409,6 @@ window.handlePrint = () => {
 //             }
 //           }
 
-
-
 //           let formattedValue = value;
 //           if (measure.format) {
 //             if (measure.format.type === 'currency') {
@@ -524,7 +520,9 @@ function renderTable(state) {
 
     const uniqueRegions =
       state.columnGroups && state.columnGroups.length > 0
-        ? state.columnGroups.map(group => group.key || group.name || group.value)
+        ? state.columnGroups.map(
+            group => group.key || group.name || group.value
+          )
         : [...new Set(state.data.map(item => item.region))];
 
     uniqueRegions.forEach((region, index) => {
@@ -566,7 +564,8 @@ function renderTable(state) {
 
     productHeader.addEventListener('click', () => {
       const direction =
-        currentSortConfig?.field === 'product' && currentSortConfig?.direction === 'asc'
+        currentSortConfig?.field === 'product' &&
+        currentSortConfig?.direction === 'asc'
           ? 'desc'
           : 'asc';
       pivotTable.sort('product', direction);
@@ -592,7 +591,10 @@ function renderTable(state) {
           measureText.textContent = measure.caption;
           headerContent.appendChild(measureText);
 
-          const sortIcon = createSortIcon(measure.uniqueName, currentSortConfig);
+          const sortIcon = createSortIcon(
+            measure.uniqueName,
+            currentSortConfig
+          );
           headerContent.appendChild(sortIcon);
           th.appendChild(headerContent);
 
@@ -637,7 +639,9 @@ function renderTable(state) {
       productCell.style.gap = '8px';
 
       const rowId = `product-${product}`;
-      const isExpanded = pivotTable.isRowExpanded ? pivotTable.isRowExpanded(rowId) : true;
+      const isExpanded = pivotTable.isRowExpanded
+        ? pivotTable.isRowExpanded(rowId)
+        : true;
       const toggleIcon = document.createElement('span');
       toggleIcon.textContent = isExpanded ? '▼' : '▶';
       toggleIcon.style.cursor = 'pointer';
@@ -675,7 +679,7 @@ function renderTable(state) {
                 );
                 break;
               // ... other aggregation cases ...
-               case 'avg':
+              case 'avg':
                 if (measure.formula) {
                   value =
                     filteredData.reduce(
@@ -705,17 +709,11 @@ function renderTable(state) {
             }
           }
 
-          // ==========================================================
-          // ===== THIS IS THE ONLY PART THAT HAS BEEN CHANGED ========
-          // ==========================================================
-
-          // The 'value' is already calculated. Now, format it using the component's public method.
-          // The component will delegate this call to its internal engine.
-          const formattedValue = pivotTable.formatValue(value, measure.uniqueName);
+          const formattedValue = pivotTable.formatValue(
+            value,
+            measure.uniqueName
+          );
           td.textContent = formattedValue;
-
-          // ==========================================================
-          // ==========================================================
 
           // Apply conditional formatting (this part remains unchanged)
           if (
@@ -812,25 +810,6 @@ function setupPaginationControls() {
     }
   });
 
-  // Next Page
-  // nextBtn.addEventListener('click', () => {
-  //   const pagination = pivotTable.getPagination();
-  //   const state = pivotTable.getState();
-  //   const uniqueProducts = [...new Set(state.data.map(item => item.product))];
-  //   const totalPages = Math.ceil(uniqueProducts.length / pagination.pageSize);
-
-  //   console.log('Next page clicked, current page:', pagination.currentPage, 'total pages:', totalPages);
-
-  //   if (pagination.currentPage < totalPages) {
-  //     pivotTable.setPagination({
-  //       ...pagination,
-  //       currentPage: pagination.currentPage + 1,
-  //     });
-  //     renderTable(pivotTable.getState());
-  //     updatePaginationInfo();
-  //   }
-  // });
-
   nextBtn.addEventListener('click', () => {
     const pagination = pivotTable.getPagination();
     const fullData = pivotTable.getRawData();
@@ -853,29 +832,6 @@ function setupPaginationControls() {
     }
   });
 }
-
-// function updatePaginationInfo() {
-//   const pagination = pivotTable.getPagination();
-//   const state = pivotTable.getState();
-//   const uniqueProducts = [...new Set(state.data.map(item => item.product))];
-//   const totalPages = Math.ceil(uniqueProducts.length / pagination.pageSize);
-
-//   const info = document.getElementById('paginationInfo');
-//   if (info) {
-//     info.textContent = `Page ${pagination.currentPage} of ${totalPages} (${uniqueProducts.length} total products)`;
-//   }
-
-//   // Update button states
-//   const prevBtn = document.getElementById('prevPageBtn');
-//   const nextBtn = document.getElementById('nextPageBtn');
-
-//   if (prevBtn) {
-//     prevBtn.disabled = pagination.currentPage <= 1;
-//   }
-//   if (nextBtn) {
-//     nextBtn.disabled = pagination.currentPage >= totalPages;
-//   }
-// }
 
 function updatePaginationInfo() {
   const pagination = pivotTable.getPagination();
@@ -1093,13 +1049,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
-
-  
 });
 
 window.applyFormatting = function () {
   if (!pivotTable) return;
- 
+
   const fieldName = document.getElementById('field-select').value;
   const formatType = document.getElementById('format-type').value;
   const decimals = parseInt(
@@ -1109,12 +1063,12 @@ window.applyFormatting = function () {
   const locale = document.getElementById('locale-input').value || 'en-US';
   const currency =
     document.getElementById('currency-code').value.toUpperCase() || 'USD';
- 
+
   const newFormat = { type: formatType, decimals, locale };
   if (formatType === 'currency') {
     newFormat.currency = currency;
   }
- 
+
   //  This calls the public method you added to the PivotHeadElement class
   pivotTable.setFormatting(fieldName, newFormat);
   closeModal('modal1');
