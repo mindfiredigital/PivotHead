@@ -1046,19 +1046,63 @@ export class PivotEngine<T extends Record<string, any>> {
   }
 
   //swap logic
+
+  // Also add a method to get the custom region order:
+  public getCustomRegionOrder(): string[] | null {
+    return (this.state as any).customRegionOrder || null;
+  }
+
+  // GENERIC CORE ENGINE METHODS - Works with any field names
+
+  /**
+   * Generic method to swap data rows based on the configured row field
+   * Works with any field name (product, country, customer, etc.)
+   */
   public swapDataRows(fromIndex: number, toIndex: number): void {
-    // Get unique products with proper type casting
-    const uniqueProducts = [
-      ...new Set(this.state.data.map((item: { product: any }) => item.product)),
-    ].filter((product): product is string => typeof product === 'string');
+    // Get the row field configuration
+    const rowField =
+      this.state.rows && this.state.rows.length > 0
+        ? this.state.rows[0] // Use first row field
+        : null;
+
+    if (!rowField) {
+      console.warn('No row field configured for swapping');
+      return;
+    }
+
+    const rowFieldName = rowField.uniqueName;
+    console.log(`Swapping rows based on field: ${rowFieldName}`);
+
+    // Get unique values for the row field
+    const uniqueRowValues = [
+      ...new Set(
+        this.state.data.map((item: { [x: string]: any }) => item[rowFieldName])
+      ),
+    ].filter(
+      (value): value is string =>
+        typeof value === 'string' && value !== null && value !== undefined
+    );
+
+    console.log(`Core swapDataRows called:`, {
+      fromIndex,
+      toIndex,
+      totalRows: uniqueRowValues.length,
+      fieldName: rowFieldName,
+      availableValues: uniqueRowValues,
+    });
 
     if (
       fromIndex < 0 ||
       toIndex < 0 ||
-      fromIndex >= uniqueProducts.length ||
-      toIndex >= uniqueProducts.length
+      fromIndex >= uniqueRowValues.length ||
+      toIndex >= uniqueRowValues.length
     ) {
-      console.warn('Invalid indices for swap operation:', fromIndex, toIndex);
+      console.warn(`Invalid indices for row swap operation:`, {
+        fromIndex,
+        toIndex,
+        totalRows: uniqueRowValues.length,
+        fieldName: rowFieldName,
+      });
       return;
     }
 
@@ -1067,24 +1111,28 @@ export class PivotEngine<T extends Record<string, any>> {
     }
 
     try {
-      console.log(`Swapping products at indices ${fromIndex} and ${toIndex}`);
+      console.log(
+        `Swapping ${rowFieldName} values at indices ${fromIndex} and ${toIndex}`
+      );
 
-      // Get the product names to swap
-      const fromProduct = uniqueProducts[fromIndex];
-      const toProduct = uniqueProducts[toIndex];
+      // Get the values to swap
+      const fromValue = uniqueRowValues[fromIndex];
+      const toValue = uniqueRowValues[toIndex];
 
-      // Create new data array with swapped product order
+      console.log(`Swapping ${rowFieldName}: ${fromValue} <-> ${toValue}`);
+
+      // Create new data array with swapped order
       const newData = [...this.state.data];
 
-      // Create swapped product order
-      const swappedProducts = [...uniqueProducts];
-      swappedProducts[fromIndex] = toProduct;
-      swappedProducts[toIndex] = fromProduct;
+      // Create swapped value order
+      const swappedValues = [...uniqueRowValues];
+      swappedValues[fromIndex] = toValue;
+      swappedValues[toIndex] = fromValue;
 
-      // Sort data according to the new product order
+      // Sort data according to the new value order
       newData.sort((a, b) => {
-        const aIndex = swappedProducts.indexOf(a.product as string);
-        const bIndex = swappedProducts.indexOf(b.product as string);
+        const aIndex = swappedValues.indexOf(a[rowFieldName] as string);
+        const bIndex = swappedValues.indexOf(b[rowFieldName] as string);
         return aIndex - bIndex;
       });
 
@@ -1104,28 +1152,64 @@ export class PivotEngine<T extends Record<string, any>> {
       if (typeof this.config.onRowDragEnd === 'function') {
         this.config.onRowDragEnd(fromIndex, toIndex, this.state.rowGroups);
       }
+
+      console.log(`Row swap completed successfully for field: ${rowFieldName}`);
     } catch (error) {
       console.error('Error during row swap operation:', error);
     }
   }
 
+  /**
+   * Generic method to swap data columns based on the configured column field
+   * Works with any field name (region, category, department, etc.)
+   */
   public swapDataColumns(fromIndex: number, toIndex: number): void {
-    // Get unique regions with proper type casting
-    const uniqueRegions = [
-      ...new Set(this.state.data.map((item: { region: any }) => item.region)),
-    ].filter((region): region is string => typeof region === 'string');
+    // Get the column field configuration
+    const columnField =
+      this.state.columns && this.state.columns.length > 0
+        ? this.state.columns[0] // Use first column field
+        : null;
+
+    if (!columnField) {
+      console.warn('No column field configured for swapping');
+      return;
+    }
+
+    const columnFieldName = columnField.uniqueName;
+    console.log(`Swapping columns based on field: ${columnFieldName}`);
+
+    // Get unique values for the column field
+    const uniqueColumnValues = [
+      ...new Set(
+        this.state.data.map(
+          (item: { [x: string]: any }) => item[columnFieldName]
+        )
+      ),
+    ].filter(
+      (value): value is string =>
+        typeof value === 'string' && value !== null && value !== undefined
+    );
+
+    console.log(`Core swapDataColumns called:`, {
+      fromIndex,
+      toIndex,
+      totalColumns: uniqueColumnValues.length,
+      fieldName: columnFieldName,
+      availableValues: uniqueColumnValues,
+    });
 
     if (
       fromIndex < 0 ||
       toIndex < 0 ||
-      fromIndex >= uniqueRegions.length ||
-      toIndex >= uniqueRegions.length
+      fromIndex >= uniqueColumnValues.length ||
+      toIndex >= uniqueColumnValues.length
     ) {
-      console.warn(
-        'Invalid indices for column swap operation:',
+      console.warn(`Invalid indices for column swap operation:`, {
         fromIndex,
-        toIndex
-      );
+        toIndex,
+        totalColumns: uniqueColumnValues.length,
+        fieldName: columnFieldName,
+      });
       return;
     }
 
@@ -1134,20 +1218,22 @@ export class PivotEngine<T extends Record<string, any>> {
     }
 
     try {
-      console.log(`Swapping columns at indices ${fromIndex} and ${toIndex}`);
+      console.log(
+        `Swapping ${columnFieldName} values at indices ${fromIndex} and ${toIndex}`
+      );
 
-      // Get the region names to swap
-      const fromRegion = uniqueRegions[fromIndex];
-      const toRegion = uniqueRegions[toIndex];
+      // Get the values to swap
+      const fromValue = uniqueColumnValues[fromIndex];
+      const toValue = uniqueColumnValues[toIndex];
 
-      console.log(`Swapping regions: ${fromRegion} <-> ${toRegion}`);
+      console.log(`Swapping ${columnFieldName}: ${fromValue} <-> ${toValue}`);
 
-      // Create swapped region order
-      const swappedRegions = [...uniqueRegions];
-      swappedRegions[fromIndex] = toRegion;
-      swappedRegions[toIndex] = fromRegion;
+      // Create swapped value order
+      const swappedValues = [...uniqueColumnValues];
+      swappedValues[fromIndex] = toValue;
+      swappedValues[toIndex] = fromValue;
 
-      console.log('New region order:', swappedRegions);
+      console.log(`New ${columnFieldName} order:`, swappedValues);
 
       // Update columns configuration if it exists
       if (this.state.columns && this.state.columns.length > 0) {
@@ -1155,10 +1241,10 @@ export class PivotEngine<T extends Record<string, any>> {
 
         // Find and swap the column configurations
         const fromColumnIndex = newColumns.findIndex(
-          col => col.uniqueName === fromRegion
+          col => col.uniqueName === fromValue
         );
         const toColumnIndex = newColumns.findIndex(
-          col => col.uniqueName === toRegion
+          col => col.uniqueName === toValue
         );
 
         if (fromColumnIndex !== -1 && toColumnIndex !== -1) {
@@ -1172,9 +1258,11 @@ export class PivotEngine<T extends Record<string, any>> {
         }
       }
 
-      // Store the custom region order in a way that can be accessed by the UI
-      // We'll use a custom property on the state
-      (this.state as any).customRegionOrder = swappedRegions;
+      // Store the custom column order (generic key for any field)
+      (this.state as any).customColumnOrder = {
+        fieldName: columnFieldName,
+        order: swappedValues,
+      };
 
       // Regenerate processed data with new column order
       this.state.processedData = this.generateProcessedDataForDisplay();
@@ -1187,21 +1275,107 @@ export class PivotEngine<T extends Record<string, any>> {
       // Call callback if provided
       if (typeof this.config.onColumnDragEnd === 'function') {
         const mappedColumns: { uniqueName: string; caption: string }[] =
-          swappedRegions.map(region => ({
-            uniqueName: region,
-            caption: region,
+          swappedValues.map(value => ({
+            uniqueName: value,
+            caption: value,
           }));
         this.config.onColumnDragEnd(fromIndex, toIndex, mappedColumns);
       }
 
-      console.log('Column swap completed successfully');
+      console.log(
+        `Column swap completed successfully for field: ${columnFieldName}`
+      );
     } catch (error) {
       console.error('Error during column swap operation:', error);
     }
   }
 
-  // Also add a method to get the custom region order:
-  public getCustomRegionOrder(): string[] | null {
-    return (this.state as any).customRegionOrder || null;
+  /**
+   * Generic method to get unique values for any field
+   * Utility method for UI components
+   */
+  public getUniqueFieldValues(fieldName: string): string[] {
+    return [
+      ...new Set(
+        this.state.data.map((item: { [x: string]: any }) => item[fieldName])
+      ),
+    ].filter(
+      (value): value is string =>
+        typeof value === 'string' && value !== null && value !== undefined
+    );
+  }
+
+  /**
+   * Generic method to get the configured row field name
+   */
+  public getRowFieldName(): string | null {
+    return this.state.rows && this.state.rows.length > 0
+      ? this.state.rows[0].uniqueName
+      : null;
+  }
+
+  /**
+   * Generic method to get the configured column field name
+   */
+  public getColumnFieldName(): string | null {
+    return this.state.columns && this.state.columns.length > 0
+      ? this.state.columns[0].uniqueName
+      : null;
+  }
+
+  /**
+   * Generic method to set custom field order
+   * Can be used by UI to store custom arrangements
+   */
+  public setCustomFieldOrder(
+    fieldName: string,
+    order: string[],
+    isRowField: boolean = true
+  ): void {
+    const customKey = isRowField ? 'customRowOrder' : 'customColumnOrder';
+    (this.state as any)[customKey] = {
+      fieldName,
+      order,
+    };
+
+    // Regenerate processed data
+    this.state.processedData = this.generateProcessedDataForDisplay();
+  }
+
+  /**
+   * Get ordered column values if custom order exists
+   */
+  public getOrderedColumnValues(): string[] | null {
+    const customColumnOrder = (this.state as any).customColumnOrder;
+    if (
+      customColumnOrder &&
+      customColumnOrder.order &&
+      customColumnOrder.order.length > 0
+    ) {
+      console.log(
+        'Engine returning custom column order:',
+        customColumnOrder.order
+      );
+      return customColumnOrder.order;
+    }
+    console.log('Engine has no custom column order');
+    return null;
+  }
+
+  /**
+   * Get ordered row values if custom order exists
+   */
+  public getOrderedRowValues(): string[] | null {
+    const customRowOrder = (this.state as any).customRowOrder;
+    if (
+      customRowOrder &&
+      customRowOrder.order &&
+      customRowOrder.order.length > 0
+    ) {
+      console.log('Engine returning custom row order:', customRowOrder.order);
+      return customRowOrder.order;
+    }
+    console.log('Engine has no custom row order');
+    return null;
   }
 }
