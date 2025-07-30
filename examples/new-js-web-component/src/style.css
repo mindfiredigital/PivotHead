@@ -1,0 +1,361 @@
+/* --- Pivot Table Styles (Updated) --- */
+/* .pivot-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  font-size: 14px;
+  color: #333;
+  margin-top: 20px;
+  border-spacing: 0;
+}
+
+.pivot-table th,
+.pivot-table td {
+  border: 1px solid #e9ecef; 
+  padding: 10px;
+  text-align: right;
+  vertical-align: middle;
+} */
+
+/* --- Header Styling --- */
+/* .pivot-table thead th {
+  background-color: #f8f9fa;
+  font-weight: 600; 
+  text-align: center;
+  border-bottom: 2px solid #dee2e6;
+} */
+
+/* --- Body & Footer Styling --- */
+/* .pivot-table tbody .row-header,
+.pivot-table tfoot .row-header {
+  text-align: left;
+  font-weight: 600;
+  background-color: #f8f9fa; 
+} */
+
+/* .pivot-table .measure-header {
+  font-weight: normal;
+  font-style: italic;
+  color: #6c757d;
+  background-color: #fff; 
+  text-align: left;
+} */
+
+/* --- Grand Total Styling --- */
+/* .pivot-table .grand-total-col,
+.pivot-table .grand-total-row td {
+  background-color: #343a40; 
+  color: white;
+  font-weight: 600;
+} */
+
+/* --- Pivot Table Styles (Updated for new layout) --- */
+.pivot-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  font-size: 14px;
+  color: #333;
+  margin-top: 20px;
+  border-spacing: 0;
+}
+
+.pivot-table th,
+.pivot-table td {
+  border: 1px solid #e9ecef;
+  /* Lighter borders */
+  padding: 10px;
+  text-align: right;
+  vertical-align: middle;
+}
+
+/* --- Header Styling --- */
+.pivot-table thead th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  /* Bolder */
+  text-align: center;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.pivot-table thead th:first-child {
+  text-align: left;
+  /* Align 'Product' header to the left */
+}
+
+/* --- Body & Footer Styling --- */
+.pivot-table tbody {
+  border-bottom: 1px solid #dee2e6;
+  /* Separates product groups */
+}
+
+.pivot-table .row-header {
+  text-align: left;
+  font-weight: 600;
+  background-color: #f8f9fa;
+  /* Light background for row headers */
+}
+
+.pivot-table .measure-header {
+  text-align: left;
+  font-style: italic;
+  color: #6c757d;
+  background-color: #fff;
+}
+
+/* --- Grand Total Styling --- */
+.pivot-table .grand-total-col,
+.pivot-table .grand-total-row td {
+  background-color: #343a40;
+  /* Dark charcoal color */
+  color: white;
+  font-weight: 600;
+}
+
+.pivot-table .grand-total-footer .row-header {
+  background-color: #343a40;
+  color: white;
+}
+
+/* Style for the element currently being dragged */
+.dragging {
+  opacity: 0.5;
+  background: #cce5ff;
+  /* A light blue to indicate movement */
+}
+
+/* A visual cue for a potential drop target */
+.drag-over {
+  border: 2px dashed #007bff !important;
+  /* A prominent dashed blue border */
+}
+
+
+/* Container for the dropdown */
+.dropdown-container {
+  position: relative;
+  display: inline-block;
+  font-family: sans-serif;
+}
+
+/* Main button */
+.main-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: center;
+  color: #555;
+  font-size: 14px;
+}
+
+.main-button .icon {
+  font-size: 20px;
+  display: block;
+}
+
+
+/* Dropdown menu */
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  /* Changed from black for better readability */
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  min-width: 180px;
+  padding: 4px 0;
+  /* Add some padding */
+  border-radius: 4px;
+  /* Rounded corners */
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: none;
+  /* Removed background color */
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  /* Set a text color */
+}
+
+.dropdown-item:hover {
+  background: #f0f0f0;
+  /* Use a light gray for hover */
+}
+
+/* Show on hover */
+.dropdown-container:hover .dropdown-menu {
+  display: block;
+}
+
+/* Modal styles */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+  align-items: center;
+  justify-content: center;
+  font-family: sans-serif;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 24px;
+  border-radius: 6px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+}
+
+h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 14px;
+  margin-bottom: 4px;
+  font-weight: 600;
+  color: #444;
+}
+
+.form-group select,
+.form-group input {
+  padding: 6px 10px;
+  font-size: 14px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.modal-actions button {
+  padding: 8px 16px;
+  margin-left: 10px;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.apply-btn {
+  background-color: #333;
+  color: white;
+}
+
+.cancel-btn {
+  background-color: #ccc;
+  color: #333;
+}
+
+
+.formatCells {
+  background-color: #c2bfbf;
+}
+
+.toolbar {
+  display: flex;
+  gap: 16px;
+  /* Adds space between the Format and Export buttons */
+  margin-bottom: 20px;
+}
+
+/* ADD these new rules to your style.css file */
+
+/* --- Toolbar Button --- */
+.toolbar-button-container .main-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+/* --- Fields Modal Specific Styles --- */
+.modal-large {
+  width: 700px;
+  /* A wider modal for field configuration */
+  max-width: 95%;
+}
+
+.modal-subtitle {
+  color: #666;
+  margin-top: -15px;
+  margin-bottom: 25px;
+  font-size: 14px;
+}
+
+.field-config-area {
+  display: flex;
+  gap: 20px;
+}
+
+.field-config-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.field-config-box {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 15px;
+}
+
+.field-config-box h3 {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.field-config-box select {
+  width: 100%;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+#measure-checkbox-container {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  padding: 5px 0;
+}
+
+.checkbox-item label {
+  margin-left: 8px;
+  font-size: 14px;
+}

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pivot Table - Enhanced Demo</title>
+  <link rel="stylesheet" href="index.css">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+  
+  button:disabled:hover {
+    background-color: #ccc;
+  }
+  
+  .control-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin: 5px 0;
+  }
+  
+  .control-group label {
+    font-weight: bold;
+    margin-right: 5px;
+  }
+  
+  #paginationInfo {
+    background-color: #f8f9fa;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+    display: inline-block;
+  }
+
+    .controls {
+      margin: 20px 0;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .control-group {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      margin: 5px 0;
+    }
+
+    button {
+      padding: 8px 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    select,
+    input {
+      padding: 6px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .file-input {
+      margin: 10px 0;
+    }
+
+    .custom-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 13px;
+    }
+
+    .custom-table th,
+    .custom-table td {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      text-align: right;
+    }
+
+    .custom-table th {
+      background-color: #f8f9fa;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .custom-table .row-header {
+      background-color: #f0f0f0;
+      text-align: left;
+      font-weight: bold;
+    }
+
+    .debug-view {
+      margin-top: 20px;
+    }
+
+    .debug-view pre {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 4px;
+      overflow: auto;
+      max-height: 300px;
+      font-size: 11px;
+    }
+
+    .section-title {
+      margin: 20px 0 10px 0;
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Enhanced Pivot Table Demo</h1>
+  <div class="dropdown-container">
+    <button class="main-button">
+      <span class="icon">🖉</span>
+      Format
+    </button>
+    <div class="dropdown-menu">
+      <button class="dropdown-item" onclick="openModal('modal1')">
+        <span class="icon">💲</span> Format cells
+      </button>
+      <button class="dropdown-item" onclick="openModal('modal2')">
+        <span class="icon">✏️</span> Conditional formatting
+      </button>
+    </div>
+  </div>
+
+  <!-- Format Cells Modal -->
+ <div id="modal1" class="modal">
+  <div class="modal-content">
+    <h2>Format cells</h2>
+
+    <!-- Field selector -->
+    <div class="form-group">
+      <label>Choose Field</label>
+      <select id="field-select">
+        <option value="sales">Sales</option>
+        <option value="quantity">Quantity</option>
+        <option value="date">Date</option>
+      </select>
+    </div>
+
+    <!-- Format type -->
+    <div class="form-group">
+      <label>Format Type</label>
+      <select id="format-type">
+        <option value="number">Number</option>
+        <option value="currency">Currency</option>
+        <option value="percentage">Percentage</option>
+        <option value="date">Date</option>
+      </select>
+    </div>
+
+    <!-- Decimal places -->
+    <div class="form-group">
+      <label>Decimal Places</label>
+      <select id="decimal-places">
+        <option value="0">0</option>
+        <option value="1">1</option>
+        <option value="2" selected>2</option>
+        <option value="3">3</option>
+      </select>
+    </div>
+
+    <!-- Currency symbol -->
+    <div class="form-group" id="currency-symbol-group">
+      <label>Currency Symbol (ISO Code)</label>
+      <input type="text" id="currency-code" placeholder="USD" />
+    </div>
+
+    <!-- Locale -->
+    <div class="form-group">
+      <label>Locale</label>
+      <input type="text" id="locale-input" placeholder="en-US" />
+    </div>
+
+    <div class="modal-actions">
+      <button class="apply-btn" onclick="applyFormatting()">APPLY</button>
+      <button class="cancel-btn" onclick="closeModal('modal1')">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+
+  <div id="modal2" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('modal2')">&times;</span>
+      <h3>Conditional Formatting</h3>
+      <div style="border-top: 1px solid #ccc; margin-top: 10px; padding-top: 15px;">
+
+        <div style="margin-bottom: 10px;">
+          <label><strong>Value:</strong></label><br />
+          <select>
+            <option>All values</option>
+            <option>Specific column</option>
+            <option>Specific row</option>
+          </select>
+          <select>
+            <option>Greater than</option>
+            <option>Less than</option>
+            <option>Equal to</option>
+            <option>Not equal to</option>
+          </select>
+          <input type="number" placeholder="Enter value" />
+        </div>
+
+        <div style="margin-bottom: 10px;">
+          <label><strong>Format:</strong></label><br />
+          <select>
+            <option>Arial</option>
+            <option>Verdana</option>
+            <option>Times New Roman</option>
+          </select>
+          <select>
+            <option>10px</option>
+            <option>12px</option>
+            <option>14px</option>
+            <option>16px</option>
+          </select>
+          <input type="text" placeholder="Custom text (optional)" />
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+          <button onclick="applyFormatting()">Apply</button>
+          <button onclick="closeModal('modal2')">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- Basic Operations -->
+  <div class="section-title">Basic Operations:</div>
+  <div class="controls">
+    <button onclick="handleReset()">Reset Table</button>
+  </div>
+
+  <!-- Filter Operations -->
+  <div>
+    <select id="filterField">
+      <option value="product">Product</option>
+      <option value="region">Region</option>
+      <option value="sales">Sales</option>
+      <option value="quantity">Quantity</option>
+      <option value="date">Date</option>
+    </select>
+
+    <select id="filterOperator">
+      <option value="equals">Equals</option>
+      <option value="contains">Contains</option>
+      <option value="greaterThan">Greater Than</option>
+      <option value="lessThan">Less Than</option>
+    </select>
+
+    <input type="text" id="filterValue" placeholder="Filter value">
+    <button onclick="handleFilter()">Filter</button>
+  </div>
+
+  <!-- Measures & Dimensions -->
+  <div class="section-title">Measures & Dimensions:</div>
+  <div class="controls">
+    <div class="control-group">
+      <select id="measureSelect">
+        <option value="sales">Sales</option>
+        <option value="quantity">Quantity</option>
+      </select>
+      <button onclick="changeMeasure()">Change Measure</button>
+    </div>
+    <div class="control-group">
+      <select id="dimensionSelect">
+        <option value="product">Product</option>
+        <option value="region">Region</option>
+        <option value="date">Date</option>
+      </select>
+      <button onclick="changeDimension()">Change Dimension</button>
+    </div>
+    <div class="control-group">
+      <select id="aggregationSelect">
+        <option value="sum">Sum</option>
+        <option value="avg">Average</option>
+        <option value="count">Count</option>
+        <option value="min">Min</option>
+        <option value="max">Max</option>
+      </select>
+      <button onclick="changeAggregation()">Change Aggregation</button>
+    </div>
+  </div>
+
+
+  <!-- Data Operations -->
+
+  <!-- Export Operations -->
+  <div class="section-title">Export:</div>
+  <div class="controls">
+    <button onclick="handleExportHTML()">Export HTML</button>
+    <button onclick="handleExportPDF()">Export PDF</button>
+    <button onclick="handleExportExcel()">Export Excel</button>
+    <button onclick="handlePrint()">Print</button>
+  </div>
+
+  <!-- <pivot-head id="pivotTable"></pivot-head> -->
+  <pivot-head id="pivotTable" enable-drag-rows enable-drag-columns>
+  </pivot-head>
+  <div id="customView">
+    <h2>Pivot Table</h2>
+    <div id="myTable"></div>
+  </div>
+
+  <!-- Pagination Controls -->
+  <div class="section-title">Pagination Controls:</div>
+<div class="controls">
+  <div class="control-group">
+    <label for="paginationField">Rows per page:</label>
+    <select id="paginationField">
+      <option value="2">2</option>
+      <option value="4" selected>4</option>
+      <option value="6">6</option>
+      <option value="8">8</option>
+      <option value="10">10</option>
+    </select>
+  </div>
+  
+  <div class="control-group">
+    <button id="prevPageBtn">Previous Page</button>
+    <button id="nextPageBtn">Next Page</button>
+  </div>
+</div>
+  <div class="debug-view">
+    <h3>Current State:</h3>
+    <pre id="stateDebug"></pre>
+  </div>
+  <script type="module" src="index.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "new",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "vite"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@mindfiredigital/pivothead-web-component": "workspace:*",
+    "serve": "^14.2.4",
+    "vite": "^4.3.9"
+  }
+}

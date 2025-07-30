@@ -7,8 +7,6 @@ describe('PivotEngine Draggable Feature', () => {
 
   beforeEach(() => {
     config = {
-      dimensions: [],
-      defaultAggregation: 'sum',
       data: [
         { id: 1, name: 'John', age: 30 },
         { id: 2, name: 'Jane', age: 25 },
@@ -22,105 +20,176 @@ describe('PivotEngine Draggable Feature', () => {
       ],
       rows: [],
       measures: [],
-      groupConfig: null,
+      dimensions: [],
+      defaultAggregation: 'sum',
     };
     engine = new PivotEngine(config);
+
+    // Manually set up row and column groups for testing this specific feature
+    const rowGroups = config.data.map((item, index) => ({
+      key: `row-${index}`,
+      items: [item],
+      aggregates: {},
+      level: 0,
+    }));
+    engine.setRowGroups(rowGroups);
+
+    const columnGroups = config.columns.map((column, index) => ({
+      key: `col-${index}`,
+      items: [column],
+      aggregates: {},
+      level: 0,
+    }));
+    engine.setColumnGroups(columnGroups);
   });
 
   describe('dragRow', () => {
-    it('should move a row from one index to another', () => {
-      engine.dragRow(1, 3);
+    it('should move a row group from one index to another', () => {
+      // initial order of keys: row-0, row-1, row-2, row-3
+      engine.dragRow(1, 3); // move row-1 to the end
       const state = engine.getState();
-      expect(state.data).toEqual([
-        { id: 1, name: 'John', age: 30 },
-        { id: 3, name: 'Bob', age: 35 },
-        { id: 4, name: 'Alice', age: 28 },
-        { id: 2, name: 'Jane', age: 25 },
+
+      // expected order of keys: row-0, row-2, row-3, row-1
+      expect(state.rowGroups.map(g => g.key)).toEqual([
+        'row-0',
+        'row-2',
+        'row-3',
+        'row-1',
+      ]);
+
+      // For more robust testing, check the content
+      expect(state.rowGroups).toEqual([
+        {
+          key: 'row-0',
+          items: [{ id: 1, name: 'John', age: 30 }],
+          aggregates: {},
+          level: 0,
+        },
+        {
+          key: 'row-2',
+          items: [{ id: 3, name: 'Bob', age: 35 }],
+          aggregates: {},
+          level: 0,
+        },
+        {
+          key: 'row-3',
+          items: [{ id: 4, name: 'Alice', age: 28 }],
+          aggregates: {},
+          level: 0,
+        },
+        {
+          key: 'row-1',
+          items: [{ id: 2, name: 'Jane', age: 25 }],
+          aggregates: {},
+          level: 0,
+        },
       ]);
     });
 
-    // it('should update rowSizes when dragging rows', () => {
-    //   engine.dragRow(0, 2);
-    //   const state = engine.getState();
-    //   expect(state.rowSizes).toEqual([
-    //     { index: 1, height: 40 },
-    //     { index: 2, height: 40 },
-    //     { index: 0, height: 40 },
-    //     { index: 3, height: 40 },
-    //   ]);
-    // });
-
-    it('should not change data when dragging to the same index', () => {
-      const initialState = engine.getState();
+    it('should not change row groups when dragging to the same index', () => {
+      const initialRowGroups = [...engine.getState().rowGroups];
       engine.dragRow(1, 1);
-      const newState = engine.getState();
-      expect(newState.data).toEqual(initialState.data);
+      const newRowGroups = engine.getState().rowGroups;
+      expect(newRowGroups).toEqual(initialRowGroups);
     });
 
     it('should handle invalid indices gracefully', () => {
-      const initialState = engine.getState();
+      const initialRowGroups = [...engine.getState().rowGroups];
       engine.dragRow(-1, 5);
-      const newState = engine.getState();
-      expect(newState.data).toEqual(initialState.data);
+      const newRowGroups = engine.getState().rowGroups;
+      expect(newRowGroups).toEqual(initialRowGroups);
     });
   });
 
   describe('dragColumn', () => {
-    it('should move a column from one index to another', () => {
-      engine.dragColumn(0, 2);
+    it('should move a column group from one index to another', () => {
+      // initial order of keys: col-0, col-1, col-2
+      engine.dragColumn(0, 2); // move col-0 to the end
       const state = engine.getState();
-      expect(state.columns).toEqual([
-        { uniqueName: 'name', caption: 'Name' },
-        { uniqueName: 'age', caption: 'Age' },
-        { uniqueName: 'id', caption: 'ID' },
+
+      // expected order of keys: col-1, col-2, col-0
+      expect(state.columnGroups.map(g => g.key)).toEqual([
+        'col-1',
+        'col-2',
+        'col-0',
+      ]);
+
+      expect(state.columnGroups).toEqual([
+        {
+          key: 'col-1',
+          items: [{ uniqueName: 'name', caption: 'Name' }],
+          aggregates: {},
+          level: 0,
+        },
+        {
+          key: 'col-2',
+          items: [{ uniqueName: 'age', caption: 'Age' }],
+          aggregates: {},
+          level: 0,
+        },
+        {
+          key: 'col-0',
+          items: [{ uniqueName: 'id', caption: 'ID' }],
+          aggregates: {},
+          level: 0,
+        },
       ]);
     });
 
-    it('should not change columns when dragging to the same index', () => {
-      const initialState = engine.getState();
+    it('should not change column groups when dragging to the same index', () => {
+      const initialColumnGroups = [...engine.getState().columnGroups];
       engine.dragColumn(1, 1);
-      const newState = engine.getState();
-      expect(newState.columns).toEqual(initialState.columns);
+      const newColumnGroups = engine.getState().columnGroups;
+      expect(newColumnGroups).toEqual(initialColumnGroups);
     });
 
     it('should handle invalid indices gracefully', () => {
-      const initialState = engine.getState();
+      const initialColumnGroups = [...engine.getState().columnGroups];
       engine.dragColumn(-1, 5);
-      const newState = engine.getState();
-      expect(newState.columns).toEqual(initialState.columns);
+      const newColumnGroups = engine.getState().columnGroups;
+      expect(newColumnGroups).toEqual(initialColumnGroups);
     });
   });
 
   describe('dragRow and dragColumn interaction', () => {
-    it('should maintain correct data and column order after multiple drags', () => {
-      engine.dragRow(0, 3);
-      engine.dragColumn(1, 0);
+    it('should maintain correct row and column group order after multiple drags', () => {
+      engine.dragRow(0, 3); // move row-0 to the end -> [1, 2, 3, 0]
+      engine.dragColumn(1, 0); // move col-1 to the start -> [1, 0, 2]
       const state = engine.getState();
-      expect(state.data).toEqual([
-        { id: 2, name: 'Jane', age: 25 },
-        { id: 3, name: 'Bob', age: 35 },
-        { id: 4, name: 'Alice', age: 28 },
-        { id: 1, name: 'John', age: 30 },
+
+      expect(state.rowGroups.map(g => g.key)).toEqual([
+        'row-1',
+        'row-2',
+        'row-3',
+        'row-0',
       ]);
-      expect(state.columns).toEqual([
-        { uniqueName: 'name', caption: 'Name' },
-        { uniqueName: 'id', caption: 'ID' },
-        { uniqueName: 'age', caption: 'Age' },
+      expect(state.columnGroups.map(g => g.key)).toEqual([
+        'col-1',
+        'col-0',
+        'col-2',
       ]);
     });
   });
 
   describe('edge cases', () => {
     it('should handle dragging row to start of the list', () => {
-      engine.dragRow(3, 0);
+      // initial order of keys: row-0, row-1, row-2, row-3
+      engine.dragRow(3, 0); // move row-3 to the start
       const state = engine.getState();
-      expect(state.data[0]).toEqual({ id: 4, name: 'Alice', age: 28 });
+
+      // expected order of keys: row-3, row-0, row-1, row-2
+      expect(state.rowGroups[0].key).toBe('row-3');
+      expect(state.rowGroups[0].items[0].id).toBe(4);
     });
 
-    it('should handle dragging column to end of the list', () => {
-      engine.dragColumn(0, 2);
+    it('should handle dragging column group to end of the list', () => {
+      // initial order of keys: col-0, col-1, col-2
+      engine.dragColumn(0, 2); // move col-0 to the end
       const state = engine.getState();
-      expect(state.columns[2]).toEqual({ uniqueName: 'id', caption: 'ID' });
+
+      // expected order of keys: col-1, col-2, col-0
+      expect(state.columnGroups[2].key).toBe('col-0');
+      expect(state.columnGroups[2].items[0].uniqueName).toBe('id');
     });
   });
 });

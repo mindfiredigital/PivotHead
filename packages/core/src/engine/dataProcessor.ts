@@ -12,8 +12,7 @@ export function processData<T extends Record<string, any>>(
   sortConfig: SortConfig | null = null,
   groupConfig: GroupConfig | null = null
 ): ProcessedDataResult<T> {
-  let processedData = [...config.data];
-
+  let processedData = [...(config.data || [])];
   if (sortConfig) {
     processedData = applySort(processedData, [sortConfig]);
   }
@@ -26,7 +25,7 @@ export function processData<T extends Record<string, any>>(
     groups = createGroups(processedData, fields, grouper);
   }
 
-  return { data: processedData, groups };
+  return { rawData: processedData, groups };
 }
 
 function createGroups<T extends Record<string, any>>(

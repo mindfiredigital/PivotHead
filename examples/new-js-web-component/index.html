@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="/src/style.css">
+  <title>Vite App</title>
+</head>
+
+<body>
+
+  <div class="dropdown-container">
+    <button class="main-button">
+      <span class="icon">🖉</span>
+      Format
+    </button>
+    <div class="dropdown-menu">
+      <button class="dropdown-item" onclick="openModal('modal1')">
+        <span class="icon">💲</span> Format cells
+      </button>
+      <button class="dropdown-item" onclick="openModal('modal2')">
+        <span class="icon">✏️</span> Conditional formatting
+      </button>
+    </div>
+  </div>
+
+  <!-- ✅ START: New Export Dropdown -->
+  <div class="dropdown-container">
+    <button class="main-button">
+      <span class="icon">📥</span>
+      Export
+    </button>
+    <div class="dropdown-menu">
+      <button class="dropdown-item" onclick="handleExport('html')">
+        <span class="icon">📄</span> Export to HTML
+      </button>
+      <button class="dropdown-item" onclick="handleExport('pdf')">
+        <span class="icon">📜</span> Export to PDF
+      </button>
+      <button class="dropdown-item" onclick="handleExport('excel')">
+        <span class="icon">📊</span> Export to Excel
+      </button>
+      <button class="dropdown-item" onclick="handleExport('print')">
+        <span class="icon">🖨️</span> Print
+      </button>
+    </div>
+  </div>
+  <!-- ✅ END: New Export Dropdown -->
+
+  <div class="toolbar-button-container">
+    <button class="main-button" onclick="openFieldsModal()">
+      <span class="icon">⚙️</span>
+      Fields
+    </button>
+  </div>
+
+  <!-- Format Cells Modal -->
+  <div id="modal1" class="modal">
+    <div class="modal-content">
+      <h2>Format cells</h2>
+
+      <!-- Field selector -->
+      <div class="form-group">
+        <label>Choose Field</label>
+        <select id="field-select">
+          <option value="sales">Sales</option>
+          <option value="quantity">Quantity</option>
+          <option value="date">Date</option>
+        </select>
+      </div>
+
+      <!-- Format type -->
+      <div class="form-group">
+        <label>Format Type</label>
+        <select id="format-type">
+          <option value="number">Number</option>
+          <option value="currency">Currency</option>
+          <option value="percentage">Percentage</option>
+          <option value="date">Date</option>
+        </select>
+      </div>
+
+      <!-- Decimal places -->
+      <div class="form-group">
+        <label>Decimal Places</label>
+        <select id="decimal-places">
+          <option value="0">0</option>
+          <option value="1">1</option>
+          <option value="2" selected>2</option>
+          <option value="3">3</option>
+        </select>
+      </div>
+
+      <!-- Currency symbol -->
+      <div class="form-group" id="currency-symbol-group">
+        <label>Currency Symbol (ISO Code)</label>
+        <input type="text" id="currency-code" placeholder="USD" />
+      </div>
+
+      <!-- Locale -->
+      <div class="form-group">
+        <label>Locale</label>
+        <input type="text" id="locale-input" placeholder="en-US" />
+      </div>
+
+      <div class="modal-actions">
+        <button class="apply-btn" onclick="applyFormatting()">APPLY</button>
+        <button class="cancel-btn" onclick="closeModal('modal1')">CANCEL</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="modal2" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('modal2')">&times;</span>
+      <h3>Conditional Formatting</h3>
+      <div style="border-top: 1px solid #ccc; margin-top: 10px; padding-top: 15px;">
+
+        <div style="margin-bottom: 10px;">
+          <label><strong>Value:</strong></label><br />
+          <select>
+            <option>All values</option>
+            <option>Specific column</option>
+            <option>Specific row</option>
+          </select>
+          <select>
+            <option>Greater than</option>
+            <option>Less than</option>
+            <option>Equal to</option>
+            <option>Not equal to</option>
+          </select>
+          <input type="number" placeholder="Enter value" />
+        </div>
+
+        <div style="margin-bottom: 10px;">
+          <label><strong>Format:</strong></label><br />
+          <select>
+            <option>Arial</option>
+            <option>Verdana</option>
+            <option>Times New Roman</option>
+          </select>
+          <select>
+            <option>10px</option>
+            <option>12px</option>
+            <option>14px</option>
+            <option>16px</option>
+          </select>
+          <input type="text" placeholder="Custom text (optional)" />
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+          <button onclick="applyFormatting()">Apply</button>
+          <button onclick="closeModal('modal2')">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-fields" class="modal">
+    <div class="modal-content modal-large">
+      <h2>Fields</h2>
+      <p class="modal-subtitle">
+        Select dimensions and measures to build your report.
+      </p>
+
+      <div class="field-config-area">
+        <!-- Column for Rows and Columns configuration -->
+        <div class="field-config-column">
+          <div class="field-config-box">
+            <h3>Rows</h3>
+            <select id="row-dimension-select"></select>
+          </div>
+          <div class="field-config-box">
+            <h3>Columns</h3>
+            <select id="column-dimension-select"></select>
+          </div>
+        </div>
+
+        <!-- Column for Values (Measures) configuration -->
+        <div class="field-config-column">
+          <div class="field-config-box">
+            <h3>Values (Measures)</h3>
+            <div id="measure-checkbox-container">
+              <!-- Checkboxes will be dynamically inserted here -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="apply-btn" onclick="applyFieldChanges()">APPLY</button>
+        <button class="cancel-btn" onclick="closeModal('modal-fields')">
+          CANCEL
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="myTable">
+  </div>
+
+  <pivot-head id="pivot"></pivot-head>
+  <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>

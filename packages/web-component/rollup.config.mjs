@@ -20,8 +20,15 @@ export default defineConfig({
     resolve(),
     typescript({
       tsconfig: './tsconfig.json',
-      declaration: true,
-      declarationDir: './dist'
+      // declaration: true,
+      // declarationDir: './dist',
+      // outDir: './dist',
+      // compilerOptions: {
+      //   rootDir: './src',
+      //   declarationDir: './dist',
+      //   outDir: './dist'
+      // },
+      exclude: ['node_modules/**', 'dist/**']
     })
   ],
   external: ['@mindfiredigital/pivothead']

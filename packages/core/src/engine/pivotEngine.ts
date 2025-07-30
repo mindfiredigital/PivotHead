@@ -12,6 +12,7 @@ import {
   SortConfig,
   FilterConfig,
   PaginationConfig,
+  DataHandlingMode,
 } from '../types/interfaces';
 import { calculateAggregates } from './aggregator';
 import { processData } from './dataProcessor';
@@ -65,6 +66,8 @@ export class PivotEngine<T extends Record<string, any>> {
   private initializeState(config: PivotTableConfig<T>): PivotTableState<T> {
     return {
       data: config.data || [],
+      dataHandlingMode: 'processed',
+      rawData: config.data || [],
       processedData: { headers: [], rows: [], totals: {} },
       rows: config.rows || [],
       columns: config.columns || [],
@@ -81,6 +84,7 @@ export class PivotEngine<T extends Record<string, any>> {
       columnWidths: {},
       isResponsive: config.isResponsive ?? true,
       rowGroups: [],
+
       columnGroups: [],
       filterConfig: [],
       paginationConfig: {
@@ -90,7 +94,6 @@ export class PivotEngine<T extends Record<string, any>> {
       },
     };
   }
-
   /**
    * Loads data from a file or URL.
    **/
@@ -98,25 +101,30 @@ export class PivotEngine<T extends Record<string, any>> {
     if (this.config.dataSource) {
       const { type, url, file } = this.config.dataSource;
       if (type === 'remote' && url) {
-        this.state.data = await this.fetchRemoteData(url);
+        this.state.rawData = await this.fetchRemoteData(url);
       } else if (type === 'file' && file) {
-        this.state.data = await this.readFileData(file);
+        this.state.rawData = await this.readFileData(file);
       } else {
         console.error('Invalid data source configuration');
       }
     } else if (this.config.data) {
-      this.state.data = this.config.data;
+      this.state.rawData = this.config.data;
     }
 
     // Initialize row sizes
-    this.state.rowSizes = this.initializeRowSizes(this.state.data);
+    this.state.rowSizes = this.initializeRowSizes(this.state.rawData);
 
     // Process data after loading
-    this.state.processedData = this.processData(this.state.data);
+    this.state.processedData = this.generateProcessedDataForDisplay();
 
     if (this.state.groupConfig) {
       this.applyGrouping();
     }
+  }
+
+  public setDataHandlingMode(mode: DataHandlingMode) {
+    this.state.dataHandlingMode = mode;
+    this.refreshData();
   }
 
   /**
@@ -128,6 +136,7 @@ export class PivotEngine<T extends Record<string, any>> {
   private async fetchRemoteData(url: string): Promise<T[]> {
     try {
       const response = await fetch(url);
+
       if (!response.ok) {
         throw new Error(`Failed to fetch data from ${url}`);
       }
@@ -176,11 +185,11 @@ export class PivotEngine<T extends Record<string, any>> {
    * @returns {ProcessedData} The processed data including headers, rows, and totals.
    * @private
    */
-  private processData(data: T[]): ProcessedData {
+  private generateProcessedDataForDisplay(): ProcessedData {
     return {
       headers: this.generateHeaders(),
-      rows: this.generateRows(data),
-      totals: this.calculateTotals(data),
+      rows: this.generateRows(this.state.rawData),
+      totals: this.calculateTotals(this.state.rawData),
     };
   }
 
@@ -190,11 +199,17 @@ export class PivotEngine<T extends Record<string, any>> {
    * @private
    */
   private generateHeaders(): string[] {
+    const useUniqueName = this.state.dataHandlingMode === 'raw';
+
     const rowHeaders = this.state.rows
-      ? this.state.rows.map(r => r.caption || r.uniqueName)
+      ? this.state.rows.map(r =>
+          useUniqueName ? r.uniqueName : r.caption || r.uniqueName
+        )
       : [];
     const columnHeaders = this.state.columns
-      ? this.state.columns.map(c => c.caption || c.uniqueName)
+      ? this.state.columns.map(c =>
+          useUniqueName ? c.uniqueName : c.caption || c.uniqueName
+        )
       : [];
     return [...rowHeaders, ...columnHeaders];
   }
@@ -270,7 +285,7 @@ export class PivotEngine<T extends Record<string, any>> {
    */
   public setMeasures(measureFields: MeasureConfig[]) {
     this.state.selectedMeasures = measureFields;
-    this.state.processedData = this.processData(this.state.data);
+    this.state.processedData = this.generateProcessedDataForDisplay();
     this.updateAggregates();
   }
 
@@ -281,8 +296,9 @@ export class PivotEngine<T extends Record<string, any>> {
    */
   public setDimensions(dimensionFields: Dimension[]) {
     this.state.selectedDimensions = dimensionFields;
-    this.state.processedData = this.processData(this.state.data);
+    this.state.processedData = this.generateProcessedDataForDisplay();
     this.updateAggregates();
+    this.refreshData();
   }
 
   /**
@@ -292,8 +308,30 @@ export class PivotEngine<T extends Record<string, any>> {
    */
   public setAggregation(type: AggregationType) {
     this.state.selectedAggregation = type;
-    this.state.processedData = this.processData(this.state.data);
+    this.state.processedData = this.generateProcessedDataForDisplay();
     this.updateAggregates();
+    this.refreshData();
+  }
+
+  /**
+   * Sets the row groups for the pivot table.
+   * @param {Group[]} rowGroups - The row groups to set.
+   * @public
+   */
+  public setRowGroups(rowGroups: Group[]) {
+    this.state.rowGroups = rowGroups;
+    this.state.processedData = this.generateProcessedDataForDisplay();
+    this.updateAggregates();
+  }
+
+  /**
+   * Sets the column groups for the pivot table.
+   * @param {Group[]} columnGroups - The column groups to set.
+   * @public
+   */
+  public setColumnGroups(columnGroups: Group[]) {
+    this.state.columnGroups = columnGroups;
+    this.state.processedData = this.generateProcessedDataForDisplay();
     this.updateAggregates();
   }
 
@@ -361,8 +399,11 @@ export class PivotEngine<T extends Record<string, any>> {
   }
 
   private applySort() {
-    const sortedData = this.sortData(this.state.data, this.state.sortConfig[0]);
-    this.state.data = sortedData;
+    const sortedData = this.sortData(
+      this.state.rawData,
+      this.state.sortConfig[0]
+    );
+    this.state.rawData = sortedData;
 
     if (this.state.groups.length > 0) {
       this.state.groups = this.sortGroups(
@@ -371,7 +412,7 @@ export class PivotEngine<T extends Record<string, any>> {
       );
     }
 
-    this.state.processedData = this.processData(this.state.data);
+    this.state.processedData = this.generateProcessedDataForDisplay();
     this.updateAggregates();
   }
 
@@ -452,7 +493,7 @@ export class PivotEngine<T extends Record<string, any>> {
    * Applies grouping to the pivot table data.
    * @private
    */
-  private applyGrouping() {
+  private applyGrouping(dataOverride?: T[]) {
     if (!this.state.groupConfig) return;
 
     const { rowFields, columnFields, grouper } = this.state.groupConfig;
@@ -462,82 +503,25 @@ export class PivotEngine<T extends Record<string, any>> {
       return;
     }
 
-    const { data, groups } = processData(
-      this.config,
+    // Use provided data or fall back to config data
+    const dataToUse = dataOverride || this.config.data || [];
+
+    const tempConfig = {
+      ...this.config,
+      data: dataToUse,
+    };
+
+    const { rawData, groups } = processData(
+      tempConfig,
       this.state.sortConfig[0] || null,
       this.state.groupConfig
     );
 
-    this.state.data = data;
+    this.state.rawData = rawData;
     this.state.groups = groups;
     this.updateAggregates();
-    this.state.processedData = this.processData(this.state.data);
-  }
 
-  /**
-   * Creates groups based on the specified fields and grouper function.
-   * @param {T[]} data - The data to group.
-   * @param {string[]} fields - The fields to group by.
-   * @param {(item: T, fields: string[]) => string} grouper - The grouping function.
-   * @returns {Group[]} An array of grouped data.
-   * @private
-   */
-  private createGroups(
-    data: T[],
-    fields: string[],
-    grouper: (item: T, fields: string[]) => string
-  ): Group[] {
-    if (!fields || fields.length === 0 || !data) {
-      return [
-        {
-          key: 'All',
-          items: data || [],
-          aggregates: {},
-        },
-      ];
-    }
-
-    const groups: { [key: string]: Group } = {};
-
-    data.forEach(item => {
-      if (item && grouper) {
-        const key = grouper(item, fields);
-        if (!groups[key]) {
-          groups[key] = { key, items: [], subgroups: [], aggregates: {} };
-        }
-        groups[key].items.push(item);
-      }
-    });
-
-    if (fields.length > 1) {
-      Object.values(groups).forEach(group => {
-        if (group && group.items) {
-          group.subgroups = this.createGroups(
-            group.items,
-            fields.slice(1),
-            grouper
-          );
-        }
-      });
-    }
-
-    // Calculate aggregates for each group
-    Object.values(groups).forEach(group => {
-      if (group && group.items && this.state.measures) {
-        this.state.measures.forEach(measure => {
-          if (measure && measure.uniqueName) {
-            const aggregateKey = `${this.state.selectedAggregation}_${measure.uniqueName}`;
-            group.aggregates[aggregateKey] = calculateAggregates(
-              group.items,
-              measure.uniqueName as keyof T,
-              this.state.selectedAggregation as AggregationType
-            );
-          }
-        });
-      }
-    });
-
-    return Object.values(groups);
+    this.state.processedData = this.generateProcessedDataForDisplay();
   }
 
   /**
@@ -551,7 +535,7 @@ export class PivotEngine<T extends Record<string, any>> {
       this.applyGrouping();
     } else {
       this.state.groups = [];
-      this.state.processedData = this.processData(this.state.data);
+      this.state.processedData = this.generateProcessedDataForDisplay();
     }
   }
 
@@ -580,8 +564,8 @@ export class PivotEngine<T extends Record<string, any>> {
   public reset() {
     this.state = {
       ...this.state,
-      data: this.config.data || [],
-      processedData: this.processData(this.config.data || []),
+      rawData: this.config.data || [],
+      processedData: this.generateProcessedDataForDisplay(),
       sortConfig: [],
       rowSizes: this.initializeRowSizes(this.config.data || []),
       expandedRows: {},
@@ -628,138 +612,105 @@ export class PivotEngine<T extends Record<string, any>> {
 
   /**
    * Handles dragging a row to a new position.
+   * This method now correctly operates on state.rowGroups.
    * @param {number} fromIndex - The original index of the row.
    * @param {number} toIndex - The new index for the row.
    * @public
    */
   public dragRow(fromIndex: number, toIndex: number) {
-    // Prevent invalid indices
+    // Validate indices against the rowGroups array
     if (
-      fromIndex < 0 ||
-      toIndex < 0 ||
-      fromIndex >= this.state.data.length ||
-      toIndex >= this.state.data.length
+      !this.validateDragOperation(
+        fromIndex,
+        toIndex,
+        this.state.rowGroups.length
+      )
     ) {
-      console.warn('Invalid drag indices');
+      // The validateDragOperation already logs a warning, so we can just return.
       return;
     }
 
-    // Create new data array with reordered items
-    const newData = [...this.state.data];
-    const [removed] = newData.splice(fromIndex, 1);
-    newData.splice(toIndex, 0, removed);
+    // Create a new array from the existing row groups to avoid direct mutation
+    const newRowGroups = [...this.state.rowGroups];
 
-    // Update state
-    this.state.data = newData;
+    // Remove the item from its original position
+    const [movedGroup] = newRowGroups.splice(fromIndex, 1);
 
-    // Update row sizes while maintaining references
-    const newRowSizes = [...this.state.rowSizes];
-    const [removedSize] = newRowSizes.splice(fromIndex, 1);
-    newRowSizes.splice(toIndex, 0, removedSize);
+    // Insert the removed item into its new position
+    newRowGroups.splice(toIndex, 0, movedGroup);
 
-    // Update indices
-    this.state.rowSizes = newRowSizes.map((size, index) => ({
-      ...size,
-      index,
-    }));
+    // Update the state with the newly ordered array
+    this.state.rowGroups = newRowGroups;
 
-    // If groups exist, update group order
-    if (this.state.groups.length > 0) {
-      const newGroups = [...this.state.groups];
-      const [removedGroup] = newGroups.splice(fromIndex, 1);
-      newGroups.splice(toIndex, 0, removedGroup);
-      this.state.groups = newGroups;
-    }
-
-    // Refresh processed data and aggregates
-    this.state.processedData = this.processData(this.state.data);
-    this.updateAggregates();
-
-    // Emit change event if needed
+    // Optional: Call the onRowDragEnd callback if it's defined in the config
     if (typeof this.config.onRowDragEnd === 'function') {
-      this.config.onRowDragEnd(fromIndex, toIndex, this.state.data);
+      this.config.onRowDragEnd(fromIndex, toIndex, this.state.rowGroups);
     }
   }
+
   /**
    * Handles dragging a column to a new position.
+   * This method now correctly operates on state.columnGroups.
    * @param {number} fromIndex - The original index of the column.
    * @param {number} toIndex - The new index for the column.
    * @public
    */
   public dragColumn(fromIndex: number, toIndex: number): void {
-    // Validate indices
+    // Validate indices against the columnGroups array
     if (
-      !this.validateDragOperation(fromIndex, toIndex, this.state.columns.length)
+      !this.validateDragOperation(
+        fromIndex,
+        toIndex,
+        this.state.columnGroups.length
+      )
     ) {
-      console.error(
-        `Invalid column drag operation: from ${fromIndex} to ${toIndex}`
-      );
       return;
     }
 
     try {
-      // Create new columns array with reordered items
-      const newColumns = [...this.state.columns];
-      const [removed] = newColumns.splice(fromIndex, 1);
-      newColumns.splice(toIndex, 0, removed);
+      // Create a new array from the existing column groups
+      const newColumnGroups = [...this.state.columnGroups];
 
-      // Update column state
-      this.state.columns = newColumns;
+      // Remove the group from its original position
+      const [movedColumn] = newColumnGroups.splice(fromIndex, 1);
 
-      // Update column widths if they exist
-      if (Object.keys(this.state.columnWidths).length > 0) {
-        const newColumnWidths: Record<string, number> = {};
-        Object.keys(this.state.columnWidths).forEach((key, index) => {
-          if (index === fromIndex) {
-            newColumnWidths[newColumns[toIndex].uniqueName] =
-              this.state.columnWidths[key];
-          } else if (index === toIndex) {
-            newColumnWidths[newColumns[fromIndex].uniqueName] =
-              this.state.columnWidths[key];
-          } else {
-            newColumnWidths[key] = this.state.columnWidths[key];
-          }
-        });
-        this.state.columnWidths = newColumnWidths;
-      }
+      // Insert the removed group into its new position
+      newColumnGroups.splice(toIndex, 0, movedColumn);
 
-      // Update column groups if they exist
-      if (this.state.columnGroups.length > 0) {
-        const newColumnGroups = [...this.state.columnGroups];
-        const [removedGroup] = newColumnGroups.splice(fromIndex, 1);
-        newColumnGroups.splice(toIndex, 0, removedGroup);
-        this.state.columnGroups = newColumnGroups;
-      }
+      // Update the state with the newly ordered array
+      this.state.columnGroups = newColumnGroups;
 
-      // Refresh processed data and aggregates
-      this.state.processedData = this.processData(this.state.data);
-      this.updateAggregates();
-
-      // Emit change event if needed
+      // Call callback if provided
       if (typeof this.config.onColumnDragEnd === 'function') {
-        const columnsWithCaptions = this.state.columns.map(column => ({
-          ...column,
-          caption: column.caption || column.uniqueName,
+        // Map Group[] to { uniqueName, caption }[] before passing to callback
+        const mappedColumnGroups = newColumnGroups.map(group => ({
+          uniqueName: (group as any).uniqueName ?? group.key ?? '',
+          caption: (group as any).caption ?? group.key ?? '',
         }));
-        this.config.onColumnDragEnd(fromIndex, toIndex, columnsWithCaptions);
+        this.config.onColumnDragEnd(fromIndex, toIndex, mappedColumnGroups);
       }
     } catch (error) {
       console.error('Error during column drag operation:', error);
     }
   }
 
+  // Ensure this validation method also prevents dragging to the same spot
   private validateDragOperation(
     fromIndex: number,
     toIndex: number,
     length: number
   ): boolean {
-    return (
-      fromIndex >= 0 &&
-      toIndex >= 0 &&
-      fromIndex < length &&
-      toIndex < length &&
-      fromIndex !== toIndex
-    );
+    if (fromIndex === toIndex) {
+      return false; // No operation needed, not an error
+    }
+    const isValid =
+      fromIndex >= 0 && toIndex >= 0 && fromIndex < length && toIndex < length;
+    if (!isValid) {
+      console.warn(
+        `Invalid drag indices: from ${fromIndex} to ${toIndex} with length ${length}`
+      );
+    }
+    return isValid;
   }
 
   /**
@@ -782,7 +733,17 @@ export class PivotEngine<T extends Record<string, any>> {
       ...this.paginationConfig,
       ...config,
     };
+
     this.refreshData();
+  }
+
+  /**
+   * Returns the current pagination configuration
+   * @returns {PaginationConfig}
+   * @public
+   */
+  public getPagination(): PaginationConfig {
+    return this.paginationConfig;
   }
 
   /**
@@ -791,25 +752,23 @@ export class PivotEngine<T extends Record<string, any>> {
    */
   private refreshData() {
     // Store original data
-    const originalData = [...this.state.data];
-
+    const originalData = [...this.state.rawData];
     // Apply filters first
     let filteredData = this.filterData(originalData);
-
     // Update total pages based on filtered data
     this.paginationConfig.totalPages = Math.ceil(
       filteredData.length / this.paginationConfig.pageSize
     );
-
     // Apply pagination
     filteredData = this.paginateData(filteredData);
 
     // Update state with filtered and paginated data
-    this.state.processedData = this.processData(filteredData);
-
+    this.state.rawData = filteredData; // Add this line
     if (this.state.groupConfig) {
-      this.applyGrouping();
+      // Pass the filtered data to grouping instead of using config
+      this.applyGrouping(filteredData);
     }
+    this.state.processedData = this.generateProcessedDataForDisplay();
   }
 
   /**
@@ -908,5 +867,515 @@ export class PivotEngine<T extends Record<string, any>> {
    */
   public openPrintDialog(): void {
     PivotExportService.openPrintDialog(this.getState());
+  }
+
+  // Add these methods to your PivotEngine class to fix drag functionality
+
+  /**
+   * Handles dragging a data row (product) to a new position
+   * This method operates on the actual data items, not groups
+   * @param {number} fromIndex - The original index of the product in unique products list
+   * @param {number} toIndex - The new index for the product in unique products list
+   * @public
+   */
+  public dragDataRow(fromIndex: number, toIndex: number): void {
+    // Get unique products with proper type casting
+    const uniqueProducts = [
+      ...new Set(this.state.data.map((item: { product: any }) => item.product)),
+    ].filter((product): product is string => typeof product === 'string');
+
+    if (
+      !this.validateDragOperation(fromIndex, toIndex, uniqueProducts.length)
+    ) {
+      return;
+    }
+
+    try {
+      // Get the product names being moved
+      const fromProduct = uniqueProducts[fromIndex];
+      const toProduct = uniqueProducts[toIndex];
+
+      console.log(`Reordering products: ${fromProduct} -> ${toProduct}`);
+
+      // Create a new data array with reordered products
+      const newData = [...this.state.data];
+
+      // Create a mapping of desired product order
+      const reorderedProducts = [...uniqueProducts];
+      const [movedProduct] = reorderedProducts.splice(fromIndex, 1);
+      reorderedProducts.splice(toIndex, 0, movedProduct);
+
+      // Sort the data array based on the new product order
+      newData.sort((a, b) => {
+        const aIndex = reorderedProducts.indexOf(a.product as string);
+        const bIndex = reorderedProducts.indexOf(b.product as string);
+        return aIndex - bIndex;
+      });
+
+      // Update the state
+      this.state.data = newData;
+      this.state.rawData = newData;
+
+      // Regenerate processed data
+      this.state.processedData = this.generateProcessedDataForDisplay();
+
+      // Update aggregates if groups exist
+      if (this.state.groups.length > 0) {
+        this.updateAggregates();
+      }
+
+      // Call callback if provided
+      if (typeof this.config.onRowDragEnd === 'function') {
+        this.config.onRowDragEnd(fromIndex, toIndex, this.state.rowGroups);
+      }
+    } catch (error) {
+      console.error('Error during data row drag operation:', error);
+    }
+  }
+
+  /**
+   * Handles dragging a data column (region) to a new position
+   * This method operates on the actual data structure, not groups
+   * @param {number} fromIndex - The original index of the region
+   * @param {number} toIndex - The new index for the region
+   * @public
+   */
+  public dragDataColumn(fromIndex: number, toIndex: number): void {
+    // Get unique regions with proper type casting
+    const uniqueRegions = [
+      ...new Set(this.state.data.map((item: { region: any }) => item.region)),
+    ].filter((region): region is string => typeof region === 'string');
+
+    if (!this.validateDragOperation(fromIndex, toIndex, uniqueRegions.length)) {
+      return;
+    }
+
+    try {
+      // Get the region names being moved
+      const fromRegion = uniqueRegions[fromIndex];
+      const toRegion = uniqueRegions[toIndex];
+
+      console.log(`Reordering regions: ${fromRegion} -> ${toRegion}`);
+
+      // Create a new data array with reordered regions
+      const newData = [...this.state.data];
+
+      // Create a mapping of desired region order
+      const reorderedRegions = [...uniqueRegions];
+      const [movedRegion] = reorderedRegions.splice(fromIndex, 1);
+      reorderedRegions.splice(toIndex, 0, movedRegion);
+
+      // Update columns configuration if it exists
+      if (this.state.columns && this.state.columns.length > 0) {
+        const newColumns = [...this.state.columns];
+        // Find and reorder column configurations that match regions
+        newColumns.sort((a, b) => {
+          const aIndex = reorderedRegions.indexOf(a.uniqueName);
+          const bIndex = reorderedRegions.indexOf(b.uniqueName);
+          if (aIndex === -1) return 1;
+          if (bIndex === -1) return -1;
+          return aIndex - bIndex;
+        });
+        this.state.columns = newColumns;
+      }
+
+      // Update the state
+      this.state.data = newData;
+      this.state.rawData = newData;
+
+      // Regenerate processed data
+      this.state.processedData = this.generateProcessedDataForDisplay();
+
+      // Update aggregates if groups exist
+      if (this.state.groups.length > 0) {
+        this.updateAggregates();
+      }
+
+      // Call callback if provided
+      if (typeof this.config.onColumnDragEnd === 'function') {
+        const mappedColumns: { uniqueName: string; caption: string }[] =
+          reorderedRegions.map(region => ({
+            uniqueName: region,
+            caption: region,
+          }));
+        this.config.onColumnDragEnd(fromIndex, toIndex, mappedColumns);
+      }
+    } catch (error) {
+      console.error('Error during data column drag operation:', error);
+    }
+  }
+
+  /**
+   * Alternative method: Reorder products by their names directly
+   * This is more direct for your UI implementation
+   * @param {string} fromProduct - Name of the product being moved
+   * @param {string} toProduct - Name of the product to move before/after
+   * @param {'before' | 'after'} position - Whether to place before or after target
+   * @public
+   */
+  public reorderProductsByName(
+    fromProduct: string,
+    toProduct: string,
+    position: 'before' | 'after' = 'before'
+  ): void {
+    try {
+      const uniqueProducts = [
+        ...new Set(
+          this.state.data.map((item: { product: any }) => item.product)
+        ),
+      ];
+      const fromIndex = uniqueProducts.indexOf(fromProduct);
+      const toIndex = uniqueProducts.indexOf(toProduct);
+
+      if (fromIndex === -1 || toIndex === -1) {
+        console.warn('Invalid product names for reordering:', {
+          fromProduct,
+          toProduct,
+        });
+        return;
+      }
+
+      // Calculate the actual target index based on position
+      const actualToIndex = position === 'after' ? toIndex + 1 : toIndex;
+
+      // Use the existing dragDataRow method
+      this.dragDataRow(fromIndex, actualToIndex);
+    } catch (error) {
+      console.error('Error reordering products by name:', error);
+    }
+  }
+
+  //swap logic
+
+  // Also add a method to get the custom region order:
+  public getCustomRegionOrder(): string[] | null {
+    return (this.state as any).customRegionOrder || null;
+  }
+
+  // GENERIC CORE ENGINE METHODS - Works with any field names
+
+  /**
+   * Generic method to swap data rows based on the configured row field
+   * Works with any field name (product, country, customer, etc.)
+   */
+  public swapDataRows(fromIndex: number, toIndex: number): void {
+    // Get the row field configuration
+    const rowField =
+      this.state.rows && this.state.rows.length > 0
+        ? this.state.rows[0] // Use first row field
+        : null;
+
+    if (!rowField) {
+      console.warn('No row field configured for swapping');
+      return;
+    }
+
+    const rowFieldName = rowField.uniqueName;
+    console.log(`Swapping rows based on field: ${rowFieldName}`);
+
+    // Get unique values for the row field
+    const uniqueRowValues = [
+      ...new Set(
+        this.state.data.map((item: { [x: string]: any }) => item[rowFieldName])
+      ),
+    ].filter(
+      (value): value is string =>
+        typeof value === 'string' && value !== null && value !== undefined
+    );
+
+    console.log(`Core swapDataRows called:`, {
+      fromIndex,
+      toIndex,
+      totalRows: uniqueRowValues.length,
+      fieldName: rowFieldName,
+      availableValues: uniqueRowValues,
+    });
+
+    if (
+      fromIndex < 0 ||
+      toIndex < 0 ||
+      fromIndex >= uniqueRowValues.length ||
+      toIndex >= uniqueRowValues.length
+    ) {
+      console.warn(`Invalid indices for row swap operation:`, {
+        fromIndex,
+        toIndex,
+        totalRows: uniqueRowValues.length,
+        fieldName: rowFieldName,
+      });
+      return;
+    }
+
+    if (fromIndex === toIndex) {
+      return; // No swap needed
+    }
+
+    try {
+      console.log(
+        `Swapping ${rowFieldName} values at indices ${fromIndex} and ${toIndex}`
+      );
+
+      // Get the values to swap
+      const fromValue = uniqueRowValues[fromIndex];
+      const toValue = uniqueRowValues[toIndex];
+
+      console.log(`Swapping ${rowFieldName}: ${fromValue} <-> ${toValue}`);
+
+      // Create new data array with swapped order
+      const newData = [...this.state.data];
+
+      // Create swapped value order
+      const swappedValues = [...uniqueRowValues];
+      swappedValues[fromIndex] = toValue;
+      swappedValues[toIndex] = fromValue;
+
+      // Sort data according to the new value order
+      newData.sort((a, b) => {
+        const aIndex = swappedValues.indexOf(a[rowFieldName] as string);
+        const bIndex = swappedValues.indexOf(b[rowFieldName] as string);
+        return aIndex - bIndex;
+      });
+
+      // Update the state
+      this.state.data = newData;
+      this.state.rawData = newData;
+
+      // Regenerate processed data
+      this.state.processedData = this.generateProcessedDataForDisplay();
+
+      // Update aggregates if groups exist
+      if (this.state.groups.length > 0) {
+        this.updateAggregates();
+      }
+
+      // Call callback if provided
+      if (typeof this.config.onRowDragEnd === 'function') {
+        this.config.onRowDragEnd(fromIndex, toIndex, this.state.rowGroups);
+      }
+
+      console.log(`Row swap completed successfully for field: ${rowFieldName}`);
+    } catch (error) {
+      console.error('Error during row swap operation:', error);
+    }
+  }
+
+  /**
+   * Generic method to swap data columns based on the configured column field
+   * Works with any field name (region, category, department, etc.)
+   */
+  public swapDataColumns(fromIndex: number, toIndex: number): void {
+    // Get the column field configuration
+    const columnField =
+      this.state.columns && this.state.columns.length > 0
+        ? this.state.columns[0] // Use first column field
+        : null;
+
+    if (!columnField) {
+      console.warn('No column field configured for swapping');
+      return;
+    }
+
+    const columnFieldName = columnField.uniqueName;
+    console.log(`Swapping columns based on field: ${columnFieldName}`);
+
+    // Get unique values for the column field
+    const uniqueColumnValues = [
+      ...new Set(
+        this.state.data.map(
+          (item: { [x: string]: any }) => item[columnFieldName]
+        )
+      ),
+    ].filter(
+      (value): value is string =>
+        typeof value === 'string' && value !== null && value !== undefined
+    );
+
+    console.log(`Core swapDataColumns called:`, {
+      fromIndex,
+      toIndex,
+      totalColumns: uniqueColumnValues.length,
+      fieldName: columnFieldName,
+      availableValues: uniqueColumnValues,
+    });
+
+    if (
+      fromIndex < 0 ||
+      toIndex < 0 ||
+      fromIndex >= uniqueColumnValues.length ||
+      toIndex >= uniqueColumnValues.length
+    ) {
+      console.warn(`Invalid indices for column swap operation:`, {
+        fromIndex,
+        toIndex,
+        totalColumns: uniqueColumnValues.length,
+        fieldName: columnFieldName,
+      });
+      return;
+    }
+
+    if (fromIndex === toIndex) {
+      return; // No swap needed
+    }
+
+    try {
+      console.log(
+        `Swapping ${columnFieldName} values at indices ${fromIndex} and ${toIndex}`
+      );
+
+      // Get the values to swap
+      const fromValue = uniqueColumnValues[fromIndex];
+      const toValue = uniqueColumnValues[toIndex];
+
+      console.log(`Swapping ${columnFieldName}: ${fromValue} <-> ${toValue}`);
+
+      // Create swapped value order
+      const swappedValues = [...uniqueColumnValues];
+      swappedValues[fromIndex] = toValue;
+      swappedValues[toIndex] = fromValue;
+
+      console.log(`New ${columnFieldName} order:`, swappedValues);
+
+      // Update columns configuration if it exists
+      if (this.state.columns && this.state.columns.length > 0) {
+        const newColumns = [...this.state.columns];
+
+        // Find and swap the column configurations
+        const fromColumnIndex = newColumns.findIndex(
+          col => col.uniqueName === fromValue
+        );
+        const toColumnIndex = newColumns.findIndex(
+          col => col.uniqueName === toValue
+        );
+
+        if (fromColumnIndex !== -1 && toColumnIndex !== -1) {
+          // Swap the column configurations
+          [newColumns[fromColumnIndex], newColumns[toColumnIndex]] = [
+            newColumns[toColumnIndex],
+            newColumns[fromColumnIndex],
+          ];
+          this.state.columns = newColumns;
+          console.log('Updated column configurations');
+        }
+      }
+
+      // Store the custom column order (generic key for any field)
+      (this.state as any).customColumnOrder = {
+        fieldName: columnFieldName,
+        order: swappedValues,
+      };
+
+      // Regenerate processed data with new column order
+      this.state.processedData = this.generateProcessedDataForDisplay();
+
+      // Update aggregates if groups exist
+      if (this.state.groups.length > 0) {
+        this.updateAggregates();
+      }
+
+      // Call callback if provided
+      if (typeof this.config.onColumnDragEnd === 'function') {
+        const mappedColumns: { uniqueName: string; caption: string }[] =
+          swappedValues.map(value => ({
+            uniqueName: value,
+            caption: value,
+          }));
+        this.config.onColumnDragEnd(fromIndex, toIndex, mappedColumns);
+      }
+
+      console.log(
+        `Column swap completed successfully for field: ${columnFieldName}`
+      );
+    } catch (error) {
+      console.error('Error during column swap operation:', error);
+    }
+  }
+
+  /**
+   * Generic method to get unique values for any field
+   * Utility method for UI components
+   */
+  public getUniqueFieldValues(fieldName: string): string[] {
+    return [
+      ...new Set(
+        this.state.data.map((item: { [x: string]: any }) => item[fieldName])
+      ),
+    ].filter(
+      (value): value is string =>
+        typeof value === 'string' && value !== null && value !== undefined
+    );
+  }
+
+  /**
+   * Generic method to get the configured row field name
+   */
+  public getRowFieldName(): string | null {
+    return this.state.rows && this.state.rows.length > 0
+      ? this.state.rows[0].uniqueName
+      : null;
+  }
+
+  /**
+   * Generic method to get the configured column field name
+   */
+  public getColumnFieldName(): string | null {
+    return this.state.columns && this.state.columns.length > 0
+      ? this.state.columns[0].uniqueName
+      : null;
+  }
+
+  /**
+   * Generic method to set custom field order
+   * Can be used by UI to store custom arrangements
+   */
+  public setCustomFieldOrder(
+    fieldName: string,
+    order: string[],
+    isRowField: boolean = true
+  ): void {
+    const customKey = isRowField ? 'customRowOrder' : 'customColumnOrder';
+    (this.state as any)[customKey] = {
+      fieldName,
+      order,
+    };
+
+    // Regenerate processed data
+    this.state.processedData = this.generateProcessedDataForDisplay();
+  }
+
+  /**
+   * Get ordered column values if custom order exists
+   */
+  public getOrderedColumnValues(): string[] | null {
+    const customColumnOrder = (this.state as any).customColumnOrder;
+    if (
+      customColumnOrder &&
+      customColumnOrder.order &&
+      customColumnOrder.order.length > 0
+    ) {
+      console.log(
+        'Engine returning custom column order:',
+        customColumnOrder.order
+      );
+      return customColumnOrder.order;
+    }
+    console.log('Engine has no custom column order');
+    return null;
+  }
+
+  /**
+   * Get ordered row values if custom order exists
+   */
+  public getOrderedRowValues(): string[] | null {
+    const customRowOrder = (this.state as any).customRowOrder;
+    if (
+      customRowOrder &&
+      customRowOrder.order &&
+      customRowOrder.order.length > 0
+    ) {
+      console.log('Engine returning custom row order:', customRowOrder.order);
+      return customRowOrder.order;
+    }
+    console.log('Engine has no custom row order');
+    return null;
   }
 }

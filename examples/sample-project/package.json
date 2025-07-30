@@ -1,0 +1,14 @@
+{
+  "name": "pivot-table-sample",
+  "version": "1.0.0",
+  "description": "A sample project to demonstrate the pivot table core logic.",
+  "main": "app.js",
+  "scripts": {
+    "start": "serve ../.."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "serve": "^14.2.4"
+  }
+}
