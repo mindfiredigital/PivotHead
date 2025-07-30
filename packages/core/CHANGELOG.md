@@ -1,5 +1,11 @@
 # @mindfiredigital/pivothead
 
+## 1.2.0
+
+### Minor Changes
+
+- fix unwanted private true (#160)
+
 ## 1.1.1
 
 ### Patch Changes
