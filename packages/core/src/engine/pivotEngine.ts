@@ -129,6 +129,34 @@ export class PivotEngine<T extends Record<string, any>> {
   }
 
   /**
+   * Gets the current data handling mode
+   * @returns {DataHandlingMode}
+   * @public
+   */
+  public getDataHandlingMode(): DataHandlingMode {
+    return this.state.dataHandlingMode;
+  }
+
+  /**
+   * Updates the engine's data source and applies current filters
+   * This method allows external components to update the data while preserving filtering
+   * @param {T[]} newData - The new data to use as the source
+   * @public
+   */
+  public updateDataSource(newData: T[]) {
+    // Update the config data (original source)
+    this.config.data = [...newData];
+
+    // Update the state data
+    this.state.data = [...newData];
+    this.state.rawData = [...newData];
+
+    // Refresh with current filters applied
+    this.refreshData();
+    this._emit(); // Notify subscribers after state change
+  }
+
+  /**
    * Loads data from a file or URL.
    * @param {File | string} source - The file or URL to load data from.
    * @public
@@ -187,10 +215,31 @@ export class PivotEngine<T extends Record<string, any>> {
    * @private
    */
   private generateProcessedDataForDisplay(): ProcessedData {
+    // For processed data mode, use sorted data if available
+    let dataToUse = this.state.rawData;
+
+    // If we're in processed mode and have a sort config, ensure data is sorted
+    if (
+      this.state.dataHandlingMode === 'processed' &&
+      this.state.sortConfig.length > 0
+    ) {
+      const sortConfig = this.state.sortConfig[0];
+
+      // If we have groups (which is common in processed mode),
+      // extract data from sorted groups to respect the sorted order
+      if (this.state.groups.length > 0) {
+        // Extract data from sorted groups in the correct order
+        dataToUse = this.state.groups.flatMap(group => group.items);
+      } else {
+        // If no groups, sort the raw data directly
+        dataToUse = this.sortData(this.state.rawData, sortConfig);
+      }
+    }
+
     return {
       headers: this.generateHeaders(),
-      rows: this.generateRows(this.state.rawData),
-      totals: this.calculateTotals(this.state.rawData),
+      rows: this.generateRows(dataToUse),
+      totals: this.calculateTotals(dataToUse),
     };
   }
 
@@ -422,29 +471,58 @@ export class PivotEngine<T extends Record<string, any>> {
   }
 
   private applySort() {
-    const sortedData = this.sortData(
-      this.state.rawData,
-      this.state.sortConfig[0]
-    );
-
-    this.state.rawData = sortedData;
-
-    if (this.state.groups.length > 0) {
-      this.state.groups = this.sortGroups(
-        this.state.groups,
+    if (this.state.dataHandlingMode === 'raw') {
+      // Sort raw data
+      const sortedData = this.sortData(
+        this.state.rawData,
         this.state.sortConfig[0]
       );
+
+      // Update both data and rawData for consistency
+      this.state.data = sortedData;
+      this.state.rawData = sortedData;
+
+      this.state.processedData = this.generateProcessedDataForDisplay();
+      this.updateAggregates();
+    } else {
+      // For processed data mode
+      if (this.state.groups.length > 0) {
+        // If we have groups, sort the grouped data
+        this.state.groups = this.sortGroups(
+          this.state.groups,
+          this.state.sortConfig[0]
+        );
+
+        // Regenerate processed data to reflect the sorted groups
+        this.state.processedData = this.generateProcessedDataForDisplay();
+        this.updateAggregates();
+      } else {
+        // If we don't have groups, but we're in processed mode,
+        // we need to sort the raw data and then regenerate processed data
+        const sortedData = this.sortData(
+          this.state.rawData,
+          this.state.sortConfig[0]
+        );
+        this.state.data = sortedData;
+        this.state.rawData = sortedData;
+
+        // Regenerate processed data to reflect the sorted data
+        this.state.processedData = this.generateProcessedDataForDisplay();
+        this.updateAggregates();
+      }
     }
 
-    this.state.processedData = this.generateProcessedDataForDisplay();
-    this.updateAggregates();
     this._emit(); // Notify subscribers of state change
   }
 
   private sortData(data: T[], sortConfig: SortConfig): T[] {
     return [...data].sort((a, b) => {
-      const aValue = this.getFieldValue(a, sortConfig);
-      const bValue = this.getFieldValue(b, sortConfig);
+      let aValue = this.getFieldValue(a, sortConfig);
+      let bValue = this.getFieldValue(b, sortConfig);
+
+      // Handle different data types for raw data sorting
+      if (typeof aValue === 'string') aValue = aValue.toLowerCase();
+      if (typeof bValue === 'string') bValue = bValue.toLowerCase();
 
       if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
       if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
@@ -452,7 +530,7 @@ export class PivotEngine<T extends Record<string, any>> {
     });
   }
 
-  private getFieldValue(item: T, sortConfig: SortConfig): number {
+  private getFieldValue(item: T, sortConfig: SortConfig): any {
     if (sortConfig.type === 'measure') {
       const measure = this.state.measures.find(
         m => m.uniqueName === sortConfig.field
@@ -461,15 +539,47 @@ export class PivotEngine<T extends Record<string, any>> {
         return measure.formula(item);
       }
     }
-    return item[sortConfig.field] as number;
+    return item[sortConfig.field];
   }
 
   private sortGroups(groups: Group[], sortConfig: SortConfig): Group[] {
     return [...groups].sort((a, b) => {
-      const aValue =
-        a.aggregates[`${sortConfig.aggregation}_${sortConfig.field}`] || 0;
-      const bValue =
-        b.aggregates[`${sortConfig.aggregation}_${sortConfig.field}`] || 0;
+      let aValue: any;
+      let bValue: any;
+
+      if (sortConfig.type === 'measure') {
+        // Sort by aggregated measure values
+        aValue =
+          a.aggregates[`${sortConfig.aggregation}_${sortConfig.field}`] || 0;
+        bValue =
+          b.aggregates[`${sortConfig.aggregation}_${sortConfig.field}`] || 0;
+      } else {
+        // Sort by dimension values (e.g., row field names like country, product, etc.)
+        // Extract the dimension value from the group key
+        const keys = a.key ? a.key.split('|') : [];
+        const bKeys = b.key ? b.key.split('|') : [];
+
+        // For row field sorting, use the first key (row field value)
+        // For column field sorting, use the second key (column field value)
+        const rowField = this.state.rows?.[0]?.uniqueName;
+        const columnField = this.state.columns?.[0]?.uniqueName;
+
+        if (sortConfig.field === rowField) {
+          aValue = keys[0] || '';
+          bValue = bKeys[0] || '';
+        } else if (sortConfig.field === columnField) {
+          aValue = keys[1] || '';
+          bValue = bKeys[1] || '';
+        } else {
+          // Fallback: try to find the field in the first item of each group
+          aValue = a.items[0]?.[sortConfig.field] || '';
+          bValue = b.items[0]?.[sortConfig.field] || '';
+        }
+
+        // Handle string comparison
+        if (typeof aValue === 'string') aValue = aValue.toLowerCase();
+        if (typeof bValue === 'string') bValue = bValue.toLowerCase();
+      }
 
       if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
       if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
@@ -488,7 +598,7 @@ export class PivotEngine<T extends Record<string, any>> {
         if (measure.formula && typeof measure.formula === 'function') {
           // Handle custom measures
           const formulaResults = group.items.map(item =>
-            measure.formula!(item)
+            measure.formula ? measure.formula(item) : 0
           );
           group.aggregates[aggregateKey] = calculateAggregates(
             formulaResults.map(value => ({ value })),
@@ -786,24 +896,57 @@ export class PivotEngine<T extends Record<string, any>> {
    * @private
    */
   private refreshData() {
-    // Store original data
-    const originalData = [...this.state.rawData];
-    // Apply filters first
-    let filteredData = this.filterData(originalData);
+    // Get the appropriate data source based on data handling mode
+    const originalData = this.getDataForCurrentMode();
+
+    let filteredData: T[];
+
+    // Check if we're filtering on aggregated measures in processed mode
+    if (
+      this.state.dataHandlingMode === 'processed' &&
+      this.hasAggregatedFilters()
+    ) {
+      // For aggregated filters, we need to filter the grouped data, not raw data
+      filteredData = this.filterProcessedData(originalData);
+    } else {
+      // For regular field filters, apply normal filtering
+      filteredData = this.filterData(originalData);
+    }
+
     // Update total pages based on filtered data
     this.paginationConfig.totalPages = Math.ceil(
       filteredData.length / this.paginationConfig.pageSize
     );
+
     // Apply pagination
     filteredData = this.paginateData(filteredData);
 
-    // Update state with filtered and paginated data
-    this.state.rawData = filteredData; // Add this line
-    if (this.state.groupConfig) {
-      // Pass the filtered data to grouping instead of using config
-      this.applyGrouping(filteredData);
+    // Update state based on data handling mode
+    if (this.state.dataHandlingMode === 'raw') {
+      // For raw mode, update the raw data directly
+      this.state.data = filteredData;
+      this.state.rawData = filteredData;
+      // Still need to regenerate processed data for display (headers depend on mode)
+      this.state.processedData = this.generateProcessedDataForDisplay();
+    } else {
+      // For processed mode, update the data and regenerate processed data
+      this.state.data = filteredData;
+      this.state.rawData = filteredData;
+      if (this.state.groupConfig) {
+        // Pass the filtered data to grouping instead of using config
+        this.applyGrouping(filteredData);
+      }
+      this.state.processedData = this.generateProcessedDataForDisplay();
     }
-    this.state.processedData = this.generateProcessedDataForDisplay();
+  }
+
+  /**
+   * Gets the appropriate data source based on the current data handling mode
+   * @private
+   */
+  private getDataForCurrentMode(): T[] {
+    // Always start from the original data stored in config
+    return [...(this.config.data || [])];
   }
 
   /**
@@ -1414,5 +1557,179 @@ export class PivotEngine<T extends Record<string, any>> {
     }
     console.log('Engine has no custom row order');
     return null;
+  }
+
+  /**
+   * Method to swap raw data rows by index
+   * This works directly with the raw data array regardless of pivot configuration
+   */
+  public swapRawDataRows(fromIndex: number, toIndex: number): void {
+    if (!this.state.data || this.state.data.length === 0) {
+      console.warn('No data available for raw row swap');
+      return;
+    }
+
+    if (
+      fromIndex < 0 ||
+      toIndex < 0 ||
+      fromIndex >= this.state.data.length ||
+      toIndex >= this.state.data.length
+    ) {
+      console.warn(`Invalid indices for raw row swap operation:`, {
+        fromIndex,
+        toIndex,
+        totalRows: this.state.data.length,
+      });
+      return;
+    }
+
+    if (fromIndex === toIndex) {
+      return; // No swap needed
+    }
+
+    try {
+      // Create a new data array with swapped rows
+      const newData = [...this.state.data];
+      const temp = newData[fromIndex];
+      newData[fromIndex] = newData[toIndex];
+      newData[toIndex] = temp;
+
+      // Update the state
+      this.state.data = newData;
+      this.state.rawData = newData;
+
+      // Regenerate processed data if needed
+      if (this.state.dataHandlingMode === 'raw') {
+        this.state.processedData = this.generateProcessedDataForDisplay();
+      } else {
+        // For processed mode, regenerate the pivot table
+        this.state.processedData = this.generateProcessedDataForDisplay();
+      }
+
+      // Emit state change to notify subscribers
+      this._emit();
+    } catch (error) {
+      console.error('Error during raw row swap operation:', error);
+    }
+  }
+
+  /**
+   * Checks if any of the current filters are for aggregated measures
+   * @private
+   */
+  private hasAggregatedFilters(): boolean {
+    return this.filterConfig.some(filter => {
+      // Check if the filter field is an aggregated measure (e.g., "sum_price", "avg_sales")
+      return (
+        filter.field.includes('_') &&
+        this.state.measures.some(
+          measure =>
+            filter.field === `${measure.aggregation}_${measure.uniqueName}`
+        )
+      );
+    });
+  }
+
+  /**
+   * Filters processed data based on aggregated values
+   * @private
+   */
+  private filterProcessedData(originalData: T[]): T[] {
+    // First, ensure we have grouped data for filtering
+    if (this.state.groupConfig) {
+      this.applyGrouping(originalData);
+    }
+
+    // Get all aggregated filters and regular field filters
+    const aggregatedFilters = this.filterConfig.filter(
+      filter =>
+        filter.field.includes('_') &&
+        this.state.measures.some(
+          measure =>
+            filter.field === `${measure.aggregation}_${measure.uniqueName}`
+        )
+    );
+
+    const regularFilters = this.filterConfig.filter(
+      filter =>
+        !filter.field.includes('_') ||
+        !this.state.measures.some(
+          measure =>
+            filter.field === `${measure.aggregation}_${measure.uniqueName}`
+        )
+    );
+
+    // Apply regular field filters to raw data first
+    let filteredData = originalData;
+    if (regularFilters.length > 0) {
+      filteredData = filteredData.filter(item =>
+        regularFilters.every(filter => {
+          const value = item[filter.field];
+          const filterValue =
+            typeof value === 'number' ? Number(filter.value) : filter.value;
+
+          switch (filter.operator) {
+            case 'equals':
+              return value === filterValue;
+            case 'contains':
+              return String(value)
+                .toLowerCase()
+                .includes(String(filterValue).toLowerCase());
+            case 'greaterThan':
+              return Number(value) > Number(filterValue);
+            case 'lessThan':
+              return Number(value) < Number(filterValue);
+            case 'between':
+              return value >= filterValue[0] && value <= filterValue[1];
+            default:
+              return true;
+          }
+        })
+      );
+    }
+
+    // If we have aggregated filters, we need to filter based on grouped data
+    if (aggregatedFilters.length > 0) {
+      // Re-apply grouping to the filtered data
+      if (this.state.groupConfig) {
+        this.applyGrouping(filteredData);
+      }
+
+      // Filter groups based on aggregated values
+      const filteredGroups = this.state.groups.filter(group =>
+        aggregatedFilters.every(filter => {
+          const aggregateValue = group.aggregates[filter.field];
+          const filterValue =
+            typeof filter.value === 'string'
+              ? Number(filter.value)
+              : filter.value;
+
+          switch (filter.operator) {
+            case 'equals':
+              return aggregateValue === filterValue;
+            case 'greaterThan':
+              return aggregateValue > (filterValue as number);
+            case 'lessThan':
+              return aggregateValue < (filterValue as number);
+            case 'between': {
+              const values = Array.isArray(filterValue)
+                ? filterValue
+                : [filterValue, filterValue];
+              return (
+                aggregateValue >= Number(values[0]) &&
+                aggregateValue <= Number(values[1])
+              );
+            }
+            default:
+              return true;
+          }
+        })
+      );
+
+      // Extract the filtered data from the filtered groups
+      filteredData = filteredGroups.flatMap(group => group.items);
+    }
+
+    return filteredData;
   }
 }
