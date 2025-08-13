@@ -1810,6 +1810,11 @@ function resetFilters() {
     data: sampleData, // Use original sample data
   });
 
+  // Subscribe again to state changes
+  pivotEngine.subscribe(state => {
+    renderTable();
+  });
+
   // Update pagination
   updatePagination(sampleData, true);
 
@@ -1818,8 +1823,7 @@ function resetFilters() {
   document.getElementById('filterOperator').selectedIndex = 0;
   document.getElementById('filterValue').value = '';
 
-  // Re-render table
-  renderTable();
+  // No need to call renderTable() here
 }
 
 // Update pagination based on data size
@@ -2029,6 +2033,11 @@ function setupEventListeners() {
       data: sampleData,
     });
 
+    // Subscribe again to state changes
+    pivotEngine.subscribe(state => {
+      renderTable();
+    });
+
     // Reset to first page
     paginationState.currentPage = 1;
 
@@ -2042,7 +2051,7 @@ function setupEventListeners() {
     document.getElementById('filterOperator').selectedIndex = 0;
     document.getElementById('filterValue').value = '';
 
-    renderTable();
+    // No need to call renderTable() here
   });
 }
 
@@ -3133,6 +3142,11 @@ document.addEventListener('DOMContentLoaded', () => {
     data: sampleData, // Use original sample data, not filtered
   });
 
+  // Subscribe to state changes and re-render UI
+  pivotEngine.subscribe(state => {
+    renderTable();
+  });
+
   console.log('Initial pivot engine state:', pivotEngine.getState());
 
   if (config.toolbar) {
@@ -3152,6 +3166,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // CRITICAL: Set initial pagination with all sample data
   updatePagination(sampleData, true);
 
-  // Initial render
-  renderTable();
+  // Initial render (optional, since subscribe will call it immediately)
+  // renderTable();
 });

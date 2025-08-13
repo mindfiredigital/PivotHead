@@ -273,8 +273,11 @@ describe('PivotEngine', () => {
       expect(bCombinations.length).toBeGreaterThan(0);
     });
 
-    it('should handle row ordering with custom sort', () => {
+    it('should handle row ordering with custom sort in processed mode', () => {
       const engine = new PivotEngine(swapableConfig);
+
+      // Ensure we're in processed mode for this test
+      engine.setDataHandlingMode('processed');
 
       // Sort by category descending
       engine.sort('category', 'desc');
@@ -282,14 +285,20 @@ describe('PivotEngine', () => {
 
       // Verify row order changed but unique values preserved
       const sortedRows = sortedState.processedData.rows;
-      const firstRowCategory = sortedRows[0][0];
 
-      // First row should start with 'B' (descending order)
-      expect(firstRowCategory).toBe('B');
+      // In processed mode with grouping, we should have aggregated rows
+      // First row should be the B category group (descending order)
+      expect(sortedRows[0][0]).toBe('B');
 
-      // Unique values should still be preserved
+      // Unique categories should still be preserved
       const uniqueCategories = [...new Set(sortedRows.map(row => row[0]))];
       expect(uniqueCategories.sort()).toEqual(['A', 'B']);
+
+      // Test ascending sort as well
+      engine.sort('category', 'asc');
+      const ascSortedState = engine.getState();
+      const ascSortedRows = ascSortedState.processedData.rows;
+      expect(ascSortedRows[0][0]).toBe('A');
     });
 
     it('should maintain data integrity with mixed data types', () => {
@@ -556,6 +565,298 @@ describe('PivotEngine', () => {
       );
       // With 10 groups and 5 categories, we should see 10 different unique combinations
       expect(uniqueCombinations.size).toBeLessThanOrEqual(50); // At most 50, but could be fewer
+    });
+  });
+
+  // Filtering Tests for Processed Data
+  describe('Filtering on Aggregated Values in Processed Mode', () => {
+    const filterTestData = [
+      { country: 'USA', product: 'A', price: 100, discount: 10 },
+      { country: 'USA', product: 'B', price: 200, discount: 20 },
+      { country: 'Canada', product: 'A', price: 150, discount: 15 },
+      { country: 'Canada', product: 'B', price: 250, discount: 25 },
+      { country: 'Mexico', product: 'A', price: 80, discount: 8 },
+      { country: 'Mexico', product: 'B', price: 120, discount: 12 },
+    ];
+
+    const filterTestConfig: PivotTableConfig<(typeof filterTestData)[0]> = {
+      data: filterTestData,
+      rawData: filterTestData,
+      rows: [{ uniqueName: 'country', caption: 'Country' }],
+      columns: [],
+      measures: [
+        { uniqueName: 'price', caption: 'Sum of Price', aggregation: 'sum' },
+        {
+          uniqueName: 'discount',
+          caption: 'Sum of Discount',
+          aggregation: 'sum',
+        },
+      ],
+      dimensions: [],
+      defaultAggregation: 'sum',
+    };
+
+    it('should filter on aggregated price values in processed mode', () => {
+      const engine = new PivotEngine(filterTestConfig);
+      engine.setDataHandlingMode('processed');
+
+      // Set the default aggregation to sum to match our measures
+      engine.setAggregation('sum');
+
+      // Set up grouping by country to enable aggregation
+      engine.setGroupConfig({
+        rowFields: ['country'],
+        columnFields: [],
+        grouper: (item: (typeof filterTestData)[0], fields: string[]) => {
+          return fields
+            .map(field => item[field as keyof typeof item])
+            .join('-');
+        },
+      });
+
+      // Filter for countries with sum of price greater than 250
+      // USA: 300 (100+200), Canada: 400 (150+250), Mexico: 200 (80+120)
+      // Should include USA and Canada, exclude Mexico
+      engine.applyFilters([
+        {
+          field: 'sum_price',
+          operator: 'greaterThan',
+          value: 250,
+        },
+      ]);
+
+      const state = engine.getState();
+      const processedRows = state.processedData.rows;
+
+      // Should have 4 rows (2 from USA + 2 from Canada) after filtering out Mexico
+      expect(processedRows.length).toBe(4);
+
+      // Verify the countries are correct (should only have USA and Canada rows)
+      const countries = processedRows.map(row => row[0]);
+      expect(countries).toContain('USA');
+      expect(countries).toContain('Canada');
+      expect(countries).not.toContain('Mexico');
+
+      // Verify we have 2 USA rows and 2 Canada rows
+      const usaRows = processedRows.filter(row => row[0] === 'USA');
+      const canadaRows = processedRows.filter(row => row[0] === 'Canada');
+      expect(usaRows.length).toBe(2);
+      expect(canadaRows.length).toBe(2);
+    });
+
+    it('should filter on aggregated discount values in processed mode', () => {
+      const engine = new PivotEngine(filterTestConfig);
+      engine.setDataHandlingMode('processed');
+
+      // Set the default aggregation to sum to match our measures
+      engine.setAggregation('sum');
+
+      // Set up grouping by country to enable aggregation
+      engine.setGroupConfig({
+        rowFields: ['country'],
+        columnFields: [],
+        grouper: (item: (typeof filterTestData)[0], fields: string[]) => {
+          return fields
+            .map(field => item[field as keyof typeof item])
+            .join('-');
+        },
+      });
+
+      // Filter for countries with sum of discount less than 25
+      // USA: 30 (10+20), Canada: 40 (15+25), Mexico: 20 (8+12)
+      // Should include only Mexico
+      engine.applyFilters([
+        {
+          field: 'sum_discount',
+          operator: 'lessThan',
+          value: 25,
+        },
+      ]);
+
+      const state = engine.getState();
+      const processedRows = state.processedData.rows;
+
+      // Should have 2 rows (only Mexico's 2 items)
+      expect(processedRows.length).toBe(2);
+      expect(processedRows[0][0]).toBe('Mexico');
+      expect(processedRows[1][0]).toBe('Mexico');
+    });
+
+    it('should handle multiple aggregated filters in processed mode', () => {
+      const engine = new PivotEngine(filterTestConfig);
+      engine.setDataHandlingMode('processed');
+
+      // Set the default aggregation to sum to match our measures
+      engine.setAggregation('sum');
+
+      // Set up grouping by country to enable aggregation
+      engine.setGroupConfig({
+        rowFields: ['country'],
+        columnFields: [],
+        grouper: (item: (typeof filterTestData)[0], fields: string[]) => {
+          return fields
+            .map(field => item[field as keyof typeof item])
+            .join('-');
+        },
+      });
+
+      // Filter for countries with sum of price greater than 250 AND sum of discount greater than 25
+      // USA: price=300, discount=30 (matches both)
+      // Canada: price=400, discount=40 (matches both)
+      // Mexico: price=200, discount=20 (matches neither)
+      engine.applyFilters([
+        {
+          field: 'sum_price',
+          operator: 'greaterThan',
+          value: 250,
+        },
+        {
+          field: 'sum_discount',
+          operator: 'greaterThan',
+          value: 25,
+        },
+      ]);
+
+      const state = engine.getState();
+      const processedRows = state.processedData.rows;
+
+      // Should have 4 rows (2 from USA + 2 from Canada)
+      expect(processedRows.length).toBe(4);
+
+      const countries = processedRows.map(row => row[0]);
+      expect(countries).toContain('USA');
+      expect(countries).toContain('Canada');
+      expect(countries).not.toContain('Mexico');
+
+      // Verify we have 2 USA rows and 2 Canada rows
+      const usaRows = processedRows.filter(row => row[0] === 'USA');
+      const canadaRows = processedRows.filter(row => row[0] === 'Canada');
+      expect(usaRows.length).toBe(2);
+      expect(canadaRows.length).toBe(2);
+    });
+
+    it('should handle mixed regular and aggregated filters in processed mode', () => {
+      const engine = new PivotEngine(filterTestConfig);
+      engine.setDataHandlingMode('processed');
+
+      // Set the default aggregation to sum to match our measures
+      engine.setAggregation('sum');
+
+      // Set up grouping by country to enable aggregation
+      engine.setGroupConfig({
+        rowFields: ['country'],
+        columnFields: [],
+        grouper: (item: (typeof filterTestData)[0], fields: string[]) => {
+          return fields
+            .map(field => item[field as keyof typeof item])
+            .join('-');
+        },
+      });
+
+      // Filter for countries containing "a" AND with sum of price greater than 250
+      // USA: contains "a" (in USA), price=300 (matches both)
+      // Canada: contains "a" (in Canada), price=400 (matches both)
+      // Mexico: doesn't contain "a", price=200 (matches neither)
+      engine.applyFilters([
+        {
+          field: 'country',
+          operator: 'contains',
+          value: 'a',
+        },
+        {
+          field: 'sum_price',
+          operator: 'greaterThan',
+          value: 250,
+        },
+      ]);
+
+      const state = engine.getState();
+      const processedRows = state.processedData.rows;
+
+      // Should have 4 rows (2 from USA + 2 from Canada)
+      expect(processedRows.length).toBe(4);
+
+      const countries = processedRows.map(row => row[0]);
+      expect(countries).toContain('USA');
+      expect(countries).toContain('Canada');
+      expect(countries).not.toContain('Mexico');
+    });
+
+    it('should return empty results when no aggregated values match filter', () => {
+      const engine = new PivotEngine(filterTestConfig);
+      engine.setDataHandlingMode('processed');
+
+      // Set the default aggregation to sum to match our measures
+      engine.setAggregation('sum');
+
+      // Set up grouping by country to enable aggregation
+      engine.setGroupConfig({
+        rowFields: ['country'],
+        columnFields: [],
+        grouper: (item: (typeof filterTestData)[0], fields: string[]) => {
+          return fields
+            .map(field => item[field as keyof typeof item])
+            .join('-');
+        },
+      });
+
+      // Filter for countries with sum of price greater than 1000 (none match)
+      engine.applyFilters([
+        {
+          field: 'sum_price',
+          operator: 'greaterThan',
+          value: 1000,
+        },
+      ]);
+
+      const state = engine.getState();
+      const processedRows = state.processedData.rows;
+
+      // Should have no results
+      expect(processedRows.length).toBe(0);
+    });
+
+    it('should maintain correct sorting after applying aggregated filters', () => {
+      const engine = new PivotEngine(filterTestConfig);
+      engine.setDataHandlingMode('processed');
+
+      // Set the default aggregation to sum to match our measures
+      engine.setAggregation('sum');
+
+      // Set up grouping by country to enable aggregation
+      engine.setGroupConfig({
+        rowFields: ['country'],
+        columnFields: [],
+        grouper: (item: (typeof filterTestData)[0], fields: string[]) => {
+          return fields
+            .map(field => item[field as keyof typeof item])
+            .join('-');
+        },
+      });
+
+      // Sort by country descending
+      engine.sort('country', 'desc');
+
+      // Filter for countries with sum of price greater than 250
+      engine.applyFilters([
+        {
+          field: 'sum_price',
+          operator: 'greaterThan',
+          value: 250,
+        },
+      ]);
+
+      const state = engine.getState();
+      const processedRows = state.processedData.rows;
+
+      // Should have 4 rows (2 from USA + 2 from Canada), sorted in descending order
+      expect(processedRows.length).toBe(4);
+
+      // Since we sorted by country descending, USA should come before Canada
+      expect(processedRows[0][0]).toBe('USA');
+      expect(processedRows[1][0]).toBe('USA');
+      expect(processedRows[2][0]).toBe('Canada');
+      expect(processedRows[3][0]).toBe('Canada');
     });
   });
 });
