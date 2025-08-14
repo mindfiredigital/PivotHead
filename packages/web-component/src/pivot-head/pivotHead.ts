@@ -45,12 +45,9 @@ interface EnhancedPivotEngine<T extends Record<string, unknown>>
   isRowExpanded(rowId: string): boolean;
   setPagination(config: PaginationConfig): void;
   getPaginationState(): PaginationConfig;
-  // Add methods for getting ordered values after swaps
   getOrderedColumnValues(): string[] | null;
   getOrderedRowValues(): string[] | null;
-  // Add subscribe method for state changes
   subscribe(fn: (state: PivotTableState<T>) => void): () => void;
-  // Add new methods for data handling mode and data source updates
   setDataHandlingMode(mode: 'raw' | 'processed'): void;
   getDataHandlingMode(): 'raw' | 'processed';
   updateDataSource(newData: T[]): void;
@@ -188,12 +185,17 @@ export class PivotHeadElement extends HTMLElement {
         composed: true,
       })
     );
-    // Render the correct view
-    if (this.getAttribute('mode') === 'none') {
+
+    // Keep pagination in sync for all modes, including minimal and default
+    this.calculatePaginationForCurrentView();
+
+    // Render based on mode
+    const mode = this.getAttribute('mode');
+    if (mode === 'none') {
       if (this.shadowRoot) {
         this.shadowRoot.innerHTML = `<style>:host { display:block; }</style>`;
       }
-    } else if (this.getAttribute('mode') === 'minimal') {
+    } else if (mode === 'minimal') {
       if (this.shadowRoot) {
         this.shadowRoot.innerHTML = `
         <style>
@@ -1009,6 +1011,15 @@ export class PivotHeadElement extends HTMLElement {
               : this._processedFilters;
             console.log('Applying filters for new view mode:', currentFilters);
             this.engine.applyFilters(currentFilters);
+
+            // Notify listeners of view mode change
+            this.dispatchEvent(
+              new CustomEvent('viewModeChange', {
+                detail: { mode: this._showRawData ? 'raw' : 'processed' },
+                bubbles: true,
+                composed: true,
+              })
+            );
           }
         } catch (error) {
           console.error('Error during view switch:', error);
@@ -1532,6 +1543,128 @@ export class PivotHeadElement extends HTMLElement {
     });
   }
 
+  // Handle click on sortable headers to toggle sort via engine
+  private handleSortClick(e: Event): void {
+    if (!this.engine) return;
+    const target = e.target as HTMLElement;
+    const header = target.closest('.sortable-header') as HTMLElement | null;
+    if (!header) return;
+
+    const field = header.dataset.field;
+    if (!field) return;
+
+    const state = this.engine.getState();
+    const current =
+      state.sortConfig && state.sortConfig.length > 0
+        ? state.sortConfig[0]
+        : null;
+    const nextDir: 'asc' | 'desc' =
+      current && current.field === field && current.direction === 'asc'
+        ? 'desc'
+        : 'asc';
+
+    this.sort(field, nextDir);
+  }
+
+  // Handle double-click on data cell to show drill-down details from raw records
+  private handleDrillDownClick(e: Event): void {
+    if (!this.engine) return;
+    const cell = (e.target as HTMLElement).closest(
+      '.drill-down-cell'
+    ) as HTMLElement | null;
+    if (!cell) return;
+
+    const rowValue = cell.getAttribute('data-row-value') || '';
+    const columnValue = cell.getAttribute('data-column-value') || '';
+    const measureName = cell.getAttribute('data-measure-name') || '';
+    const measureCaption =
+      cell.getAttribute('data-measure-caption') || measureName;
+    const rowField = cell.getAttribute('data-row-field') || '';
+    const columnField = cell.getAttribute('data-column-field') || '';
+
+    const state = this.engine.getState();
+    const rawData = (state.rawData || state.data || []) as Array<
+      Record<string, unknown>
+    >;
+
+    // Filter records matching the clicked intersection
+    const subset = rawData.filter((r: Record<string, unknown>) => {
+      const rowOk = rowField
+        ? String(r[rowField] ?? '') === String(rowValue)
+        : true;
+      const colOk = columnField
+        ? String(r[columnField] ?? '') === String(columnValue)
+        : true;
+      return rowOk && colOk;
+    });
+
+    // Ensure modal styles are available
+    this.addModalStylesToDocument();
+
+    // Build modal content
+    const overlay = document.createElement('div');
+    overlay.className = 'drill-down-modal';
+
+    const content = document.createElement('div');
+    content.className = 'drill-down-content';
+    content.innerHTML = `
+      <div class="drill-down-header">
+        <div class="drill-down-title">Details: ${rowField}: ${rowValue}${columnField ? `, ${columnField}: ${columnValue}` : ''}</div>
+        <button class="drill-down-close" aria-label="Close">&times;</button>
+      </div>
+      <div class="drill-down-summary">
+        Records: ${subset.length}. Measure: ${measureCaption} (${measureName}).
+      </div>
+      <div class="drill-down-body"></div>
+    `;
+
+    const bodyDiv = content.querySelector('.drill-down-body') as HTMLElement;
+    if (subset.length > 0) {
+      const headers = Object.keys(subset[0] as Record<string, unknown>);
+      const table = document.createElement('table');
+      table.className = 'drill-down-table';
+
+      const thead = document.createElement('thead');
+      const trh = document.createElement('tr');
+      headers.forEach(h => {
+        const th = document.createElement('th');
+        th.textContent = h;
+        trh.appendChild(th);
+      });
+      thead.appendChild(trh);
+      table.appendChild(thead);
+
+      const tbody = document.createElement('tbody');
+      subset.forEach(row => {
+        const tr = document.createElement('tr');
+        headers.forEach(h => {
+          const td = document.createElement('td');
+          const val = (row as Record<string, unknown>)[h];
+          td.textContent = val != null ? String(val) : '';
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      bodyDiv.appendChild(table);
+    } else {
+      bodyDiv.textContent = 'No matching records.';
+    }
+
+    overlay.appendChild(content);
+    document.body.appendChild(overlay);
+
+    const close = () => overlay.remove();
+    overlay.addEventListener('click', evt => {
+      if (evt.target === overlay) close();
+    });
+    const closeBtn = content.querySelector(
+      '.drill-down-close'
+    ) as HTMLButtonElement | null;
+    closeBtn?.addEventListener('click', close);
+  }
+
+  // Drag and interaction state
   private draggedColumn: HTMLElement | null = null;
   private draggedRow: HTMLElement | null = null;
 
@@ -1629,7 +1762,6 @@ export class PivotHeadElement extends HTMLElement {
     e.preventDefault();
     const target = e.target as HTMLElement;
 
-    // Find the closest TR element (in case we dropped on a TD)
     const targetRow = target.closest('tr') as HTMLElement;
 
     if (targetRow) {
@@ -1657,22 +1789,32 @@ export class PivotHeadElement extends HTMLElement {
   // Public API methods for programmatic control
 
   /**
-   * Returns the raw data from the pivot table
+   * @preserve
+   * Returns the raw data array currently loaded into the component.
+   * @public
+   * @returns {Record<string, unknown>[]} Raw data records as provided to the component.
    */
-
   public getRawData(): PivotDataRecord[] {
     return this._data;
   }
 
   /**
-   * Returns the pagination from the engine or local fallback
+   * @preserve
+   * Returns pagination information managed by the web component. In minimal mode and default mode,
+   * the component owns pagination for display and emits paginationChange on updates.
+   * @public
+   * @returns {PaginationConfig} The current pagination state.
    */
   public getPagination(): PaginationConfig {
-    return this.engine?.getPagination?.() ?? this._pagination;
+    return this._pagination;
   }
 
   /**
-   * Get the current state of the pivot table
+   * @preserve
+   * Gets the current engine state (dimensions, measures, processed data, sort, etc.).
+   * @public
+   * @throws {Error} If the engine has not been initialized yet.
+   * @returns {PivotTableState<Record<string, unknown>>} The current pivot state.
    */
   public getState(): PivotTableState<PivotDataRecord> {
     if (!this.engine) {
@@ -1682,7 +1824,10 @@ export class PivotHeadElement extends HTMLElement {
   }
 
   /**
-   * Reset the pivot table to its initial state
+   * @preserve
+   * Refreshes the component by clearing the current filter UI state and calling the engine reset.
+   * This retains configuration but clears applied filters.
+   * @public
    */
   public refresh(): void {
     if (!this.engine) {
@@ -1690,58 +1835,45 @@ export class PivotHeadElement extends HTMLElement {
       return;
     }
 
-    // Clear local filters
     this._filters = [];
     this.removeAttribute('filters');
-
-    // Reset the engine completely
     this.engine.reset();
 
-    // Clear filter UI
     const filterValueInput = this.shadowRoot?.getElementById(
       'filterValue'
     ) as HTMLInputElement;
     if (filterValueInput) {
       filterValueInput.value = '';
     }
-
-    // Engine subscription will handle state change automatically
   }
 
   /**
-   * Reset the pivot table to its initial state - using core engine reset
+   * @preserve
+   * Resets the component and engine: clears processed/raw filters, resets pagination and filter UI,
+   * and invokes the engine reset.
+   * @public
    */
   public reset(): void {
-    console.log(
-      'Resetting pivot table via core engine, current view mode:',
-      this._showRawData ? 'RAW' : 'PROCESSED'
-    );
-
     if (!this.engine) {
       console.error('Engine not initialized');
       return;
     }
 
-    // Clear all filter states
     this._rawFilters = [];
     this._processedFilters = [];
     this._filters = [];
     this.removeAttribute('filters');
 
-    // Reset pagination to first page
     this._pagination.currentPage = 1;
 
-    // Use core engine's reset method instead of recreating engine
     this.engine.reset();
 
-    // Clear filter UI
     this.clearFilterUI();
-
-    console.log('Core engine reset completed');
   }
 
   /**
-   * Clear filter UI elements
+   * Clears the filter UI controls (field/operator/value).
+   * @private
    */
   private clearFilterUI(): void {
     const filterValueInput = this.shadowRoot?.getElementById(
@@ -1757,144 +1889,155 @@ export class PivotHeadElement extends HTMLElement {
     const filterOperatorSelect = this.shadowRoot?.getElementById(
       'filterOperator'
     ) as HTMLSelectElement;
-    if (filterFieldSelect) {
-      filterFieldSelect.selectedIndex = 0;
-    }
-    if (filterOperatorSelect) {
-      filterOperatorSelect.selectedIndex = 0;
-    }
+    if (filterFieldSelect) filterFieldSelect.selectedIndex = 0;
+    if (filterOperatorSelect) filterOperatorSelect.selectedIndex = 0;
   }
 
   /**
-   * Sort the pivot table by a specific field - using core engine functionality
+   * @preserve
+   * Sorts the pivot data by a field using the core engine. Triggers a state update via subscription.
+   * @public
+   * @param {string} field - Field name (dimension or measure uniqueName) to sort by.
+   * @param {'asc'|'desc'} direction - Sort direction.
    */
   public sort(field: string, direction: 'asc' | 'desc'): void {
     if (!this.engine) {
       console.error('Engine not initialized');
       return;
     }
-
-    console.log(
-      `Sorting ${this._showRawData ? 'RAW' : 'PROCESSED'} data by ${field} ${direction} via core engine`
-    );
-
-    // Use core engine's sort method for both raw and processed data
     this.engine.sort(field, direction);
-
-    console.log('Sort applied via core engine');
   }
 
   /**
-   * Set measures for the pivot table
+   * @preserve
+   * Updates measures in the engine.
+   * @public
+   * @param {MeasureConfig[]} measures - The new measures configuration.
    */
   public setMeasures(measures: MeasureConfig[]): void {
     if (!this.engine) {
       console.error('Engine not initialized');
       return;
     }
-
     this.engine.setMeasures(measures);
-    // Engine subscription will handle state change automatically
   }
 
   /**
-   * Set dimensions for the pivot table
+   * @preserve
+   * Updates dimensions in the engine.
+   * @public
+   * @param {Dimension[]} dimensions - The new dimensions configuration.
    */
   public setDimensions(dimensions: Dimension[]): void {
     if (!this.engine) {
       console.error('Engine not initialized');
       return;
     }
-
     this.engine.setDimensions(dimensions);
-    // Engine subscription will handle state change automatically
   }
 
   /**
-   * Set grouping configuration
+   * @preserve
+   * Sets the grouping configuration used by the engine.
+   * @public
+   * @param {GroupConfig|null} groupConfig - Grouping configuration or null to clear.
    */
   public setGroupConfig(groupConfig: GroupConfig | null): void {
     if (!this.engine) {
       console.error('Engine not initialized');
       return;
     }
-
     this.engine.setGroupConfig(groupConfig);
-    // Engine subscription will handle state change automatically
   }
 
   /**
-   * Set aggregation type for measures
+   * @preserve
+   * Sets the default aggregation type used by the engine (e.g., sum, avg).
+   * @public
+   * @param {AggregationType} type - Aggregation type.
    */
   public setAggregation(type: AggregationType): void {
     if (!this.engine) {
       console.error('Engine not initialized');
       return;
     }
-
     this.engine.setAggregation(type);
-    // Engine subscription will handle state change automatically
   }
 
   /**
-   * Format a value according to field formatting rules
+   * @preserve
+   * Formats a value using the engine's formatting for a given field.
+   * @public
+   * @param {unknown} value - The raw value.
+   * @param {string} field - The field name for formatting context.
+   * @returns {string} The formatted value.
    */
   public formatValue(value: unknown, field: string): string {
     if (!this.engine) {
       console.error('Engine not initialized');
       return String(value);
     }
-
     return this.engine.formatValue(value, field);
   }
 
   /**
-   * Get grouped data from the pivot table
+   * @preserve
+   * Returns the grouped data produced by the engine, useful for custom rendering in minimal mode.
+   * @public
+   * @returns {Group[]} The list of groups with aggregates.
    */
   public getGroupedData(): Group[] {
     if (!this.engine) {
       console.error('Engine not initialized');
       return [];
     }
-
     return this.engine.getGroupedData();
   }
 
   /**
-   * Get current filter state
+   * @preserve
+   * Returns the last filters set via the component API. In processed/raw modes, this reflects the
+   * filters applied in that respective mode.
+   * @public
+   * @returns {FilterConfig[]} The current filter array.
    */
   public getFilters(): FilterConfig[] {
     return this._filters;
   }
 
   /**
-   * Get the raw data from the pivot table
+   * @preserve
+   * Returns the raw data from the engine state (post-load, pre-aggregation).
+   * @public
+   * @returns {Record<string, unknown>[]} Raw rows.
    */
   public getData(): PivotDataRecord[] {
     if (!this.engine) {
       console.error('Engine not initialized');
       return [];
     }
-
     return this.engine.getState().rawData;
   }
 
   /**
-   * Get the processed data (headers, rows, totals)
+   * @preserve
+   * Returns the processed pivot data structure from the engine state.
+   * @public
+   * @returns {unknown} The processed data payload (headers, rows, aggregates).
    */
   public getProcessedData(): unknown {
     if (!this.engine) {
       console.error('Engine not initialized');
       return null;
     }
-
     return this.engine.getState().processedData;
   }
 
-  // Export methods
-
   /**
-   * Export pivot table to HTML format
+   * @preserve
+   * Exports the current table to HTML via the engine.
+   * @public
+   * @param {string} [fileName='pivot-table'] - Base filename (without extension).
    */
   public exportToHTML(fileName = 'pivot-table'): void {
     if (!this.engine) {
@@ -1905,7 +2048,10 @@ export class PivotHeadElement extends HTMLElement {
   }
 
   /**
-   * Export pivot table to PDF format
+   * @preserve
+   * Exports the current table to PDF via the engine.
+   * @public
+   * @param {string} [fileName='pivot-table'] - Base filename (without extension).
    */
   public exportToPDF(fileName = 'pivot-table'): void {
     if (!this.engine) {
@@ -1916,7 +2062,10 @@ export class PivotHeadElement extends HTMLElement {
   }
 
   /**
-   * Export pivot table to Excel format
+   * @preserve
+   * Exports the current table to Excel via the engine.
+   * @public
+   * @param {string} [fileName='pivot-table'] - Base filename (without extension).
    */
   public exportToExcel(fileName = 'pivot-table'): void {
     if (!this.engine) {
@@ -1927,7 +2076,9 @@ export class PivotHeadElement extends HTMLElement {
   }
 
   /**
-   * Open print dialog for the pivot table
+   * @preserve
+   * Opens the browser print dialog for the current table via the engine.
+   * @public
    */
   public openPrintDialog(): void {
     if (!this.engine) {
@@ -1937,10 +2088,15 @@ export class PivotHeadElement extends HTMLElement {
     this.engine.openPrintDialog();
   }
 
-  // File loading methods
-
   /**
-   * Load data from a file
+   * @preserve
+   * Loads JSON data from a File object and assigns it to the component.
+   * @public
+   * @param {File} file - A file containing JSON array data.
+   * @returns {Promise<void>} Resolves when the data has been loaded and set.
+   * @example
+   * const file = new File([JSON.stringify(data)], 'data.json', { type: 'application/json' });
+   * await pivotEl.loadFromFile(file);
    */
   public loadFromFile(file: File): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -1965,7 +2121,11 @@ export class PivotHeadElement extends HTMLElement {
   }
 
   /**
-   * Load data from a URL
+   * @preserve
+   * Loads JSON data from a URL and assigns it to the component.
+   * @public
+   * @param {string} url - The endpoint returning a JSON array.
+   * @returns {Promise<void>} Resolves when the data has been fetched and set.
    */
   public loadFromUrl(url: string): Promise<void> {
     return fetch(url)
@@ -1982,81 +2142,75 @@ export class PivotHeadElement extends HTMLElement {
       });
   }
 
-  // Public drag API methods
-
   /**
-   * Programmatically drag a row from one position to another
+   * @preserve
+   * Drags/moves a row within the current ordering using the core engine implementation.
+   * @public
+   * @param {number} fromIndex - Source visual index.
+   * @param {number} toIndex - Target visual index.
    */
   public dragRow(fromIndex: number, toIndex: number): void {
     if (!this.engine) {
       console.error('Engine not initialized');
       return;
     }
-
     this.engine.dragRow(fromIndex, toIndex);
-    // Engine subscription will handle state change automatically
   }
 
   /**
-   * Programmatically drag a column from one position to another
+   * @preserve
+   * Drags/moves a column within the current ordering using the core engine implementation.
+   * @public
+   * @param {number} fromIndex - Source visual index.
+   * @param {number} toIndex - Target visual index.
    */
   public dragColumn(fromIndex: number, toIndex: number): void {
     if (!this.engine) {
       console.error('Engine not initialized');
       return;
     }
-
     this.engine.dragColumn(fromIndex, toIndex);
-    // Engine subscription will handle state change automatically
   }
 
   /**
-   * Swap two rows using the core engine's functionality
+   * @preserve
+   * Swaps two rows. Uses raw-data swap in raw mode, or processed-data swap in processed mode.
+   * @public
+   * @param {number} fromIndex - Source index.
+   * @param {number} toIndex - Target index.
    */
   public swapRows(fromIndex: number, toIndex: number): void {
     if (!this.engine) {
       console.error('Engine not initialized');
       return;
     }
-
     try {
-      console.log(
-        `Swapping rows ${fromIndex} <-> ${toIndex} via core engine, view mode: ${this._showRawData ? 'RAW' : 'PROCESSED'}`
-      );
-
       if (this._showRawData) {
-        // For raw data, use the specialized raw data row swapping method
         this.engine.swapRawDataRows(fromIndex, toIndex);
       } else {
-        // For processed data, use swapDataRows which works with unique row values
         this.engine.swapDataRows(fromIndex, toIndex);
       }
-
-      console.log('Row swap completed via core engine');
     } catch (error) {
       console.error('Row swap failed:', error);
     }
   }
 
   /**
-   * Swap two columns using the core engine's functionality
+   * @preserve
+   * Swaps two columns. In raw mode, it updates internal raw column order and re-renders; in
+   * processed mode, it delegates to the engine and stores the returned order.
+   * @public
+   * @param {number} fromIndex - Source index.
+   * @param {number} toIndex - Target index.
    */
   public swapColumns(fromIndex: number, toIndex: number): void {
     if (!this.engine) {
       console.error('Engine not initialized');
       return;
     }
-
     try {
-      console.log(
-        `Swapping columns ${fromIndex} <-> ${toIndex} via core engine`
-      );
-
       if (this._showRawData) {
-        // For raw data, we need to handle column headers (field names)
-        // Get headers from the data
         const headers = this._data.length > 0 ? Object.keys(this._data[0]) : [];
-
         if (
           fromIndex < 0 ||
           toIndex < 0 ||
@@ -2068,54 +2222,36 @@ export class PivotHeadElement extends HTMLElement {
           );
           return;
         }
-
-        // Store the custom column order for raw data
         if (
           !this._rawDataColumnOrder ||
           this._rawDataColumnOrder.length === 0
         ) {
           this._rawDataColumnOrder = [...headers];
         }
-
-        // Swap in the column order array
         const temp = this._rawDataColumnOrder[fromIndex];
         this._rawDataColumnOrder[fromIndex] = this._rawDataColumnOrder[toIndex];
         this._rawDataColumnOrder[toIndex] = temp;
-
-        console.log('Raw data column order updated:', this._rawDataColumnOrder);
-
-        // Re-render the raw table with new column order
         this.renderRawTable();
       } else {
-        // For processed data, use core engine's swapDataColumns method
         this.engine.swapDataColumns(fromIndex, toIndex);
-
-        // Store the new column order if available
         const newOrder = this.engine.getOrderedColumnValues();
-        if (newOrder) {
-          this._processedColumnOrder = [...newOrder];
-          console.log('Stored new processed column order:', newOrder);
-        }
+        if (newOrder) this._processedColumnOrder = [...newOrder];
       }
-
-      console.log('Column swap completed via core engine');
     } catch (error) {
       console.error('Column swap failed:', error);
     }
   }
 
   /**
-   * Handle column swapping for raw data view
+   * Swaps two raw-data columns by visual index.
+   * @private
    */
   private swapRawDataColumns(fromIndex: number, toIndex: number): void {
     if (!this._data || this._data.length === 0) {
       console.error('No raw data available for column swap');
       return;
     }
-
-    // Get the headers (field names) from the first data item
     const headers = Object.keys(this._data[0]);
-
     if (
       fromIndex < 0 ||
       toIndex < 0 ||
@@ -2127,31 +2263,19 @@ export class PivotHeadElement extends HTMLElement {
       );
       return;
     }
-
-    if (fromIndex === toIndex) {
-      return; // No swap needed
-    }
-
-    // Store the custom column order for raw data
-    if (!this._rawDataColumnOrder) {
-      this._rawDataColumnOrder = [...headers];
-    }
-
-    // Swap in the column order array
+    if (fromIndex === toIndex) return;
+    if (!this._rawDataColumnOrder) this._rawDataColumnOrder = [...headers];
     const temp = this._rawDataColumnOrder[fromIndex];
     this._rawDataColumnOrder[fromIndex] = this._rawDataColumnOrder[toIndex];
     this._rawDataColumnOrder[toIndex] = temp;
-
-    // Re-render the raw table with new column order
     this.renderRawTable();
   }
 
   /**
-   * Get/Set methods for swap functionality
-   */
-
-  /**
-   * Enable or disable drag and drop functionality
+   * @preserve
+   * Enables or disables drag-and-drop for rows/columns in the rendered table.
+   * @public
+   * @param {boolean} enabled - True to enable, false to disable.
    */
   public setDragAndDropEnabled(enabled: boolean): void {
     const table = this.shadowRoot?.querySelector('table');
@@ -2159,7 +2283,6 @@ export class PivotHeadElement extends HTMLElement {
       if (enabled) {
         this.addDragListeners();
       } else {
-        // Remove drag listeners
         const draggableElements = table.querySelectorAll('[draggable="true"]');
         draggableElements.forEach(element => {
           element.setAttribute('draggable', 'false');
@@ -2169,7 +2292,10 @@ export class PivotHeadElement extends HTMLElement {
   }
 
   /**
-   * Get the current drag and drop state
+   * @preserve
+   * Indicates whether drag-and-drop is currently enabled based on presence of draggable elements.
+   * @public
+   * @returns {boolean} True if enabled, false otherwise.
    */
   public isDragAndDropEnabled(): boolean {
     const firstDraggableElement =
@@ -2178,336 +2304,143 @@ export class PivotHeadElement extends HTMLElement {
   }
 
   /**
-   * Programmatically swap two data rows by their visual indices
+   * @preserve
+   * Alias for swapRows(fromIndex, toIndex).
+   * @public
    */
   public swapDataRowsByIndex(fromIndex: number, toIndex: number): void {
     this.swapRows(fromIndex, toIndex);
   }
 
   /**
-   * Programmatically swap two data columns by their visual indices
+   * @preserve
+   * Alias for swapColumns(fromIndex, toIndex).
+   * @public
    */
   public swapDataColumnsByIndex(fromIndex: number, toIndex: number): void {
     this.swapColumns(fromIndex, toIndex);
   }
 
-  // Pagination methods
-
   /**
-   * Navigate to the previous page
+   * @preserve
+   * Moves to the previous page (display-only pagination) and emits a `paginationChange` event.
+   * @public
    */
   public previousPage(): void {
     if (this._pagination.currentPage > 1) {
       this._pagination.currentPage--;
-      this._renderSwitch(); // Just re-render with new page
+      this._renderSwitch();
+      this.dispatchEvent(
+        new CustomEvent('paginationChange', {
+          detail: { ...this._pagination },
+          bubbles: true,
+          composed: true,
+        })
+      );
     }
   }
 
   /**
-   * Navigate to the next page
+   * @preserve
+   * Moves to the next page (display-only pagination) and emits a `paginationChange` event.
+   * @public
    */
   public nextPage(): void {
     if (this._pagination.currentPage < this._pagination.totalPages) {
       this._pagination.currentPage++;
-      this._renderSwitch(); // Just re-render with new page
+      this._renderSwitch();
+      this.dispatchEvent(
+        new CustomEvent('paginationChange', {
+          detail: { ...this._pagination },
+          bubbles: true,
+          composed: true,
+        })
+      );
     }
   }
 
   /**
-   * Set the page size and update pagination
+   * @preserve
+   * Sets the page size (display-only), recalculates pagination, re-renders, and emits a `paginationChange` event.
+   * @public
+   * @param {number} pageSize - Items per page, must be > 0.
    */
   public setPageSize(pageSize: number): void {
     if (pageSize > 0) {
       this._pagination.pageSize = pageSize;
-      this._pagination.currentPage = 1; // Reset to first page
-      // Recalculate pagination and trigger re-render
+      this._pagination.currentPage = 1;
       this.calculatePaginationForCurrentView();
       this._renderSwitch();
+      this.dispatchEvent(
+        new CustomEvent('paginationChange', {
+          detail: { ...this._pagination },
+          bubbles: true,
+          composed: true,
+        })
+      );
     }
   }
 
   /**
-   * Navigate to a specific page
+   * @preserve
+   * Navigates to a specific page number (display-only) and emits a `paginationChange` event.
+   * @public
+   * @param {number} page - 1-based page index.
    */
   public goToPage(page: number): void {
     if (page >= 1 && page <= this._pagination.totalPages) {
       this._pagination.currentPage = page;
-      this._renderSwitch(); // Just re-render with new page
-    }
-  }
-
-  /**
-   * Handle sort click on table headers
-   */
-  private handleSortClick(e: Event): void {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const target = e.currentTarget as HTMLElement;
-    const field = target.getAttribute('data-field');
-
-    if (!field) {
-      console.warn('No field attribute found on sort target');
-      return;
-    }
-
-    // Get current sort state from engine instead of local tracking
-    const state = this.engine.getState();
-    const currentSortConfig =
-      state.sortConfig && state.sortConfig.length > 0
-        ? state.sortConfig[0]
-        : null;
-    const currentDirection =
-      currentSortConfig?.field === field ? currentSortConfig.direction : null;
-    const direction = currentDirection === 'asc' ? 'desc' : 'asc';
-
-    // Use core engine's sort method
-    this.engine.sort(field, direction);
-
-    console.log(
-      `Sorted ${this._showRawData ? 'RAW' : 'PROCESSED'} data by ${field} ${direction} via core engine`
-    );
-  }
-
-  /**
-   * Handle drill-down double-click on data cells
-   */
-  private handleDrillDownClick(e: Event): void {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const target = e.currentTarget as HTMLElement;
-    const rowValue = target.getAttribute('data-row-value');
-    const columnValue = target.getAttribute('data-column-value');
-    const measureName = target.getAttribute('data-measure-name');
-    const measureCaption = target.getAttribute('data-measure-caption');
-    const rowField = target.getAttribute('data-row-field');
-    const columnField = target.getAttribute('data-column-field');
-
-    if (
-      !rowValue ||
-      !columnValue ||
-      !measureName ||
-      !rowField ||
-      !columnField
-    ) {
-      console.warn('Missing required data attributes for drill-down');
-      return;
-    }
-
-    console.log(
-      `Drill-down clicked: ${rowField}:${rowValue} - ${columnField}:${columnValue} - ${measureCaption}`
-    );
-
-    // Get the raw data for this cell
-    const rawDetails = this.getDrillDownData(
-      rowValue,
-      columnValue,
-      measureName,
-      rowField,
-      columnField
-    );
-
-    if (rawDetails.length === 0) {
-      alert(
-        `No detailed data found for ${this.getFieldDisplayName(rowField)}: ${rowValue} in ${this.getFieldDisplayName(columnField)}: ${columnValue}`
+      this._renderSwitch();
+      this.dispatchEvent(
+        new CustomEvent('paginationChange', {
+          detail: { ...this._pagination },
+          bubbles: true,
+          composed: true,
+        })
       );
-      return;
     }
-
-    // Show the drill-down modal
-    this.createDrillDownModal(
-      rowValue,
-      columnValue,
-      { uniqueName: measureName, caption: measureCaption || measureName },
-      rawDetails,
-      target.textContent || '0',
-      rowField,
-      columnField
-    );
   }
 
   /**
-   * Get drill-down data for a specific cell
+   * @preserve
+   * Sets the data handling mode for rendering (raw or processed), updates the engine, reapplies
+   * the current filters for that mode, and emits a `viewModeChange` event.
+   * @public
+   * @param {'raw'|'processed'} mode - Desired view mode.
    */
-  private getDrillDownData(
-    rowValue: string,
-    columnValue: string,
-    measureName: string,
-    rowFieldName: string,
-    columnFieldName: string
-  ): PivotDataRecord[] {
-    if (!this.engine) return [];
+  public setViewMode(mode: 'raw' | 'processed'): void {
+    const wantRaw = mode === 'raw';
+    if (this._showRawData === wantRaw) return;
 
-    const state = this.engine.getState();
-    const rawData = state.rawData || state.data || this._data;
+    this._showRawData = wantRaw;
+    if (!this.engine) return;
 
-    // Create filter object dynamically
-    const filter: Record<string, unknown> = {};
-    filter[rowFieldName] = rowValue;
-    filter[columnFieldName] = columnValue;
-
-    // Filter raw data for this specific row and column combination
-    const filteredData = rawData.filter((item: PivotDataRecord) => {
-      return Object.keys(filter).every(key => item[key] === filter[key]);
-    });
-
-    console.log(
-      `Drill-down data for ${rowFieldName}:${rowValue} - ${columnFieldName}:${columnValue}:`,
-      filteredData
-    );
-
-    return filteredData;
-  }
-
-  /**
-   * Create and show the drill-down modal
-   */
-  private createDrillDownModal(
-    rowValue: string,
-    columnValue: string,
-    measure: { uniqueName: string; caption: string },
-    rawDetails: PivotDataRecord[],
-    aggregatedValue: string,
-    rowFieldName: string,
-    columnFieldName: string
-  ): void {
-    // Remove existing modal if any
-    const existingModal = document.querySelector('.drill-down-modal');
-    if (existingModal) {
-      existingModal.remove();
+    try {
+      this.engine.setDataHandlingMode(wantRaw ? 'raw' : 'processed');
+      const currentFilters = wantRaw
+        ? this._rawFilters
+        : this._processedFilters;
+      this.engine.applyFilters(currentFilters);
+      this.dispatchEvent(
+        new CustomEvent('viewModeChange', {
+          detail: { mode },
+          bubbles: true,
+          composed: true,
+        })
+      );
+    } catch (err) {
+      console.error('Failed to set view mode:', err);
     }
-
-    // Add modal styles to document head if not already present
-    this.addModalStylesToDocument();
-
-    // Create modal elements
-    const modal = document.createElement('div');
-    modal.className = 'drill-down-modal';
-
-    const content = document.createElement('div');
-    content.className = 'drill-down-content';
-
-    // Header
-    const header = document.createElement('div');
-    header.className = 'drill-down-header';
-
-    const title = document.createElement('div');
-    title.className = 'drill-down-title';
-    title.textContent = 'Details';
-
-    const closeButton = document.createElement('button');
-    closeButton.className = 'drill-down-close';
-    closeButton.innerHTML = '×';
-    closeButton.addEventListener('click', () => modal.remove());
-
-    header.appendChild(title);
-    header.appendChild(closeButton);
-
-    // Summary
-    const summary = document.createElement('div');
-    summary.className = 'drill-down-summary';
-    summary.innerHTML = `
-      <strong>${this.getFieldDisplayName(rowFieldName)}:</strong> ${rowValue} &nbsp;&nbsp;
-      <strong>${this.getFieldDisplayName(columnFieldName)}:</strong> ${columnValue} &nbsp;&nbsp;
-      <strong>${measure.caption}:</strong> ${aggregatedValue}
-    `;
-
-    // Table
-    const table = document.createElement('table');
-    table.className = 'drill-down-table';
-
-    // Table header
-    const thead = document.createElement('thead');
-    const headerRow = document.createElement('tr');
-
-    // Get all columns from the raw data
-    const columns = rawDetails.length > 0 ? Object.keys(rawDetails[0]) : [];
-    columns.forEach(col => {
-      const th = document.createElement('th');
-      th.textContent = this.getFieldDisplayName(col);
-      headerRow.appendChild(th);
-    });
-
-    thead.appendChild(headerRow);
-    table.appendChild(thead);
-
-    // Table body
-    const tbody = document.createElement('tbody');
-    rawDetails.forEach((row: PivotDataRecord) => {
-      const tr = document.createElement('tr');
-      columns.forEach(col => {
-        const td = document.createElement('td');
-        let value = row[col];
-
-        // Format values appropriately
-        if (typeof value === 'number') {
-          if (
-            col.includes('price') ||
-            col.includes('sales') ||
-            col.includes('revenue')
-          ) {
-            value = new Intl.NumberFormat('en-US', {
-              style: 'currency',
-              currency: 'USD',
-            }).format(value);
-          } else {
-            value = value.toLocaleString();
-          }
-        } else if (col.includes('date') && value) {
-          try {
-            // Ensure value is a valid date input
-            const dateValue =
-              typeof value === 'string' ||
-              typeof value === 'number' ||
-              value instanceof Date
-                ? value
-                : String(value);
-            value = new Date(dateValue).toLocaleDateString();
-          } catch {
-            // Keep original value if date parsing fails
-          }
-        }
-
-        td.textContent = String(value);
-        tr.appendChild(td);
-      });
-      tbody.appendChild(tr);
-    });
-
-    table.appendChild(tbody);
-
-    // Assemble modal
-    content.appendChild(header);
-    content.appendChild(summary);
-    content.appendChild(table);
-    modal.appendChild(content);
-
-    // Add to document body (not shadow DOM for proper positioning)
-    document.body.appendChild(modal);
-
-    // Close modal when clicking outside
-    modal.addEventListener('click', (e: Event) => {
-      if (e.target === modal) {
-        modal.remove();
-      }
-    });
-
-    // Close modal with Escape key
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        modal.remove();
-        document.removeEventListener('keydown', handleEscape);
-      }
-    };
-    document.addEventListener('keydown', handleEscape);
   }
 
   /**
-   * Get field display name (capitalize first letter)
+   * @preserve
+   * Gets the current view mode.
+   * @public
+   * @returns {'raw'|'processed'} The view mode string.
    */
-  private getFieldDisplayName(fieldName: string): string {
-    return fieldName.charAt(0).toUpperCase() + fieldName.slice(1);
+  public getViewMode(): 'raw' | 'processed' {
+    return this._showRawData ? 'raw' : 'processed';
   }
 }
 
