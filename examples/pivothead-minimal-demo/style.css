@@ -1,0 +1,44 @@
+:root {
+  --border: #e5e7eb;
+  --header-1: #eef2f7;
+  --header-2: #f9fbfd;
+  --text: #111827;
+  --muted: #6b7280;
+  --accent: #2563eb;
+  --row-alt: #f8fafc;
+}
+body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 24px; color: var(--text); }
+.grid { border:1px solid var(--border); border-radius:10px; overflow:hidden; background:#fff; box-shadow: 0 1px 2px rgba(0,0,0,.03); }
+.grid-header { padding: 10px 12px; background:#fff; border-bottom: 1px solid var(--border); }
+.toolbar { display:flex; gap:8px; align-items:center; flex-wrap: wrap; }
+.toolbar label { font-weight:600; color: var(--muted); }
+.toolbar input, .toolbar select { padding: 6px 8px; border:1px solid var(--border); border-radius:6px; background:#fff; }
+.toolbar button { padding: 6px 10px; border:1px solid var(--border); background:#fff; border-radius:6px; cursor:pointer; }
+.toolbar button:hover { background:#f8fafc; }
+
+table { width: 100%; border-collapse: separate; border-spacing: 0; }
+thead tr:first-child th { background: var(--header-1); border-bottom: 1px solid var(--border); }
+thead tr.measures th { background: var(--header-2); border-bottom: 2px solid var(--border); }
+th, td { border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 8px 10px; text-align: left; }
+tr > th:first-child, tr > td:first-child { border-left: 1px solid var(--border); }
+tbody tr:nth-child(even) td { background: var(--row-alt); }
+th.draggable, tr.draggable { cursor: move; }
+
+/* Sort indicators */
+th.sortable { position: relative; user-select: none; cursor: pointer; }
+th.sortable::after { content: "⇅"; font-size: 11px; color: var(--muted); margin-left: 6px; opacity: .5; }
+th.sorted-asc::after { content: "↑"; color: var(--accent); opacity: 1; }
+th.sorted-desc::after { content: "↓"; color: var(--accent); opacity: 1; }
+
+.drag-over { outline: 2px dashed #2672dd; background: #f3f8fd !important; }
+
+/* Stacked measure values inside a single category cell */
+.cell-stack { display: flex; flex-direction: column; gap: 4px; line-height: 1.1; }
+.cell-line { display:flex; justify-content: space-between; gap: 8px; }
+.cell-line .label { color: var(--muted); font-size: 11px; cursor: pointer; }
+.cell-line .label:hover { text-decoration: underline; }
+.cell-line .value { font-weight: 600; }
+
+/* Drill-down cells */
+.drill-down-cell { cursor: pointer; }
+.drill-down-cell:hover { background: #eef6ff !important; }
