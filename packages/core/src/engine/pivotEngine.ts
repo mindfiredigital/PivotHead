@@ -13,6 +13,8 @@ import {
   FilterConfig,
   PaginationConfig,
   DataHandlingMode,
+  CellFormatConfig,
+  CellPosition, // <-- Add this line
 } from '../types/interfaces';
 import { calculateAggregates } from './aggregator';
 import { processData } from './dataProcessor';
@@ -32,6 +34,8 @@ export class PivotEngine<T extends Record<string, any>> {
     pageSize: 10,
     totalPages: 1,
   };
+  private cellFormats: Map<string, CellFormatConfig> = new Map();
+  private selectedCells: Set<string> = new Set();
 
   // Add cache for expensive calculations
   // private cache: Map<string, any> = new Map();
@@ -50,6 +54,8 @@ export class PivotEngine<T extends Record<string, any>> {
 
     this.state = this.initializeState(config);
     this.loadData();
+    this.state.cellFormats = this.cellFormats;
+    this.state.selectedCells = this.selectedCells;
   }
 
   private validateConfig(config: PivotTableConfig<T>): boolean {
@@ -342,7 +348,24 @@ export class PivotEngine<T extends Record<string, any>> {
    * @returns {string} The formatted value as a string.
    * @public
    */
-  public formatValue(value: any, field: string): string {
+  public formatValue(
+    value: any,
+    field: string,
+    cellPosition?: CellPosition,
+    customFormat?: CellFormatConfig
+  ): string {
+    // Check for cell-specific formatting first
+    const cellKey = cellPosition
+      ? `${cellPosition.row}-${cellPosition.col}`
+      : null;
+    const cellFormat = cellKey ? this.cellFormats.get(cellKey) : null;
+    const formatToUse = customFormat || cellFormat;
+
+    if (formatToUse) {
+      return this.applyAdvancedFormatting(value, formatToUse);
+    }
+
+    // Fall back to existing field-based formatting
     const format = this.state.formatting[field];
     if (!format) return String(value);
 
@@ -376,6 +399,114 @@ export class PivotEngine<T extends Record<string, any>> {
       console.error(`Error formatting value for field ${field}:`, error);
       return String(value);
     }
+  }
+
+  /**
+   * Apply advanced formatting based on CellFormatConfig
+   */
+  private applyAdvancedFormatting(
+    value: any,
+    format: CellFormatConfig
+  ): string {
+    if (value === null || value === undefined || value === '') {
+      return format.nullValue || '';
+    }
+
+    // Handle different value types
+    switch (format.chooseValue) {
+      case 'currency':
+        return this.formatCurrency(value, format);
+      case 'number':
+        return this.formatNumber(value, format);
+      case 'percentage':
+        return this.formatPercentage(value, format);
+      case 'date':
+        return this.formatDate(value, format);
+      case 'text':
+        return String(value);
+      default:
+        return this.formatNumber(value, format);
+    }
+  }
+
+  /**
+   * Format currency values
+   */
+  private formatCurrency(value: any, format: CellFormatConfig): string {
+    let num = parseFloat(value);
+    if (isNaN(num)) return String(value);
+
+    const formattedNumber = this.formatNumberBase(num, format);
+    const symbol = format.currencySymbol || '$';
+
+    return format.currencyAlign === 'right'
+      ? formattedNumber + symbol
+      : symbol + formattedNumber;
+  }
+
+  /**
+   * Format number values
+   */
+  private formatNumber(value: any, format: CellFormatConfig): string {
+    let num = parseFloat(value);
+    if (isNaN(num)) return String(value);
+
+    return this.formatNumberBase(num, format);
+  }
+
+  /**
+   * Format percentage values
+   */
+  private formatPercentage(value: any, format: CellFormatConfig): string {
+    let num = parseFloat(value);
+    if (isNaN(num)) return String(value);
+
+    if (format.formatAsPercent) {
+      num = num * 100;
+    }
+
+    return this.formatNumberBase(num, format) + '%';
+  }
+
+  /**
+   * Format date values
+   */
+  private formatDate(value: any, format: CellFormatConfig): string {
+    try {
+      const date = new Date(value);
+      return date.toLocaleDateString();
+    } catch (error) {
+      return String(value);
+    }
+  }
+
+  /**
+   * Base number formatting with separators and decimal places
+   */
+  private formatNumberBase(num: number, format: CellFormatConfig): string {
+    // Apply decimal places
+    const decimalPlaces = format.decimalPlaces ?? 2;
+    const fixedNumber = num.toFixed(decimalPlaces);
+
+    // Split into integer and decimal parts
+    let [integerPart, decimalPart] = fixedNumber.split('.');
+
+    // Apply thousand separator
+    if (format.thousandSeparator && format.thousandSeparator !== 'none') {
+      integerPart = integerPart.replace(
+        /\B(?=(\d{3})+(?!\d))/g,
+        format.thousandSeparator
+      );
+    }
+
+    // Combine parts with decimal separator
+    let formattedNumber = integerPart;
+    if (decimalPart && decimalPlaces > 0) {
+      const separator = format.decimalSeparator || '.';
+      formattedNumber += separator + decimalPart;
+    }
+
+    return formattedNumber;
   }
 
   /**
@@ -554,7 +685,11 @@ export class PivotEngine<T extends Record<string, any>> {
    * @public
    */
   public getState(): PivotTableState<T> {
-    return { ...this.state };
+    return {
+      ...this.state,
+      cellFormats: this.cellFormats,
+      selectedCells: this.selectedCells,
+    };
   }
 
   /**
@@ -1377,5 +1512,99 @@ export class PivotEngine<T extends Record<string, any>> {
     }
     console.log('Engine has no custom row order');
     return null;
+  }
+
+  /**
+   * Set formatting for specific cells
+   */
+  public setCellFormat(cellKey: string, format: CellFormatConfig): void {
+    this.cellFormats.set(cellKey, format);
+  }
+
+  /**
+   * Get formatting for a specific cell
+   */
+  public getCellFormat(cellKey: string): CellFormatConfig | undefined {
+    return this.cellFormats.get(cellKey);
+  }
+
+  /**
+   * Clear formatting for specific cells
+   */
+  public clearCellFormat(cellKey: string): void {
+    this.cellFormats.delete(cellKey);
+  }
+
+  /**
+   * Clear all cell formatting
+   */
+  public clearAllCellFormats(): void {
+    this.cellFormats.clear();
+  }
+
+  /**
+   * Set selected cells
+   */
+  public setSelectedCells(cellKeys: string[]): void {
+    this.selectedCells.clear();
+    cellKeys.forEach(key => this.selectedCells.add(key));
+  }
+
+  /**
+   * Get selected cells
+   */
+  public getSelectedCells(): string[] {
+    return Array.from(this.selectedCells);
+  }
+
+  /**
+   * Add cell to selection
+   */
+  public addToSelection(cellKey: string): void {
+    this.selectedCells.add(cellKey);
+  }
+
+  /**
+   * Remove cell from selection
+   */
+  public removeFromSelection(cellKey: string): void {
+    this.selectedCells.delete(cellKey);
+  }
+
+  /**
+   * Clear selection
+   */
+  public clearSelection(): void {
+    this.selectedCells.clear();
+  }
+
+  /**
+   * Apply formatting to multiple cells
+   */
+  public applyFormatToSelection(format: CellFormatConfig): void {
+    this.selectedCells.forEach(cellKey => {
+      this.setCellFormat(cellKey, format);
+    });
+  }
+
+  /**
+   * Export formatting data
+   */
+  public exportFormats(): Record<string, CellFormatConfig> {
+    const formats: Record<string, CellFormatConfig> = {};
+    this.cellFormats.forEach((format, key) => {
+      formats[key] = format;
+    });
+    return formats;
+  }
+
+  /**
+   * Import formatting data
+   */
+  public importFormats(formats: Record<string, CellFormatConfig>): void {
+    this.cellFormats.clear();
+    Object.entries(formats).forEach(([key, format]) => {
+      this.cellFormats.set(key, format);
+    });
   }
 }

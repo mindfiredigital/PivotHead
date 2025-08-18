@@ -114,6 +114,8 @@ export interface PivotTableState<T> {
   columnGroups: Group[];
   filterConfig: FilterConfig[];
   paginationConfig: PaginationConfig;
+  cellFormats?: Map<string, CellFormatConfig>;
+  selectedCells?: Set<string>;
 }
 
 export interface PivotTableConfig<T> {
@@ -179,3 +181,34 @@ export type Config = {
   columns: Column[];
   data: Row[];
 };
+
+export interface CellFormatConfig {
+  // Text formatting
+  textAlign?: 'left' | 'center' | 'right';
+  fontWeight?: 'normal' | 'bold';
+  fontStyle?: 'normal' | 'italic';
+  fontSize?: string;
+  fontFamily?: string;
+  color?: string;
+  backgroundColor?: string;
+
+  // Number formatting
+  chooseValue?: 'none' | 'currency' | 'number' | 'percentage' | 'text' | 'date';
+  thousandSeparator?: string;
+  decimalSeparator?: string;
+  decimalPlaces?: number;
+
+  // Currency formatting
+  currencySymbol?: string;
+  currencyAlign?: 'left' | 'right';
+
+  // Special formatting
+  nullValue?: string;
+  formatAsPercent?: boolean;
+}
+
+export interface CellPosition {
+  row: number;
+  col: number;
+  field?: string;
+}

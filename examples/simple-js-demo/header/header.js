@@ -77,7 +77,25 @@ export function createHeader(config) {
           console.log(optionName);
           switch (optionName) {
             case 'Format Cell':
-              formatCellPopUp(config);
+              // Check if cellFormatter is available and has selected cells
+              if (
+                window.cellFormatter &&
+                window.cellFormatter.selectedCells.size === 0
+              ) {
+                alert(
+                  'Please select cells first by clicking on them while holding Ctrl'
+                );
+                dropdown.style.display = 'none'; // Hide the dropdown
+                return;
+              }
+              if (window.cellFormatter) {
+                window.cellFormatter.showFormatModal();
+              } else {
+                alert(
+                  'Cell formatter not initialized. Please refresh the page.'
+                );
+              }
+              dropdown.style.display = 'none'; // Hide the dropdown
               break;
             case 'Condition Formatting':
               conditionFormattingPopUp();

@@ -28,6 +28,28 @@ let paginationState = {
   totalPages: 1,
 };
 
+let cellFormatter = null;
+let selectedCells = new Set();
+
+// Cell formatting configuration
+const CellFormatConfig = {
+  textAlign: 'left',
+  fontWeight: 'normal',
+  fontStyle: 'normal',
+  fontSize: '14px',
+  fontFamily: 'Arial, sans-serif',
+  color: '#000000',
+  backgroundColor: '#ffffff',
+  chooseValue: 'none',
+  thousandSeparator: ' ',
+  decimalSeparator: '.',
+  decimalPlaces: 2,
+  currencySymbol: '$',
+  currencyAlign: 'left',
+  nullValue: '',
+  formatAsPercent: false,
+};
+
 // Initialize filter fields
 // function initializeFilters() {
 //   const filterField = document.getElementById('filterField');
@@ -138,6 +160,471 @@ function createSortIcon(field, currentSortConfig) {
 
   return sortIcon;
 }
+
+// Cell Formatter Class - ADD THIS ENTIRE CLASS
+// REPLACE your existing CellFormatter class with this enhanced version
+
+class CellFormatter {
+  constructor() {
+    this.currentFormat = { ...CellFormatConfig };
+    this.selectedCells = new Set();
+    this.formatHistory = new Map();
+  }
+
+  // Enhanced formatNumber with all separator options
+  formatNumber(value, config) {
+    if (value === null || value === undefined || value === '') {
+      return config.nullValue || '';
+    }
+
+    let num = parseFloat(value);
+    if (isNaN(num)) return value;
+
+    // Handle percentage
+    if (config.formatAsPercent) {
+      num = num * 100;
+    }
+
+    // Apply decimal places
+    const decimalPlaces = config.decimalPlaces || 2;
+    num = num.toFixed(decimalPlaces);
+
+    // Split into integer and decimal parts
+    let [integerPart, decimalPart] = num.split('.');
+
+    // Apply thousand separator
+    if (config.thousandSeparator && config.thousandSeparator !== 'none') {
+      let separator = config.thousandSeparator;
+      // Convert display names to actual separators
+      if (separator === '(Space)') separator = ' ';
+      if (separator === '(Comma)') separator = ',';
+      if (separator === '(Dot)') separator = '.';
+
+      integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, separator);
+    }
+
+    // Combine parts with decimal separator
+    let formattedNumber = integerPart;
+    if (decimalPart && decimalPlaces > 0) {
+      let decSeparator = config.decimalSeparator || '.';
+      // Convert display names to actual separators
+      if (decSeparator === '. (Dot)') decSeparator = '.';
+      if (decSeparator === ', (Comma)') decSeparator = ',';
+
+      formattedNumber += decSeparator + decimalPart;
+    }
+
+    // Add currency or percentage symbol
+    if (config.chooseValue === 'currency') {
+      const symbol = this.getCurrencySymbol(config.currencySymbol);
+      formattedNumber =
+        config.currencyAlign === 'right'
+          ? formattedNumber + symbol
+          : symbol + formattedNumber;
+    } else if (config.formatAsPercent || config.chooseValue === 'percentage') {
+      formattedNumber += '%';
+    }
+
+    return formattedNumber;
+  }
+
+  // Get currency symbol from dropdown value
+  getCurrencySymbol(currencyValue) {
+    const currencyMap = {
+      '$ (Dollar)': '$',
+      '€ (Euro)': '€',
+      '£ (Pound)': '£',
+      '₹ (Rupee)': '₹',
+      '¥ (Yen)': '¥',
+    };
+    return currencyMap[currencyValue] || '$';
+  }
+
+  // Enhanced applyTextStyling with text alignment
+  applyTextStyling(element, config) {
+    if (!element) return;
+    element.style.textAlign = config.textAlign || 'left';
+    element.style.fontFamily = config.fontFamily || 'Arial, sans-serif';
+    element.style.fontSize = config.fontSize || '14px';
+    element.style.fontWeight = config.fontWeight || 'normal';
+    element.style.fontStyle = config.fontStyle || 'normal';
+    element.style.color = config.color || '#000000';
+    element.style.backgroundColor = config.backgroundColor || '#ffffff';
+  }
+
+  showFormatModal() {
+    if (this.selectedCells.size === 0) {
+      alert('Please select cells first by clicking on them while holding Ctrl');
+      return;
+    }
+
+    const modal = this.createFormatModal();
+    document.body.appendChild(modal);
+    this.setupModalEventListeners(modal);
+    this.loadCurrentFormat();
+    this.updatePreview();
+  }
+
+  // Enhanced createFormatModal with all options matching the screenshot
+  createFormatModal() {
+    const modal = document.createElement('div');
+    modal.id = 'formatCellModal';
+    modal.className = 'format-modal';
+    modal.innerHTML = `
+      <div class="format-modal-content">
+        <div class="format-modal-header">
+          <h3>Format cells</h3>
+          <button id="closeFormatModal" class="format-close-btn">&times;</button>
+        </div>
+        
+        <div class="format-modal-body">
+          <!-- Choose Value -->
+          <div class="format-section">
+            <label for="chooseValue">CHOOSE VALUE</label>
+            <select id="chooseValue" class="format-select">
+              <option value="none">Choose value</option>
+              <option value="currency">Currency</option>
+              <option value="number">Number</option>
+              <option value="percentage">Percentage</option>
+              <option value="text">Text</option>
+              <option value="date">Date</option>
+            </select>
+          </div>
+
+          <!-- Text Align -->
+          <div class="format-section">
+            <label for="textAlign">Text align</label>
+            <select id="textAlign" class="format-select">
+              <option value="left">left</option>
+              <option value="center">center</option>
+              <option value="right">right</option>
+            </select>
+          </div>
+
+          <!-- Thousand Separator -->
+          <div class="format-section">
+            <label for="thousandSeparator">Thousand separator</label>
+            <select id="thousandSeparator" class="format-select">
+              <option value="(Space)">(Space)</option>
+              <option value="(Comma)">(Comma)</option>
+              <option value="(Dot)">(Dot)</option>
+              <option value="none">None</option>
+            </select>
+          </div>
+
+          <!-- Decimal Separator -->
+          <div class="format-section">
+            <label for="decimalSeparator">Decimal separator</label>
+            <select id="decimalSeparator" class="format-select">
+              <option value=". (Dot)">. (Dot)</option>
+              <option value=", (Comma)">, (Comma)</option>
+            </select>
+          </div>
+
+          <!-- Decimal Places -->
+          <div class="format-section">
+            <label for="decimalPlaces">Decimal places</label>
+            <select id="decimalPlaces" class="format-select">
+              <option value="none">None</option>
+              <option value="0">0</option>
+              <option value="1">1</option>
+              <option value="2" selected>2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+          </div>
+
+          <!-- Currency Symbol -->
+          <div class="format-section currency-section" style="display: none;">
+            <label for="currencySymbol">Currency symbol</label>
+            <select id="currencySymbol" class="format-select">
+              <option value="$ (Dollar)">$ (Dollar)</option>
+              <option value="€ (Euro)">€ (Euro)</option>
+              <option value="£ (Pound)">£ (Pound)</option>
+              <option value="₹ (Rupee)">₹ (Rupee)</option>
+              <option value="¥ (Yen)">¥ (Yen)</option>
+            </select>
+          </div>
+
+          <!-- Currency Align -->
+          <div class="format-section currency-section" style="display: none;">
+            <label for="currencyAlign">Currency align</label>
+            <select id="currencyAlign" class="format-select">
+              <option value="left">left</option>
+              <option value="right">right</option>
+            </select>
+          </div>
+
+          <!-- Null Value -->
+          <div class="format-section">
+            <label for="nullValue">Null value</label>
+            <input type="text" id="nullValue" class="format-input" placeholder="What to show for empty values">
+          </div>
+
+          <!-- Format as Percent -->
+          <div class="format-section">
+            <label for="formatAsPercent">Format as percent</label>
+            <select id="formatAsPercent" class="format-select">
+              <option value="false">false</option>
+              <option value="true">true</option>
+            </select>
+          </div>
+
+          <!-- Font Styling -->
+          <div class="format-section">
+            <label>Font Style</label>
+            <div class="font-controls">
+              <select id="fontFamily" class="format-select">
+                <option value="Arial, sans-serif">Arial</option>
+                <option value="Helvetica, sans-serif">Helvetica</option>
+                <option value="Times New Roman, serif">Times New Roman</option>
+                <option value="Courier New, monospace">Courier New</option>
+              </select>
+              <select id="fontSize" class="format-select">
+                <option value="12px">12px</option>
+                <option value="14px" selected>14px</option>
+                <option value="16px">16px</option>
+                <option value="18px">18px</option>
+              </select>
+              <button type="button" id="boldToggle" class="format-btn">B</button>
+              <button type="button" id="italicToggle" class="format-btn">I</button>
+            </div>
+          </div>
+
+          <!-- Colors -->
+          <div class="format-section">
+            <label>Colors</label>
+            <div class="color-controls">
+              <div class="color-control">
+                <label for="textColor">Text Color:</label>
+                <input type="color" id="textColor" value="#000000">
+              </div>
+              <div class="color-control">
+                <label for="backgroundColor">Background:</label>
+                <input type="color" id="backgroundColor" value="#ffffff">
+              </div>
+            </div>
+          </div>
+
+          <!-- Preview Section -->
+          <div class="format-section">
+            <label>Preview</label>
+            <div id="formatPreview" class="format-preview">1234.56</div>
+          </div>
+        </div>
+
+        <div class="format-modal-footer">
+          <button id="applyFormat" class="format-apply-btn">APPLY</button>
+          <button id="cancelFormat" class="format-cancel-btn">CANCEL</button>
+        </div>
+      </div>
+    `;
+    return modal;
+  }
+
+  // Enhanced setupModalEventListeners
+  setupModalEventListeners(modal) {
+    // Close handlers
+    modal
+      .querySelector('#closeFormatModal')
+      .addEventListener('click', () => modal.remove());
+    modal
+      .querySelector('#cancelFormat')
+      .addEventListener('click', () => modal.remove());
+
+    // Apply handler
+    modal.querySelector('#applyFormat').addEventListener('click', () => {
+      this.applyFormat();
+      modal.remove();
+    });
+
+    // Input change handlers
+    const inputs = modal.querySelectorAll('select, input');
+    inputs.forEach(input => {
+      input.addEventListener('change', () => {
+        this.updateFormatFromInputs();
+        this.updatePreview();
+      });
+      input.addEventListener('input', () => {
+        this.updateFormatFromInputs();
+        this.updatePreview();
+      });
+    });
+
+    // Font style toggles
+    const boldToggle = modal.querySelector('#boldToggle');
+    const italicToggle = modal.querySelector('#italicToggle');
+
+    boldToggle.addEventListener('click', () => {
+      boldToggle.classList.toggle('active');
+      this.currentFormat.fontWeight = boldToggle.classList.contains('active')
+        ? 'bold'
+        : 'normal';
+      this.updatePreview();
+    });
+
+    italicToggle.addEventListener('click', () => {
+      italicToggle.classList.toggle('active');
+      this.currentFormat.fontStyle = italicToggle.classList.contains('active')
+        ? 'italic'
+        : 'normal';
+      this.updatePreview();
+    });
+
+    // Show/hide currency sections based on choose value
+    modal.querySelector('#chooseValue').addEventListener('change', e => {
+      this.toggleCurrencyFields();
+      this.updatePreview();
+    });
+  }
+
+  // Enhanced updateFormatFromInputs
+  updateFormatFromInputs() {
+    const modal = document.getElementById('formatCellModal');
+    if (!modal) return;
+
+    this.currentFormat = {
+      ...this.currentFormat,
+      chooseValue: modal.querySelector('#chooseValue').value,
+      textAlign: modal.querySelector('#textAlign').value,
+      thousandSeparator: modal.querySelector('#thousandSeparator').value,
+      decimalSeparator: modal.querySelector('#decimalSeparator').value,
+      decimalPlaces:
+        modal.querySelector('#decimalPlaces').value === 'none'
+          ? 0
+          : parseInt(modal.querySelector('#decimalPlaces').value),
+      currencySymbol: modal.querySelector('#currencySymbol').value,
+      currencyAlign: modal.querySelector('#currencyAlign').value,
+      nullValue: modal.querySelector('#nullValue').value,
+      formatAsPercent: modal.querySelector('#formatAsPercent').value === 'true',
+      fontFamily: modal.querySelector('#fontFamily').value,
+      fontSize: modal.querySelector('#fontSize').value,
+      color: modal.querySelector('#textColor').value,
+      backgroundColor: modal.querySelector('#backgroundColor').value,
+    };
+  }
+
+  // Toggle currency-specific fields
+  toggleCurrencyFields() {
+    const currencySections = document.querySelectorAll('.currency-section');
+    const isCurrency = this.currentFormat.chooseValue === 'currency';
+
+    currencySections.forEach(section => {
+      section.style.display = isCurrency ? 'block' : 'none';
+    });
+  }
+
+  // Enhanced updatePreview
+  updatePreview() {
+    const preview = document.getElementById('formatPreview');
+    if (!preview) return;
+
+    // Sample value for preview
+    const sampleValue = 1234.56;
+    const formattedValue = this.formatNumber(sampleValue, this.currentFormat);
+
+    preview.textContent = formattedValue;
+    this.applyTextStyling(preview, this.currentFormat);
+  }
+
+  // Load current format into modal
+  loadCurrentFormat() {
+    const modal = document.getElementById('formatCellModal');
+    if (!modal) return;
+
+    // Set all input values
+    modal.querySelector('#chooseValue').value =
+      this.currentFormat.chooseValue || 'none';
+    modal.querySelector('#textAlign').value =
+      this.currentFormat.textAlign || 'left';
+    modal.querySelector('#thousandSeparator').value =
+      this.currentFormat.thousandSeparator || '(Space)';
+    modal.querySelector('#decimalSeparator').value =
+      this.currentFormat.decimalSeparator || '. (Dot)';
+    modal.querySelector('#decimalPlaces').value =
+      this.currentFormat.decimalPlaces === 0
+        ? 'none'
+        : this.currentFormat.decimalPlaces || 2;
+    modal.querySelector('#currencySymbol').value =
+      this.currentFormat.currencySymbol || '$ (Dollar)';
+    modal.querySelector('#currencyAlign').value =
+      this.currentFormat.currencyAlign || 'left';
+    modal.querySelector('#nullValue').value =
+      this.currentFormat.nullValue || '';
+    modal.querySelector('#formatAsPercent').value = this.currentFormat
+      .formatAsPercent
+      ? 'true'
+      : 'false';
+    modal.querySelector('#fontFamily').value =
+      this.currentFormat.fontFamily || 'Arial, sans-serif';
+    modal.querySelector('#fontSize').value =
+      this.currentFormat.fontSize || '14px';
+    modal.querySelector('#textColor').value =
+      this.currentFormat.color || '#000000';
+    modal.querySelector('#backgroundColor').value =
+      this.currentFormat.backgroundColor || '#ffffff';
+
+    // Set font style toggles
+    const boldToggle = modal.querySelector('#boldToggle');
+    const italicToggle = modal.querySelector('#italicToggle');
+
+    if (this.currentFormat.fontWeight === 'bold') {
+      boldToggle.classList.add('active');
+    }
+    if (this.currentFormat.fontStyle === 'italic') {
+      italicToggle.classList.add('active');
+    }
+
+    this.toggleCurrencyFields();
+  }
+
+  // Apply format to selected cells
+  applyFormat() {
+    this.selectedCells.forEach(cellSelector => {
+      const cell = document.querySelector(cellSelector);
+      if (cell) {
+        const originalValue = cell.dataset.originalValue || cell.textContent;
+        cell.dataset.originalValue = originalValue;
+
+        const formattedValue = this.formatNumber(
+          originalValue,
+          this.currentFormat
+        );
+        cell.textContent = formattedValue;
+        this.applyTextStyling(cell, this.currentFormat);
+
+        this.formatHistory.set(cellSelector, { ...this.currentFormat });
+      }
+    });
+  }
+
+  // Rest of the methods remain the same...
+  addCellToSelection(cell) {
+    const selector = this.getCellSelector(cell);
+    this.selectedCells.add(selector);
+    cell.classList.add('selected-cell');
+  }
+
+  removeCellFromSelection(cell) {
+    const selector = this.getCellSelector(cell);
+    this.selectedCells.delete(selector);
+    cell.classList.remove('selected-cell');
+  }
+
+  clearSelection() {
+    document.querySelectorAll('.selected-cell').forEach(cell => {
+      cell.classList.remove('selected-cell');
+    });
+    this.selectedCells.clear();
+  }
+
+  getCellSelector(cell) {
+    const row = cell.closest('tr').rowIndex;
+    const col = cell.cellIndex;
+    return `tr:nth-child(${row + 1}) td:nth-child(${col + 1})`;
+  }
+}
+
 function sortRawDataByColumn(columnName, rawData) {
   console.log(`Sorting raw data by column: ${columnName}`);
 
@@ -2042,6 +2529,34 @@ function setupEventListeners() {
     document.getElementById('filterOperator').selectedIndex = 0;
     document.getElementById('filterValue').value = '';
 
+    // Format controls event listeners - ADD THESE LINES
+    // document.getElementById('formatCellsBtn').addEventListener('click', () => {
+    //   if (cellFormatter.selectedCells.size === 0) {
+    //     alert('Please select cells first by clicking on them while holding Ctrl');
+    //     return;
+    //   }
+    //   cellFormatter.showFormatModal();
+    // });
+
+    // document.getElementById('clearFormatBtn').addEventListener('click', () => {
+    //   if (confirm('Clear all cell formatting?')) {
+    //     document.querySelectorAll('td').forEach(cell => {
+    //       if (cell.dataset.originalValue) {
+    //         cell.textContent = cell.dataset.originalValue;
+    //         delete cell.dataset.originalValue;
+    //       }
+    //       cell.style.cssText = cell.style.cssText.replace(/text-align[^;]*;?/g, '')
+    //                                              .replace(/font-family[^;]*;?/g, '')
+    //                                              .replace(/font-size[^;]*;?/g, '')
+    //                                              .replace(/font-weight[^;]*;?/g, '')
+    //                                              .replace(/font-style[^;]*;?/g, '')
+    //                                              .replace(/color[^;]*;?/g, '')
+    //                                              .replace(/background-color[^;]*;?/g, '');
+    //     });
+    //     cellFormatter.formatHistory.clear();
+    //   }
+    // });
+
     renderTable();
   });
 }
@@ -2328,6 +2843,310 @@ function addDraggableStyles() {
   document.head.appendChild(styleEl);
 }
 
+/* REPLACE your addFormattingStyles function with this enhanced version */
+
+function addFormattingStyles() {
+  const styles = `
+    <style id="formattingStyles">
+      /* Cell selection styles */
+      .selected-cell {
+        background-color: rgba(76, 175, 80, 0.3) !important;
+        border: 2px solid #4CAF50 !important;
+      }
+      
+      /* Format modal styles - matching the screenshot */
+      .format-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+      }
+
+      .format-modal-content {
+        background: white;
+        border-radius: 4px;
+        width: 90%;
+        max-width: 480px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border: 1px solid #d0d0d0;
+      }
+
+      .format-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        border-bottom: 1px solid #e0e0e0;
+        background-color: #fafafa;
+      }
+
+      .format-modal-header h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 500;
+        color: #333;
+      }
+
+      .format-close-btn {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: #666;
+        padding: 4px;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 2px;
+      }
+
+      .format-close-btn:hover {
+        background-color: #e0e0e0;
+      }
+
+      .format-modal-body {
+        padding: 20px;
+        max-height: calc(90vh - 140px);
+        overflow-y: auto;
+      }
+
+      .format-section {
+        margin-bottom: 16px;
+      }
+
+      .format-section label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 400;
+        color: #555;
+        font-size: 13px;
+        text-transform: none;
+      }
+
+      .format-select, .format-input {
+        width: 100%;
+        padding: 8px 10px;
+        border: 1px solid #d0d0d0;
+        border-radius: 3px;
+        font-size: 13px;
+        background-color: white;
+        color: #333;
+        font-family: inherit;
+      }
+
+      .format-select:focus, .format-input:focus {
+        outline: none;
+        border-color: #4a90e2;
+        box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+      }
+
+      .format-input::placeholder {
+        color: #999;
+        font-style: italic;
+      }
+
+      /* Font controls styling */
+      .font-controls {
+        display: grid;
+        grid-template-columns: 2fr 1fr auto auto;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .format-btn {
+        width: 32px;
+        height: 32px;
+        border: 1px solid #d0d0d0;
+        background: white;
+        border-radius: 3px;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        color: #333;
+      }
+
+      .format-btn.active {
+        background-color: #4a90e2;
+        color: white;
+        border-color: #4a90e2;
+      }
+
+      .format-btn:hover {
+        background-color: #f0f0f0;
+      }
+
+      .format-btn.active:hover {
+        background-color: #357abd;
+      }
+
+      /* Color controls styling */
+      .color-controls {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .color-control {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .color-control label {
+        margin: 0;
+        font-size: 12px;
+        min-width: 65px;
+        color: #666;
+      }
+
+      .color-control input[type="color"] {
+        width: 36px;
+        height: 24px;
+        border: 1px solid #d0d0d0;
+        border-radius: 3px;
+        cursor: pointer;
+        padding: 0;
+      }
+
+      /* Preview styling */
+      .format-preview {
+        border: 1px solid #d0d0d0;
+        border-radius: 3px;
+        padding: 12px;
+        background-color: #f9f9f9;
+        text-align: center;
+        min-height: 20px;
+        font-size: 14px;
+        color: #333;
+        font-family: inherit;
+      }
+
+      /* Modal footer styling */
+      .format-modal-footer {
+        padding: 16px 20px;
+        border-top: 1px solid #e0e0e0;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        background-color: #fafafa;
+      }
+
+      .format-apply-btn, .format-cancel-btn {
+        padding: 8px 20px;
+        border: none;
+        border-radius: 3px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        min-width: 70px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .format-apply-btn {
+        background-color: #666;
+        color: white;
+      }
+
+      .format-apply-btn:hover {
+        background-color: #555;
+      }
+
+      .format-cancel-btn {
+        background-color: #e0e0e0;
+        color: #666;
+        border: 1px solid #d0d0d0;
+      }
+
+      .format-cancel-btn:hover {
+        background-color: #d0d0d0;
+      }
+
+      /* Currency section visibility */
+      .currency-section {
+        transition: all 0.2s ease;
+      }
+
+      /* Scrollbar styling for modal body */
+      .format-modal-body::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .format-modal-body::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+      }
+
+      .format-modal-body::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+      }
+
+      .format-modal-body::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 600px) {
+        .format-modal-content {
+          width: 95%;
+          margin: 10px;
+        }
+        
+        .font-controls {
+          grid-template-columns: 1fr;
+          gap: 8px;
+        }
+        
+        .color-controls {
+          grid-template-columns: 1fr;
+        }
+        
+        .format-modal-footer {
+          flex-direction: column-reverse;
+        }
+        
+        .format-apply-btn, .format-cancel-btn {
+          width: 100%;
+        }
+      }
+
+      /* Disabled state for currency fields */
+      .currency-section select:disabled {
+        background-color: #f5f5f5;
+        color: #999;
+        cursor: not-allowed;
+      }
+
+      /* Better focus states */
+      .format-btn:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.3);
+      }
+
+      .color-control input[type="color"]:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.3);
+      }
+    </style>
+  `;
+
+  document.head.insertAdjacentHTML('beforeend', styles);
+}
+
 // Add this function to create the drill-down modal:
 // Generic function to update drill-down modal for any fields
 function createDrillDownModal(
@@ -2559,6 +3378,7 @@ function addControlsHTML() {
       <button id="resetFilter">Reset</button>
       <button id="switchView">Switch to Raw Data</button>
     </div>
+   
     <div class="pagination-container">
       <label>Items per page:</label>
       <select id="pageSize">
@@ -2578,6 +3398,25 @@ function addControlsHTML() {
 
   const myTable = document.getElementById('myTable');
   myTable.parentNode.insertBefore(container, myTable);
+}
+
+function setupCellSelection() {
+  document.addEventListener('click', e => {
+    if (e.target.tagName === 'TD' && e.target.closest('#myTable')) {
+      if (e.ctrlKey || e.metaKey) {
+        if (e.target.classList.contains('selected-cell')) {
+          cellFormatter.removeCellFromSelection(e.target);
+        } else {
+          cellFormatter.addCellToSelection(e.target);
+        }
+      } else {
+        cellFormatter.clearSelection();
+        cellFormatter.addCellToSelection(e.target);
+      }
+    } else if (!e.target.closest('.format-modal')) {
+      cellFormatter.clearSelection();
+    }
+  });
 }
 
 // Add this function to set up drag and drop functionality
@@ -3135,6 +3974,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   console.log('Initial pivot engine state:', pivotEngine.getState());
 
+  // Initialize cell formatter - ADD THESE LINES
+  cellFormatter = new CellFormatter();
+  addFormattingStyles();
+
   if (config.toolbar) {
     createHeader(config);
   }
@@ -3149,8 +3992,12 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeFilters();
   setupEventListeners();
 
+  setupCellSelection();
+
   // CRITICAL: Set initial pagination with all sample data
   updatePagination(sampleData, true);
+
+  window.cellFormatter = cellFormatter;
 
   // Initial render
   renderTable();
