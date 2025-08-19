@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>PivotHead None Mode Demo</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <h2>PivotHead Web Component: mode="none" (Headless)</h2>
+  <p>
+    In <code>mode="none"</code> the component renders no markup. You own the DOM
+    and call the component API to get state, data and utilities.
+  </p>
+
+  <!-- The component holds data, options and APIs, but renders nothing in none mode -->
+  <pivot-head id="pivot" mode="none"
+    data='[{"country":"Australia","category":"Accessories","price":174,"discount":23},{"country":"Australia","category":"Accessories","price":680,"discount":80},{"country":"Canada","category":"Cars","price":180,"discount":80},{"country":"Australia","category":"Accessories","price":680,"discount":80},{"country":"Australia","category":"Accessories","price":680,"discount":80},{"country":"Australia","category":"Accessories","price":680,"discount":80},{"country":"Canada","category":"Cars","price":180,"discount":80}]'
+    options='{
+      "rows":[{"uniqueName":"country","caption":"Country"}],
+      "columns":[{"uniqueName":"category","caption":"Category"}],
+      "measures":[
+        {"uniqueName":"price","caption":"Sum of Price","aggregation":"sum"},
+        {"uniqueName":"discount","caption":"Sum of Discount","aggregation":"sum"}
+      ]
+    }'
+  ></pivot-head>
+
+  <!-- UI -->
+  <div class="toolbar">
+    <div class="row">
+      <label>Field</label>
+      <select id="filterField"></select>
+      <select id="filterOperator">
+        <option value="equals">Equals</option>
+        <option value="contains">Contains</option>
+        <option value="greaterThan">Greater Than</option>
+        <option value="lessThan">Less Than</option>
+      </select>
+      <input type="text" id="filterValue" placeholder="Value" />
+      <button id="applyFilter">Apply</button>
+      <button id="resetFilter">Reset</button>
+    </div>
+
+    <div class="row">
+      <label>Page Size</label>
+      <select id="pageSize">
+        <option value="5">5</option>
+        <option value="10" selected>10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+      </select>
+      <button id="prevPage">Prev</button>
+      <span id="pageInfo"></span>
+      <button id="nextPage">Next</button>
+    </div>
+
+    <div class="row">
+      <button id="switchView">Switch to Raw</button>
+      <button id="exportHTML">Export HTML</button>
+      <button id="exportPDF">Export PDF</button>
+      <button id="exportExcel">Export Excel</button>
+      <button id="printTable">Print</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <table id="table"></table>
+  </div>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
