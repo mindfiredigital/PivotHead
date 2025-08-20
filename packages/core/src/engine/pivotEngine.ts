@@ -13,8 +13,6 @@ import {
   FilterConfig,
   PaginationConfig,
   DataHandlingMode,
-  CellFormatConfig,
-  CellPosition, // <-- Add this line
 } from '../types/interfaces';
 import { calculateAggregates } from './aggregator';
 import { processData } from './dataProcessor';
@@ -34,8 +32,6 @@ export class PivotEngine<T extends Record<string, any>> {
     pageSize: 10,
     totalPages: 1,
   };
-  private cellFormats: Map<string, CellFormatConfig> = new Map();
-  private selectedCells: Set<string> = new Set();
 
   // Add cache for expensive calculations
   // private cache: Map<string, any> = new Map();
@@ -54,8 +50,6 @@ export class PivotEngine<T extends Record<string, any>> {
 
     this.state = this.initializeState(config);
     this.loadData();
-    this.state.cellFormats = this.cellFormats;
-    this.state.selectedCells = this.selectedCells;
   }
 
   private validateConfig(config: PivotTableConfig<T>): boolean {
@@ -131,6 +125,35 @@ export class PivotEngine<T extends Record<string, any>> {
   public setDataHandlingMode(mode: DataHandlingMode) {
     this.state.dataHandlingMode = mode;
     this.refreshData();
+    this._emit(); // Notify subscribers after state change
+  }
+
+  /**
+   * Gets the current data handling mode
+   * @returns {DataHandlingMode}
+   * @public
+   */
+  public getDataHandlingMode(): DataHandlingMode {
+    return this.state.dataHandlingMode;
+  }
+
+  /**
+   * Updates the engine's data source and applies current filters
+   * This method allows external components to update the data while preserving filtering
+   * @param {T[]} newData - The new data to use as the source
+   * @public
+   */
+  public updateDataSource(newData: T[]) {
+    // Update the config data (original source)
+    this.config.data = [...newData];
+
+    // Update the state data
+    this.state.data = [...newData];
+    this.state.rawData = [...newData];
+
+    // Refresh with current filters applied
+    this.refreshData();
+    this._emit(); // Notify subscribers after state change
   }
 
   /**
@@ -192,10 +215,31 @@ export class PivotEngine<T extends Record<string, any>> {
    * @private
    */
   private generateProcessedDataForDisplay(): ProcessedData {
+    // For processed data mode, use sorted data if available
+    let dataToUse = this.state.rawData;
+
+    // If we're in processed mode and have a sort config, ensure data is sorted
+    if (
+      this.state.dataHandlingMode === 'processed' &&
+      this.state.sortConfig.length > 0
+    ) {
+      const sortConfig = this.state.sortConfig[0];
+
+      // If we have groups (which is common in processed mode),
+      // extract data from sorted groups to respect the sorted order
+      if (this.state.groups.length > 0) {
+        // Extract data from sorted groups in the correct order
+        dataToUse = this.state.groups.flatMap(group => group.items);
+      } else {
+        // If no groups, sort the raw data directly
+        dataToUse = this.sortData(this.state.rawData, sortConfig);
+      }
+    }
+
     return {
       headers: this.generateHeaders(),
-      rows: this.generateRows(this.state.rawData),
-      totals: this.calculateTotals(this.state.rawData),
+      rows: this.generateRows(dataToUse),
+      totals: this.calculateTotals(dataToUse),
     };
   }
 
@@ -284,6 +328,23 @@ export class PivotEngine<T extends Record<string, any>> {
     return totals;
   }
 
+  // --- SUBSCRIPTION SYSTEM ---
+  private listeners: Set<(state: PivotTableState<T>) => void> = new Set();
+  /**
+   * Subscribe to state changes. Returns an unsubscribe function.
+   */
+  public subscribe(fn: (state: PivotTableState<T>) => void): () => void {
+    this.listeners.add(fn);
+    fn(this.getState()); // Immediately call with current state
+    return () => this.listeners.delete(fn);
+  }
+  /**
+   * Emit state changes to all subscribers.
+   */
+  private _emit() {
+    this.listeners.forEach(fn => fn(this.getState()));
+  }
+
   /**
    * Sets the measures for the pivot table.
    * @param {MeasureConfig[]} measureFields - The measure configurations to set.
@@ -293,6 +354,7 @@ export class PivotEngine<T extends Record<string, any>> {
     this.state.selectedMeasures = measureFields;
     this.state.processedData = this.generateProcessedDataForDisplay();
     this.updateAggregates();
+    this._emit(); // Notify subscribers after state change
   }
 
   /**
@@ -305,6 +367,7 @@ export class PivotEngine<T extends Record<string, any>> {
     this.state.processedData = this.generateProcessedDataForDisplay();
     this.updateAggregates();
     this.refreshData();
+    this._emit(); // Notify subscribers after state change
   }
 
   /**
@@ -317,6 +380,7 @@ export class PivotEngine<T extends Record<string, any>> {
     this.state.processedData = this.generateProcessedDataForDisplay();
     this.updateAggregates();
     this.refreshData();
+    this._emit(); // Notify subscribers after state change
   }
 
   /**
@@ -328,6 +392,7 @@ export class PivotEngine<T extends Record<string, any>> {
     this.state.rowGroups = rowGroups;
     this.state.processedData = this.generateProcessedDataForDisplay();
     this.updateAggregates();
+    this._emit(); // Notify subscribers after state change
   }
 
   /**
@@ -339,6 +404,7 @@ export class PivotEngine<T extends Record<string, any>> {
     this.state.columnGroups = columnGroups;
     this.state.processedData = this.generateProcessedDataForDisplay();
     this.updateAggregates();
+    this._emit(); // Notify subscribers after state change
   }
 
   /**
@@ -348,24 +414,7 @@ export class PivotEngine<T extends Record<string, any>> {
    * @returns {string} The formatted value as a string.
    * @public
    */
-  public formatValue(
-    value: any,
-    field: string,
-    cellPosition?: CellPosition,
-    customFormat?: CellFormatConfig
-  ): string {
-    // Check for cell-specific formatting first
-    const cellKey = cellPosition
-      ? `${cellPosition.row}-${cellPosition.col}`
-      : null;
-    const cellFormat = cellKey ? this.cellFormats.get(cellKey) : null;
-    const formatToUse = customFormat || cellFormat;
-
-    if (formatToUse) {
-      return this.applyAdvancedFormatting(value, formatToUse);
-    }
-
-    // Fall back to existing field-based formatting
+  public formatValue(value: any, field: string): string {
     const format = this.state.formatting[field];
     if (!format) return String(value);
 
@@ -402,114 +451,6 @@ export class PivotEngine<T extends Record<string, any>> {
   }
 
   /**
-   * Apply advanced formatting based on CellFormatConfig
-   */
-  private applyAdvancedFormatting(
-    value: any,
-    format: CellFormatConfig
-  ): string {
-    if (value === null || value === undefined || value === '') {
-      return format.nullValue || '';
-    }
-
-    // Handle different value types
-    switch (format.chooseValue) {
-      case 'currency':
-        return this.formatCurrency(value, format);
-      case 'number':
-        return this.formatNumber(value, format);
-      case 'percentage':
-        return this.formatPercentage(value, format);
-      case 'date':
-        return this.formatDate(value, format);
-      case 'text':
-        return String(value);
-      default:
-        return this.formatNumber(value, format);
-    }
-  }
-
-  /**
-   * Format currency values
-   */
-  private formatCurrency(value: any, format: CellFormatConfig): string {
-    let num = parseFloat(value);
-    if (isNaN(num)) return String(value);
-
-    const formattedNumber = this.formatNumberBase(num, format);
-    const symbol = format.currencySymbol || '$';
-
-    return format.currencyAlign === 'right'
-      ? formattedNumber + symbol
-      : symbol + formattedNumber;
-  }
-
-  /**
-   * Format number values
-   */
-  private formatNumber(value: any, format: CellFormatConfig): string {
-    let num = parseFloat(value);
-    if (isNaN(num)) return String(value);
-
-    return this.formatNumberBase(num, format);
-  }
-
-  /**
-   * Format percentage values
-   */
-  private formatPercentage(value: any, format: CellFormatConfig): string {
-    let num = parseFloat(value);
-    if (isNaN(num)) return String(value);
-
-    if (format.formatAsPercent) {
-      num = num * 100;
-    }
-
-    return this.formatNumberBase(num, format) + '%';
-  }
-
-  /**
-   * Format date values
-   */
-  private formatDate(value: any, format: CellFormatConfig): string {
-    try {
-      const date = new Date(value);
-      return date.toLocaleDateString();
-    } catch (error) {
-      return String(value);
-    }
-  }
-
-  /**
-   * Base number formatting with separators and decimal places
-   */
-  private formatNumberBase(num: number, format: CellFormatConfig): string {
-    // Apply decimal places
-    const decimalPlaces = format.decimalPlaces ?? 2;
-    const fixedNumber = num.toFixed(decimalPlaces);
-
-    // Split into integer and decimal parts
-    let [integerPart, decimalPart] = fixedNumber.split('.');
-
-    // Apply thousand separator
-    if (format.thousandSeparator && format.thousandSeparator !== 'none') {
-      integerPart = integerPart.replace(
-        /\B(?=(\d{3})+(?!\d))/g,
-        format.thousandSeparator
-      );
-    }
-
-    // Combine parts with decimal separator
-    let formattedNumber = integerPart;
-    if (decimalPart && decimalPlaces > 0) {
-      const separator = format.decimalSeparator || '.';
-      formattedNumber += separator + decimalPart;
-    }
-
-    return formattedNumber;
-  }
-
-  /**
    * Sorts the pivot table data based on the specified field and direction.
    * @param {string} field - The field to sort by.
    * @param {'asc' | 'desc'} direction - The sort direction.
@@ -530,27 +471,58 @@ export class PivotEngine<T extends Record<string, any>> {
   }
 
   private applySort() {
-    const sortedData = this.sortData(
-      this.state.rawData,
-      this.state.sortConfig[0]
-    );
-    this.state.rawData = sortedData;
-
-    if (this.state.groups.length > 0) {
-      this.state.groups = this.sortGroups(
-        this.state.groups,
+    if (this.state.dataHandlingMode === 'raw') {
+      // Sort raw data
+      const sortedData = this.sortData(
+        this.state.rawData,
         this.state.sortConfig[0]
       );
+
+      // Update both data and rawData for consistency
+      this.state.data = sortedData;
+      this.state.rawData = sortedData;
+
+      this.state.processedData = this.generateProcessedDataForDisplay();
+      this.updateAggregates();
+    } else {
+      // For processed data mode
+      if (this.state.groups.length > 0) {
+        // If we have groups, sort the grouped data
+        this.state.groups = this.sortGroups(
+          this.state.groups,
+          this.state.sortConfig[0]
+        );
+
+        // Regenerate processed data to reflect the sorted groups
+        this.state.processedData = this.generateProcessedDataForDisplay();
+        this.updateAggregates();
+      } else {
+        // If we don't have groups, but we're in processed mode,
+        // we need to sort the raw data and then regenerate processed data
+        const sortedData = this.sortData(
+          this.state.rawData,
+          this.state.sortConfig[0]
+        );
+        this.state.data = sortedData;
+        this.state.rawData = sortedData;
+
+        // Regenerate processed data to reflect the sorted data
+        this.state.processedData = this.generateProcessedDataForDisplay();
+        this.updateAggregates();
+      }
     }
 
-    this.state.processedData = this.generateProcessedDataForDisplay();
-    this.updateAggregates();
+    this._emit(); // Notify subscribers of state change
   }
 
   private sortData(data: T[], sortConfig: SortConfig): T[] {
     return [...data].sort((a, b) => {
-      const aValue = this.getFieldValue(a, sortConfig);
-      const bValue = this.getFieldValue(b, sortConfig);
+      let aValue = this.getFieldValue(a, sortConfig);
+      let bValue = this.getFieldValue(b, sortConfig);
+
+      // Handle different data types for raw data sorting
+      if (typeof aValue === 'string') aValue = aValue.toLowerCase();
+      if (typeof bValue === 'string') bValue = bValue.toLowerCase();
 
       if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
       if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
@@ -558,7 +530,7 @@ export class PivotEngine<T extends Record<string, any>> {
     });
   }
 
-  private getFieldValue(item: T, sortConfig: SortConfig): number {
+  private getFieldValue(item: T, sortConfig: SortConfig): any {
     if (sortConfig.type === 'measure') {
       const measure = this.state.measures.find(
         m => m.uniqueName === sortConfig.field
@@ -567,15 +539,47 @@ export class PivotEngine<T extends Record<string, any>> {
         return measure.formula(item);
       }
     }
-    return item[sortConfig.field] as number;
+    return item[sortConfig.field];
   }
 
   private sortGroups(groups: Group[], sortConfig: SortConfig): Group[] {
     return [...groups].sort((a, b) => {
-      const aValue =
-        a.aggregates[`${sortConfig.aggregation}_${sortConfig.field}`] || 0;
-      const bValue =
-        b.aggregates[`${sortConfig.aggregation}_${sortConfig.field}`] || 0;
+      let aValue: any;
+      let bValue: any;
+
+      if (sortConfig.type === 'measure') {
+        // Sort by aggregated measure values
+        aValue =
+          a.aggregates[`${sortConfig.aggregation}_${sortConfig.field}`] || 0;
+        bValue =
+          b.aggregates[`${sortConfig.aggregation}_${sortConfig.field}`] || 0;
+      } else {
+        // Sort by dimension values (e.g., row field names like country, product, etc.)
+        // Extract the dimension value from the group key
+        const keys = a.key ? a.key.split('|') : [];
+        const bKeys = b.key ? b.key.split('|') : [];
+
+        // For row field sorting, use the first key (row field value)
+        // For column field sorting, use the second key (column field value)
+        const rowField = this.state.rows?.[0]?.uniqueName;
+        const columnField = this.state.columns?.[0]?.uniqueName;
+
+        if (sortConfig.field === rowField) {
+          aValue = keys[0] || '';
+          bValue = bKeys[0] || '';
+        } else if (sortConfig.field === columnField) {
+          aValue = keys[1] || '';
+          bValue = bKeys[1] || '';
+        } else {
+          // Fallback: try to find the field in the first item of each group
+          aValue = a.items[0]?.[sortConfig.field] || '';
+          bValue = b.items[0]?.[sortConfig.field] || '';
+        }
+
+        // Handle string comparison
+        if (typeof aValue === 'string') aValue = aValue.toLowerCase();
+        if (typeof bValue === 'string') bValue = bValue.toLowerCase();
+      }
 
       if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
       if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
@@ -594,7 +598,7 @@ export class PivotEngine<T extends Record<string, any>> {
         if (measure.formula && typeof measure.formula === 'function') {
           // Handle custom measures
           const formulaResults = group.items.map(item =>
-            measure.formula!(item)
+            measure.formula ? measure.formula(item) : 0
           );
           group.aggregates[aggregateKey] = calculateAggregates(
             formulaResults.map(value => ({ value })),
@@ -668,6 +672,7 @@ export class PivotEngine<T extends Record<string, any>> {
       this.state.groups = [];
       this.state.processedData = this.generateProcessedDataForDisplay();
     }
+    this._emit(); // Notify subscribers after state change
   }
 
   /**
@@ -685,11 +690,7 @@ export class PivotEngine<T extends Record<string, any>> {
    * @public
    */
   public getState(): PivotTableState<T> {
-    return {
-      ...this.state,
-      cellFormats: this.cellFormats,
-      selectedCells: this.selectedCells,
-    };
+    return { ...this.state };
   }
 
   /**
@@ -711,6 +712,7 @@ export class PivotEngine<T extends Record<string, any>> {
     if (this.state.groupConfig) {
       this.applyGrouping();
     }
+    this._emit(); // Notify subscribers after state change
   }
 
   /**
@@ -723,6 +725,7 @@ export class PivotEngine<T extends Record<string, any>> {
     const rowIndex = this.state.rowSizes.findIndex(row => row.index === index);
     if (rowIndex !== -1) {
       this.state.rowSizes[rowIndex].height = Math.max(20, height);
+      this._emit(); // Notify subscribers after state change
     }
   }
 
@@ -733,6 +736,7 @@ export class PivotEngine<T extends Record<string, any>> {
    */
   public toggleRowExpansion(rowId: string) {
     this.state.expandedRows[rowId] = !this.state.expandedRows[rowId];
+    this._emit(); // Notify subscribers after state change
   }
 
   /**
@@ -781,6 +785,8 @@ export class PivotEngine<T extends Record<string, any>> {
     if (typeof this.config.onRowDragEnd === 'function') {
       this.config.onRowDragEnd(fromIndex, toIndex, this.state.rowGroups);
     }
+
+    this._emit(); // Notify subscribers after state change
   }
 
   /**
@@ -824,6 +830,8 @@ export class PivotEngine<T extends Record<string, any>> {
         }));
         this.config.onColumnDragEnd(fromIndex, toIndex, mappedColumnGroups);
       }
+
+      this._emit(); // Notify subscribers after state change
     } catch (error) {
       console.error('Error during column drag operation:', error);
     }
@@ -856,6 +864,7 @@ export class PivotEngine<T extends Record<string, any>> {
   public applyFilters(filters: FilterConfig[]) {
     this.filterConfig = filters;
     this.refreshData();
+    this._emit(); // Notify subscribers after state change
   }
 
   /**
@@ -870,6 +879,7 @@ export class PivotEngine<T extends Record<string, any>> {
     };
 
     this.refreshData();
+    this._emit(); // Notify subscribers after state change
   }
 
   /**
@@ -886,24 +896,57 @@ export class PivotEngine<T extends Record<string, any>> {
    * @private
    */
   private refreshData() {
-    // Store original data
-    const originalData = [...this.state.rawData];
-    // Apply filters first
-    let filteredData = this.filterData(originalData);
+    // Get the appropriate data source based on data handling mode
+    const originalData = this.getDataForCurrentMode();
+
+    let filteredData: T[];
+
+    // Check if we're filtering on aggregated measures in processed mode
+    if (
+      this.state.dataHandlingMode === 'processed' &&
+      this.hasAggregatedFilters()
+    ) {
+      // For aggregated filters, we need to filter the grouped data, not raw data
+      filteredData = this.filterProcessedData(originalData);
+    } else {
+      // For regular field filters, apply normal filtering
+      filteredData = this.filterData(originalData);
+    }
+
     // Update total pages based on filtered data
     this.paginationConfig.totalPages = Math.ceil(
       filteredData.length / this.paginationConfig.pageSize
     );
+
     // Apply pagination
     filteredData = this.paginateData(filteredData);
 
-    // Update state with filtered and paginated data
-    this.state.rawData = filteredData; // Add this line
-    if (this.state.groupConfig) {
-      // Pass the filtered data to grouping instead of using config
-      this.applyGrouping(filteredData);
+    // Update state based on data handling mode
+    if (this.state.dataHandlingMode === 'raw') {
+      // For raw mode, update the raw data directly
+      this.state.data = filteredData;
+      this.state.rawData = filteredData;
+      // Still need to regenerate processed data for display (headers depend on mode)
+      this.state.processedData = this.generateProcessedDataForDisplay();
+    } else {
+      // For processed mode, update the data and regenerate processed data
+      this.state.data = filteredData;
+      this.state.rawData = filteredData;
+      if (this.state.groupConfig) {
+        // Pass the filtered data to grouping instead of using config
+        this.applyGrouping(filteredData);
+      }
+      this.state.processedData = this.generateProcessedDataForDisplay();
     }
-    this.state.processedData = this.generateProcessedDataForDisplay();
+  }
+
+  /**
+   * Gets the appropriate data source based on the current data handling mode
+   * @private
+   */
+  private getDataForCurrentMode(): T[] {
+    // Always start from the original data stored in config
+    return [...(this.config.data || [])];
   }
 
   /**
@@ -1087,11 +1130,6 @@ export class PivotEngine<T extends Record<string, any>> {
 
     try {
       // Get the region names being moved
-      const fromRegion = uniqueRegions[fromIndex];
-      const toRegion = uniqueRegions[toIndex];
-
-      console.log(`Reordering regions: ${fromRegion} -> ${toRegion}`);
-
       // Create a new data array with reordered regions
       const newData = [...this.state.data];
 
@@ -1206,25 +1244,36 @@ export class PivotEngine<T extends Record<string, any>> {
     }
 
     const rowFieldName = rowField.uniqueName;
-    console.log(`Swapping rows based on field: ${rowFieldName}`);
 
-    // Get unique values for the row field
-    const uniqueRowValues = [
-      ...new Set(
-        this.state.data.map((item: { [x: string]: any }) => item[rowFieldName])
-      ),
-    ].filter(
-      (value): value is string =>
-        typeof value === 'string' && value !== null && value !== undefined
+    // Get unique values for the row field from FULL DATASET - use current custom order if it exists
+    const customRowOrder = (this.state as any).customRowOrder;
+    let uniqueRowValues: string[];
+
+    if (
+      customRowOrder &&
+      customRowOrder.fieldName === rowFieldName &&
+      customRowOrder.order
+    ) {
+      // Use the current custom order
+      uniqueRowValues = [...customRowOrder.order];
+    } else {
+      // Use original FULL data order - THIS IS THE KEY FIX
+      uniqueRowValues = [
+        ...new Set(
+          (this.config.data || []).map(
+            (item: { [x: string]: any }) => item[rowFieldName]
+          )
+        ),
+      ].filter(
+        (value): value is string =>
+          typeof value === 'string' && value !== null && value !== undefined
+      );
+    }
+
+    console.log(
+      `Row swap validation: ${rowFieldName} has ${uniqueRowValues.length} unique values:`,
+      uniqueRowValues
     );
-
-    console.log(`Core swapDataRows called:`, {
-      fromIndex,
-      toIndex,
-      totalRows: uniqueRowValues.length,
-      fieldName: rowFieldName,
-      availableValues: uniqueRowValues,
-    });
 
     if (
       fromIndex < 0 ||
@@ -1246,23 +1295,23 @@ export class PivotEngine<T extends Record<string, any>> {
     }
 
     try {
-      console.log(
-        `Swapping ${rowFieldName} values at indices ${fromIndex} and ${toIndex}`
-      );
-
       // Get the values to swap
       const fromValue = uniqueRowValues[fromIndex];
       const toValue = uniqueRowValues[toIndex];
 
-      console.log(`Swapping ${rowFieldName}: ${fromValue} <-> ${toValue}`);
-
-      // Create new data array with swapped order
-      const newData = [...this.state.data];
+      // Create new data array with swapped order - use FULL dataset
+      const newData = [...(this.config.data || [])];
 
       // Create swapped value order
       const swappedValues = [...uniqueRowValues];
       swappedValues[fromIndex] = toValue;
       swappedValues[toIndex] = fromValue;
+
+      // Store the custom row order
+      (this.state as any).customRowOrder = {
+        fieldName: rowFieldName,
+        order: swappedValues,
+      };
 
       // Sort data according to the new value order
       newData.sort((a, b) => {
@@ -1271,9 +1320,12 @@ export class PivotEngine<T extends Record<string, any>> {
         return aIndex - bIndex;
       });
 
-      // Update the state
-      this.state.data = newData;
+      // Update the config data (source of truth)
+      this.config.data = newData;
+
+      // Update the state with full data, then let pagination handle the subset
       this.state.rawData = newData;
+      this.state.data = newData; // This will be re-paginated by refreshData
 
       // Regenerate processed data
       this.state.processedData = this.generateProcessedDataForDisplay();
@@ -1289,6 +1341,9 @@ export class PivotEngine<T extends Record<string, any>> {
       }
 
       console.log(`Row swap completed successfully for field: ${rowFieldName}`);
+
+      // Emit state change to notify subscribers
+      this._emit();
     } catch (error) {
       console.error('Error during row swap operation:', error);
     }
@@ -1311,27 +1366,36 @@ export class PivotEngine<T extends Record<string, any>> {
     }
 
     const columnFieldName = columnField.uniqueName;
-    console.log(`Swapping columns based on field: ${columnFieldName}`);
 
-    // Get unique values for the column field
-    const uniqueColumnValues = [
-      ...new Set(
-        this.state.data.map(
-          (item: { [x: string]: any }) => item[columnFieldName]
-        )
-      ),
-    ].filter(
-      (value): value is string =>
-        typeof value === 'string' && value !== null && value !== undefined
+    // Get unique values for the column field from FULL DATASET - use current custom order if it exists
+    const customColumnOrder = (this.state as any).customColumnOrder;
+    let uniqueColumnValues: string[];
+
+    if (
+      customColumnOrder &&
+      customColumnOrder.fieldName === columnFieldName &&
+      customColumnOrder.order
+    ) {
+      // Use the current custom order
+      uniqueColumnValues = [...customColumnOrder.order];
+    } else {
+      // Use original FULL data order - THIS IS THE KEY FIX
+      uniqueColumnValues = [
+        ...new Set(
+          (this.config.data || []).map(
+            (item: { [x: string]: any }) => item[columnFieldName]
+          )
+        ),
+      ].filter(
+        (value): value is string =>
+          typeof value === 'string' && value !== null && value !== undefined
+      );
+    }
+
+    console.log(
+      `Column swap validation: ${columnFieldName} has ${uniqueColumnValues.length} unique values:`,
+      uniqueColumnValues
     );
-
-    console.log(`Core swapDataColumns called:`, {
-      fromIndex,
-      toIndex,
-      totalColumns: uniqueColumnValues.length,
-      fieldName: columnFieldName,
-      availableValues: uniqueColumnValues,
-    });
 
     if (
       fromIndex < 0 ||
@@ -1353,22 +1417,14 @@ export class PivotEngine<T extends Record<string, any>> {
     }
 
     try {
-      console.log(
-        `Swapping ${columnFieldName} values at indices ${fromIndex} and ${toIndex}`
-      );
-
       // Get the values to swap
       const fromValue = uniqueColumnValues[fromIndex];
       const toValue = uniqueColumnValues[toIndex];
-
-      console.log(`Swapping ${columnFieldName}: ${fromValue} <-> ${toValue}`);
 
       // Create swapped value order
       const swappedValues = [...uniqueColumnValues];
       swappedValues[fromIndex] = toValue;
       swappedValues[toIndex] = fromValue;
-
-      console.log(`New ${columnFieldName} order:`, swappedValues);
 
       // Update columns configuration if it exists
       if (this.state.columns && this.state.columns.length > 0) {
@@ -1393,7 +1449,7 @@ export class PivotEngine<T extends Record<string, any>> {
         }
       }
 
-      // Store the custom column order (generic key for any field)
+      // Store the custom column order
       (this.state as any).customColumnOrder = {
         fieldName: columnFieldName,
         order: swappedValues,
@@ -1420,6 +1476,9 @@ export class PivotEngine<T extends Record<string, any>> {
       console.log(
         `Column swap completed successfully for field: ${columnFieldName}`
       );
+
+      // Emit state change to notify subscribers
+      this._emit();
     } catch (error) {
       console.error('Error during column swap operation:', error);
     }
@@ -1427,17 +1486,57 @@ export class PivotEngine<T extends Record<string, any>> {
 
   /**
    * Generic method to get unique values for any field
+   * Uses the original config data, not the paginated state data
    * Utility method for UI components
    */
   public getUniqueFieldValues(fieldName: string): string[] {
-    return [
+    // Use the original config data, not the paginated state data
+    const dataSource = this.config.data || [];
+
+    console.log(
+      `Getting unique values for field: ${fieldName} from ${dataSource.length} total items`
+    );
+
+    const uniqueValues = [
       ...new Set(
-        this.state.data.map((item: { [x: string]: any }) => item[fieldName])
+        dataSource.map((item: { [x: string]: any }) => item[fieldName])
       ),
     ].filter(
       (value): value is string =>
         typeof value === 'string' && value !== null && value !== undefined
     );
+
+    console.log(
+      `Found ${uniqueValues.length} unique values for ${fieldName}:`,
+      uniqueValues
+    );
+
+    return uniqueValues;
+  }
+
+  // Also add this method to get unique values in their current custom order:
+  /**
+   * Get unique field values respecting any custom order that has been set
+   */
+  public getOrderedUniqueFieldValues(
+    fieldName: string,
+    isRowField = false
+  ): string[] {
+    // Check if there's a custom order for this field
+    const customOrderKey = isRowField ? 'customRowOrder' : 'customColumnOrder';
+    const customOrder = (this.state as any)[customOrderKey];
+
+    if (
+      customOrder &&
+      customOrder.fieldName === fieldName &&
+      customOrder.order
+    ) {
+      console.log(`Using custom order for ${fieldName}:`, customOrder.order);
+      return customOrder.order;
+    }
+
+    // Fall back to natural order from full dataset
+    return this.getUniqueFieldValues(fieldName);
   }
 
   /**
@@ -1465,7 +1564,7 @@ export class PivotEngine<T extends Record<string, any>> {
   public setCustomFieldOrder(
     fieldName: string,
     order: string[],
-    isRowField: boolean = true
+    isRowField = true
   ): void {
     const customKey = isRowField ? 'customRowOrder' : 'customColumnOrder';
     (this.state as any)[customKey] = {
@@ -1475,6 +1574,7 @@ export class PivotEngine<T extends Record<string, any>> {
 
     // Regenerate processed data
     this.state.processedData = this.generateProcessedDataForDisplay();
+    this._emit(); // Notify subscribers after state change
   }
 
   /**
@@ -1515,96 +1615,176 @@ export class PivotEngine<T extends Record<string, any>> {
   }
 
   /**
-   * Set formatting for specific cells
+   * Method to swap raw data rows by index
+   * This works directly with the raw data array regardless of pivot configuration
    */
-  public setCellFormat(cellKey: string, format: CellFormatConfig): void {
-    this.cellFormats.set(cellKey, format);
+  public swapRawDataRows(fromIndex: number, toIndex: number): void {
+    if (!this.state.data || this.state.data.length === 0) {
+      console.warn('No data available for raw row swap');
+      return;
+    }
+
+    if (
+      fromIndex < 0 ||
+      toIndex < 0 ||
+      fromIndex >= this.state.data.length ||
+      toIndex >= this.state.data.length
+    ) {
+      console.warn(`Invalid indices for raw row swap operation:`, {
+        fromIndex,
+        toIndex,
+        totalRows: this.state.data.length,
+      });
+      return;
+    }
+
+    if (fromIndex === toIndex) {
+      return; // No swap needed
+    }
+
+    try {
+      // Create a new data array with swapped rows
+      const newData = [...this.state.data];
+      const temp = newData[fromIndex];
+      newData[fromIndex] = newData[toIndex];
+      newData[toIndex] = temp;
+
+      // Update the state
+      this.state.data = newData;
+      this.state.rawData = newData;
+
+      // Regenerate processed data if needed
+      if (this.state.dataHandlingMode === 'raw') {
+        this.state.processedData = this.generateProcessedDataForDisplay();
+      } else {
+        // For processed mode, regenerate the pivot table
+        this.state.processedData = this.generateProcessedDataForDisplay();
+      }
+
+      // Emit state change to notify subscribers
+      this._emit();
+    } catch (error) {
+      console.error('Error during raw row swap operation:', error);
+    }
   }
 
   /**
-   * Get formatting for a specific cell
+   * Checks if any of the current filters are for aggregated measures
+   * @private
    */
-  public getCellFormat(cellKey: string): CellFormatConfig | undefined {
-    return this.cellFormats.get(cellKey);
-  }
-
-  /**
-   * Clear formatting for specific cells
-   */
-  public clearCellFormat(cellKey: string): void {
-    this.cellFormats.delete(cellKey);
-  }
-
-  /**
-   * Clear all cell formatting
-   */
-  public clearAllCellFormats(): void {
-    this.cellFormats.clear();
-  }
-
-  /**
-   * Set selected cells
-   */
-  public setSelectedCells(cellKeys: string[]): void {
-    this.selectedCells.clear();
-    cellKeys.forEach(key => this.selectedCells.add(key));
-  }
-
-  /**
-   * Get selected cells
-   */
-  public getSelectedCells(): string[] {
-    return Array.from(this.selectedCells);
-  }
-
-  /**
-   * Add cell to selection
-   */
-  public addToSelection(cellKey: string): void {
-    this.selectedCells.add(cellKey);
-  }
-
-  /**
-   * Remove cell from selection
-   */
-  public removeFromSelection(cellKey: string): void {
-    this.selectedCells.delete(cellKey);
-  }
-
-  /**
-   * Clear selection
-   */
-  public clearSelection(): void {
-    this.selectedCells.clear();
-  }
-
-  /**
-   * Apply formatting to multiple cells
-   */
-  public applyFormatToSelection(format: CellFormatConfig): void {
-    this.selectedCells.forEach(cellKey => {
-      this.setCellFormat(cellKey, format);
+  private hasAggregatedFilters(): boolean {
+    return this.filterConfig.some(filter => {
+      // Check if the filter field is an aggregated measure (e.g., "sum_price", "avg_sales")
+      return (
+        filter.field.includes('_') &&
+        this.state.measures.some(
+          measure =>
+            filter.field === `${measure.aggregation}_${measure.uniqueName}`
+        )
+      );
     });
   }
 
   /**
-   * Export formatting data
+   * Filters processed data based on aggregated values
+   * @private
    */
-  public exportFormats(): Record<string, CellFormatConfig> {
-    const formats: Record<string, CellFormatConfig> = {};
-    this.cellFormats.forEach((format, key) => {
-      formats[key] = format;
-    });
-    return formats;
-  }
+  private filterProcessedData(originalData: T[]): T[] {
+    // First, ensure we have grouped data for filtering
+    if (this.state.groupConfig) {
+      this.applyGrouping(originalData);
+    }
 
-  /**
-   * Import formatting data
-   */
-  public importFormats(formats: Record<string, CellFormatConfig>): void {
-    this.cellFormats.clear();
-    Object.entries(formats).forEach(([key, format]) => {
-      this.cellFormats.set(key, format);
-    });
+    // Get all aggregated filters and regular field filters
+    const aggregatedFilters = this.filterConfig.filter(
+      filter =>
+        filter.field.includes('_') &&
+        this.state.measures.some(
+          measure =>
+            filter.field === `${measure.aggregation}_${measure.uniqueName}`
+        )
+    );
+
+    const regularFilters = this.filterConfig.filter(
+      filter =>
+        !filter.field.includes('_') ||
+        !this.state.measures.some(
+          measure =>
+            filter.field === `${measure.aggregation}_${measure.uniqueName}`
+        )
+    );
+
+    // Apply regular field filters to raw data first
+    let filteredData = originalData;
+    if (regularFilters.length > 0) {
+      filteredData = filteredData.filter(item =>
+        regularFilters.every(filter => {
+          const value = item[filter.field];
+          const filterValue =
+            typeof value === 'number' ? Number(filter.value) : filter.value;
+
+          switch (filter.operator) {
+            case 'equals':
+              return value === filterValue;
+            case 'contains':
+              return String(value)
+                .toLowerCase()
+                .includes(String(filterValue).toLowerCase());
+            case 'greaterThan':
+              return Number(value) > Number(filterValue);
+            case 'lessThan':
+              return Number(value) < Number(filterValue);
+            case 'between':
+              return value >= filterValue[0] && value <= filterValue[1];
+            default:
+              return true;
+          }
+        })
+      );
+    }
+
+    // If we have aggregated filters, we need to filter based on grouped data
+    if (aggregatedFilters.length > 0) {
+      // Re-apply grouping to the filtered data
+      if (this.state.groupConfig) {
+        this.applyGrouping(filteredData);
+      }
+
+      // Filter groups based on aggregated values
+      const filteredGroups = this.state.groups.filter(group =>
+        aggregatedFilters.every(filter => {
+          const aggregateValue = group.aggregates[filter.field];
+          const filterValue =
+            typeof filter.value === 'string'
+              ? Number(filter.value)
+              : filter.value;
+
+          switch (filter.operator) {
+            case 'equals':
+              return aggregateValue === filterValue;
+            case 'greaterThan':
+              return aggregateValue > (filterValue as number);
+            case 'lessThan':
+              return aggregateValue < (filterValue as number);
+            case 'between': {
+              const values = Array.isArray(filterValue)
+                ? filterValue
+                : [filterValue, filterValue];
+              return (
+                aggregateValue >= Number(values[0]) &&
+                aggregateValue <= Number(values[1])
+              );
+            }
+            default:
+              return true;
+          }
+        })
+      );
+
+      // Extract the filtered data from the filtered groups
+      filteredData = filteredGroups.flatMap(group => group.items);
+    }
+
+    return filteredData;
   }
 }

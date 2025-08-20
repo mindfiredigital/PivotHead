@@ -1,0 +1,5141 @@
+Directory structure:
+└── simple-js-demo/
+    ├── CHANGELOG.md
+    ├── index.html
+    ├── index.js
+    ├── package.json
+    ├── style.css
+    ├── config/
+    │   └── config.js
+    ├── header/
+    │   └── header.js
+    └── services/
+        ├── conditionFormattingPopUp.js
+        ├── dataSourceOptions.js
+        ├── exportService.js
+        ├── fieldsPopup.js
+        ├── formatCell.js
+        └── optionsPopup.js
+
+================================================
+FILE: CHANGELOG.md
+================================================
+# simple-js-demo
+
+## 1.0.8
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.1.0
+
+## 1.0.7
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.0.8
+
+## 1.0.6
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.0.7
+
+## 1.0.5
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.0.6
+
+## 1.0.4
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.0.5
+
+## 1.0.3
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.0.4
+
+## 1.0.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.0.3
+
+## 1.0.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.0.2
+
+
+
+================================================
+FILE: index.html
+================================================
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>PivotHead Simple Demo</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="controls"></div>
+    <div id="myTable"></div>
+    <script type="module" src="./index.js"></script>
+  </body>
+</html>
+
+
+================================================
+FILE: index.js
+================================================
+/* PivotHead Demo
+ *
+ * This file demonstrates the usage of the PivotheadCore library to create an interactive pivot table.
+ * Features include:
+ * - Sorting
+ * - Grouping
+ * - Column resizing
+ * - Column reordering (drag and drop)
+ * - Row reordering (drag and drop)
+ */
+
+// Import statements - Make sure these paths are correct
+import { createHeader } from './header/header.js';
+import { PivotEngine } from '@mindfiredigital/pivothead';
+import { sampleData, config } from './config/config.js';
+
+// Create a single instance of PivotEngine
+export let pivotEngine;
+
+// Store filtered data
+let filteredData = [...sampleData];
+let showProcessedData = true;
+let currentViewMode = 'processed'; // 'raw' or 'processed'
+
+// Manage pagination state locally
+let paginationState = {
+  currentPage: 1,
+  pageSize: 10,
+  totalPages: 1,
+};
+
+// Initialize filter fields
+function initializeFilters() {
+  const filterField = document.getElementById('filterField');
+  if (!filterField) {
+    console.error('Filter field element not found');
+    return;
+  }
+  
+  filterField.innerHTML = `
+    <option value="country">Country</option>
+    <option value="category">Category</option>
+    <option value="price">Price</option>
+    <option value="discount">Discount</option>
+  `;
+
+  const filterOperator = document.getElementById('filterOperator');
+  if (!filterOperator) {
+    console.error('Filter operator element not found');
+    return;
+  }
+  
+  filterOperator.innerHTML = `
+    <option value="equals">Equals</option>
+    <option value="contains">Contains</option>
+    <option value="greaterThan">Greater Than</option>
+    <option value="lessThan">Less Than</option>
+  `;
+}
+
+// Apply filter to data
+function applyFilter(data, filter) {
+  const newFilteredData = data.filter(item => {
+    const fieldValue = item[filter.field];
+
+    switch (filter.operator) {
+      case 'equals':
+        return fieldValue === filter.value;
+      case 'contains':
+        return String(fieldValue)
+          .toLowerCase()
+          .includes(String(filter.value).toLowerCase());
+      case 'greaterThan':
+        return parseFloat(fieldValue) > parseFloat(filter.value);
+      case 'lessThan':
+        return parseFloat(fieldValue) < parseFloat(filter.value);
+      default:
+        return true;
+    }
+  });
+
+  // Update the global filteredData variable
+  filteredData = newFilteredData;
+
+  // Create a new PivotEngine instance with the filtered data
+  try {
+    pivotEngine = new PivotEngine({
+      ...config,
+      data: newFilteredData,
+    });
+  } catch (error) {
+    console.error('Error creating PivotEngine:', error);
+  }
+
+  return newFilteredData;
+}
+
+// Get paginated data
+function getPaginatedData(data, paginationState) {
+  if (!data || !Array.isArray(data)) {
+    console.warn('Invalid data provided to getPaginatedData');
+    return [];
+  }
+  
+  const start = (paginationState.currentPage - 1) * paginationState.pageSize;
+  const end = start + paginationState.pageSize;
+  return data.slice(start, end);
+}
+
+// Helper function to create sort icons
+function createSortIcon(field, currentSortConfig) {
+  const sortIcon = document.createElement('span');
+  sortIcon.style.marginLeft = '5px';
+  sortIcon.style.display = 'inline-block';
+
+  // Check if this field is currently being sorted
+  const isCurrentlySorted = currentSortConfig && currentSortConfig.field === field;
+
+  if (isCurrentlySorted) {
+    if (currentSortConfig.direction === 'asc') {
+      sortIcon.innerHTML = '&#9650;'; // Up arrow
+      sortIcon.title = 'Sorted ascending';
+    } else {
+      sortIcon.innerHTML = '&#9660;'; // Down arrow
+      sortIcon.title = 'Sorted descending';
+    }
+    sortIcon.style.color = '#007bff';
+  } else {
+    sortIcon.innerHTML = '&#8693;'; // Up/down arrow
+    sortIcon.title = 'Click to sort';
+    sortIcon.style.color = '#6c757d';
+    sortIcon.style.opacity = '0.5';
+  }
+
+  return sortIcon;
+}
+
+function sortRawDataByColumn(columnName, rawData) {
+  console.log(`Sorting raw data by column: ${columnName}`);
+
+  // Get current sort state
+  const currentSort = window.rawDataSort || {};
+  const direction = currentSort.column === columnName && currentSort.direction === 'asc' ? 'desc' : 'asc';
+
+  // Sort the data
+  rawData.sort((a, b) => {
+    let aVal = a[columnName];
+    let bVal = b[columnName];
+
+    // Handle different data types
+    if (typeof aVal === 'string') aVal = aVal.toLowerCase();
+    if (typeof bVal === 'string') bVal = bVal.toLowerCase();
+
+    if (aVal < bVal) return direction === 'asc' ? -1 : 1;
+    if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  // Store sort state
+  window.rawDataSort = { column: columnName, direction };
+
+  // Update the global data arrays to maintain sort
+  if (filteredData === rawData) {
+    filteredData = [...rawData];
+  }
+
+  console.log(`Sorted raw data by ${columnName} (${direction})`);
+  renderRawDataTable();
+}
+
+function swapRawDataRows(fromIndex, toIndex, rawData) {
+  console.log('Swapping raw data rows:', fromIndex, '->', toIndex);
+
+  if (fromIndex < 0 || toIndex < 0 || fromIndex >= rawData.length || toIndex >= rawData.length) {
+    console.error('Invalid row indices for raw data swap');
+    return;
+  }
+
+  // Swap the rows in the raw data array
+  const temp = rawData[fromIndex];
+  rawData[fromIndex] = rawData[toIndex];
+  rawData[toIndex] = temp;
+
+  // Update filteredData if it's the same reference
+  if (filteredData === rawData || (filteredData && filteredData.length === rawData.length)) {
+    filteredData = [...rawData];
+  }
+
+  console.log('Raw data rows swapped successfully');
+}
+
+// function swapRawDataColumns(fromIndex, toIndex) {
+//   // Store the column order preference for raw data
+//   if (!window.rawDataColumnOrder) {
+//     const rawData = filteredData.length > 0 ? filteredData : sampleData;
+//     const headers = rawData.length > 0 ? Object.keys(rawData[0]) : [];
+//     window.rawDataColumnOrder = [...headers];
+//   }
+
+//   // Swap in the column order array
+//   const temp = window.rawDataColumnOrder[fromIndex];
+//   window.rawDataColumnOrder[fromIndex] = window.rawDataColumnOrder[toIndex];
+//   window.rawDataColumnOrder[toIndex] = temp;
+
+//   console.log('Raw data column order updated:', window.rawDataColumnOrder);
+// }
+
+function swapRawDataColumns(fromIndex, toIndex) {
+  console.log('Swapping raw data columns:', fromIndex, '->', toIndex);
+
+  // Get the current data being displayed
+  const rawDataToUse = filteredData.length > 0 ? filteredData : sampleData;
+  
+  if (rawDataToUse.length === 0) {
+    console.error('No raw data available for column swap');
+    return;
+  }
+
+  // Get current column order
+  const headers = Object.keys(rawDataToUse[0]);
+  
+  if (fromIndex < 0 || toIndex < 0 || fromIndex >= headers.length || toIndex >= headers.length) {
+    console.error('Invalid column indices for raw data swap:', fromIndex, toIndex, 'Available columns:', headers.length);
+    return;
+  }
+
+  // Initialize or update the column order
+  if (!window.rawDataColumnOrder) {
+    window.rawDataColumnOrder = [...headers];
+  }
+
+  // Swap in the column order array
+  const temp = window.rawDataColumnOrder[fromIndex];
+  window.rawDataColumnOrder[fromIndex] = window.rawDataColumnOrder[toIndex];
+  window.rawDataColumnOrder[toIndex] = temp;
+
+  console.log('Raw data column order updated:', window.rawDataColumnOrder);
+  
+  // Important: Re-render the table to show the new column order
+  renderRawDataTable();
+}
+
+// function renderRawDataTable() {
+//   try {
+//     console.log('Rendering raw data table');
+
+//     // Get data source
+//     let rawDataToUse;
+//     if (filteredData && filteredData.length > 0) {
+//       rawDataToUse = filteredData;
+//       console.log('Using filteredData for raw view:', filteredData.length, 'items');
+//     } else if (sampleData && sampleData.length > 0) {
+//       rawDataToUse = sampleData;
+//       console.log('Using sampleData for raw view:', sampleData.length, 'items');
+//     } else if (pivotEngine) {
+//       const state = pivotEngine.getState();
+//       rawDataToUse = state.data || state.rawData || [];
+//       console.log('Using engine data for raw view:', rawDataToUse.length, 'items');
+//     } else {
+//       rawDataToUse = [];
+//     }
+
+//     if (!rawDataToUse || rawDataToUse.length === 0) {
+//       console.error('No raw data available');
+//       const tableContainer = document.getElementById('myTable');
+//       if (tableContainer) {
+//         tableContainer.innerHTML = '<div style="padding: 20px;">No data available to display.</div>';
+//       }
+//       return;
+//     }
+
+//     console.log('Rendering raw data table with', rawDataToUse.length, 'total items');
+
+//     const tableContainer = document.getElementById('myTable');
+//     if (!tableContainer) {
+//       console.error('Table container not found');
+//       return;
+//     }
+    
+//     tableContainer.innerHTML = '';
+
+//     const table = document.createElement('table');
+//     table.style.width = '100%';
+//     table.style.borderCollapse = 'collapse';
+//     table.style.marginTop = '20px';
+//     table.style.border = '1px solid #dee2e6';
+
+//     // Get headers
+//     const headers = rawDataToUse.length > 0 ? Object.keys(rawDataToUse[0]) : [];
+//     console.log('Raw data headers:', headers);
+
+//     // Create table header
+//     const thead = document.createElement('thead');
+//     const headerRow = document.createElement('tr');
+
+//     headers.forEach((headerText, index) => {
+//       const th = document.createElement('th');
+//       th.style.padding = '12px';
+//       th.style.backgroundColor = '#f8f9fa';
+//       th.style.borderBottom = '2px solid #dee2e6';
+//       th.style.borderRight = '1px solid #dee2e6';
+//       th.style.cursor = 'pointer';
+//       th.style.position = 'relative';
+
+//       th.setAttribute('draggable', 'true');
+//       th.dataset.columnIndex = index;
+//       th.dataset.columnName = headerText;
+//       th.className = 'raw-data-header';
+
+//       const headerContent = document.createElement('div');
+//       headerContent.style.display = 'flex';
+//       headerContent.style.alignItems = 'center';
+//       headerContent.style.justifyContent = 'space-between';
+
+//       const headerSpan = document.createElement('span');
+//       headerSpan.textContent = getFieldDisplayName(headerText);
+//       headerContent.appendChild(headerSpan);
+
+//       const sortIcon = document.createElement('span');
+//       sortIcon.innerHTML = '↕️';
+//       sortIcon.style.marginLeft = '5px';
+//       sortIcon.style.fontSize = '12px';
+//       headerContent.appendChild(sortIcon);
+
+//       th.appendChild(headerContent);
+
+//       th.addEventListener('click', () => {
+//         sortRawDataByColumn(headerText, rawDataToUse);
+//       });
+
+//       headerRow.appendChild(th);
+//     });
+
+//     thead.appendChild(headerRow);
+//     table.appendChild(thead);
+
+//     // Update pagination
+//     updateRawDataPagination(rawDataToUse);
+
+//     // Get paginated data
+//     const paginatedData = getPaginatedData(rawDataToUse, paginationState);
+//     console.log('Paginated raw data:', paginatedData.length, 'items out of', rawDataToUse.length, 'total');
+
+//     // Create table body
+//     const tbody = document.createElement('tbody');
+
+//     paginatedData.forEach((rowData, rowIndex) => {
+//       const tr = document.createElement('tr');
+//       tr.dataset.rowIndex = rowIndex;
+//       tr.dataset.globalIndex = rawDataToUse.indexOf(rowData);
+//       tr.setAttribute('draggable', 'true');
+//       tr.style.cursor = 'move';
+//       tr.className = 'raw-data-row';
+
+//       headers.forEach(header => {
+//         const td = document.createElement('td');
+//         td.style.padding = '8px';
+//         td.style.borderBottom = '1px solid #dee2e6';
+//         td.style.borderRight = '1px solid #dee2e6';
+
+//         let cellValue = rowData[header];
+//         if (cellValue === null || cellValue === undefined) {
+//           cellValue = '';
+//         } else if (typeof cellValue === 'number') {
+//           if (header === 'price' || header === 'sales' || header === 'revenue' || header === 'discount') {
+//             cellValue = new Intl.NumberFormat('en-US', {
+//               style: 'currency',
+//               currency: 'USD',
+//             }).format(cellValue);
+//           } else if (typeof cellValue === 'number' && cellValue % 1 !== 0) {
+//             cellValue = cellValue.toFixed(2);
+//           }
+//         }
+
+//         td.textContent = cellValue;
+//         tr.appendChild(td);
+//       });
+
+//       tbody.appendChild(tr);
+//     });
+
+//     table.appendChild(tbody);
+//     tableContainer.appendChild(table);
+
+//     // Update pagination info
+//     updatePaginationInfo('Raw Data');
+
+//     // Set up drag and drop
+//     setupRawDataDragAndDrop(rawDataToUse);
+//   } catch (error) {
+//     console.error('Error rendering raw data table:', error);
+//     const tableContainer = document.getElementById('myTable');
+//     if (tableContainer) {
+//       tableContainer.innerHTML = `<div style="color: red; padding: 20px;">Error rendering raw data table: ${error.message}</div>`;
+//     }
+//   }
+// }
+
+function renderRawDataTable() {
+  try {
+    console.log('Rendering raw data table');
+
+    // Get data source
+    let rawDataToUse;
+    if (filteredData && filteredData.length > 0) {
+      rawDataToUse = filteredData;
+      console.log('Using filteredData for raw view:', filteredData.length, 'items');
+    } else if (sampleData && sampleData.length > 0) {
+      rawDataToUse = sampleData;
+      console.log('Using sampleData for raw view:', sampleData.length, 'items');
+    } else {
+      rawDataToUse = [];
+    }
+
+    if (!rawDataToUse || rawDataToUse.length === 0) {
+      console.error('No raw data available');
+      const tableContainer = document.getElementById('myTable');
+      if (tableContainer) {
+        tableContainer.innerHTML = '<div style="padding: 20px;">No data available to display.</div>';
+      }
+      return;
+    }
+
+    console.log('Rendering raw data table with', rawDataToUse.length, 'total items');
+
+    const tableContainer = document.getElementById('myTable');
+    if (!tableContainer) {
+      console.error('Table container not found');
+      return;
+    }
+    
+    tableContainer.innerHTML = '';
+
+    const table = document.createElement('table');
+    table.style.width = '100%';
+    table.style.borderCollapse = 'collapse';
+    table.style.marginTop = '20px';
+    table.style.border = '1px solid #dee2e6';
+
+    // Get headers - use custom order if available
+    let headers;
+    if (window.rawDataColumnOrder && window.rawDataColumnOrder.length > 0) {
+      headers = window.rawDataColumnOrder;
+      console.log('Using custom column order:', headers);
+    } else {
+      headers = rawDataToUse.length > 0 ? Object.keys(rawDataToUse[0]) : [];
+      console.log('Using natural column order:', headers);
+    }
+
+    // Create table header
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+
+    headers.forEach((headerText, index) => {
+      const th = document.createElement('th');
+      th.style.padding = '12px';
+      th.style.backgroundColor = '#f8f9fa';
+      th.style.borderBottom = '2px solid #dee2e6';
+      th.style.borderRight = '1px solid #dee2e6';
+      th.style.cursor = 'pointer';
+      th.style.position = 'relative';
+
+      th.setAttribute('draggable', 'true');
+      th.dataset.columnIndex = index;
+      th.dataset.columnName = headerText;
+      th.className = 'raw-data-header';
+
+      const headerContent = document.createElement('div');
+      headerContent.style.display = 'flex';
+      headerContent.style.alignItems = 'center';
+      headerContent.style.justifyContent = 'space-between';
+
+      const headerSpan = document.createElement('span');
+      headerSpan.textContent = getFieldDisplayName(headerText);
+      headerContent.appendChild(headerSpan);
+
+      const sortIcon = document.createElement('span');
+      sortIcon.innerHTML = '↕️';
+      sortIcon.style.marginLeft = '5px';
+      sortIcon.style.fontSize = '12px';
+      headerContent.appendChild(sortIcon);
+
+      th.appendChild(headerContent);
+
+      th.addEventListener('click', () => {
+        sortRawDataByColumn(headerText, rawDataToUse);
+      });
+
+      headerRow.appendChild(th);
+    });
+
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    // Update pagination
+    updateRawDataPagination(rawDataToUse);
+
+    // Get paginated data
+    const paginatedData = getPaginatedData(rawDataToUse, paginationState);
+    console.log('Paginated raw data:', paginatedData.length, 'items out of', rawDataToUse.length, 'total');
+
+    // Create table body - use the custom header order for cells too
+    const tbody = document.createElement('tbody');
+
+    paginatedData.forEach((rowData, rowIndex) => {
+      const tr = document.createElement('tr');
+      tr.dataset.rowIndex = rowIndex;
+      tr.dataset.globalIndex = rawDataToUse.indexOf(rowData);
+      tr.setAttribute('draggable', 'true');
+      tr.style.cursor = 'move';
+      tr.className = 'raw-data-row';
+
+      // Use the headers array (which respects custom order) for cell creation
+      headers.forEach(header => {
+        const td = document.createElement('td');
+        td.style.padding = '8px';
+        td.style.borderBottom = '1px solid #dee2e6';
+        td.style.borderRight = '1px solid #dee2e6';
+
+        let cellValue = rowData[header];
+        if (cellValue === null || cellValue === undefined) {
+          cellValue = '';
+        } else if (typeof cellValue === 'number') {
+          if (header === 'price' || header === 'sales' || header === 'revenue' || header === 'discount') {
+            cellValue = new Intl.NumberFormat('en-US', {
+              style: 'currency',
+              currency: 'USD',
+            }).format(cellValue);
+          } else if (typeof cellValue === 'number' && cellValue % 1 !== 0) {
+            cellValue = cellValue.toFixed(2);
+          }
+        }
+
+        td.textContent = cellValue;
+        tr.appendChild(td);
+      });
+
+      tbody.appendChild(tr);
+    });
+
+    table.appendChild(tbody);
+    tableContainer.appendChild(table);
+
+    // Update pagination info
+    updatePaginationInfo('Raw Data');
+
+    // Set up drag and drop
+    setupRawDataDragAndDrop(rawDataToUse);
+  } catch (error) {
+    console.error('Error rendering raw data table:', error);
+    const tableContainer = document.getElementById('myTable');
+    if (tableContainer) {
+      tableContainer.innerHTML = `<div style="color: red; padding: 20px;">Error rendering raw data table: ${error.message}</div>`;
+    }
+  }
+}
+
+function updateRawDataPagination(rawData) {
+  if (!rawData || !Array.isArray(rawData)) {
+    console.warn('Invalid raw data for pagination');
+    return;
+  }
+
+  // Get pageSize from the select element, with fallback
+  const pageSizeElement = document.getElementById('pageSize');
+  const pageSize = pageSizeElement ? Number(pageSizeElement.value) : 10;
+  const totalPages = Math.ceil(rawData.length / pageSize) || 1;
+
+  console.log('updateRawDataPagination - Total raw data items:', rawData.length);
+  console.log('updateRawDataPagination - Page size:', pageSize);
+  console.log('updateRawDataPagination - Total pages:', totalPages);
+
+  // Check if current page is valid for new pagination
+  if (paginationState.currentPage > totalPages) {
+    paginationState.currentPage = Math.max(1, totalPages);
+  }
+
+  paginationState.pageSize = pageSize;
+  paginationState.totalPages = totalPages;
+
+  console.log('Updated pagination state for raw data:', paginationState);
+}
+
+function ensureDataConsistency() {
+  if (!pivotEngine) {
+    console.warn('PivotEngine not initialized');
+    return;
+  }
+
+  const state = pivotEngine.getState();
+  console.log('Checking data consistency:');
+  console.log('- sampleData length:', sampleData.length);
+  console.log('- filteredData length:', filteredData.length);
+  console.log('- state.data length:', state.data?.length || 0);
+  console.log('- state.rawData length:', state.rawData?.length || 0);
+
+  // Check for significant data inconsistency
+  const hasSignificantInconsistency = Math.abs((state.rawData?.length || 0) - filteredData.length) > 50;
+
+  if (hasSignificantInconsistency) {
+    console.log('Significant data inconsistency detected, preserving custom orders during reinit...');
+
+    // Preserve custom orders
+    const customColumnOrder = pivotEngine.getOrderedColumnValues && pivotEngine.getOrderedColumnValues();
+    const customRowOrder = pivotEngine.getOrderedRowValues && pivotEngine.getOrderedRowValues();
+    const preservedColumnOrder = customColumnOrder || window.swappedColumnOrder;
+    const preservedRowOrder = customRowOrder || window.swappedRowOrder;
+
+    console.log('Preserving column order:', preservedColumnOrder);
+    console.log('Preserving row order:', preservedRowOrder);
+
+    // Reinitialize the engine with full data
+    try {
+      pivotEngine = new PivotEngine({
+        ...config,
+        data: filteredData,
+      });
+
+      // Restore custom orders using the core engine methods
+      if (preservedColumnOrder && preservedColumnOrder.length > 0) {
+        console.log('Restoring preserved column order:', preservedColumnOrder);
+        const columnFieldName = pivotEngine.getColumnFieldName();
+        if (columnFieldName && pivotEngine.setCustomFieldOrder) {
+          pivotEngine.setCustomFieldOrder(columnFieldName, preservedColumnOrder, false);
+          window.swappedColumnOrder = preservedColumnOrder;
+        }
+      }
+
+      if (preservedRowOrder && preservedRowOrder.length > 0) {
+        console.log('Restoring preserved row order:', preservedRowOrder);
+        const rowFieldName = pivotEngine.getRowFieldName();
+        if (rowFieldName && pivotEngine.setCustomFieldOrder) {
+          pivotEngine.setCustomFieldOrder(rowFieldName, preservedRowOrder, true);
+          window.swappedRowOrder = preservedRowOrder;
+        }
+      }
+    } catch (error) {
+      console.error('Error reinitializing PivotEngine:', error);
+    }
+  } else {
+    console.log('Data consistency acceptable, no reinit needed');
+  }
+}
+
+// Generic function to get ordered column values
+function getOrderedColumnValues(state) {
+  if (!pivotEngine) {
+    console.warn('PivotEngine not initialized');
+    return [];
+  }
+
+  const columnFieldName = pivotEngine.getColumnFieldName();
+  if (!columnFieldName) {
+    console.warn('No column field configured');
+    return [];
+  }
+
+  // Check for custom order from engine
+  const customOrder = pivotEngine.getOrderedColumnValues && pivotEngine.getOrderedColumnValues();
+  if (customOrder && customOrder.length > 0) {
+    console.log(`Using custom ${columnFieldName} order from engine:`, customOrder);
+    return customOrder;
+  }
+
+  // Check engine state for custom order
+  if (state.customColumnOrder && state.customColumnOrder.fieldName === columnFieldName) {
+    console.log(`Using custom ${columnFieldName} order from state:`, state.customColumnOrder.order);
+    return state.customColumnOrder.order;
+  }
+
+  // Check window storage
+  if (window.swappedColumnOrder && window.swappedColumnOrder.length > 0) {
+    console.log(`Using swapped ${columnFieldName} order:`, window.swappedColumnOrder);
+    return window.swappedColumnOrder;
+  }
+
+  // Use natural order
+  const uniqueValues = pivotEngine.getUniqueFieldValues(columnFieldName);
+  console.log(`Using natural ${columnFieldName} order:`, uniqueValues);
+  return uniqueValues;
+}
+
+// Generic function to get ordered row values
+function getOrderedRowValues(state) {
+  if (!pivotEngine) {
+    console.warn('PivotEngine not initialized');
+    return [];
+  }
+
+  // Get the row field name from configuration
+  const rowFieldName = pivotEngine.getRowFieldName();
+  if (!rowFieldName) {
+    console.warn('No row field configured');
+    return [];
+  }
+
+  // First try to get custom row order from the pivot engine
+  const customOrder = pivotEngine.getOrderedRowValues();
+  if (customOrder && customOrder.length > 0) {
+    console.log(`Using custom ${rowFieldName} order from engine:`, customOrder);
+    return customOrder;
+  }
+
+  // Fall back to swapped order if available
+  if (window.swappedRowOrder && window.swappedRowOrder.length > 0) {
+    console.log(`Using swapped ${rowFieldName} order:`, window.swappedRowOrder);
+    return window.swappedRowOrder;
+  }
+
+  // Use natural order from data
+  const uniqueValues = pivotEngine.getUniqueFieldValues(rowFieldName);
+  console.log(`Using natural ${rowFieldName} order:`, uniqueValues);
+  return uniqueValues;
+}
+
+function setupRawDataDragAndDrop(rawData) {
+  console.log('Setting up raw data drag and drop with', rawData.length, 'items');
+
+  // Column drag and drop for raw data
+  const headers = document.querySelectorAll('.raw-data-header[draggable="true"]');
+  let draggedColumnIndex = null;
+
+  headers.forEach(header => {
+    const columnIndex = parseInt(header.dataset.columnIndex);
+    const columnName = header.dataset.columnName;
+
+    header.addEventListener('dragstart', e => {
+      draggedColumnIndex = columnIndex;
+      e.dataTransfer.setData('text/plain', columnName);
+      setTimeout(() => header.classList.add('dragging'), 0);
+      console.log('Raw data column drag started:', columnName, 'Index:', columnIndex);
+    });
+
+    header.addEventListener('dragend', () => {
+      header.classList.remove('dragging');
+      draggedColumnIndex = null;
+    });
+
+    header.addEventListener('dragover', e => {
+      e.preventDefault();
+    });
+
+    header.addEventListener('dragenter', e => {
+      e.preventDefault();
+      if (draggedColumnIndex !== null && draggedColumnIndex !== columnIndex) {
+        header.classList.add('drag-over');
+      }
+    });
+
+    header.addEventListener('dragleave', () => {
+      header.classList.remove('drag-over');
+    });
+
+    header.addEventListener('drop', e => {
+      e.preventDefault();
+      header.classList.remove('drag-over');
+
+      const targetColumnIndex = columnIndex;
+
+      if (draggedColumnIndex !== null && draggedColumnIndex !== targetColumnIndex) {
+        console.log(`Swapping raw data columns ${draggedColumnIndex} with ${targetColumnIndex}`);
+        swapRawDataColumns(draggedColumnIndex, targetColumnIndex);
+        renderRawDataTable();
+      }
+    });
+  });
+
+  // Row drag and drop for raw data
+  const rows = document.querySelectorAll('.raw-data-row[draggable="true"]');
+  let draggedRowIndex = null;
+
+  rows.forEach(row => {
+    const rowIndex = parseInt(row.dataset.rowIndex);
+    const globalIndex = parseInt(row.dataset.globalIndex);
+
+    row.addEventListener('dragstart', e => {
+      draggedRowIndex = globalIndex;
+      e.dataTransfer.setData('text/plain', rowIndex.toString());
+      setTimeout(() => row.classList.add('dragging'), 0);
+      console.log('Raw data row drag started. Global index:', globalIndex);
+    });
+
+    row.addEventListener('dragend', () => {
+      row.classList.remove('dragging');
+      draggedRowIndex = null;
+    });
+
+    row.addEventListener('dragover', e => {
+      e.preventDefault();
+    });
+
+    row.addEventListener('dragenter', e => {
+      e.preventDefault();
+      if (draggedRowIndex !== null && draggedRowIndex !== globalIndex) {
+        row.classList.add('drag-over');
+      }
+    });
+
+    row.addEventListener('dragleave', () => {
+      row.classList.remove('drag-over');
+    });
+
+    row.addEventListener('drop', e => {
+      e.preventDefault();
+      row.classList.remove('drag-over');
+
+      const targetRowIndex = globalIndex;
+
+      if (draggedRowIndex !== null && draggedRowIndex !== targetRowIndex) {
+        console.log(`Swapping raw data rows ${draggedRowIndex} with ${targetRowIndex}`);
+        swapRawDataRows(draggedRowIndex, targetRowIndex, rawData);
+        renderRawDataTable();
+      }
+    });
+  });
+}
+
+// Generic renderTable function that works with any field names
+function renderTable() {
+  // Check current view mode
+  if (!showProcessedData || currentViewMode === 'raw') {
+    console.log('Rendering raw data view');
+    renderRawDataTable();
+    return;
+  }
+
+  if (!pivotEngine) {
+    console.error('PivotEngine not initialized');
+    return;
+  }
+
+  try {
+    // Ensure data consistency before rendering
+    ensureDataConsistency();
+
+    const state = pivotEngine.getState();
+    console.log('Current Engine State:', state);
+
+    if (!state.processedData) {
+      console.error('No processed data available');
+      return;
+    }
+
+    // Get field names from configuration
+    const rowFieldName = pivotEngine.getRowFieldName();
+    const columnFieldName = pivotEngine.getColumnFieldName();
+
+    if (!rowFieldName || !columnFieldName) {
+      console.error('Row or column field not configured');
+      return;
+    }
+
+    console.log(`Rendering table with row field: ${rowFieldName}, column field: ${columnFieldName}`);
+
+    const tableContainer = document.getElementById('myTable');
+    if (!tableContainer) {
+      console.error('Table container not found');
+      return;
+    }
+
+    // Clear previous content
+    tableContainer.innerHTML = '';
+
+    // Create table element
+    const table = document.createElement('table');
+    table.style.width = '100%';
+    table.style.borderCollapse = 'collapse';
+    table.style.marginTop = '20px';
+    table.style.border = '1px solid #dee2e6';
+
+    // Create table header
+    const thead = document.createElement('thead');
+
+    // First header row for column values
+    const columnHeaderRow = document.createElement('tr');
+
+    // Add empty cell for top-left corner
+    const cornerCell = document.createElement('th');
+    cornerCell.style.padding = '12px';
+    cornerCell.style.backgroundColor = '#f8f9fa';
+    cornerCell.style.borderBottom = '2px solid #dee2e6';
+    cornerCell.style.borderRight = '1px solid #dee2e6';
+    cornerCell.textContent = `${getFieldDisplayName(rowFieldName)} / ${getFieldDisplayName(columnFieldName)}`;
+    columnHeaderRow.appendChild(cornerCell);
+
+    // Get unique column values
+    const uniqueColumnValues = getOrderedColumnValues(state);
+    console.log('Setting up column headers for values:', uniqueColumnValues);
+
+    // Add column headers with colspan for measures
+    uniqueColumnValues.forEach((columnValue, index) => {
+      const th = document.createElement('th');
+      th.textContent = columnValue;
+      th.colSpan = state.measures.length;
+      th.style.padding = '12px';
+      th.style.backgroundColor = '#f8f9fa';
+      th.style.borderBottom = '2px solid #dee2e6';
+      th.style.borderRight = '1px solid #dee2e6';
+      th.style.textAlign = 'center';
+      th.dataset.index = index + 1;
+      th.dataset.fieldName = columnFieldName;
+      th.dataset.fieldValue = columnValue;
+      th.dataset.columnIndex = index;
+
+      // Make headers draggable
+      th.setAttribute('draggable', 'true');
+      th.style.cursor = 'move';
+      th.className = 'column-header';
+
+      console.log(`Created column header: ${columnValue}, index: ${index}, fieldName: ${columnFieldName}`);
+
+      columnHeaderRow.appendChild(th);
+    });
+
+    thead.appendChild(columnHeaderRow);
+
+    // Second header row for measures
+    const measureHeaderRow = document.createElement('tr');
+
+    // Get current sort configuration
+    const currentSortConfig = state.sortConfig?.[0];
+
+    // Add row field header with sort icon
+    const rowHeader = document.createElement('th');
+    rowHeader.style.padding = '12px';
+    rowHeader.style.backgroundColor = '#f8f9fa';
+    rowHeader.style.borderBottom = '2px solid #dee2e6';
+    rowHeader.style.borderRight = '1px solid #dee2e6';
+    rowHeader.style.cursor = 'pointer';
+
+    // Create a container for the header content to align text and icon
+    const rowHeaderContent = document.createElement('div');
+    rowHeaderContent.style.display = 'flex';
+    rowHeaderContent.style.alignItems = 'center';
+
+    const rowText = document.createElement('span');
+    rowText.textContent = getFieldDisplayName(rowFieldName);
+    rowHeaderContent.appendChild(rowText);
+
+    // Add sort icon for row field
+    const rowSortIcon = createSortIcon(rowFieldName, currentSortConfig);
+    rowHeaderContent.appendChild(rowSortIcon);
+
+    rowHeader.appendChild(rowHeaderContent);
+
+    // Add sort functionality to row header
+    rowHeader.addEventListener('click', () => {
+      const direction = currentSortConfig?.field === rowFieldName && currentSortConfig?.direction === 'asc' ? 'desc' : 'asc';
+      pivotEngine.sort(rowFieldName, direction);
+      renderTable();
+    });
+
+    measureHeaderRow.appendChild(rowHeader);
+
+    // Add measure headers for each column value
+    uniqueColumnValues.forEach(columnValue => {
+      state.measures.forEach(measure => {
+        const th = document.createElement('th');
+        th.style.padding = '12px';
+        th.style.backgroundColor = '#f8f9fa';
+        th.style.borderBottom = '2px solid #dee2e6';
+        th.style.borderRight = '1px solid #dee2e6';
+        th.style.cursor = 'pointer';
+
+        // Create a container for the header content to align text and icon
+        const headerContent = document.createElement('div');
+        headerContent.style.display = 'flex';
+        headerContent.style.alignItems = 'center';
+        headerContent.style.justifyContent = 'space-between';
+
+        const measureText = document.createElement('span');
+        measureText.textContent = measure.caption;
+        headerContent.appendChild(measureText);
+
+        // Add sort icon for measure
+        const sortIcon = createSortIcon(measure.uniqueName, currentSortConfig);
+        headerContent.appendChild(sortIcon);
+
+        th.appendChild(headerContent);
+
+        // Add sort functionality
+        th.addEventListener('click', () => {
+          const direction = currentSortConfig?.field === measure.uniqueName && currentSortConfig?.direction === 'asc' ? 'desc' : 'asc';
+          pivotEngine.sort(measure.uniqueName, direction);
+          renderTable();
+        });
+
+        measureHeaderRow.appendChild(th);
+      });
+    });
+
+    thead.appendChild(measureHeaderRow);
+    table.appendChild(thead);
+
+    // Create table body
+    const tbody = document.createElement('tbody');
+
+    // Get all unique row values in their current order
+    const allUniqueRowValues = getOrderedRowValues(state);
+
+    console.log(`All unique ${rowFieldName} values:`, allUniqueRowValues);
+
+    // Update pagination to ensure it's based on current data
+    updatePagination(state.rawData, false);
+
+    // Get paginated row values for CURRENT PAGE ONLY
+    const paginatedRowValues = getPaginatedData(allUniqueRowValues, paginationState);
+
+    console.log(`${getFieldDisplayName(rowFieldName)} for current page:`, paginatedRowValues);
+    console.log('Current pagination state:', paginationState);
+
+    // Add rows for ONLY the paginated row values
+    paginatedRowValues.forEach((rowValue, rowIndex) => {
+      const tr = document.createElement('tr');
+      tr.dataset.rowIndex = rowIndex;
+      tr.dataset.fieldName = rowFieldName;
+      tr.dataset.fieldValue = rowValue;
+      tr.dataset.globalIndex = allUniqueRowValues.indexOf(rowValue);
+      tr.setAttribute('draggable', 'true');
+      tr.style.cursor = 'move';
+
+      // Add row value cell
+      const rowCell = document.createElement('td');
+      rowCell.textContent = rowValue;
+      rowCell.style.fontWeight = 'bold';
+      rowCell.style.padding = '8px';
+      rowCell.style.borderBottom = '1px solid #dee2e6';
+      rowCell.style.borderRight = '1px solid #dee2e6';
+      rowCell.className = 'row-cell';
+      tr.appendChild(rowCell);
+
+      // Add data cells for each column value and measure
+      uniqueColumnValues.forEach(columnValue => {
+        // Filter data for this row value and column value
+        const filteredDataForCell = state.rawData.filter(
+          item => item[rowFieldName] === rowValue && item[columnFieldName] === columnValue
+        );
+
+        // Add cells for each measure
+        state.measures.forEach(measure => {
+          const td = document.createElement('td');
+          td.style.padding = '8px';
+          td.style.borderBottom = '1px solid #dee2e6';
+          td.style.borderRight = '1px solid #dee2e6';
+          td.style.textAlign = 'right';
+
+          // Calculate the value based on aggregation
+          let value = 0;
+          if (filteredDataForCell.length > 0) {
+            switch (measure.aggregation) {
+              case 'sum':
+                value = filteredDataForCell.reduce((sum, item) => sum + (item[measure.uniqueName] || 0), 0);
+                break;
+              case 'avg':
+                if (measure.formula) {
+                  value = filteredDataForCell.reduce((sum, item) => sum + measure.formula(item), 0) / filteredDataForCell.length;
+                } else {
+                  value = filteredDataForCell.reduce((sum, item) => sum + (item[measure.uniqueName] || 0), 0) / filteredDataForCell.length;
+                }
+                break;
+              case 'max':
+                value = Math.max(...filteredDataForCell.map(item => item[measure.uniqueName] || 0));
+                break;
+              case 'min':
+                value = Math.min(...filteredDataForCell.map(item => item[measure.uniqueName] || 0));
+                break;
+              default:
+                value = 0;
+            }
+          }
+
+          // Format the value
+          let formattedValue = value;
+          if (measure.format) {
+            if (measure.format.type === 'currency') {
+              formattedValue = new Intl.NumberFormat(measure.format.locale, {
+                style: 'currency',
+                currency: measure.format.currency,
+                minimumFractionDigits: measure.format.decimals,
+                maximumFractionDigits: measure.format.decimals,
+              }).format(value);
+            } else if (measure.format.type === 'number') {
+              formattedValue = new Intl.NumberFormat(measure.format.locale, {
+                minimumFractionDigits: measure.format.decimals,
+                maximumFractionDigits: measure.format.decimals,
+              }).format(value);
+            }
+          }
+
+          // Add drill-down functionality with generic parameters
+          addDrillDownToDataCell(
+            td,
+            rowValue,
+            columnValue,
+            measure,
+            value,
+            formattedValue,
+            rowFieldName,
+            columnFieldName
+          );
+
+          // Apply conditional formatting
+          if (config.conditionalFormatting && Array.isArray(config.conditionalFormatting)) {
+            config.conditionalFormatting.forEach(rule => {
+              if (rule.value.type === 'Number' && !isNaN(value)) {
+                let applyFormat = false;
+
+                switch (rule.value.operator) {
+                  case 'Greater than':
+                    applyFormat = value > parseFloat(rule.value.value1);
+                    break;
+                  case 'Less than':
+                    applyFormat = value < parseFloat(rule.value.value1);
+                    break;
+                  case 'Equal to':
+                    applyFormat = value === parseFloat(rule.value.value1);
+                    break;
+                  case 'Between':
+                    applyFormat = value >= parseFloat(rule.value.value1) && value <= parseFloat(rule.value.value2);
+                    break;
+                }
+
+                if (applyFormat) {
+                  if (rule.format.font) td.style.fontFamily = rule.format.font;
+                  if (rule.format.size) td.style.fontSize = rule.format.size;
+                  if (rule.format.color) td.style.color = rule.format.color;
+                  if (rule.format.backgroundColor) td.style.backgroundColor = rule.format.backgroundColor;
+                }
+              }
+            });
+          }
+
+          tr.appendChild(td);
+        });
+      });
+
+      tbody.appendChild(tr);
+    });
+
+    table.appendChild(tbody);
+    tableContainer.appendChild(table);
+
+    // Update pagination info
+    const pageInfo = document.getElementById('pageInfo');
+    if (pageInfo) {
+      pageInfo.textContent = `Page ${paginationState.currentPage} of ${paginationState.totalPages}`;
+
+      // Update button states
+      const prevButton = document.getElementById('prevPage');
+      const nextButton = document.getElementById('nextPage');
+      if (prevButton) prevButton.disabled = paginationState.currentPage <= 1;
+      if (nextButton) nextButton.disabled = paginationState.currentPage >= paginationState.totalPages;
+    }
+
+    // Set up drag and drop after rendering
+    setupDragAndDrop();
+  } catch (error) {
+    console.error('Error rendering table:', error);
+
+    // Display error message to user
+    const tableContainer = document.getElementById('myTable');
+    if (tableContainer) {
+      tableContainer.innerHTML = `<div style="color: red; padding: 20px;">Error rendering table: ${error.message}</div>`;
+    }
+  }
+}
+
+// function setupColumnDragAndDropFixed(columnFieldName) {
+//   // Select only column headers with proper class
+//   const columnHeaders = document.querySelectorAll('.column-header[draggable="true"]');
+//   let draggedColumnIndex = null;
+//   let draggedColumnValue = null;
+
+//   console.log('Setting up column drag, found column headers:', columnHeaders.length);
+
+//   if (!pivotEngine) {
+//     console.warn('PivotEngine not initialized for column drag setup');
+//     return;
+//   }
+
+//   const state = pivotEngine.getState();
+//   const uniqueColumnValues = getOrderedColumnValues(state);
+
+//   console.log(`Current ${columnFieldName} values for drag setup:`, uniqueColumnValues);
+
+//   columnHeaders.forEach((header, headerIdx) => {
+//     const fieldName = header.dataset.fieldName;
+//     const fieldValue = header.dataset.fieldValue;
+//     const columnIndex = parseInt(header.dataset.columnIndex);
+
+//     console.log(`Setting up column header ${headerIdx}: field=${fieldName}, value=${fieldValue}, columnIndex=${columnIndex}`);
+
+//     // Validate this is our column field
+//     if (fieldName !== columnFieldName || !fieldValue) {
+//       console.warn('Skipping header - field mismatch or missing value:', fieldName, fieldValue);
+//       return;
+//     }
+
+//     header.addEventListener('dragstart', e => {
+//       draggedColumnIndex = columnIndex;
+//       draggedColumnValue = fieldValue;
+//       e.dataTransfer.setData('text/plain', fieldValue);
+//       setTimeout(() => header.classList.add('dragging'), 0);
+//       console.log(`Column drag started for ${columnFieldName}: ${fieldValue}, Index: ${columnIndex}`);
+//     });
+
+//     header.addEventListener('dragend', () => {
+//       header.classList.remove('dragging');
+//       draggedColumnIndex = null;
+//       draggedColumnValue = null;
+//       console.log('Column drag ended');
+//     });
+
+//     header.addEventListener('dragover', e => {
+//       e.preventDefault();
+//     });
+
+//     header.addEventListener('dragenter', e => {
+//       e.preventDefault();
+//       if (draggedColumnValue && draggedColumnValue !== fieldValue) {
+//         header.classList.add('drag-over');
+//       }
+//     });
+
+//     header.addEventListener('dragleave', () => {
+//       header.classList.remove('drag-over');
+//     });
+
+//     header.addEventListener('drop', e => {
+//       e.preventDefault();
+//       header.classList.remove('drag-over');
+
+//       const targetColumnValue = fieldValue;
+//       const targetColumnIndex = parseInt(header.dataset.columnIndex);
+
+//       if (draggedColumnValue && targetColumnValue && draggedColumnValue !== targetColumnValue) {
+//         console.log(`Swapping ${columnFieldName}: ${draggedColumnValue} (index: ${draggedColumnIndex}) with ${targetColumnValue} (index: ${targetColumnIndex})`);
+
+//         try {
+//           // Try core engine method first
+//           pivotEngine.swapDataColumns(draggedColumnIndex, targetColumnIndex);
+//           console.log('Core column swap completed');
+
+//           // Store the new order to prevent loss
+//           const newOrder = pivotEngine.getOrderedColumnValues();
+//           if (newOrder) {
+//             window.swappedColumnOrder = newOrder;
+//             console.log('Stored new column order:', newOrder);
+//           }
+
+//           renderTable();
+//         } catch (error) {
+//           console.error('Core column swap failed:', error);
+//           // Fallback to manual swap
+//           console.log('Falling back to manual column swap');
+//           manualColumnSwap(draggedColumnIndex, targetColumnIndex, columnFieldName, uniqueColumnValues);
+//           renderTable();
+//         }
+//       } else {
+//         console.log('Invalid column swap - same values or missing data');
+//       }
+//     });
+//   });
+// }
+
+// function setupRowDragAndDrop(rowFieldName) {
+//   const rows = document.querySelectorAll('tbody tr[draggable="true"]');
+//   let draggedRowIndex = null;
+//   let draggedRowValue = null;
+
+//   console.log('Setting up row drag, found rows:', rows.length);
+
+//   rows.forEach((row, rowIdx) => {
+//     const fieldName = row.dataset.fieldName;
+//     const fieldValue = row.dataset.fieldValue;
+//     const globalIndex = parseInt(row.dataset.globalIndex);
+
+//     console.log(`Setting up row ${rowIdx}: field=${fieldName}, value=${fieldValue}, globalIndex=${globalIndex}`);
+
+//     // Validate this is our row field
+//     if (fieldName !== rowFieldName || !fieldValue) {
+//       console.warn('Skipping row - field mismatch or missing value:', fieldName, fieldValue);
+//       return;
+//     }
+
+//     row.addEventListener('dragstart', e => {
+//       draggedRowValue = fieldValue;
+//       draggedRowIndex = globalIndex;
+//       e.dataTransfer.setData('text/plain', fieldValue);
+//       setTimeout(() => row.classList.add('dragging'), 0);
+//       console.log(`Row drag started for ${rowFieldName}: ${fieldValue}, Global index: ${globalIndex}`);
+//     });
+
+//     row.addEventListener('dragend', () => {
+//       row.classList.remove('dragging');
+//       draggedRowValue = null;
+//       draggedRowIndex = null;
+//     });
+
+//     row.addEventListener('dragover', e => {
+//       e.preventDefault();
+//     });
+
+//     row.addEventListener('dragenter', e => {
+//       e.preventDefault();
+//       if (draggedRowValue && draggedRowValue !== fieldValue) {
+//         row.classList.add('drag-over');
+//       }
+//     });
+
+//     row.addEventListener('dragleave', () => {
+//       row.classList.remove('drag-over');
+//     });
+
+//     row.addEventListener('drop', e => {
+//       e.preventDefault();
+//       row.classList.remove('drag-over');
+
+//       const targetRowValue = fieldValue;
+//       const targetRowIndex = globalIndex;
+
+//       if (draggedRowValue && targetRowValue && draggedRowValue !== targetRowValue) {
+//         console.log(`Swapping ${rowFieldName}: ${draggedRowValue} (global: ${draggedRowIndex}) with ${targetRowValue} (global: ${targetRowIndex})`);
+
+//         try {
+//           // Try core engine method first
+//           if (pivotEngine && pivotEngine.swapDataRows) {
+//             pivotEngine.swapDataRows(draggedRowIndex, targetRowIndex);
+//             console.log('Core row swap completed');
+//             renderTable();
+//           } else {
+//             throw new Error('Core row swap method not available');
+//           }
+//         } catch (error) {
+//           console.error('Core row swap failed:', error);
+//           // Fallback to manual swap
+//           console.log('Falling back to manual row swap');
+//           manualRowSwap(draggedRowIndex, targetRowIndex, rowFieldName);
+//           renderTable();
+//         }
+//       }
+//     });
+//   });
+// }
+
+// Manual column swap function
+
+// Update your setupColumnDragAndDropFixed function
+function setupColumnDragAndDropFixed(columnFieldName) {
+  const columnHeaders = document.querySelectorAll('.column-header[draggable="true"]');
+  let draggedColumnIndex = null;
+  let draggedColumnValue = null;
+
+  console.log('Setting up column drag, found column headers:', columnHeaders.length);
+
+  if (!pivotEngine) {
+    console.warn('PivotEngine not initialized for column drag setup');
+    return;
+  }
+
+  // Get the unique column values from the FULL dataset, not paginated data
+  const uniqueColumnValues = pivotEngine.getOrderedUniqueFieldValues(columnFieldName, false);
+  console.log(`ALL ${columnFieldName} values for drag setup:`, uniqueColumnValues);
+
+  columnHeaders.forEach((header, headerIdx) => {
+    const fieldName = header.dataset.fieldName;
+    const fieldValue = header.dataset.fieldValue;
+    
+    // Calculate the actual index in the unique values array
+    const actualColumnIndex = uniqueColumnValues.indexOf(fieldValue);
+
+    console.log(`Setting up column header ${headerIdx}: field=${fieldName}, value=${fieldValue}, actualIndex=${actualColumnIndex}`);
+
+    // Validate this is our column field
+    if (fieldName !== columnFieldName || !fieldValue || actualColumnIndex === -1) {
+      console.warn('Skipping header - field mismatch or missing value:', fieldName, fieldValue, 'available values:', uniqueColumnValues);
+      return;
+    }
+
+    header.addEventListener('dragstart', e => {
+      draggedColumnIndex = actualColumnIndex;
+      draggedColumnValue = fieldValue;
+      e.dataTransfer.setData('text/plain', fieldValue);
+      setTimeout(() => header.classList.add('dragging'), 0);
+      console.log(`Column drag started for ${columnFieldName}: ${fieldValue}, Actual Index: ${actualColumnIndex}`);
+    });
+
+    header.addEventListener('dragend', () => {
+      header.classList.remove('dragging');
+      draggedColumnIndex = null;
+      draggedColumnValue = null;
+    });
+
+    header.addEventListener('dragover', e => {
+      e.preventDefault();
+    });
+
+    header.addEventListener('dragenter', e => {
+      e.preventDefault();
+      if (draggedColumnValue && draggedColumnValue !== fieldValue) {
+        header.classList.add('drag-over');
+      }
+    });
+
+    header.addEventListener('dragleave', () => {
+      header.classList.remove('drag-over');
+    });
+
+    header.addEventListener('drop', e => {
+      e.preventDefault();
+      header.classList.remove('drag-over');
+
+      const targetColumnValue = fieldValue;
+      const targetColumnIndex = uniqueColumnValues.indexOf(targetColumnValue);
+
+      if (draggedColumnValue && targetColumnValue && 
+          draggedColumnValue !== targetColumnValue && 
+          draggedColumnIndex !== null && targetColumnIndex !== -1) {
+        
+        console.log(`Swapping ${columnFieldName}: ${draggedColumnValue} (index: ${draggedColumnIndex}) with ${targetColumnValue} (index: ${targetColumnIndex})`);
+
+        try {
+          // Use the core engine method with correct indices
+          pivotEngine.swapDataColumns(draggedColumnIndex, targetColumnIndex);
+          console.log('Core column swap completed');
+          renderTable();
+        } catch (error) {
+          console.error('Core column swap failed:', error);
+        }
+      }
+    });
+  });
+}
+
+// Update your setupRowDragAndDrop function
+function setupRowDragAndDrop(rowFieldName) {
+  const rows = document.querySelectorAll('tbody tr[draggable="true"]');
+  let draggedRowIndex = null;
+  let draggedRowValue = null;
+
+  console.log('Setting up row drag, found rows:', rows.length);
+
+  if (!pivotEngine) {
+    console.warn('PivotEngine not initialized for row drag setup');
+    return;
+  }
+
+  // Get the unique row values from the FULL dataset, not paginated data
+  const uniqueRowValues = pivotEngine.getOrderedUniqueFieldValues(rowFieldName, true);
+  console.log(`ALL ${rowFieldName} values for drag setup:`, uniqueRowValues);
+
+  rows.forEach((row, rowIdx) => {
+    const fieldName = row.dataset.fieldName;
+    const fieldValue = row.dataset.fieldValue;
+    
+    // Calculate the actual index in the unique values array
+    const actualRowIndex = uniqueRowValues.indexOf(fieldValue);
+
+    console.log(`Setting up row ${rowIdx}: field=${fieldName}, value=${fieldValue}, actualIndex=${actualRowIndex}`);
+
+    // Validate this is our row field
+    if (fieldName !== rowFieldName || !fieldValue || actualRowIndex === -1) {
+      console.warn('Skipping row - field mismatch or missing value:', fieldName, fieldValue, 'available values:', uniqueRowValues);
+      return;
+    }
+
+    row.addEventListener('dragstart', e => {
+      draggedRowValue = fieldValue;
+      draggedRowIndex = actualRowIndex;
+      e.dataTransfer.setData('text/plain', fieldValue);
+      setTimeout(() => row.classList.add('dragging'), 0);
+      console.log(`Row drag started for ${rowFieldName}: ${fieldValue}, Actual index: ${actualRowIndex}`);
+    });
+
+    row.addEventListener('dragend', () => {
+      row.classList.remove('dragging');
+      draggedRowValue = null;
+      draggedRowIndex = null;
+    });
+
+    row.addEventListener('dragover', e => {
+      e.preventDefault();
+    });
+
+    row.addEventListener('dragenter', e => {
+      e.preventDefault();
+      if (draggedRowValue && draggedRowValue !== fieldValue) {
+        row.classList.add('drag-over');
+      }
+    });
+
+    row.addEventListener('dragleave', () => {
+      row.classList.remove('drag-over');
+    });
+
+    row.addEventListener('drop', e => {
+      e.preventDefault();
+      row.classList.remove('drag-over');
+
+      const targetRowValue = fieldValue;
+      const targetRowIndex = uniqueRowValues.indexOf(targetRowValue);
+
+      if (draggedRowValue && targetRowValue && 
+          draggedRowValue !== targetRowValue && 
+          draggedRowIndex !== null && targetRowIndex !== -1) {
+        
+        console.log(`Swapping ${rowFieldName}: ${draggedRowValue} (index: ${draggedRowIndex}) with ${targetRowValue} (index: ${targetRowIndex})`);
+
+        try {
+          // Use the core engine method with correct indices
+          pivotEngine.swapDataRows(draggedRowIndex, targetRowIndex);
+          console.log('Core row swap completed');
+          renderTable();
+        } catch (error) {
+          console.error('Core row swap failed:', error);
+        }
+      }
+    });
+  });
+}
+
+// Updated debug function
+function debugDragState() {
+  if (!pivotEngine) {
+    console.log('❌ PivotEngine not initialized');
+    return;
+  }
+
+  const rowFieldName = pivotEngine.getRowFieldName();
+  const columnFieldName = pivotEngine.getColumnFieldName();
+  
+  console.log('🔍 Drag Debug Info:');
+  console.log('Row field name:', rowFieldName);
+  console.log('Column field name:', columnFieldName);
+  
+  if (rowFieldName) {
+    const uniqueRowValues = pivotEngine.getUniqueFieldValues(rowFieldName);
+    const orderedRowValues = pivotEngine.getOrderedUniqueFieldValues(rowFieldName, true);
+    console.log(`Unique ${rowFieldName} values (from full data):`, uniqueRowValues);
+    console.log(`Ordered ${rowFieldName} values (with custom order):`, orderedRowValues);
+  }
+  
+  if (columnFieldName) {
+    const uniqueColumnValues = pivotEngine.getUniqueFieldValues(columnFieldName);
+    const orderedColumnValues = pivotEngine.getOrderedUniqueFieldValues(columnFieldName, false);
+    console.log(`Unique ${columnFieldName} values (from full data):`, uniqueColumnValues);
+    console.log(`Ordered ${columnFieldName} values (with custom order):`, orderedColumnValues);
+  }
+  
+  const state = pivotEngine.getState();
+  console.log('Current data handling mode:', state.dataHandlingMode);
+  console.log('Config data length:', pivotEngine.config?.data?.length || 0);
+  console.log('State data length:', state.data?.length || 0);
+  console.log('State rawData length:', state.rawData?.length || 0);
+}
+
+function manualColumnSwap(fromIndex, toIndex, columnFieldName, uniqueColumnValues) {
+  console.log(`Manual column swap: ${columnFieldName} from ${fromIndex} to ${toIndex}`);
+  console.log('Available column values:', uniqueColumnValues);
+
+  if (fromIndex < 0 || toIndex < 0 || fromIndex >= uniqueColumnValues.length || toIndex >= uniqueColumnValues.length) {
+    console.error('Invalid column indices:', fromIndex, toIndex, 'Available:', uniqueColumnValues.length);
+    return;
+  }
+
+  // Create swapped order
+  const swappedValues = [...uniqueColumnValues];
+  const temp = swappedValues[fromIndex];
+  swappedValues[fromIndex] = swappedValues[toIndex];
+  swappedValues[toIndex] = temp;
+
+  console.log('New column order:', swappedValues);
+
+  // Store in multiple locations to ensure persistence
+  window.swappedColumnOrder = swappedValues;
+
+  // Store in engine state using the core method
+  if (pivotEngine && pivotEngine.setCustomFieldOrder) {
+    pivotEngine.setCustomFieldOrder(columnFieldName, swappedValues, false);
+  }
+
+  // Also store directly in state as backup
+  if (pivotEngine && pivotEngine.state) {
+    pivotEngine.state.customColumnOrder = {
+      fieldName: columnFieldName,
+      order: swappedValues,
+    };
+  }
+
+  console.log('Manual column swap completed and stored');
+}
+
+// Manual row swap function
+function manualRowSwap(fromIndex, toIndex, rowFieldName) {
+  if (!pivotEngine) {
+    console.error('PivotEngine not available for manual row swap');
+    return;
+  }
+
+  const state = pivotEngine.getState();
+  const uniqueRowValues = pivotEngine.getUniqueFieldValues(rowFieldName);
+
+  console.log(`Manual row swap: ${rowFieldName} from ${fromIndex} to ${toIndex}`);
+  console.log('Available row values:', uniqueRowValues);
+
+  if (fromIndex < 0 || toIndex < 0 || fromIndex >= uniqueRowValues.length || toIndex >= uniqueRowValues.length) {
+    console.error('Invalid row indices:', fromIndex, toIndex, 'Available:', uniqueRowValues.length);
+    return;
+  }
+
+  // Get the values to swap
+  const fromValue = uniqueRowValues[fromIndex];
+  const toValue = uniqueRowValues[toIndex];
+
+  // Create swapped order
+  const swappedValues = [...uniqueRowValues];
+  swappedValues[fromIndex] = toValue;
+  swappedValues[toIndex] = fromValue;
+
+  console.log('New row order:', swappedValues);
+
+  // Reorder the actual data
+  const dataToUse = state.data || state.rawData || filteredData;
+  const newData = [...dataToUse];
+
+  newData.sort((a, b) => {
+    const aIndex = swappedValues.indexOf(a[rowFieldName]);
+    const bIndex = swappedValues.indexOf(b[rowFieldName]);
+    return aIndex - bIndex;
+  });
+
+  // Update filteredData
+  if (filteredData) {
+    filteredData.sort((a, b) => {
+      const aIndex = swappedValues.indexOf(a[rowFieldName]);
+      const bIndex = swappedValues.indexOf(b[rowFieldName]);
+      return aIndex - bIndex;
+    });
+  }
+
+  // Create new engine
+  try {
+    pivotEngine = new PivotEngine({
+      ...config,
+      data: newData,
+    });
+  } catch (error) {
+    console.error('Error creating new PivotEngine during manual row swap:', error);
+  }
+
+  console.log('Manual row swap completed');
+}
+
+function getFieldDisplayName(fieldName) {
+  // Convert field name to display name (capitalize first letter)
+  return fieldName.charAt(0).toUpperCase() + fieldName.slice(1);
+}
+
+// Reset filters
+function resetFilters() {
+  // Reset data to original
+  filteredData = [...sampleData];
+
+  // Create a new PivotEngine instance with the original data
+  try {
+    pivotEngine = new PivotEngine({
+      ...config,
+      data: sampleData,
+    });
+
+    // Subscribe again to state changes
+    pivotEngine.subscribe(state => {
+      renderTable();
+    });
+  } catch (error) {
+    console.error('Error resetting filters:', error);
+  }
+
+  // Update pagination
+  updatePagination(sampleData, true);
+
+  // Reset filter inputs
+  const filterField = document.getElementById('filterField');
+  const filterOperator = document.getElementById('filterOperator');
+  const filterValue = document.getElementById('filterValue');
+  
+  if (filterField) filterField.selectedIndex = 0;
+  if (filterOperator) filterOperator.selectedIndex = 0;
+  if (filterValue) filterValue.value = '';
+}
+
+// Update pagination based on data size
+function updatePaginationInfo(viewType = null) {
+  const pageInfo = document.getElementById('pageInfo');
+  if (pageInfo) {
+    let viewMode;
+    if (viewType) {
+      viewMode = viewType;
+    } else {
+      viewMode = currentViewMode === 'raw' ? 'Raw Data' : 'Processed Data';
+    }
+
+    pageInfo.textContent = `${viewMode} - Page ${paginationState.currentPage} of ${paginationState.totalPages}`;
+
+    const prevButton = document.getElementById('prevPage');
+    const nextButton = document.getElementById('nextPage');
+    if (prevButton) prevButton.disabled = paginationState.currentPage <= 1;
+    if (nextButton) nextButton.disabled = paginationState.currentPage >= paginationState.totalPages;
+  }
+}
+
+// Generic updatePagination function
+function updatePagination(data, resetPage = false) {
+  if (!pivotEngine) {
+    console.warn('PivotEngine not initialized for pagination');
+    return;
+  }
+
+  const state = pivotEngine.getState();
+  const rowFieldName = pivotEngine.getRowFieldName();
+
+  if (!rowFieldName) {
+    console.warn('No row field configured for pagination');
+    return;
+  }
+
+  // Get unique row values
+  const uniqueRowValues = pivotEngine.getUniqueFieldValues(rowFieldName);
+
+  // Get pageSize from the select element, with fallback
+  const pageSizeElement = document.getElementById('pageSize');
+  const pageSize = pageSizeElement ? Number(pageSizeElement.value) : 10;
+  const totalPages = Math.ceil(uniqueRowValues.length / pageSize) || 1;
+
+  console.log(`updatePagination - Total unique ${rowFieldName}:`, uniqueRowValues.length);
+  console.log('updatePagination - Page size:', pageSize);
+  console.log('updatePagination - Total pages:', totalPages);
+
+  if (resetPage) {
+    paginationState.currentPage = 1;
+  } else {
+    // Ensure current page doesn't exceed total pages
+    if (paginationState.currentPage > totalPages) {
+      paginationState.currentPage = totalPages;
+    }
+  }
+
+  paginationState.pageSize = pageSize;
+  paginationState.totalPages = totalPages;
+
+  // Keep the engine in sync
+  if (pivotEngine.setPagination) {
+    pivotEngine.setPagination(paginationState);
+  }
+
+  console.log('Updated pagination state:', paginationState);
+}
+
+export function formatTable(config) {
+  try {
+    pivotEngine = new PivotEngine(config);
+    renderTable();
+  } catch (error) {
+    console.error('Error formatting table:', error);
+  }
+}
+
+// Event Listeners
+function setupEventListeners() {
+  // Switch view functionality
+  const switchButton = document.getElementById('switchView');
+  if (switchButton) {
+    switchButton.addEventListener('click', () => {
+      // Toggle the view mode
+      currentViewMode = currentViewMode === 'processed' ? 'raw' : 'processed';
+      showProcessedData = currentViewMode === 'processed';
+
+      console.log('Switching to view mode:', currentViewMode);
+
+      // Update button text
+      switchButton.textContent = currentViewMode === 'processed' ? 'Switch to Raw Data' : 'Switch to Processed Data';
+
+      // Reset pagination when switching views
+      if (currentViewMode === 'raw') {
+        const dataToUse = filteredData.length > 0 ? filteredData : sampleData;
+        paginationState.currentPage = 1;
+        updateRawDataPagination(dataToUse);
+        console.log('Switched to raw data view with', dataToUse.length, 'total items');
+      } else {
+        paginationState.currentPage = 1;
+        updatePagination(filteredData, true);
+        console.log('Switched to processed data view');
+      }
+
+      // Re-render table
+      renderTable();
+    });
+  }
+
+  // Page size change handler
+  const pageSizeElement = document.getElementById('pageSize');
+  if (pageSizeElement) {
+    pageSizeElement.addEventListener('change', e => {
+      const newPageSize = Number(e.target.value);
+
+      // Calculate what page we should be on with the new page size
+      const currentFirstItem = (paginationState.currentPage - 1) * paginationState.pageSize;
+      const newPage = Math.floor(currentFirstItem / newPageSize) + 1;
+
+      paginationState.currentPage = newPage;
+
+      if (currentViewMode === 'raw') {
+        const dataToUse = filteredData.length > 0 ? filteredData : sampleData;
+        updateRawDataPagination(dataToUse);
+      } else {
+        updatePagination(filteredData, false);
+        // Ensure we don't exceed total pages
+        if (paginationState.currentPage > paginationState.totalPages) {
+          paginationState.currentPage = paginationState.totalPages;
+        }
+      }
+
+      console.log('Page size changed to:', newPageSize, 'New page:', paginationState.currentPage);
+      renderTable();
+    });
+  }
+
+  // Previous page handler
+  const prevButton = document.getElementById('prevPage');
+  if (prevButton) {
+    prevButton.addEventListener('click', () => {
+      if (paginationState.currentPage > 1) {
+        paginationState.currentPage--;
+        if (currentViewMode === 'processed' && pivotEngine && pivotEngine.setPagination) {
+          pivotEngine.setPagination(paginationState);
+        }
+        console.log('Previous page clicked, now on page:', paginationState.currentPage);
+        renderTable();
+      }
+    });
+  }
+
+  // Next page handler
+  const nextButton = document.getElementById('nextPage');
+  if (nextButton) {
+    nextButton.addEventListener('click', () => {
+      if (paginationState.currentPage < paginationState.totalPages) {
+        paginationState.currentPage++;
+        if (currentViewMode === 'processed' && pivotEngine && pivotEngine.setPagination) {
+          pivotEngine.setPagination(paginationState);
+        }
+        console.log('Next page clicked, now on page:', paginationState.currentPage);
+        renderTable();
+      }
+    });
+  }
+
+  // Filter event listeners
+  const applyFilterButton = document.getElementById('applyFilter');
+  if (applyFilterButton) {
+    applyFilterButton.addEventListener('click', () => {
+      const fieldElement = document.getElementById('filterField');
+      const operatorElement = document.getElementById('filterOperator');
+      const valueElement = document.getElementById('filterValue');
+
+      if (!fieldElement || !operatorElement || !valueElement) {
+        console.error('Filter elements not found');
+        return;
+      }
+
+      const field = fieldElement.value;
+      const operator = operatorElement.value;
+      const value = valueElement.value;
+
+      if (!value) {
+        alert('Please enter a filter value');
+        return;
+      }
+
+      const filter = { field, operator, value };
+      filteredData = applyFilter(sampleData, filter);
+
+      console.log('Filtered data:', filteredData);
+
+      // Reset to first page when applying filter
+      paginationState.currentPage = 1;
+
+      if (currentViewMode === 'raw') {
+        updateRawDataPagination(filteredData);
+      } else {
+        updatePagination(filteredData, true);
+      }
+
+      renderTable();
+    });
+  }
+
+  const resetFilterButton = document.getElementById('resetFilter');
+  if (resetFilterButton) {
+    resetFilterButton.addEventListener('click', () => {
+      filteredData = [...sampleData];
+
+      try {
+        pivotEngine = new PivotEngine({
+          ...config,
+          data: sampleData,
+        });
+
+        // Subscribe again to state changes
+        pivotEngine.subscribe(state => {
+          renderTable();
+        });
+      } catch (error) {
+        console.error('Error resetting filter:', error);
+      }
+
+      // Reset to first page
+      paginationState.currentPage = 1;
+
+      if (currentViewMode === 'raw') {
+        updateRawDataPagination(sampleData);
+      } else {
+        updatePagination(filteredData, true);
+      }
+
+      const filterField = document.getElementById('filterField');
+      const filterOperator = document.getElementById('filterOperator');
+      const filterValue = document.getElementById('filterValue');
+      
+      if (filterField) filterField.selectedIndex = 0;
+      if (filterOperator) filterOperator.selectedIndex = 0;
+      if (filterValue) filterValue.value = '';
+    });
+  }
+}
+
+function addDraggableStyles() {
+  // Check if styles already exist
+  if (document.querySelector('#pivot-table-styles')) {
+    return;
+  }
+
+  const styleEl = document.createElement('style');
+  styleEl.id = 'pivot-table-styles';
+  styleEl.innerHTML = `
+        .dragging {
+            opacity: 0.5;
+            background-color: #f0f0f0;
+        }
+        
+        .drag-over {
+            border: 2px dashed #666 !important;
+            background-color: #e9ecef !important;
+        }
+        
+        th[draggable="true"], tr[draggable="true"] {
+            cursor: move;
+        }
+        
+        .column-header[draggable="true"] {
+            cursor: move;
+            transition: background-color 0.2s;
+        }
+        
+        .column-header[draggable="true"]:hover {
+            background-color: #e3f2fd !important;
+            border: 1px solid #2196f3 !important;
+        }
+        
+        .column-header.dragging {
+            opacity: 0.6;
+            background-color: #ffecb3 !important;
+        }
+        
+        .column-header.drag-over {
+            border: 3px dashed #4caf50 !important;
+            background-color: #e8f5e8 !important;
+        }
+        
+        .sort-icon {
+            margin-left: 5px;
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+        
+        th:hover .sort-icon {
+            opacity: 1 !important;
+        }
+        
+        th[data-sortable="true"]:hover {
+            background-color: #e9ecef !important;
+        }
+        
+        .controls-container {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .filter-container, .pagination-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        #myTable {
+            overflow-x: auto;
+            width: 100%;
+        }
+        
+        button {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        select, input {
+            padding: 5px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .drill-down-cell {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .drill-down-cell:hover {
+            background-color: #e3f2fd !important;
+            border: 2px solid #2196f3 !important;
+        }
+
+        .drill-down-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .drill-down-content {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80%;
+            overflow: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .drill-down-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .drill-down-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .drill-down-close {
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .drill-down-close:hover {
+            background: #d32f2f;
+        }
+
+        .drill-down-summary {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .drill-down-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .drill-down-table th {
+            background: #f8f9fa;
+            padding: 8px;
+            border: 1px solid #dee2e6;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .drill-down-table td {
+            padding: 6px 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .drill-down-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .drill-down-table tr:hover {
+            background-color: #e3f2fd;
+        }
+    `;
+  document.head.appendChild(styleEl);
+}
+
+// Create drill-down modal for any fields
+function createDrillDownModal(rowValue, columnValue, measure, rawDetails, aggregatedValue, rowFieldName, columnFieldName) {
+  // Remove existing modal if any
+  const existingModal = document.querySelector('.drill-down-modal');
+  if (existingModal) {
+    existingModal.remove();
+  }
+
+  // Create modal elements
+  const modal = document.createElement('div');
+  modal.className = 'drill-down-modal';
+
+  const content = document.createElement('div');
+  content.className = 'drill-down-content';
+
+  // Header
+  const header = document.createElement('div');
+  header.className = 'drill-down-header';
+
+  const title = document.createElement('div');
+  title.className = 'drill-down-title';
+  title.textContent = 'Details';
+
+  const closeButton = document.createElement('button');
+  closeButton.className = 'drill-down-close';
+  closeButton.innerHTML = '×';
+  closeButton.addEventListener('click', () => modal.remove());
+
+  header.appendChild(title);
+  header.appendChild(closeButton);
+
+  // Summary
+  const summary = document.createElement('div');
+  summary.className = 'drill-down-summary';
+  summary.innerHTML = `
+    <strong>${getFieldDisplayName(rowFieldName)}:</strong> ${rowValue} &nbsp;&nbsp;
+    <strong>${getFieldDisplayName(columnFieldName)}:</strong> ${columnValue} &nbsp;&nbsp;
+    <strong>${measure.caption}:</strong> ${aggregatedValue}
+  `;
+
+  // Table
+  const table = document.createElement('table');
+  table.className = 'drill-down-table';
+
+  // Table header
+  const thead = document.createElement('thead');
+  const headerRow = document.createElement('tr');
+
+  // Get all columns from the raw data
+  const columns = rawDetails.length > 0 ? Object.keys(rawDetails[0]) : [];
+  columns.forEach(col => {
+    const th = document.createElement('th');
+    th.textContent = getFieldDisplayName(col);
+    headerRow.appendChild(th);
+  });
+
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+
+  // Table body
+  const tbody = document.createElement('tbody');
+  rawDetails.forEach((row, index) => {
+    const tr = document.createElement('tr');
+    columns.forEach(col => {
+      const td = document.createElement('td');
+      let value = row[col];
+
+      // Format values appropriately based on measure format
+      if (measure.format && (col === measure.uniqueName || col.includes('price') || col.includes('sales') || col.includes('revenue'))) {
+        if (typeof value === 'number') {
+          if (measure.format.type === 'currency') {
+            value = new Intl.NumberFormat('en-US', {
+              style: 'currency',
+              currency: 'USD',
+            }).format(value);
+          }
+        }
+      } else if (col.includes('date')) {
+        value = new Date(value).toLocaleDateString();
+      }
+
+      td.textContent = value;
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+
+  table.appendChild(tbody);
+
+  // Assemble modal
+  content.appendChild(header);
+  content.appendChild(summary);
+  content.appendChild(table);
+  modal.appendChild(content);
+
+  // Add to document
+  document.body.appendChild(modal);
+
+  // Close modal when clicking outside
+  modal.addEventListener('click', e => {
+    if (e.target === modal) {
+      modal.remove();
+    }
+  });
+
+  // Close modal with Escape key
+  const handleEscape = e => {
+    if (e.key === 'Escape') {
+      modal.remove();
+      document.removeEventListener('keydown', handleEscape);
+    }
+  };
+  document.addEventListener('keydown', handleEscape);
+}
+
+// Generic getDrillDownData function
+function getDrillDownData(rowValue, columnValue, measure, rowFieldName, columnFieldName) {
+  if (!pivotEngine) {
+    console.warn('PivotEngine not available for drill-down');
+    return [];
+  }
+
+  const state = pivotEngine.getState();
+
+  // Create filter object dynamically
+  const filter = {};
+  filter[rowFieldName] = rowValue;
+  filter[columnFieldName] = columnValue;
+
+  // Filter raw data for this specific row and column combination
+  const filteredData = state.rawData.filter(item => {
+    return Object.keys(filter).every(key => item[key] === filter[key]);
+  });
+
+  console.log(`Drill-down for ${rowFieldName}:${rowValue} - ${columnFieldName}:${columnValue} - ${measure.caption}:`, filteredData);
+
+  return filteredData;
+}
+
+// Generic addDrillDownToDataCell function
+function addDrillDownToDataCell(td, rowValue, columnValue, measure, value, formattedValue, rowFieldName, columnFieldName) {
+  td.textContent = formattedValue;
+
+  // Add drill-down functionality
+  td.className = 'drill-down-cell';
+  td.title = `Double-click to see details for ${rowFieldName}: ${rowValue} - ${columnFieldName}: ${columnValue}`;
+
+  // Add double-click event listener
+  td.addEventListener('dblclick', e => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    console.log(`Double-clicked on ${rowFieldName}: ${rowValue} - ${columnFieldName}: ${columnValue} - ${measure.caption}`);
+
+    // Get the raw data for this cell
+    const rawDetails = getDrillDownData(rowValue, columnValue, measure, rowFieldName, columnFieldName);
+
+    if (rawDetails.length === 0) {
+      alert(`No detailed data found for ${rowFieldName}: ${rowValue} in ${columnFieldName}: ${columnValue}`);
+      return;
+    }
+
+    // Show the drill-down modal
+    createDrillDownModal(rowValue, columnValue, measure, rawDetails, formattedValue, rowFieldName, columnFieldName);
+  });
+}
+
+// Add HTML for filter and pagination controls
+function addControlsHTML() {
+  if (document.querySelector('.controls-container')) {
+    return;
+  }
+
+  const container = document.createElement('div');
+  container.className = 'controls-container';
+  container.innerHTML = `
+    <div class="filter-container">
+      <select id="filterField"></select>
+      <select id="filterOperator"></select>
+      <input type="text" id="filterValue" placeholder="Filter value">
+      <button id="applyFilter">Apply Filter</button>
+      <button id="resetFilter">Reset</button>
+      <button id="switchView">Switch to Raw Data</button>
+    </div>
+    <div class="pagination-container">
+      <label>Items per page:</label>
+      <select id="pageSize">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="10" selected>10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+      </select>
+      <button id="prevPage">Previous</button>
+      <span id="pageInfo">Processed Data - Page 1 of 1</span>
+      <button id="nextPage">Next</button>
+    </div>
+  `;
+
+  const myTable = document.getElementById('myTable');
+  if (myTable && myTable.parentNode) {
+    myTable.parentNode.insertBefore(container, myTable);
+  }
+}
+
+// Set up drag and drop functionality
+function setupDragAndDrop() {
+  console.log('Setting up generic drag and drop');
+
+  if (!pivotEngine) {
+    console.warn('PivotEngine not available for drag and drop setup');
+    return;
+  }
+
+  // Get field names from configuration
+  const rowFieldName = pivotEngine.getRowFieldName();
+  const columnFieldName = pivotEngine.getColumnFieldName();
+
+  if (!rowFieldName || !columnFieldName) {
+    console.warn('Row or column field not configured for drag and drop');
+    return;
+  }
+
+  console.log(`Setting up drag and drop for row field: ${rowFieldName}, column field: ${columnFieldName}`);
+
+  // Use the improved column drag setup
+  setupColumnDragAndDropFixed(columnFieldName);
+
+  // Row drag setup
+  setupRowDragAndDrop(rowFieldName);
+}
+
+// Generic function to manually swap field values (fallback)
+function swapGenericFieldValues(fromIndex, toIndex, fieldName, isRowField) {
+  if (!pivotEngine) {
+    console.error('PivotEngine not available for generic field swap');
+    return;
+  }
+
+  const state = pivotEngine.getState();
+  const uniqueValues = pivotEngine.getUniqueFieldValues(fieldName);
+
+  console.log(`Manual ${fieldName} swap - From index:`, fromIndex, 'To index:', toIndex);
+  console.log(`Current ${fieldName} values:`, uniqueValues);
+
+  // Validate indices
+  if (fromIndex < 0 || toIndex < 0 || fromIndex >= uniqueValues.length || toIndex >= uniqueValues.length) {
+    console.error(`Invalid indices for ${fieldName} swap:`, fromIndex, toIndex, 'Available values:', uniqueValues.length);
+    return;
+  }
+
+  if (fromIndex === toIndex) {
+    console.log('Same index, no swap needed');
+    return;
+  }
+
+  // Get the values to swap
+  const fromValue = uniqueValues[fromIndex];
+  const toValue = uniqueValues[toIndex];
+
+  if (!fromValue || !toValue) {
+    console.error(`Invalid ${fieldName} values for swap:`, fromValue, toValue);
+    return;
+  }
+
+  console.log(`Swapping ${fieldName}: ${fromValue} <-> ${toValue}`);
+
+  // Create swapped value order
+  const swappedValues = [...uniqueValues];
+  swappedValues[fromIndex] = toValue;
+  swappedValues[toIndex] = fromValue;
+
+  console.log(`After manual swap - ${fieldName} values:`, swappedValues);
+
+  // Store the swapped order
+  const storageKey = isRowField ? 'swappedRowOrder' : 'swappedColumnOrder';
+  window[storageKey] = swappedValues;
+
+  // Also store in the engine state
+  if (pivotEngine && pivotEngine.state) {
+    const stateKey = isRowField ? 'customRowOrder' : 'customColumnOrder';
+    pivotEngine.state[stateKey] = {
+      fieldName: fieldName,
+      order: swappedValues,
+    };
+  }
+
+  // For row fields, we need to reorder the actual data
+  if (isRowField) {
+    const dataToUse = state.data || state.rawData || filteredData;
+    const newData = [...dataToUse];
+
+    // Sort data according to the new value order
+    newData.sort((a, b) => {
+      const aIndex = swappedValues.indexOf(a[fieldName]);
+      const bIndex = swappedValues.indexOf(b[fieldName]);
+      return aIndex - bIndex;
+    });
+
+    // Update filteredData to maintain consistency
+    if (filteredData) {
+      filteredData.sort((a, b) => {
+        const aIndex = swappedValues.indexOf(a[fieldName]);
+        const bIndex = swappedValues.indexOf(b[fieldName]);
+        return aIndex - bIndex;
+      });
+    }
+
+    // Create new engine with swapped data
+    try {
+      pivotEngine = new PivotEngine({
+        ...config,
+        data: newData,
+      });
+    } catch (error) {
+      console.error('Error creating new PivotEngine during generic field swap:', error);
+    }
+  }
+
+  console.log(`Manual ${fieldName} swap completed. New order:`, swappedValues);
+}
+
+export function onSectionItemDrop(droppedFields) {
+  let droppedFieldsInSections = JSON.stringify({
+    rows: Array.from(droppedFields.rows),
+    columns: Array.from(droppedFields.columns),
+    values: Array.from(droppedFields.values),
+    filters: Array.from(droppedFields.filters),
+  });
+  const parsedDroppedFieldsInSections = JSON.parse(droppedFieldsInSections);
+
+  const transformedRows = parsedDroppedFieldsInSections.rows.map(rowField => {
+    return { uniqueName: rowField.toLowerCase(), caption: rowField };
+  });
+  const transformedColumns = parsedDroppedFieldsInSections.columns.map(columnField => {
+    return { uniqueName: columnField.toLowerCase(), caption: columnField };
+  });
+
+  if (pivotEngine && pivotEngine.state) {
+    pivotEngine.state.rows = transformedRows;
+    pivotEngine.state.columns = transformedColumns;
+    renderTable();
+  }
+}
+
+// Initialize everything when the DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+  try {
+    // Ensure we start with all the original data
+    console.log('Initializing with sampleData:', sampleData?.length || 0, 'items');
+
+    // Check if sampleData is available
+    if (!sampleData || !Array.isArray(sampleData) || sampleData.length === 0) {
+      console.error('Sample data is not available or empty');
+      const tableContainer = document.getElementById('myTable');
+      if (tableContainer) {
+        tableContainer.innerHTML = '<div style="color: red; padding: 20px;">Error: Sample data not available. Please check your config file.</div>';
+      }
+      return;
+    }
+
+    // Reset filteredData to ensure we have all data
+    filteredData = [...sampleData];
+
+    // Create PivotEngine instance with all data
+    try {
+      pivotEngine = new PivotEngine({
+        ...config,
+        data: sampleData,
+      });
+
+      // Subscribe to state changes and re-render UI
+      // pivotEngine.subscribe(state => {
+      //   renderTable();
+      // });
+
+      console.log('Initial pivot engine state:', pivotEngine.getState());
+    } catch (error) {
+      console.error('Error initializing PivotEngine:', error);
+      const tableContainer = document.getElementById('myTable');
+      if (tableContainer) {
+        tableContainer.innerHTML = `<div style="color: red; padding: 20px;">Error initializing PivotEngine: ${error.message}</div>`;
+      }
+      return;
+    }
+
+    // Initialize header if configured
+    if (config.toolbar && typeof createHeader === 'function') {
+      try {
+        createHeader(config);
+      } catch (error) {
+        console.error('Error creating header:', error);
+      }
+    }
+
+    // Add draggable styles
+    addDraggableStyles();
+
+    // Add controls HTML
+    addControlsHTML();
+
+    // Initialize UI
+    initializeFilters();
+    setupEventListeners();
+
+    // Set initial pagination with all sample data
+    updatePagination(sampleData, true);
+    renderTable();
+
+    console.log('Initialization completed successfully');
+  } catch (error) {
+    console.error('Error during initialization:', error);
+    const tableContainer = document.getElementById('myTable');
+    if (tableContainer) {
+      tableContainer.innerHTML = `<div style="color: red; padding: 20px;">Error during initialization: ${error.message}</div>`;
+    }
+  }
+});
+
+
+================================================
+FILE: package.json
+================================================
+{
+  "name": "simple-js-demo",
+  "private": true,
+  "version": "1.0.8",
+  "dependencies": {
+    "@mindfiredigital/pivothead": "workspace:*"
+  },
+  "scripts": {
+    "dev": "vite"
+  },
+  "devDependencies": {
+    "vite": "^4.3.9"
+  }
+}
+
+
+
+================================================
+FILE: style.css
+================================================
+.controls {
+  margin: 20px;
+  padding: 10px;
+  margin-top: 60px;
+}
+
+.filter-controls,
+.pagination-controls {
+  margin: 10px 0;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+#myTable {
+  margin: 20px;
+  border-collapse: collapse;
+}
+
+#myTable th,
+#myTable td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+/* Add these styles for drag and drop */
+.dragging {
+  opacity: 0.5;
+  background-color: #f0f0f0;
+}
+
+.drag-over {
+  border: 2px dashed #666 !important;
+  background-color: #e9ecef !important;
+}
+
+th[draggable='true'],
+tr[draggable='true'] {
+  cursor: move;
+}
+
+
+================================================
+FILE: config/config.js
+================================================
+// Sample data for the pivot table
+// export const sampleData = [
+//   {
+//     date: '2024-01-01',
+//     product: 'Widget A',
+//     region: 'North',
+//     sales: 1000,
+//     quantity: 50,
+//   },
+//   {
+//     date: '2024-01-01',
+//     product: 'Widget B',
+//     region: 'South',
+//     sales: 1500,
+//     quantity: 75,
+//   },
+//   {
+//     date: '2024-01-01',
+//     product: 'Widget D',
+//     region: 'North',
+//     sales: 1300,
+//     quantity: 70,
+//   },
+//   {
+//     date: '2024-01-02',
+//     product: 'Widget A',
+//     region: 'East',
+//     sales: 1200,
+//     quantity: 60,
+//   },
+//   {
+//     date: '2024-01-02',
+//     product: 'Widget A',
+//     region: 'East',
+//     sales: 100,
+//     quantity: 44,
+//   },
+//   {
+//     date: '2024-01-02',
+//     product: 'Widget C',
+//     region: 'West',
+//     sales: 800,
+//     quantity: 40,
+//   },
+//   {
+//     date: '2024-01-03',
+//     product: 'Widget B',
+//     region: 'North',
+//     sales: 1800,
+//     quantity: 90,
+//   },
+//   {
+//     date: '2024-01-03',
+//     product: 'Widget C',
+//     region: 'South',
+//     sales: 1100,
+//     quantity: 55,
+//   },
+//   {
+//     date: '2024-01-04',
+//     product: 'Widget A',
+//     region: 'West',
+//     sales: 1300,
+//     quantity: 65,
+//   },
+//   {
+//     date: '2024-01-04',
+//     product: 'Widget B',
+//     region: 'East',
+//     sales: 1600,
+//     quantity: 80,
+//   },
+//   {
+//     date: '2024-01-05',
+//     product: 'Widget E',
+//     region: 'North',
+//     sales: 900,
+//     quantity: 45,
+//   },
+//   {
+//     date: '2024-01-05',
+//     product: 'Widget F',
+//     region: 'South',
+//     sales: 1100,
+//     quantity: 55,
+//   },
+//   {
+//     date: '2024-01-06',
+//     product: 'Widget G',
+//     region: 'East',
+//     sales: 1400,
+//     quantity: 70,
+//   },
+//   {
+//     date: '2024-01-06',
+//     product: 'Widget H',
+//     region: 'West',
+//     sales: 1700,
+//     quantity: 85,
+//   },
+//   {
+//     date: '2024-01-07',
+//     product: 'Widget I',
+//     region: 'North',
+//     sales: 1900,
+//     quantity: 95,
+//   },
+//   {
+//     date: '2024-01-07',
+//     product: 'Widget J',
+//     region: 'South',
+//     sales: 2000,
+//     quantity: 100,
+//   },
+// ];
+
+// Pivot table configuration
+// export const config = {
+//   data: sampleData,
+//   rows: [{ uniqueName: 'product', caption: 'Product' }],
+//   columns: [{ uniqueName: 'region', caption: 'Region' }],
+//   measures: [
+//     {
+//       uniqueName: 'sales',
+//       caption: 'Total Sales',
+//       aggregation: 'sum',
+//       format: {
+//         type: 'currency',
+//         currency: 'USD',
+//         locale: 'en-US',
+//         decimals: 2,
+//       },
+//       sortable: true,
+//     },
+//     {
+//       uniqueName: 'quantity',
+//       caption: 'Total Quantity',
+//       aggregation: 'sum',
+//       format: {
+//         type: 'number',
+//         decimals: 0,
+//         locale: 'en-US',
+//       },
+//       sortable: false,
+//     },
+//     {
+//       uniqueName: 'averageSale',
+//       caption: 'Average Sale',
+//       aggregation: 'avg',
+//       format: {
+//         type: 'currency',
+//         currency: 'USD',
+//         locale: 'en-US',
+//         decimals: 2,
+//       },
+//       formula: item => item.sales / item.quantity,
+//       sortable: true,
+//     },
+//   ],
+//   dimensions: [
+//     { field: 'product', label: 'Product', type: 'string', sortable: true },
+//     { field: 'region', label: 'Region', type: 'string', sortable: false },
+//     { field: 'date', label: 'Date', type: 'date', sortable: true },
+//     { field: 'sales', label: 'Sales', type: 'number', sortable: true },
+//     { field: 'quantity', label: 'Quantity', type: 'number', sortable: false },
+//   ],
+//   defaultAggregation: 'sum',
+//   isResponsive: true,
+//   toolbar: true,
+//   // Add initial sort configuration
+//   initialSort: [
+//     {
+//       field: 'sales',
+//       direction: 'desc',
+//       type: 'measure',
+//       aggregation: 'sum',
+//     },
+//   ],
+//   groupConfig: {
+//     rowFields: ['product'],
+//     columnFields: ['region'],
+//     grouper: (item, fields) => fields.map(field => item[field]).join(' - '),
+//   },
+//   formatting: {
+//     sales: {
+//       type: 'currency',
+//       currency: 'USD',
+//       locale: 'en-US',
+//       decimals: 2,
+//     },
+//     quantity: {
+//       type: 'number',
+//       decimals: 0,
+//       locale: 'en-US',
+//     },
+//     averageSale: {
+//       type: 'currency',
+//       currency: 'USD',
+//       locale: 'en-US',
+//       decimals: 2,
+//     },
+//   },
+//   conditionalFormatting: [
+//     {
+//       value: {
+//         type: 'Number',
+//         operator: 'Greater than',
+//         value1: '1000',
+//         value2: '',
+//       },
+//       format: {
+//         font: 'Arial',
+//         size: '14px',
+//         color: '#ffffff',
+//         backgroundColor: '#4CAF50',
+//       },
+//     },
+//     {
+//       value: {
+//         type: 'Number',
+//         operator: 'Less than',
+//         value1: '500',
+//         value2: '',
+//       },
+//       format: {
+//         font: 'Arial',
+//         size: '14px',
+//         color: '#ffffff',
+//         backgroundColor: '#F44336',
+//       },
+//     },
+//   ],
+//   onRowDragEnd: (fromIndex, toIndex, newData) => {
+//     console.log('Row dragged:', { fromIndex, toIndex, newData });
+//   },
+//   onColumnDragEnd: (fromIndex, toIndex, newColumns) => {
+//     console.log('Column dragged:', { fromIndex, toIndex, newColumns });
+//   },
+// };
+
+export const sampleData = [
+  // Australia - Accessories
+  {
+    country: 'Australia',
+    category: 'Accessories',
+    price: 174.0,
+    discount: 23.0,
+  },
+  {
+    country: 'Australia',
+    category: 'Accessories',
+    price: 680.0,
+    discount: 80.0,
+  },
+  { country: 'Australia', category: 'Accessories', price: 9.0, discount: 8.0 },
+  {
+    country: 'Australia',
+    category: 'Accessories',
+    price: 174.0,
+    discount: 43.0,
+  },
+  {
+    country: 'Australia',
+    category: 'Accessories',
+    price: 680.0,
+    discount: 11.0,
+  },
+  { country: 'Australia', category: 'Accessories', price: 9.0, discount: 90.0 },
+  {
+    country: 'Australia',
+    category: 'Accessories',
+    price: 174.0,
+    discount: 0.0,
+  },
+  {
+    country: 'Australia',
+    category: 'Accessories',
+    price: 680.0,
+    discount: 0.0,
+  },
+  { country: 'Australia', category: 'Accessories', price: 9.0, discount: 0.0 },
+  {
+    country: 'Australia',
+    category: 'Accessories',
+    price: 174.0,
+    discount: 0.0,
+  },
+  {
+    country: 'Australia',
+    category: 'Accessories',
+    price: 680.0,
+    discount: 0.0,
+  },
+  { country: 'Australia', category: 'Accessories', price: 9.0, discount: 0.0 },
+
+  // Australia - Bikes
+  { country: 'Australia', category: 'Bikes', price: 2749.0, discount: 25.0 },
+  { country: 'Australia', category: 'Bikes', price: 1200.0, discount: 45.0 },
+  { country: 'Australia', category: 'Bikes', price: 3250.0, discount: 180.0 },
+  { country: 'Australia', category: 'Bikes', price: 890.0, discount: 1.0 },
+
+  // Australia - Cars
+  { country: 'Australia', category: 'Cars', price: 28500.0, discount: 1200.0 },
+  { country: 'Australia', category: 'Cars', price: 32000.0, discount: 336.0 },
+
+  // Australia - Clothing
+  { country: 'Australia', category: 'Clothing', price: 89.0, discount: 12.0 },
+  { country: 'Australia', category: 'Clothing', price: 125.0, discount: 8.0 },
+  { country: 'Australia', category: 'Clothing', price: 67.0, discount: 5.0 },
+  { country: 'Australia', category: 'Clothing', price: 234.0, discount: 45.0 },
+  { country: 'Australia', category: 'Clothing', price: 156.0, discount: 15.0 },
+  { country: 'Australia', category: 'Clothing', price: 78.0, discount: 8.0 },
+  { country: 'Australia', category: 'Clothing', price: 345.0, discount: 89.0 },
+  { country: 'Australia', category: 'Clothing', price: 234.0, discount: 67.0 },
+  { country: 'Australia', category: 'Clothing', price: 156.0, discount: 45.0 },
+  { country: 'Australia', category: 'Clothing', price: 89.0, discount: 23.0 },
+  { country: 'Australia', category: 'Clothing', price: 67.0, discount: 12.0 },
+  { country: 'Australia', category: 'Clothing', price: 234.0, discount: 67.0 },
+  { country: 'Australia', category: 'Clothing', price: 156.0, discount: 89.0 },
+  { country: 'Australia', category: 'Clothing', price: 89.0, discount: 12.0 },
+  { country: 'Australia', category: 'Clothing', price: 125.0, discount: 34.0 },
+  { country: 'Australia', category: 'Clothing', price: 78.0, discount: 23.0 },
+  { country: 'Australia', category: 'Clothing', price: 345.0, discount: 45.0 },
+  { country: 'Australia', category: 'Clothing', price: 234.0, discount: 12.0 },
+  { country: 'Australia', category: 'Clothing', price: 89.0, discount: 8.0 },
+  { country: 'Australia', category: 'Clothing', price: 156.0, discount: 67.0 },
+
+  // Australia - Components
+  {
+    country: 'Australia',
+    category: 'Components',
+    price: 450.0,
+    discount: 25.0,
+  },
+  {
+    country: 'Australia',
+    category: 'Components',
+    price: 380.0,
+    discount: 18.0,
+  },
+  {
+    country: 'Australia',
+    category: 'Components',
+    price: 620.0,
+    discount: 45.0,
+  },
+  {
+    country: 'Australia',
+    category: 'Components',
+    price: 290.0,
+    discount: 12.0,
+  },
+  {
+    country: 'Australia',
+    category: 'Components',
+    price: 540.0,
+    discount: 67.0,
+  },
+  {
+    country: 'Australia',
+    category: 'Components',
+    price: 780.0,
+    discount: 89.0,
+  },
+  {
+    country: 'Australia',
+    category: 'Components',
+    price: 320.0,
+    discount: 23.0,
+  },
+  {
+    country: 'Australia',
+    category: 'Components',
+    price: 450.0,
+    discount: 34.0,
+  },
+  {
+    country: 'Australia',
+    category: 'Components',
+    price: 680.0,
+    discount: 45.0,
+  },
+  {
+    country: 'Australia',
+    category: 'Components',
+    price: 290.0,
+    discount: 12.0,
+  },
+  {
+    country: 'Australia',
+    category: 'Components',
+    price: 540.0,
+    discount: 23.0,
+  },
+  {
+    country: 'Australia',
+    category: 'Components',
+    price: 380.0,
+    discount: 67.0,
+  },
+  {
+    country: 'Australia',
+    category: 'Components',
+    price: 620.0,
+    discount: 89.0,
+  },
+  {
+    country: 'Australia',
+    category: 'Components',
+    price: 450.0,
+    discount: 12.0,
+  },
+  {
+    country: 'Australia',
+    category: 'Components',
+    price: 780.0,
+    discount: 34.0,
+  },
+  {
+    country: 'Australia',
+    category: 'Components',
+    price: 320.0,
+    discount: 45.0,
+  },
+  {
+    country: 'Australia',
+    category: 'Components',
+    price: 680.0,
+    discount: 23.0,
+  },
+  {
+    country: 'Australia',
+    category: 'Components',
+    price: 540.0,
+    discount: 67.0,
+  },
+
+  // Canada - Accessories
+  { country: 'Canada', category: 'Accessories', price: 156.0, discount: 12.0 },
+  { country: 'Canada', category: 'Accessories', price: 89.0, discount: 23.0 },
+  { country: 'Canada', category: 'Accessories', price: 234.0, discount: 45.0 },
+  { country: 'Canada', category: 'Accessories', price: 67.0, discount: 8.0 },
+  { country: 'Canada', category: 'Accessories', price: 345.0, discount: 67.0 },
+  { country: 'Canada', category: 'Accessories', price: 123.0, discount: 12.0 },
+  { country: 'Canada', category: 'Accessories', price: 78.0, discount: 23.0 },
+  { country: 'Canada', category: 'Accessories', price: 234.0, discount: 45.0 },
+  { country: 'Canada', category: 'Accessories', price: 156.0, discount: 67.0 },
+  { country: 'Canada', category: 'Accessories', price: 89.0, discount: 89.0 },
+  { country: 'Canada', category: 'Accessories', price: 345.0, discount: 12.0 },
+  { country: 'Canada', category: 'Accessories', price: 234.0, discount: 34.0 },
+  { country: 'Canada', category: 'Accessories', price: 123.0, discount: 23.0 },
+  { country: 'Canada', category: 'Accessories', price: 67.0, discount: 45.0 },
+  { country: 'Canada', category: 'Accessories', price: 156.0, discount: 67.0 },
+  { country: 'Canada', category: 'Accessories', price: 89.0, discount: 12.0 },
+  { country: 'Canada', category: 'Accessories', price: 234.0, discount: 23.0 },
+  { country: 'Canada', category: 'Accessories', price: 345.0, discount: 45.0 },
+  { country: 'Canada', category: 'Accessories', price: 78.0, discount: 67.0 },
+  { country: 'Canada', category: 'Accessories', price: 123.0, discount: 89.0 },
+
+  // Canada - Bikes
+  { country: 'Canada', category: 'Bikes', price: 1850.0, discount: 45.0 },
+  { country: 'Canada', category: 'Bikes', price: 2340.0, discount: 67.0 },
+  { country: 'Canada', category: 'Bikes', price: 3100.0, discount: 89.0 },
+  { country: 'Canada', category: 'Bikes', price: 1567.0, discount: 123.0 },
+  { country: 'Canada', category: 'Bikes', price: 2890.0, discount: 67.0 },
+
+  // Canada - Cars
+  { country: 'Canada', category: 'Cars', price: 24500.0, discount: 890.0 },
+  { country: 'Canada', category: 'Cars', price: 28900.0, discount: 456.0 },
+  { country: 'Canada', category: 'Cars', price: 32500.0, discount: 67.0 },
+
+  // Canada - Clothing
+  { country: 'Canada', category: 'Clothing', price: 67.0, discount: 8.0 },
+  { country: 'Canada', category: 'Clothing', price: 89.0, discount: 12.0 },
+  { country: 'Canada', category: 'Clothing', price: 123.0, discount: 23.0 },
+  { country: 'Canada', category: 'Clothing', price: 156.0, discount: 34.0 },
+  { country: 'Canada', category: 'Clothing', price: 234.0, discount: 45.0 },
+  { country: 'Canada', category: 'Clothing', price: 345.0, discount: 67.0 },
+  { country: 'Canada', category: 'Clothing', price: 78.0, discount: 12.0 },
+  { country: 'Canada', category: 'Clothing', price: 123.0, discount: 23.0 },
+  { country: 'Canada', category: 'Clothing', price: 234.0, discount: 45.0 },
+  { country: 'Canada', category: 'Clothing', price: 156.0, discount: 67.0 },
+  { country: 'Canada', category: 'Clothing', price: 89.0, discount: 12.0 },
+  { country: 'Canada', category: 'Clothing', price: 345.0, discount: 23.0 },
+  { country: 'Canada', category: 'Clothing', price: 234.0, discount: 45.0 },
+  { country: 'Canada', category: 'Clothing', price: 67.0, discount: 8.0 },
+
+  // Canada - Components
+  { country: 'Canada', category: 'Components', price: 380.0, discount: 23.0 },
+  { country: 'Canada', category: 'Components', price: 540.0, discount: 45.0 },
+  { country: 'Canada', category: 'Components', price: 620.0, discount: 67.0 },
+  { country: 'Canada', category: 'Components', price: 780.0, discount: 89.0 },
+  { country: 'Canada', category: 'Components', price: 450.0, discount: 12.0 },
+  { country: 'Canada', category: 'Components', price: 320.0, discount: 23.0 },
+  { country: 'Canada', category: 'Components', price: 680.0, discount: 45.0 },
+  { country: 'Canada', category: 'Components', price: 290.0, discount: 8.0 },
+  { country: 'Canada', category: 'Components', price: 540.0, discount: 67.0 },
+  { country: 'Canada', category: 'Components', price: 380.0, discount: 12.0 },
+  { country: 'Canada', category: 'Components', price: 620.0, discount: 23.0 },
+  { country: 'Canada', category: 'Components', price: 450.0, discount: 45.0 },
+  { country: 'Canada', category: 'Components', price: 780.0, discount: 67.0 },
+  { country: 'Canada', category: 'Components', price: 320.0, discount: 8.0 },
+  { country: 'Canada', category: 'Components', price: 680.0, discount: 89.0 },
+
+  // France - Accessories
+  { country: 'France', category: 'Accessories', price: 123.0, discount: 12.0 },
+  { country: 'France', category: 'Accessories', price: 234.0, discount: 23.0 },
+  { country: 'France', category: 'Accessories', price: 345.0, discount: 45.0 },
+  { country: 'France', category: 'Accessories', price: 67.0, discount: 8.0 },
+  { country: 'France', category: 'Accessories', price: 156.0, discount: 67.0 },
+  { country: 'France', category: 'Accessories', price: 89.0, discount: 12.0 },
+  { country: 'France', category: 'Accessories', price: 234.0, discount: 23.0 },
+  { country: 'France', category: 'Accessories', price: 345.0, discount: 45.0 },
+  { country: 'France', category: 'Accessories', price: 123.0, discount: 67.0 },
+  { country: 'France', category: 'Accessories', price: 78.0, discount: 8.0 },
+  { country: 'France', category: 'Accessories', price: 156.0, discount: 89.0 },
+  { country: 'France', category: 'Accessories', price: 234.0, discount: 12.0 },
+  { country: 'France', category: 'Accessories', price: 345.0, discount: 23.0 },
+  { country: 'France', category: 'Accessories', price: 89.0, discount: 45.0 },
+  { country: 'France', category: 'Accessories', price: 67.0, discount: 8.0 },
+
+  // France - Bikes
+  { country: 'France', category: 'Bikes', price: 2100.0, discount: 89.0 },
+  { country: 'France', category: 'Bikes', price: 2850.0, discount: 123.0 },
+  { country: 'France', category: 'Bikes', price: 1950.0, discount: 67.0 },
+  { country: 'France', category: 'Bikes', price: 3200.0, discount: 234.0 },
+  { country: 'France', category: 'Bikes', price: 1750.0, discount: 45.0 },
+
+  // France - Cars
+  { country: 'France', category: 'Cars', price: 26800.0, discount: 567.0 },
+  { country: 'France', category: 'Cars', price: 31200.0, discount: 789.0 },
+  { country: 'France', category: 'Cars', price: 29500.0, discount: 234.0 },
+
+  // France - Clothing
+  { country: 'France', category: 'Clothing', price: 78.0, discount: 8.0 },
+  { country: 'France', category: 'Clothing', price: 123.0, discount: 12.0 },
+  { country: 'France', category: 'Clothing', price: 156.0, discount: 23.0 },
+  { country: 'France', category: 'Clothing', price: 234.0, discount: 34.0 },
+  { country: 'France', category: 'Clothing', price: 89.0, discount: 45.0 },
+  { country: 'France', category: 'Clothing', price: 345.0, discount: 67.0 },
+  { country: 'France', category: 'Clothing', price: 67.0, discount: 8.0 },
+  { country: 'France', category: 'Clothing', price: 234.0, discount: 12.0 },
+  { country: 'France', category: 'Clothing', price: 156.0, discount: 23.0 },
+  { country: 'France', category: 'Clothing', price: 89.0, discount: 34.0 },
+  { country: 'France', category: 'Clothing', price: 345.0, discount: 45.0 },
+  { country: 'France', category: 'Clothing', price: 123.0, discount: 8.0 },
+  { country: 'France', category: 'Clothing', price: 78.0, discount: 67.0 },
+
+  // France - Components
+  { country: 'France', category: 'Components', price: 290.0, discount: 12.0 },
+  { country: 'France', category: 'Components', price: 450.0, discount: 23.0 },
+  { country: 'France', category: 'Components', price: 620.0, discount: 45.0 },
+  { country: 'France', category: 'Components', price: 380.0, discount: 67.0 },
+  { country: 'France', category: 'Components', price: 540.0, discount: 8.0 },
+  { country: 'France', category: 'Components', price: 780.0, discount: 89.0 },
+  { country: 'France', category: 'Components', price: 320.0, discount: 12.0 },
+  { country: 'France', category: 'Components', price: 680.0, discount: 23.0 },
+  { country: 'France', category: 'Components', price: 450.0, discount: 45.0 },
+  { country: 'France', category: 'Components', price: 290.0, discount: 8.0 },
+  { country: 'France', category: 'Components', price: 620.0, discount: 67.0 },
+  { country: 'France', category: 'Components', price: 380.0, discount: 12.0 },
+
+  // Germany - Accessories
+  { country: 'Germany', category: 'Accessories', price: 89.0, discount: 12.0 },
+  { country: 'Germany', category: 'Accessories', price: 156.0, discount: 23.0 },
+  { country: 'Germany', category: 'Accessories', price: 234.0, discount: 45.0 },
+  { country: 'Germany', category: 'Accessories', price: 123.0, discount: 8.0 },
+  { country: 'Germany', category: 'Accessories', price: 345.0, discount: 67.0 },
+  { country: 'Germany', category: 'Accessories', price: 67.0, discount: 12.0 },
+  { country: 'Germany', category: 'Accessories', price: 78.0, discount: 23.0 },
+  { country: 'Germany', category: 'Accessories', price: 234.0, discount: 45.0 },
+  { country: 'Germany', category: 'Accessories', price: 156.0, discount: 8.0 },
+  { country: 'Germany', category: 'Accessories', price: 89.0, discount: 67.0 },
+  { country: 'Germany', category: 'Accessories', price: 345.0, discount: 12.0 },
+  { country: 'Germany', category: 'Accessories', price: 123.0, discount: 23.0 },
+
+  // Germany - Bikes
+  { country: 'Germany', category: 'Bikes', price: 1980.0, discount: 123.0 },
+  { country: 'Germany', category: 'Bikes', price: 2750.0, discount: 234.0 },
+  { country: 'Germany', category: 'Bikes', price: 3150.0, discount: 89.0 },
+  { country: 'Germany', category: 'Bikes', price: 1650.0, discount: 45.0 },
+
+  // Germany - Cars
+  { country: 'Germany', category: 'Cars', price: 27500.0, discount: 890.0 },
+  { country: 'Germany', category: 'Cars', price: 33200.0, discount: 567.0 },
+  { country: 'Germany', category: 'Cars', price: 30800.0, discount: 206.0 },
+
+  // Germany - Clothing
+  { country: 'Germany', category: 'Clothing', price: 67.0, discount: 8.0 },
+  { country: 'Germany', category: 'Clothing', price: 123.0, discount: 12.0 },
+  { country: 'Germany', category: 'Clothing', price: 89.0, discount: 23.0 },
+  { country: 'Germany', category: 'Clothing', price: 234.0, discount: 34.0 },
+  { country: 'Germany', category: 'Clothing', price: 156.0, discount: 45.0 },
+  { country: 'Germany', category: 'Clothing', price: 345.0, discount: 8.0 },
+  { country: 'Germany', category: 'Clothing', price: 78.0, discount: 67.0 },
+
+  // Germany - Components
+  { country: 'Germany', category: 'Components', price: 320.0, discount: 12.0 },
+  { country: 'Germany', category: 'Components', price: 540.0, discount: 23.0 },
+  { country: 'Germany', category: 'Components', price: 780.0, discount: 45.0 },
+  { country: 'Germany', category: 'Components', price: 450.0, discount: 67.0 },
+  { country: 'Germany', category: 'Components', price: 290.0, discount: 8.0 },
+  { country: 'Germany', category: 'Components', price: 620.0, discount: 89.0 },
+  { country: 'Germany', category: 'Components', price: 380.0, discount: 12.0 },
+  { country: 'Germany', category: 'Components', price: 680.0, discount: 23.0 },
+];
+
+// Also update your config.js to match the new data structure:
+
+export const config = {
+  data: sampleData,
+  rows: [{ uniqueName: 'country', caption: 'Country' }],
+  columns: [{ uniqueName: 'category', caption: 'Category' }],
+  measures: [
+    {
+      uniqueName: 'price',
+      caption: 'Sum of Price',
+      aggregation: 'sum',
+      format: {
+        type: 'currency',
+        currency: 'USD',
+        locale: 'en-US',
+        decimals: 2,
+      },
+    },
+    {
+      uniqueName: 'discount',
+      caption: 'Sum of Discount',
+      aggregation: 'sum',
+      format: {
+        type: 'currency',
+        currency: 'USD',
+        locale: 'en-US',
+        decimals: 2,
+      },
+    },
+  ],
+  // Keep your existing conditionalFormatting, toolbar, etc.
+  conditionalFormatting: [
+    {
+      value: {
+        type: 'Number',
+        operator: 'Greater than',
+        value1: 1000,
+      },
+      format: {
+        backgroundColor: '#d4edda',
+        color: '#155724',
+      },
+    },
+  ],
+  toolbar: true,
+  isResponsive: true,
+  pageSize: 10,
+  // Add callback for drill-down
+  onRowDragEnd: (fromIndex, toIndex, newData) => {
+    console.log('Row dragged:', { fromIndex, toIndex, newData });
+  },
+  onColumnDragEnd: (fromIndex, toIndex, newColumns) => {
+    console.log('Column dragged:', { fromIndex, toIndex, newColumns });
+  },
+};
+
+
+
+================================================
+FILE: header/header.js
+================================================
+import { formatCellPopUp } from '../services/formatCell.js';
+import { createOptionsPopup } from '../services/optionsPopup.js';
+import { conditionFormattingPopUp } from '../services/conditionFormattingPopUp.js';
+import { createFieldsPopup } from '../services/fieldsPopup.js';
+import { dataSourceOptions } from '../services/dataSourceOptions.js';
+import { pivotEngine } from '../index.js';
+import {
+  exportToHTML,
+  exportToExcel,
+  exportToPDF,
+  openPrintDialog,
+} from '../services/exportService.js';
+
+export function createHeader(config) {
+  const header = document.createElement('div');
+  header.style.display = 'flex';
+  header.style.justifyContent = 'space-between';
+  header.style.alignItems = 'center';
+  header.style.padding = '10px 20px';
+  header.style.backgroundColor = '#f3f4f6';
+  header.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+  header.style.position = 'fixed';
+  header.style.top = '0';
+  header.style.left = '0';
+  header.style.right = '0';
+  header.style.zIndex = '1000';
+
+  function createOption(icon, label, dropdownOptions) {
+    const option = document.createElement('div');
+    option.style.position = 'relative';
+    option.style.display = 'flex';
+    option.style.flexDirection = 'column';
+    option.style.alignItems = 'center';
+    option.style.margin = '0 10px';
+    option.style.cursor = 'pointer';
+
+    // Icon element
+    const iconElement = document.createElement('div');
+    iconElement.textContent = icon;
+    iconElement.style.fontSize = '24px';
+
+    // Label element
+    const labelElement = document.createElement('span');
+    labelElement.textContent = label;
+    labelElement.style.fontSize = '12px';
+    labelElement.style.color = '#4b5563';
+
+    // Dropdown container
+    const dropdown = document.createElement('div');
+    dropdown.style.position = 'absolute';
+    dropdown.style.top = '100%';
+    dropdown.style.right = '0';
+    dropdown.style.backgroundColor = '#ffffff';
+    dropdown.style.border = '1px solid #d1d5db';
+    dropdown.style.borderRadius = '10px';
+    dropdown.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+    dropdown.style.display = 'none';
+    dropdown.style.flexDirection = 'column';
+    dropdown.style.padding = '5px';
+    dropdown.style.zIndex = '1000';
+    dropdown.style.width = 'max-content';
+    dropdown.style.whiteSpace = 'nowrap';
+
+    // Populate dropdown if options are provided
+    if (dropdownOptions && dropdownOptions.length) {
+      dropdownOptions.forEach(optionName => {
+        const dropdownItem = document.createElement('div');
+        dropdownItem.textContent = optionName;
+        dropdownItem.style.padding = '8px 16px';
+        dropdownItem.style.cursor = 'pointer';
+        dropdownItem.style.fontSize = '14px';
+        dropdownItem.style.backgroundColor = '#ffffff';
+        dropdownItem.style.transition = 'background-color 0.3s';
+
+        // Dropdown item click logic
+        dropdownItem.addEventListener('click', () => {
+          console.log(optionName);
+          switch (optionName) {
+            case 'Format Cell':
+              formatCellPopUp(config);
+              break;
+            case 'Condition Formatting':
+              conditionFormattingPopUp();
+              break;
+            case 'Options':
+              createOptionsPopup();
+              break;
+            case 'To Local JSON':
+              dataSourceOptions(config);
+              break;
+            case 'Print':
+              dropdown.style.display = 'none';
+              openPrintDialog(pivotEngine);
+              break;
+            case 'To HTML':
+              dropdown.style.display = 'none';
+              exportToHTML(pivotEngine);
+              break;
+            case 'To Excel':
+              dropdown.style.display = 'none';
+              exportToExcel(pivotEngine);
+              break;
+            case 'To PDF':
+              dropdown.style.display = 'none';
+              exportToPDF(pivotEngine);
+              break;
+            default:
+              alert(optionName + ` is under development`);
+          }
+        });
+
+        // Hover effects for dropdown items
+        dropdownItem.addEventListener('mouseover', () => {
+          dropdownItem.style.backgroundColor = '#f3f4f6';
+        });
+
+        dropdownItem.addEventListener('mouseout', () => {
+          dropdownItem.style.backgroundColor = '#ffffff';
+        });
+
+        dropdown.appendChild(dropdownItem);
+      });
+    } else {
+      // Fallback for no dropdown options
+      option.addEventListener('click', () => {
+        console.log('label clicked: ' + label);
+        switch (label) {
+          case 'Options':
+            createOptionsPopup();
+            break;
+          case 'Fields':
+            createFieldsPopup();
+            break;
+          default:
+            alert(label);
+        }
+      });
+    }
+
+    // Append elements to the option container
+    option.appendChild(iconElement);
+    option.appendChild(labelElement);
+    option.appendChild(dropdown);
+
+    // Show dropdown on hover
+    option.addEventListener('mouseover', () => {
+      dropdown.style.display = 'flex';
+    });
+
+    // Hide dropdown when mouse leaves
+    option.addEventListener('mouseout', () => {
+      dropdown.style.display = 'none';
+    });
+
+    return option;
+  }
+
+  const leftSection = document.createElement('div');
+  leftSection.style.display = 'flex';
+
+  const rightSection = document.createElement('div');
+  rightSection.style.display = 'flex';
+
+  const leftOptions = [
+    {
+      icon: '🔗',
+      label: 'Connect',
+      dropdownOptions: ['To Local CSV', 'To Local JSON'],
+    },
+
+    {
+      icon: '📤',
+      label: 'Export',
+      dropdownOptions: ['Print', 'To HTML', 'To Excel', 'To PDF'],
+    },
+  ];
+
+  const rightOptions = [
+    {
+      icon: '↕️',
+      label: 'Format',
+      dropdownOptions: ['Format Cell', 'Condition Formatting'],
+    },
+    // { icon: '⚙️', label: 'Options', dropdownOptions: [] },
+    { icon: '📋', label: 'Fields', dropdownOptions: [] },
+  ];
+
+  leftOptions.forEach(option =>
+    leftSection.appendChild(
+      createOption(option.icon, option.label, option.dropdownOptions)
+    )
+  );
+
+  rightOptions.forEach(option =>
+    rightSection.appendChild(
+      createOption(option.icon, option.label, option.dropdownOptions)
+    )
+  );
+
+  header.appendChild(leftSection);
+  header.appendChild(rightSection);
+
+  document.body.appendChild(header);
+}
+
+
+
+================================================
+FILE: services/conditionFormattingPopUp.js
+================================================
+function createConditionFormattingPopup({ onApply, onCancel }) {
+  // Create overlay
+  const overlay = document.createElement('div');
+  overlay.style.position = 'fixed';
+  overlay.style.top = '0';
+  overlay.style.left = '0';
+  overlay.style.width = '100%';
+  overlay.style.height = '100%';
+  overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+  overlay.style.display = 'flex';
+  overlay.style.justifyContent = 'center';
+  overlay.style.alignItems = 'center';
+  overlay.style.zIndex = '1000';
+
+  const popup = document.createElement('div');
+  popup.style.width = '500px';
+  popup.style.padding = '20px';
+  popup.style.backgroundColor = '#fff';
+  popup.style.borderRadius = '8px';
+  popup.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
+  popup.style.width = '600px';
+  popup.style.padding = '24px';
+
+  // Create header
+  const header = document.createElement('div');
+  header.style.display = 'flex';
+  header.style.justifyContent = 'space-between';
+  header.style.alignItems = 'center';
+  header.style.marginBottom = '16px';
+
+  const title = document.createElement('h2');
+  title.textContent = 'Conditional formatting';
+  title.style.fontSize = '20px';
+  title.style.fontWeight = '600';
+
+  const buttonGroup = document.createElement('div');
+  buttonGroup.style.display = 'flex';
+  buttonGroup.style.gap = '8px';
+
+  const addButton = createButton('+', 'border');
+  const applyButton = createButton('APPLY', 'primary');
+  const cancelButton = createButton('CANCEL', 'secondary');
+
+  buttonGroup.append(addButton, applyButton, cancelButton);
+  header.append(title, buttonGroup);
+
+  // Create divider
+  const divider = document.createElement('hr');
+  divider.style.margin = '16px 0';
+  divider.style.border = 'none';
+  divider.style.borderTop = '1px solid #e5e7eb';
+
+  // Create conditions container
+  const conditionsContainer = document.createElement('div');
+  conditionsContainer.style.display = 'flex';
+  conditionsContainer.style.flexDirection = 'column';
+  conditionsContainer.style.gap = '24px';
+
+  // Add initial condition
+  addCondition(conditionsContainer);
+
+  // Close function
+  const close = () => {
+    document.body.removeChild(overlay);
+  };
+
+  // Event listeners
+  addButton.addEventListener('click', () => {
+    addCondition(conditionsContainer);
+    updateRemoveButtons(conditionsContainer);
+  });
+  applyButton.addEventListener('click', () => {
+    const conditions = Array.from(conditionsContainer.children).map(
+      getConditionData
+    );
+    onApply(conditions);
+    close();
+  });
+  cancelButton.addEventListener('click', () => {
+    close();
+    onCancel();
+  });
+
+  // Assemble popup
+  popup.append(header, divider, conditionsContainer);
+  overlay.appendChild(popup);
+  document.body.appendChild(overlay);
+
+  return { overlay, close };
+}
+
+function createButton(text, variant) {
+  const button = document.createElement('button');
+  button.textContent = text;
+  button.style.padding = variant === '+' ? '4px 12px' : '4px 16px';
+  button.style.borderRadius = '4px';
+  button.style.cursor = 'pointer';
+  button.style.fontWeight = '500';
+
+  switch (variant) {
+    case 'primary':
+      button.style.backgroundColor = '#28a745';
+      button.style.color = 'white';
+      button.style.border = 'none';
+      button.style.padding = '10px 15px';
+      break;
+    case 'secondary':
+      button.style.backgroundColor = ' #dc3545';
+      button.style.color = 'white';
+      button.style.border = 'none';
+      button.style.padding = '10px 15px';
+      break;
+    case 'border':
+      button.style.backgroundColor = 'white';
+      button.style.border = '1px solid #d1d5db';
+      button.style.color = '#374151';
+      break;
+  }
+
+  return button;
+}
+
+function addCondition(container) {
+  const conditionWrapper = document.createElement('div');
+  conditionWrapper.style.position = 'relative';
+  conditionWrapper.style.width = '100%';
+
+  const condition = document.createElement('div');
+  condition.style.display = 'flex';
+  condition.style.flexDirection = 'column';
+  condition.style.gap = '16px';
+
+  // Value row
+  const valueRow = createFormRow('Value:', [
+    createSelect(['All values', 'Number', 'Text']),
+    createSelect(['Greater than', 'Less than', 'Equal to', 'Between']), // Add 'Between' to list in future.
+    createInput('text', '', 'Enter value 1'),
+    createInput('text', '', 'For between enter value 2'),
+  ]);
+
+  // Add "between" input when needed
+  const operatorSelect = valueRow.querySelector('select:nth-child(2)');
+  operatorSelect.addEventListener('change', e => {
+    const existingBetween = valueRow.querySelector('.between-input');
+    if (e.target.value === 'Between' && !existingBetween) {
+      const betweenGroup = document.createElement('div');
+      betweenGroup.className = 'between-input';
+      betweenGroup.style.display = 'flex';
+      betweenGroup.style.alignItems = 'center';
+      betweenGroup.style.gap = '8px';
+
+      const andText = document.createElement('span');
+      andText.textContent = '&';
+      const secondInput = createInput('text', '');
+
+      betweenGroup.append(andText, secondInput);
+      valueRow.insertBefore(betweenGroup, valueRow.lastChild);
+    } else if (e.target.value !== 'Between' && existingBetween) {
+      existingBetween.remove();
+    }
+  });
+
+  // Format row
+  const formatRow = createFormRow('Format:', [
+    createSelect(['Trebuchet MS', 'Arial', 'Times New Roman']),
+    createSelect(['12px', '14px', '16px']),
+    createColorInput('#000000'),
+    createBackgroundColorInput('#FFFFFF'),
+  ]);
+
+  // Remove button
+  const removeButton = document.createElement('button');
+  removeButton.innerHTML = '&#10005;'; // 'x' symbol
+  removeButton.style.position = 'absolute';
+  removeButton.style.right = '0';
+  removeButton.style.top = '0';
+  removeButton.style.padding = '8px';
+  removeButton.style.color = '#6b7280';
+  removeButton.style.backgroundColor = 'transparent';
+  removeButton.style.border = 'none';
+  removeButton.style.cursor = 'pointer';
+  removeButton.style.fontSize = '16px';
+  removeButton.style.display = 'none'; // Initially hidden
+
+  removeButton.addEventListener('click', () => {
+    conditionWrapper.remove();
+    updateRemoveButtons(container);
+  });
+
+  condition.append(valueRow, formatRow);
+  conditionWrapper.appendChild(condition);
+  conditionWrapper.appendChild(removeButton);
+
+  // Set a data attribute to identify if it's the first condition
+  conditionWrapper.dataset.isFirst = container.children.length === 0;
+
+  container.appendChild(conditionWrapper);
+  updateRemoveButtons(container);
+}
+
+function createFormRow(label, inputs) {
+  const row = document.createElement('div');
+  row.style.display = 'flex';
+  row.style.alignItems = 'center';
+  row.style.gap = '16px';
+  row.style.position = 'relative';
+
+  const labelElement = document.createElement('span');
+  labelElement.textContent = label;
+  labelElement.style.width = '64px';
+
+  row.appendChild(labelElement);
+  inputs.forEach(input => row.appendChild(input));
+
+  return row;
+}
+
+function createSelect(options) {
+  const select = document.createElement('select');
+  select.style.padding = '8px';
+  select.style.border = '1px solid #d1d5db';
+  select.style.borderRadius = '4px';
+  select.style.backgroundColor = 'white';
+
+  options.forEach(optionText => {
+    const option = document.createElement('option');
+    option.value = optionText;
+    option.textContent = optionText;
+    select.appendChild(option);
+  });
+
+  return select;
+}
+
+function createInput(type, value, placeholder = '') {
+  const input = document.createElement('input');
+  input.type = type;
+  input.value = value;
+  input.placeholder = placeholder;
+  input.style.padding = '8px';
+  input.style.border = '1px solid #d1d5db';
+  input.style.borderRadius = '4px';
+  input.style.width = type === 'text' ? '100px' : 'auto';
+  return input;
+}
+
+function createColorInput(defaultColor) {
+  const wrapper = document.createElement('div');
+  wrapper.style.position = 'relative';
+  wrapper.style.width = '32px';
+  wrapper.style.height = '32px';
+
+  const input = document.createElement('input');
+  input.type = 'color';
+  input.value = defaultColor;
+  input.style.position = 'absolute';
+  input.style.inset = '0';
+  input.style.opacity = '0';
+  input.style.cursor = 'pointer';
+
+  const preview = document.createElement('div');
+  preview.style.width = '100%';
+  preview.style.height = '100%';
+  preview.style.backgroundColor = defaultColor;
+  preview.style.border = '1px solid #d1d5db';
+  preview.style.borderRadius = '4px';
+
+  input.addEventListener('input', e => {
+    preview.style.backgroundColor = e.target.value;
+  });
+
+  wrapper.append(preview, input);
+  return wrapper;
+}
+
+function createBackgroundColorInput(defaultColor) {
+  const wrapper = document.createElement('div');
+  wrapper.style.width = '128px';
+  wrapper.style.height = '32px';
+  wrapper.style.position = 'relative';
+
+  const input = document.createElement('input');
+  input.type = 'color';
+  input.value = defaultColor;
+  input.style.position = 'absolute';
+  input.style.inset = '0';
+  input.style.opacity = '0';
+  input.style.cursor = 'pointer';
+
+  const preview = document.createElement('div');
+  preview.style.width = '100%';
+  preview.style.height = '100%';
+  preview.style.backgroundColor = defaultColor;
+  preview.style.border = '1px solid #d1d5db';
+  preview.style.borderRadius = '4px';
+
+  input.addEventListener('input', e => {
+    preview.style.backgroundColor = e.target.value;
+  });
+
+  wrapper.append(preview, input);
+  return wrapper;
+}
+
+function getConditionData(conditionWrapper) {
+  const condition = conditionWrapper.firstChild;
+  const [valueRow, formatRow] = condition.children;
+  const valueSelects = valueRow.querySelectorAll('select');
+  const valueInputs = valueRow.querySelectorAll('input[type="text"]');
+  const formatSelects = formatRow.querySelectorAll('select');
+  const formatColors = formatRow.querySelectorAll('input[type="color"]');
+
+  return {
+    value: {
+      type: valueSelects[0].value,
+      operator: valueSelects[1].value,
+      value1: valueInputs[0].value,
+      value2: valueInputs[1]?.value || '',
+    },
+    format: {
+      font: formatSelects[0].value,
+      size: formatSelects[1].value,
+      color: formatColors[0].value,
+      backgroundColor: formatColors[1].value,
+    },
+  };
+}
+
+function updateRemoveButtons(container) {
+  const conditionWrappers = container.children;
+  Array.from(conditionWrappers).forEach((wrapper, index) => {
+    const removeButton = wrapper.querySelector('button');
+    if (index === 0 && wrapper.dataset.isFirst === 'true') {
+      removeButton.style.display = 'none';
+    } else {
+      removeButton.style.display = 'block';
+    }
+  });
+}
+
+export function conditionFormattingPopUp(config) {
+  // Ensure config is an object
+  if (typeof config !== 'object' || config === null) {
+    config = {};
+  }
+
+  createConditionFormattingPopup({
+    onApply: conditions => {
+      // Update the formatting configuration
+      if (!config.hasOwnProperty('conditionalFormatting')) {
+        config.conditionalFormatting = [];
+      }
+      config.conditionalFormatting = conditions;
+      // Apply the formatting directly
+      applyConditionalFormatting(config);
+    },
+    onCancel: () => {
+      console.warn('Conditional formatting cancelled');
+    },
+  });
+}
+
+function applyConditionalFormatting(config) {
+  const table = document.querySelector('#myTable table');
+  if (!table) {
+    console.error('Pivot table not found');
+    return;
+  }
+
+  if (
+    !config.conditionalFormatting ||
+    !Array.isArray(config.conditionalFormatting)
+  ) {
+    console.warn('No conditional formatting rules found');
+    return;
+  }
+
+  const cells = table.querySelectorAll('td');
+  cells.forEach(cell => {
+    const cellValue = cell.textContent.trim();
+    let value = parseFloat(cellValue.replace(/[^0-9.-]+/g, ''));
+
+    // Reset styles before applying new formatting
+    cell.style.fontFamily = '';
+    cell.style.fontSize = '';
+    cell.style.color = '';
+    cell.style.backgroundColor = '';
+
+    config.conditionalFormatting.forEach(rule => {
+      if (
+        rule.value.type === 'All values' ||
+        (rule.value.type === 'Number' && !isNaN(value))
+      ) {
+        let applyFormat = false;
+        switch (rule.value.operator) {
+          case 'Greater than':
+            applyFormat = value > parseFloat(rule.value.value1);
+            break;
+          case 'Less than':
+            applyFormat = value < parseFloat(rule.value.value1);
+            break;
+          case 'Equal to':
+            applyFormat = value === parseFloat(rule.value.value1);
+            break;
+          case 'Between':
+            applyFormat =
+              value >= parseFloat(rule.value.value1) &&
+              value <= parseFloat(rule.value.value2);
+            break;
+        }
+        if (applyFormat) {
+          cell.style.fontFamily = rule.format.font;
+          cell.style.fontSize = rule.format.size;
+          cell.style.color = rule.format.color;
+          cell.style.backgroundColor = rule.format.backgroundColor;
+        }
+      }
+    });
+  });
+}
+
+
+
+================================================
+FILE: services/dataSourceOptions.js
+================================================
+import { pivotEngine, formatTable } from '../index.js';
+
+export function dataSourceOptions(config) {
+  const overlay = document.createElement('div');
+  overlay.style.position = 'fixed';
+  overlay.style.top = '0';
+  overlay.style.left = '0';
+  overlay.style.width = '100%';
+  overlay.style.height = '100%';
+  overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+  overlay.style.display = 'flex';
+  overlay.style.justifyContent = 'center';
+  overlay.style.alignItems = 'center';
+  overlay.style.zIndex = '1000';
+
+  const popup = document.createElement('div');
+  popup.style.width = '400px';
+  popup.style.padding = '20px';
+  popup.style.backgroundColor = '#fff';
+  popup.style.borderRadius = '8px';
+  popup.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+
+  const header = document.createElement('h2');
+  header.textContent = 'Choose JSON File';
+  header.style.margin = '5px';
+  header.style.textAlign = 'left';
+
+  const headerSeparator = document.createElement('hr');
+  headerSeparator.style.border = '0';
+  headerSeparator.style.height = '1px';
+  headerSeparator.style.backgroundColor = '#ccc';
+  headerSeparator.style.margin = '10px 0';
+
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = '.json';
+  fileInput.style.display = 'none';
+
+  const buttonContainer = document.createElement('div');
+  buttonContainer.style.display = 'flex';
+  buttonContainer.style.justifyContent = 'flex-end';
+  buttonContainer.style.marginTop = '20px';
+
+  const applyButton = document.createElement('button');
+  applyButton.textContent = 'Apply';
+  applyButton.style.padding = '12px 24px';
+  applyButton.style.backgroundColor = '#28a745';
+  applyButton.style.color = '#fff';
+  applyButton.style.border = 'none';
+  applyButton.style.borderRadius = '6px';
+  applyButton.style.cursor = 'pointer';
+  applyButton.style.fontSize = '16px';
+  applyButton.style.fontWeight = 'bold';
+  applyButton.style.margin = '0px 10px';
+  applyButton.style.transition =
+    'background-color 0.3s ease, transform 0.2s ease';
+  applyButton.addEventListener('mouseover', () => {
+    applyButton.style.backgroundColor = '#218838';
+    applyButton.style.transform = 'scale(1.05)';
+  });
+  applyButton.addEventListener('mouseout', () => {
+    applyButton.style.backgroundColor = '#28a745';
+    applyButton.style.transform = 'scale(1)';
+  });
+
+  const cancelButton = document.createElement('button');
+  cancelButton.textContent = 'Cancel';
+  cancelButton.style.padding = '12px 24px';
+  cancelButton.style.backgroundColor = '#dc3545';
+  cancelButton.style.color = '#fff';
+  cancelButton.style.border = 'none';
+  cancelButton.style.borderRadius = '6px';
+  cancelButton.style.cursor = 'pointer';
+  cancelButton.style.fontSize = '16px';
+  cancelButton.style.fontWeight = 'bold';
+  cancelButton.style.margin = '0px 10px';
+  cancelButton.style.transition =
+    'background-color 0.3s ease, transform 0.2s ease';
+  cancelButton.addEventListener('mouseover', () => {
+    cancelButton.style.backgroundColor = '#c82333';
+    cancelButton.style.transform = 'scale(1.05)';
+  });
+  cancelButton.addEventListener('mouseout', () => {
+    cancelButton.style.backgroundColor = '#dc3545';
+    cancelButton.style.transform = 'scale(1)';
+  });
+
+  cancelButton.addEventListener('click', () => {
+    document.body.removeChild(overlay);
+  });
+
+  applyButton.addEventListener('click', async () => {
+    window.confirm('Are you sure to change the data source to JSON file!');
+    const file = fileInput.files[0];
+    if (file) {
+      // Set the dataSource to the selected file
+      config.dataSource = {
+        type: 'file',
+        file,
+      };
+      // also update the data use core package method to read data from file
+      config.data = await pivotEngine.readFileData(config.dataSource.file);
+      formatTable(config);
+      document.body.removeChild(overlay);
+    } else {
+      alert('Please select a JSON file.');
+    }
+  });
+
+  const topButtonContainer = document.createElement('div');
+  topButtonContainer.style.display = 'flex';
+  topButtonContainer.style.justifyContent = 'center';
+  topButtonContainer.style.marginBottom = '20px';
+
+  const topButton = document.createElement('button');
+  topButton.textContent = 'Upload JSON File';
+  topButton.style.padding = '12px 24px';
+  topButton.style.backgroundColor = '#007bff';
+  topButton.style.color = '#fff';
+  topButton.style.border = 'none';
+  topButton.style.borderRadius = '6px';
+  topButton.style.cursor = 'pointer';
+  topButton.style.fontSize = '16px';
+  topButton.style.fontWeight = 'bold';
+  topButton.style.transition =
+    'background-color 0.3s ease, transform 0.2s ease';
+  topButton.addEventListener('mouseover', () => {
+    topButton.style.backgroundColor = '#0056b3';
+    topButton.style.transform = 'scale(1.05)';
+  });
+  topButton.addEventListener('mouseout', () => {
+    topButton.style.backgroundColor = '#007bff';
+    topButton.style.transform = 'scale(1)';
+  });
+
+  topButton.addEventListener('click', () => {
+    fileInput.click();
+  });
+
+  topButtonContainer.appendChild(topButton);
+
+  buttonContainer.appendChild(applyButton);
+  buttonContainer.appendChild(cancelButton);
+
+  popup.appendChild(header);
+  popup.appendChild(headerSeparator);
+  popup.appendChild(topButtonContainer);
+  popup.appendChild(buttonContainer);
+  overlay.appendChild(popup);
+  document.body.appendChild(overlay);
+}
+
+
+
+================================================
+FILE: services/exportService.js
+================================================
+export function exportToHTML(pivotEngine, fileName = 'pivot-table') {
+  pivotEngine.exportToHTML(fileName);
+}
+
+export function exportToExcel(pivotEngine, fileName = 'pivot-table') {
+  pivotEngine.exportToExcel(fileName);
+}
+
+export function exportToPDF(pivotEngine, fileName = 'pivot-table') {
+  pivotEngine.exportToPDF(fileName);
+}
+
+export function openPrintDialog(pivotEngine) {
+  pivotEngine.openPrintDialog();
+}
+
+
+
+================================================
+FILE: services/fieldsPopup.js
+================================================
+import { onSectionItemDrop } from '../index.js';
+
+const droppedFields = {
+  rows: new Set(),
+  columns: new Set(),
+  values: new Set(),
+  filters: new Set(),
+};
+
+export function createFieldsPopup() {
+  let fieldSettingsPopups = document.getElementById('fieldSettingsPopup');
+  if (!fieldSettingsPopups) {
+    const style = document.createElement('style');
+    style.innerHTML = `
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.aggregation-button {
+          background-color: #007bff;
+          color: white;
+          border: none;
+          padding: 5px;
+          cursor: pointer;
+          font-size: 16px;
+          position: absolute;
+          right: 10px;
+          top: 50%;
+          transform: translateY(-50%);
+      }
+
+      .aggregation-button:hover {
+          background-color: #0056b3;
+      }
+
+      .aggregation-dropdown {
+          list-style: none;
+          margin-top: 15%;
+          background-color: #f9f9f9;
+          border: 1px solid #ddd;
+          padding: 5px 0;
+          position: absolute;
+          z-index: 10;
+          display: none; /* Initially hidden */
+          top: -100%; /* Positions the dropdown above the list item */
+          right: 10px;
+          width: max-content;
+          max-height: 80px;
+          overflow-y:auto;
+          max-width: 300px; /* Prevents dropdown from exceeding container width */
+          overflow-x: auto;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .aggregation-dropdown li {
+          padding: 5px;
+          cursor: pointer;
+      }
+
+      .aggregation-dropdown li:hover {
+          background-color: #e0e0e0;
+      }
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f0f0;
+    padding: 20px;
+}
+
+.sigma-li {
+          position: relative;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 10px;
+          background-color: #f1f1f1;
+          margin-bottom: 8px;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: background-color 0.3s;
+      }
+
+.popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border: 1px solid #ccc;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    width: 80%;
+    max-width: 900px;
+    height: 80%;
+    overflow-y: auto;
+    border-radius: 8px;
+    background: #f8f8f8;
+    display: flex;
+    flex-direction: column;
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #888;
+    transition: color 0.3s;
+}
+
+.close-btn:hover {
+    color: #333;
+}
+
+.popup-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1;
+}
+
+.popup-body {
+    display: flex;
+    gap: 20px;
+    height: 100%;
+    width: 100%;
+    flex: 1;
+    overflow: hidden;
+}
+
+.section {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    display: flex;
+    width:100%;
+    height:100%;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 10px;
+}
+
+h3 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.right-section {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    width: 70%;
+    height: 100%;
+    max-height: 100%;
+}
+
+ul.section-list {
+    list-style-type: none;
+    padding: 10px;
+    margin: 0;
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    overflow-y: auto;
+    width:100%;
+    height:100%;
+}
+
+#fieldsList {
+    max-height: 90%;
+    min-height: 90%;
+}
+
+li {
+    padding: 10px;
+    background-color: #f1f1f1;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+li:hover {
+    background-color: #e0e0e0;
+}
+
+li.draggable {
+    cursor: move;
+}
+
+li.dragging {
+    opacity: 0.5;
+}
+
+.apply-btn {
+    margin-right: 20px;
+    padding: 10px 15px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 4px;
+}
+
+.apply-btn:hover {
+    background-color: #218838;
+}
+
+.cancel-btn {
+    padding: 10px 15px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 4px;
+}
+
+.cancel-btn:hover {
+    background-color: #c82333;
+}
+
+.popup.visible {
+    display: flex;
+}
+
+.popup.hidden {
+    display: none;
+}
+
+.popup-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+}
+
+.pivot-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.pivot-table th,
+.pivot-table td {
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+    text-align: center;
+}
+
+#allFields {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#fieldsList {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.move-back-btn {
+    cursor: pointer;
+    font-size: 16px;
+    color: #007bff;
+    transition: color 0.3s;
+}
+
+.move-back-btn:hover {
+    color: #0056b3;
+}
+
+.move-back-icon {
+    font-size: 18px;
+    cursor: pointer;
+}
+
+li .field-info {
+    display: flex;
+    align-items: center;
+    gap: 2px; /* Small space between checkbox and text */
+}
+
+li .field-info input {
+    margin-right: 8px; /* Tiny space between checkbox and label */
+}
+    `;
+    document.head.appendChild(style);
+
+    // TODO: will add the following in next iteration once functioanlity is ready
+    //     <div id="reportFilters" class="section">
+    //                           <h3>Report Filters</h3>
+    //                           <ul id="reportFiltersList" class="section-list"></ul>
+    //                       </div>
+
+    //  <div id="values" class="section">
+    //                           <h3>Values</h3>
+    //                           <ul id="valuesList" class="section-list"></ul>
+    //                       </div>
+
+    const container = document.createElement('div');
+    container.innerHTML = `
+      <div id="myTableContainer">
+          <table id="myTable" class="pivot-table"></table>
+      </div>
+
+      <div id="fieldSettingsPopup" class="popup">
+          <div class="popup-content">
+              <div class="popup-header">
+                  <button id="applyBtn" class="apply-btn">Apply</button>
+                  <button id="cancelBtn" class="cancel-btn">Cancel</button>
+              </div>
+              <h2>Field Settings</h2>
+              <div class="popup-body">
+                  <div id="allFields" class="section">
+                      <h3>All Fields</h3>
+                      <ul id="fieldsList" class="section-list"></ul>
+                  </div>
+                  <div id="rightSection" class="right-section">
+                      
+                      <div id="columns" class="section">
+                          <h3>Columns</h3>
+                          <ul id="columnsList" class="section-list"></ul>
+                      </div>
+                      <div id="rows" class="section">
+                          <h3>Rows</h3>
+                          <ul id="rowsList" class="section-list"></ul>
+                      </div>
+                     
+                  </div>
+              </div>
+          </div>
+      </div>
+    `;
+    document.body.appendChild(container);
+
+    const fieldSettingsPopup = document.getElementById('fieldSettingsPopup');
+    const closeBtn = document.getElementById('cancelBtn');
+    const applyBtn = document.getElementById('applyBtn');
+    const fieldsList = document.getElementById('fieldsList');
+    const allSections = document.querySelectorAll('.section-list');
+
+    const fields = [
+      { name: 'Product', type: 'string' },
+      { name: 'Date', type: 'string' },
+      { name: 'Region', type: 'string' },
+      { name: 'Sales', type: 'number' },
+      { name: 'Quantity', type: 'number' },
+    ];
+
+    const populateFields = () => {
+      fieldsList.innerHTML = '';
+
+      fields.forEach(field => {
+        const li = document.createElement('li');
+        li.classList.add('draggable');
+
+        const fieldInfo = document.createElement('div');
+        fieldInfo.classList.add('field-info');
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = field.name;
+        checkbox.disabled = true;
+
+        const label = document.createElement('label');
+        label.htmlFor = field.name;
+        label.textContent = field.name;
+
+        const dragIcon = document.createElement('span');
+        dragIcon.classList.add('drag-icon');
+        dragIcon.innerHTML = '⤷'; // Drag icon symbol
+
+        fieldInfo.appendChild(checkbox);
+        fieldInfo.appendChild(label);
+
+        li.appendChild(fieldInfo);
+        li.appendChild(dragIcon);
+
+        li.setAttribute('draggable', 'true');
+        li.setAttribute('data-field-name', field.name);
+        fieldsList.appendChild(li);
+      });
+    };
+
+    const showPopup = () => {
+      fieldSettingsPopup.classList.remove('hidden');
+      fieldSettingsPopup.classList.add('visible');
+
+      populateFields();
+
+      attachEventListeners();
+    };
+
+    const attachEventListeners = () => {
+      closeBtn.removeEventListener('click', hidePopup); // Clean up previous listener
+      applyBtn.removeEventListener('click', hidePopup); // Clean up previous listener
+
+      closeBtn.addEventListener('click', hidePopup);
+      applyBtn.addEventListener('click', hidePopup);
+
+      fieldsList.addEventListener('dragstart', dragStart);
+      fieldsList.addEventListener('dragend', dragEnd);
+
+      allSections.forEach(section => {
+        section.addEventListener('dragover', dragOver);
+        section.addEventListener('drop', drop);
+      });
+    };
+
+    function hidePopup() {
+      fieldSettingsPopup.classList.add('hidden');
+      fieldSettingsPopup.classList.remove('visible');
+      onSectionItemDrop(droppedFields);
+    }
+
+    function dragStart(event) {
+      const draggedElement = event.target;
+      if (draggedElement && draggedElement.classList.contains('draggable')) {
+        draggedElement.classList.add('dragging');
+        event.dataTransfer.setData(
+          'text',
+          draggedElement.getAttribute('data-field-name')
+        );
+      }
+    }
+
+    function dragEnd(event) {
+      const draggedElement = event.target;
+      draggedElement.classList.remove('dragging');
+    }
+
+    function dragOver(event) {
+      event.preventDefault();
+    }
+
+    function drop(event) {
+      event.preventDefault();
+      const target = event.target.closest('.section-list');
+      const fieldName = event.dataTransfer.getData('text');
+
+      if (target && fieldName) {
+        const sectionId = target.id;
+        let sectionType;
+
+        if (sectionId === 'reportFiltersList') sectionType = 'filters';
+        else if (sectionId === 'columnsList') sectionType = 'columns';
+        else if (sectionId === 'rowsList') sectionType = 'rows';
+        else if (sectionId === 'valuesList') sectionType = 'values';
+        else return;
+
+        const section = droppedFields[sectionType];
+
+        // Check if the field is already present in the section
+        if (section.has(fieldName)) {
+          return; // Don't add if the field is already in the section
+        }
+        if (sectionType === 'values') {
+          const field = fields.find(f => f.name === fieldName);
+          if (field && field.type !== 'number') {
+            alert('Only numerical fields can be added to Values.');
+            return;
+          }
+        }
+
+        section.add(fieldName);
+
+        // Create list item for dropped field
+        const li = document.createElement('li');
+        li.textContent = fieldName;
+
+        // Add Sigma button (for aggregation options)
+        if (sectionType === 'values') {
+          const sigmaButton = document.createElement('button');
+          sigmaButton.textContent = '∑';
+          sigmaButton.classList.add('aggregation-button');
+
+          const dropdown = document.createElement('ul');
+          dropdown.classList.add('aggregation-dropdown');
+          dropdown.style.display = 'none';
+          const aggregationOptions = ['Sum', 'Average', 'Count'];
+
+          aggregationOptions.forEach(option => {
+            const optionItem = document.createElement('li');
+            optionItem.textContent = option;
+            optionItem.addEventListener('click', () => {
+              dropdown.style.display = 'none';
+            });
+            dropdown.appendChild(optionItem);
+          });
+
+          sigmaButton.addEventListener('click', () => {
+            dropdown.style.display =
+              dropdown.style.display === 'none' ? 'block' : 'none';
+          });
+
+          li.classList.add('sigma-li');
+          li.appendChild(sigmaButton);
+          li.appendChild(dropdown);
+          createMoveBackIcon(fieldName, li, section, target);
+        }
+
+        createMoveBackIcon(fieldName, li, section, target);
+      }
+    }
+
+    showPopup();
+  } else {
+    fieldSettingsPopups.classList.remove('hidden');
+    fieldSettingsPopups.classList.add('visible');
+  }
+
+  function createMoveBackIcon(fieldName, li, section, target) {
+    const moveBackIcon = document.createElement('span');
+    moveBackIcon.classList.add('move-back-icon');
+    moveBackIcon.textContent = '←'; // Move Back Icon
+    li.appendChild(moveBackIcon);
+    target.appendChild(li);
+
+    moveBackIcon.addEventListener('click', () => {
+      // Move it back to All Fields
+      target.removeChild(li);
+      section.delete(fieldName);
+
+      const allFieldsItem = document.querySelector(
+        `#fieldsList li[data-field-name="${fieldName}"]`
+      );
+      if (allFieldsItem) {
+        allFieldsItem.querySelector('input').checked = false;
+      }
+    });
+  }
+}
+
+
+
+================================================
+FILE: services/formatCell.js
+================================================
+import { formatTable } from '../index.js';
+export function formatCellPopUp(config, PivotEngine) {
+  const dynamicData = config.measures.filter(
+    measure => measure.format.type === 'currency'
+  );
+
+  const overlay = document.createElement('div');
+  overlay.style.position = 'fixed';
+  overlay.style.top = '0';
+  overlay.style.left = '0';
+  overlay.style.width = '100%';
+  overlay.style.height = '100%';
+  overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+  overlay.style.display = 'flex';
+  overlay.style.justifyContent = 'center';
+  overlay.style.alignItems = 'center';
+  overlay.style.zIndex = '1000';
+
+  const popup = document.createElement('div');
+  popup.style.width = '400px';
+  popup.style.padding = '20px';
+  popup.style.backgroundColor = '#fff';
+  popup.style.borderRadius = '8px';
+  popup.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+
+  const header = document.createElement('h2');
+  header.textContent = 'Format Cell';
+  header.style.margin = '5px';
+  header.style.textAlign = 'left';
+
+  const headerSeparator = document.createElement('hr');
+  headerSeparator.style.border = '0';
+  headerSeparator.style.height = '1px';
+  headerSeparator.style.backgroundColor = '#ccc';
+  headerSeparator.style.margin = '10px 0';
+
+  const formContainer = document.createElement('div');
+
+  // Updated "Choose Value" to show dynamic measure captions
+  const fields = [
+    {
+      name: 'Choose Value',
+      options: ['None', ...dynamicData.map(measure => measure.caption)],
+    },
+    // { name: "Text Align", options: ["Left", "Right"] },
+    // { name: "Thousand Separator", options: ["Space", "Comma", "Dot"] },
+    // { name: "Decimal Separator", options: [",", "."] },
+    {
+      name: 'Decimal Places',
+      options: Array.from({ length: 9 }, (_, i) => (i + 1).toString()),
+    },
+    { name: 'Currency Symbol', options: ['Dollar ($)', 'Rupees (₹)'] },
+    // { name: "Currency Align", options: ["Left", "Right"] },
+    // { name: "Null Value", options: ["None", "Null"] },
+    // { name: "Format as Percent", options: ["Yes", "No"] },
+  ];
+
+  const dropdownValues = fields.map(field => ({
+    field: field.name,
+    value: field.options[0],
+  }));
+
+  const dropdownElements = [];
+
+  fields.forEach((field, index) => {
+    const row = document.createElement('div');
+    row.style.display = 'flex';
+    row.style.alignItems = 'center';
+    row.style.marginBottom = '15px';
+
+    const label = document.createElement('label');
+    label.textContent = `${field.name}:`;
+    label.style.flex = '1';
+    label.style.marginRight = '10px';
+
+    const dropdown = document.createElement('select');
+    dropdown.style.flex = '2';
+    dropdown.style.padding = '10px';
+    dropdown.style.borderRadius = '4px';
+    dropdown.style.border = '1px solid #ccc';
+
+    // Populate the dropdown with dynamic options
+    field.options.forEach(optionText => {
+      const option = document.createElement('option');
+      option.value = optionText;
+      option.textContent = optionText;
+      dropdown.appendChild(option);
+    });
+
+    // Disable all fields except "Choose Value"
+    if (index !== 0) {
+      dropdown.disabled = true;
+    }
+
+    if (index === 0) {
+      dropdown.addEventListener('change', e => {
+        const selectedValue = e.target.value;
+        if (selectedValue !== 'None') {
+          dropdownElements.forEach((dropdown, i) => {
+            if (i !== 0) {
+              dropdown.disabled = false;
+            }
+          });
+        } else {
+          dropdownElements.forEach((dropdown, i) => {
+            if (i !== 0) {
+              dropdown.disabled = true;
+            }
+          });
+        }
+      });
+    }
+
+    dropdown.addEventListener('change', e => {
+      dropdownValues[index].value = e.target.value;
+    });
+
+    row.appendChild(label);
+    row.appendChild(dropdown);
+    formContainer.appendChild(row);
+    dropdownElements.push(dropdown);
+  });
+
+  const buttonContainer = document.createElement('div');
+  buttonContainer.style.display = 'flex';
+  buttonContainer.style.justifyContent = 'flex-end';
+  buttonContainer.style.marginTop = '20px';
+
+  const applyButton = document.createElement('button');
+  applyButton.textContent = 'Apply';
+  applyButton.style.padding = '12px 24px';
+  applyButton.style.backgroundColor = '#28a745';
+  applyButton.style.color = '#fff';
+  applyButton.style.border = 'none';
+  applyButton.style.borderRadius = '6px';
+  applyButton.style.cursor = 'pointer';
+  applyButton.style.fontSize = '16px';
+  applyButton.style.fontWeight = 'bold';
+  applyButton.style.margin = '0px 10px';
+  applyButton.style.transition =
+    'background-color 0.3s ease, transform 0.2s ease';
+  applyButton.addEventListener('mouseover', () => {
+    applyButton.style.backgroundColor = '#218838';
+    applyButton.style.transform = 'scale(1.05)';
+  });
+  applyButton.addEventListener('mouseout', () => {
+    applyButton.style.backgroundColor = '#28a745';
+    applyButton.style.transform = 'scale(1)';
+  });
+
+  const cancelButton = document.createElement('button');
+  cancelButton.textContent = 'Cancel';
+  cancelButton.style.padding = '12px 24px';
+  cancelButton.style.backgroundColor = '#dc3545';
+  cancelButton.style.color = '#fff';
+  cancelButton.style.border = 'none';
+  cancelButton.style.borderRadius = '6px';
+  cancelButton.style.cursor = 'pointer';
+  cancelButton.style.fontSize = '16px';
+  cancelButton.style.fontWeight = 'bold';
+  cancelButton.style.margin = '0px 10px';
+  cancelButton.style.transition =
+    'background-color 0.3s ease, transform 0.2s ease';
+  cancelButton.addEventListener('mouseover', () => {
+    cancelButton.style.backgroundColor = '#c82333';
+    cancelButton.style.transform = 'scale(1.05)';
+  });
+  cancelButton.addEventListener('mouseout', () => {
+    cancelButton.style.backgroundColor = '#dc3545';
+    cancelButton.style.transform = 'scale(1)';
+  });
+
+  cancelButton.addEventListener('click', () => {
+    document.body.removeChild(overlay);
+  });
+
+  applyButton.addEventListener('click', () => {
+    console.log('Selected Values:', dropdownValues);
+
+    // Extract the selected "Choose Value" field
+    const selectedMeasure = dropdownValues.find(
+      item => item.field === 'Choose Value'
+    )?.value;
+
+    if (selectedMeasure && selectedMeasure !== 'None') {
+      // Find the corresponding measure in the config
+      const measure = config.measures.find(m => m.caption === selectedMeasure);
+
+      if (measure) {
+        // Update the measure's format based on the dropdown selections
+        measure.format = {
+          type: 'currency',
+          currency: dropdownValues
+            .find(item => item.field === 'Currency Symbol')
+            ?.value.includes('Dollar')
+            ? 'USD'
+            : 'INR',
+          locale: 'en-US',
+          decimals:
+            parseInt(
+              dropdownValues.find(item => item.field === 'Decimal Places')
+                ?.value,
+              10
+            ) || 2,
+          // decimalSeparator: dropdownValues.find(item => item.field === "Decimal Separator")?.value || ".",
+          // align: dropdownValues.find(item => item.field === "Currency Align")?.value || "Left",
+          // percent: dropdownValues.find(item => item.field === "Format as Percent")?.value === "Yes",
+        };
+        config.formatting[measure.uniqueName] = {
+          type: 'currency',
+          currency: measure.format.currency,
+          locale: measure.format.locale,
+          decimals: measure.format.decimals,
+          // percent: measure.format.percent,
+        };
+
+        console.log('Updated Measure Format:', measure.format);
+      }
+    } else {
+      console.log('No valid measure selected. Config unchanged.');
+    }
+
+    console.log('Updated Config:', config); // Log the updated config for debugging
+    formatTable(config);
+    document.body.removeChild(overlay); // Remove the popup
+  });
+
+  buttonContainer.appendChild(applyButton);
+  buttonContainer.appendChild(cancelButton);
+
+  popup.appendChild(header);
+  popup.appendChild(headerSeparator);
+  popup.appendChild(formContainer);
+  popup.appendChild(buttonContainer);
+  overlay.appendChild(popup);
+  document.body.appendChild(overlay);
+}
+
+
+
+================================================
+FILE: services/optionsPopup.js
+================================================
+export function createOptionsPopup() {
+  // Create the overlay
+  const overlay = document.createElement('div');
+  overlay.style.position = 'fixed';
+  overlay.style.top = '0';
+  overlay.style.left = '0';
+  overlay.style.width = '100%';
+  overlay.style.height = '100%';
+  overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+  overlay.style.display = 'flex';
+  overlay.style.justifyContent = 'center';
+  overlay.style.alignItems = 'center';
+  overlay.style.zIndex = '1000';
+
+  // Create the popup container
+  const popup = document.createElement('div');
+  popup.style.width = '500px';
+  popup.style.padding = '20px';
+  popup.style.backgroundColor = '#fff';
+  popup.style.borderRadius = '8px';
+  popup.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+
+  // Header with buttons
+  const headerContainer = document.createElement('div');
+  headerContainer.style.display = 'flex';
+  headerContainer.style.justifyContent = 'space-between';
+  headerContainer.style.alignItems = 'center';
+  headerContainer.style.marginBottom = '20px';
+
+  const header = document.createElement('h3');
+  header.textContent = 'Popup Header';
+  header.style.margin = '0';
+
+  const buttonContainer = document.createElement('div');
+
+  const applyButton = document.createElement('button');
+  applyButton.textContent = 'Apply';
+  applyButton.style.padding = '8px 16px';
+  applyButton.style.backgroundColor = '#fff';
+  applyButton.style.color = '#000';
+  applyButton.style.border = '1px solid #000';
+  applyButton.style.borderRadius = '4px';
+  applyButton.style.cursor = 'pointer';
+  applyButton.style.marginLeft = '10px';
+
+  applyButton.addEventListener('click', () => {
+    const selectedData = {};
+    const groups = formContainer.querySelectorAll('.radio-group');
+    groups.forEach(group => {
+      const title = group.dataset.title;
+      const selectedRadio = group.querySelector("input[type='radio']:checked");
+      selectedData[title] = selectedRadio
+        ? selectedRadio.value
+        : 'None Selected';
+    });
+    console.log(selectedData); // Log the selected data
+  });
+
+  const cancelButton = document.createElement('button');
+  cancelButton.textContent = 'Cancel';
+  cancelButton.style.padding = '8px 16px';
+  cancelButton.style.backgroundColor = '#fff';
+  cancelButton.style.color = '#000';
+  cancelButton.style.border = '1px solid #000';
+  cancelButton.style.borderRadius = '4px';
+  cancelButton.style.cursor = 'pointer';
+
+  cancelButton.addEventListener('click', () => {
+    document.body.removeChild(overlay);
+  });
+
+  buttonContainer.appendChild(cancelButton);
+  buttonContainer.appendChild(applyButton);
+
+  headerContainer.appendChild(header);
+  headerContainer.appendChild(buttonContainer);
+
+  // Function to create a title with 4 radio buttons
+  const createRadioButtonGroup = titleText => {
+    const groupContainer = document.createElement('div');
+    groupContainer.classList.add('radio-group');
+    groupContainer.dataset.title = titleText;
+
+    const title = document.createElement('h4');
+    title.textContent = titleText;
+    title.style.color = 'gray';
+    title.style.marginBottom = '10px';
+
+    const radioContainer = document.createElement('div');
+    radioContainer.style.display = 'flex';
+    radioContainer.style.flexDirection = 'column';
+    radioContainer.style.gap = '5px';
+
+    for (let i = 1; i <= 4; i++) {
+      const radioLabel = document.createElement('label');
+      radioLabel.style.display = 'flex';
+      radioLabel.style.alignItems = 'center';
+
+      const radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.name = titleText;
+      radio.value = `Option ${i}`;
+      radio.style.marginRight = '5px';
+
+      radioLabel.appendChild(radio);
+      radioLabel.appendChild(document.createTextNode(`Option ${i}`));
+      radioContainer.appendChild(radioLabel);
+    }
+
+    groupContainer.appendChild(title);
+    groupContainer.appendChild(radioContainer);
+
+    return groupContainer;
+  };
+
+  // Add radio button groups (3 titles)
+  const formContainer = document.createElement('div');
+  formContainer.style.display = 'grid';
+  formContainer.style.gridTemplateColumns = '1fr 1fr';
+  formContainer.style.gap = '20px';
+
+  formContainer.appendChild(createRadioButtonGroup('Title 1'));
+  formContainer.appendChild(createRadioButtonGroup('Title 2'));
+  formContainer.appendChild(createRadioButtonGroup('Title 3'));
+
+  // Append everything to the popup
+  popup.appendChild(headerContainer);
+  popup.appendChild(formContainer);
+  overlay.appendChild(popup);
+  document.body.appendChild(overlay);
+}
+
+

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PivotHead Vite Shadow DOM Demo</title>
+</head>
+<body>
+  <h2>PivotHead Web Component: Vite + Shadow DOM Style Demo current</h2>
+  <p>Below table uses <code>&lt;pivot-head&gt;</code> web component. Only the style defined in the component's <b>renderTable</b> method (shadow DOM) will apply. No external CSS will affect it.</p>
+  <pivot-head
+    data='[{"country":"Australia","category":"Accessories","price":174,"discount":23},{"country":"Australia","category":"Accessories","price":680,"discount":80},{"country":"Australia","category":"Accessories","price":680,"discount":80},{"country":"Australia","category":"Accessories","price":680,"discount":80},{"country":"Australia","category":"Accessories","price":680,"discount":80},{"country":"Australia","category":"Accessories","price":680,"discount":80},{"country":"Canada","category":"Cars","price":180,"discount":80}]'
+    options='{
+      "rows":[{"uniqueName":"country","caption":"Country"}],
+      "columns":[{"uniqueName":"category","caption":"Category"}],
+      "measures":[
+        {"uniqueName":"price","caption":"Sum of Price","aggregation":"sum"},
+        {"uniqueName":"discount","caption":"Sum of Discount","aggregation":"sum"}
+      ],
+      "pageSize":10
+    }'
+  ></pivot-head>
+  <!-- <script type="module" make all functionality work on all button click whether on processed data side or wheter raw data side attached all buttons
+currently only export functionality is working
+
+check simple-js-demo example on which button click which functionlity is used from pivot engine
+Apply all these functionality in web component so that they can reflect correctly on each button clicksrc="./main.js"></script> -->
+  <!-- <script type="module" src="./index.js"></script> -->
+  <script type="module">import '@mindfiredigital/pivothead-web-component';
+    const pivot = document.querySelector('pivot-head');
+    if (pivot) {
+      pivot.addEventListener('stateChange', e => {
+        console.log('Pivot state changed:', e.detail);
+      });
+    }</script>
+</body>
+</html>

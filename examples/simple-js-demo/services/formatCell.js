@@ -1,11 +1,8 @@
-// Updated formatcell.js file
-// This integrates with the new cell formatting system
-
 import { formatTable } from '../index.js';
-
 export function formatCellPopUp(config, PivotEngine) {
-  // Get all measures, not just currency ones
-  const allMeasures = config.measures || [];
+  const dynamicData = config.measures.filter(
+    measure => measure.format.type === 'currency'
+  );
 
   const overlay = document.createElement('div');
   overlay.style.position = 'fixed';
@@ -20,14 +17,14 @@ export function formatCellPopUp(config, PivotEngine) {
   overlay.style.zIndex = '1000';
 
   const popup = document.createElement('div');
-  popup.style.width = '450px'; // Slightly wider
+  popup.style.width = '400px';
   popup.style.padding = '20px';
   popup.style.backgroundColor = '#fff';
   popup.style.borderRadius = '8px';
   popup.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
 
   const header = document.createElement('h2');
-  header.textContent = 'Format Cells (Field-Level)';
+  header.textContent = 'Format Cell';
   header.style.margin = '5px';
   header.style.textAlign = 'left';
 
@@ -37,42 +34,25 @@ export function formatCellPopUp(config, PivotEngine) {
   headerSeparator.style.backgroundColor = '#ccc';
   headerSeparator.style.margin = '10px 0';
 
-  // Add info text
-  const infoText = document.createElement('p');
-  infoText.textContent =
-    'This applies formatting to all cells for the selected field. For individual cell formatting, use the "🎨 Format Cells" button.';
-  infoText.style.fontSize = '12px';
-  infoText.style.color = '#666';
-  infoText.style.marginBottom = '15px';
-  infoText.style.fontStyle = 'italic';
-
   const formContainer = document.createElement('div');
 
-  // Enhanced fields with more options
+  // Updated "Choose Value" to show dynamic measure captions
   const fields = [
     {
-      name: 'Choose Field',
-      options: [
-        'None',
-        ...allMeasures.map(measure => measure.caption || measure.uniqueName),
-      ],
+      name: 'Choose Value',
+      options: ['None', ...dynamicData.map(measure => measure.caption)],
     },
-    {
-      name: 'Format Type',
-      options: ['Currency', 'Number', 'Percentage', 'Date'],
-    },
+    // { name: "Text Align", options: ["Left", "Right"] },
+    // { name: "Thousand Separator", options: ["Space", "Comma", "Dot"] },
+    // { name: "Decimal Separator", options: [",", "."] },
     {
       name: 'Decimal Places',
-      options: ['0', '1', '2', '3', '4'],
+      options: Array.from({ length: 9 }, (_, i) => (i + 1).toString()),
     },
-    {
-      name: 'Currency Symbol',
-      options: ['Dollar ($)', 'Euro (€)', 'Pound (£)', 'Rupee (₹)', 'Yen (¥)'],
-    },
-    {
-      name: 'Locale',
-      options: ['en-US', 'en-GB', 'de-DE', 'fr-FR', 'ja-JP', 'hi-IN'],
-    },
+    { name: 'Currency Symbol', options: ['Dollar ($)', 'Rupees (₹)'] },
+    // { name: "Currency Align", options: ["Left", "Right"] },
+    // { name: "Null Value", options: ["None", "Null"] },
+    // { name: "Format as Percent", options: ["Yes", "No"] },
   ];
 
   const dropdownValues = fields.map(field => ({
@@ -92,15 +72,14 @@ export function formatCellPopUp(config, PivotEngine) {
     label.textContent = `${field.name}:`;
     label.style.flex = '1';
     label.style.marginRight = '10px';
-    label.style.fontWeight = '500';
 
     const dropdown = document.createElement('select');
     dropdown.style.flex = '2';
-    dropdown.style.padding = '8px';
+    dropdown.style.padding = '10px';
     dropdown.style.borderRadius = '4px';
     dropdown.style.border = '1px solid #ccc';
-    dropdown.style.fontSize = '14px';
 
+    // Populate the dropdown with dynamic options
     field.options.forEach(optionText => {
       const option = document.createElement('option');
       option.value = optionText;
@@ -108,46 +87,26 @@ export function formatCellPopUp(config, PivotEngine) {
       dropdown.appendChild(option);
     });
 
-    // Disable fields except "Choose Field" initially
+    // Disable all fields except "Choose Value"
     if (index !== 0) {
       dropdown.disabled = true;
     }
 
-    // Handle "Choose Field" change
     if (index === 0) {
       dropdown.addEventListener('change', e => {
         const selectedValue = e.target.value;
         if (selectedValue !== 'None') {
-          // Enable other dropdowns
           dropdownElements.forEach((dropdown, i) => {
             if (i !== 0) {
               dropdown.disabled = false;
             }
           });
         } else {
-          // Disable other dropdowns
           dropdownElements.forEach((dropdown, i) => {
             if (i !== 0) {
               dropdown.disabled = true;
             }
           });
-        }
-      });
-    }
-
-    // Handle "Format Type" change
-    if (index === 1) {
-      dropdown.addEventListener('change', e => {
-        const formatType = e.target.value;
-        const currencyDropdown = dropdownElements[3]; // Currency Symbol dropdown
-
-        // Show/hide currency symbol based on format type
-        if (formatType === 'Currency') {
-          currencyDropdown.disabled = false;
-          currencyDropdown.style.opacity = '1';
-        } else {
-          currencyDropdown.disabled = true;
-          currencyDropdown.style.opacity = '0.5';
         }
       });
     }
@@ -160,87 +119,6 @@ export function formatCellPopUp(config, PivotEngine) {
     row.appendChild(dropdown);
     formContainer.appendChild(row);
     dropdownElements.push(dropdown);
-  });
-
-  // Preview section
-  const previewContainer = document.createElement('div');
-  previewContainer.style.marginTop = '15px';
-  previewContainer.style.padding = '10px';
-  previewContainer.style.backgroundColor = '#f8f9fa';
-  previewContainer.style.borderRadius = '4px';
-  previewContainer.style.border = '1px solid #e9ecef';
-
-  const previewLabel = document.createElement('label');
-  previewLabel.textContent = 'Preview:';
-  previewLabel.style.fontWeight = '500';
-  previewLabel.style.display = 'block';
-  previewLabel.style.marginBottom = '5px';
-
-  const previewValue = document.createElement('div');
-  previewValue.textContent = '1234.56';
-  previewValue.style.fontSize = '16px';
-  previewValue.style.fontWeight = 'bold';
-  previewValue.style.color = '#007bff';
-
-  previewContainer.appendChild(previewLabel);
-  previewContainer.appendChild(previewValue);
-
-  // Update preview function
-  function updatePreview() {
-    const formatType = dropdownValues.find(
-      item => item.field === 'Format Type'
-    )?.value;
-    const decimals =
-      parseInt(
-        dropdownValues.find(item => item.field === 'Decimal Places')?.value
-      ) || 2;
-    const currencySymbol = dropdownValues.find(
-      item => item.field === 'Currency Symbol'
-    )?.value;
-    const locale = dropdownValues.find(item => item.field === 'Locale')?.value;
-
-    let sampleValue = 1234.56;
-    let formattedValue = '';
-
-    try {
-      switch (formatType) {
-        case 'Currency':
-          const currency = getCurrencyCode(currencySymbol);
-          formattedValue = new Intl.NumberFormat(locale, {
-            style: 'currency',
-            currency: currency,
-            minimumFractionDigits: decimals,
-            maximumFractionDigits: decimals,
-          }).format(sampleValue);
-          break;
-        case 'Number':
-          formattedValue = new Intl.NumberFormat(locale, {
-            minimumFractionDigits: decimals,
-            maximumFractionDigits: decimals,
-          }).format(sampleValue);
-          break;
-        case 'Percentage':
-          formattedValue = new Intl.NumberFormat(locale, {
-            style: 'percent',
-            minimumFractionDigits: decimals,
-          }).format(sampleValue / 100);
-          break;
-        case 'Date':
-          formattedValue = new Date().toLocaleDateString(locale);
-          break;
-        default:
-          formattedValue = sampleValue.toString();
-      }
-    } catch (error) {
-      formattedValue = 'Preview Error';
-    }
-
-    previewValue.textContent = formattedValue;
-  }
-
-  // Add change listeners to update preview
-  dropdownElements.forEach(dropdown => {
-    dropdown.addEventListener('change', updatePreview);
   });
 
   const buttonContainer = document.createElement('div');
@@ -261,7 +139,6 @@ export function formatCellPopUp(config, PivotEngine) {
   applyButton.style.margin = '0px 10px';
   applyButton.style.transition =
     'background-color 0.3s ease, transform 0.2s ease';
-
   applyButton.addEventListener('mouseover', () => {
     applyButton.style.backgroundColor = '#218838';
     applyButton.style.transform = 'scale(1.05)';
@@ -284,7 +161,6 @@ export function formatCellPopUp(config, PivotEngine) {
   cancelButton.style.margin = '0px 10px';
   cancelButton.style.transition =
     'background-color 0.3s ease, transform 0.2s ease';
-
   cancelButton.addEventListener('mouseover', () => {
     cancelButton.style.backgroundColor = '#c82333';
     cancelButton.style.transform = 'scale(1.05)';
@@ -299,93 +175,63 @@ export function formatCellPopUp(config, PivotEngine) {
   });
 
   applyButton.addEventListener('click', () => {
-    console.log('Field-level formatting applied:', dropdownValues);
+    console.log('Selected Values:', dropdownValues);
 
-    const selectedField = dropdownValues.find(
-      item => item.field === 'Choose Field'
-    )?.value;
-    const formatType = dropdownValues.find(
-      item => item.field === 'Format Type'
+    // Extract the selected "Choose Value" field
+    const selectedMeasure = dropdownValues.find(
+      item => item.field === 'Choose Value'
     )?.value;
 
-    if (selectedField && selectedField !== 'None') {
-      // Find the corresponding measure
-      const measure = allMeasures.find(
-        m =>
-          (m.caption && m.caption === selectedField) ||
-          m.uniqueName === selectedField
-      );
+    if (selectedMeasure && selectedMeasure !== 'None') {
+      // Find the corresponding measure in the config
+      const measure = config.measures.find(m => m.caption === selectedMeasure);
 
       if (measure) {
-        const decimals =
-          parseInt(
-            dropdownValues.find(item => item.field === 'Decimal Places')?.value
-          ) || 2;
-        const currencySymbol = dropdownValues.find(
-          item => item.field === 'Currency Symbol'
-        )?.value;
-        const locale = dropdownValues.find(
-          item => item.field === 'Locale'
-        )?.value;
-
-        // Update measure format
-        const newFormat = {
-          type: formatType.toLowerCase(),
-          locale: locale,
-          decimals: decimals,
+        // Update the measure's format based on the dropdown selections
+        measure.format = {
+          type: 'currency',
+          currency: dropdownValues
+            .find(item => item.field === 'Currency Symbol')
+            ?.value.includes('Dollar')
+            ? 'USD'
+            : 'INR',
+          locale: 'en-US',
+          decimals:
+            parseInt(
+              dropdownValues.find(item => item.field === 'Decimal Places')
+                ?.value,
+              10
+            ) || 2,
+          // decimalSeparator: dropdownValues.find(item => item.field === "Decimal Separator")?.value || ".",
+          // align: dropdownValues.find(item => item.field === "Currency Align")?.value || "Left",
+          // percent: dropdownValues.find(item => item.field === "Format as Percent")?.value === "Yes",
+        };
+        config.formatting[measure.uniqueName] = {
+          type: 'currency',
+          currency: measure.format.currency,
+          locale: measure.format.locale,
+          decimals: measure.format.decimals,
+          // percent: measure.format.percent,
         };
 
-        if (formatType === 'Currency') {
-          newFormat.currency = getCurrencyCode(currencySymbol);
-        }
-
-        measure.format = newFormat;
-
-        // Also update config.formatting for consistency
-        if (!config.formatting) {
-          config.formatting = {};
-        }
-        config.formatting[measure.uniqueName] = newFormat;
-
-        console.log('Updated measure format:', measure.format);
-        console.log('Updated config:', config);
-
-        // Refresh the table
-        formatTable(config);
-      } else {
-        console.error('Measure not found:', selectedField);
+        console.log('Updated Measure Format:', measure.format);
       }
     } else {
-      console.log('No field selected.');
+      console.log('No valid measure selected. Config unchanged.');
     }
 
-    document.body.removeChild(overlay);
+    console.log('Updated Config:', config); // Log the updated config for debugging
+    formatTable(config);
+    document.body.removeChild(overlay); // Remove the popup
   });
-
-  // Helper function to get currency code
-  function getCurrencyCode(currencyDisplay) {
-    const currencyMap = {
-      'Dollar ($)': 'USD',
-      'Euro (€)': 'EUR',
-      'Pound (£)': 'GBP',
-      'Rupee (₹)': 'INR',
-      'Yen (¥)': 'JPY',
-    };
-    return currencyMap[currencyDisplay] || 'USD';
-  }
 
   buttonContainer.appendChild(applyButton);
   buttonContainer.appendChild(cancelButton);
 
   popup.appendChild(header);
   popup.appendChild(headerSeparator);
-  popup.appendChild(infoText);
   popup.appendChild(formContainer);
-  popup.appendChild(previewContainer);
   popup.appendChild(buttonContainer);
   overlay.appendChild(popup);
   document.body.appendChild(overlay);
-
-  // Initial preview update
-  updatePreview();
 }
