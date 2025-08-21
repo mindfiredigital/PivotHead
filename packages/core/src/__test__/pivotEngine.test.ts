@@ -385,7 +385,7 @@ describe('PivotEngine', () => {
       const singleEngine = new PivotEngine(singleRowConfig);
       const singleState = singleEngine.getState();
       expect(singleState.processedData.rows).toHaveLength(1);
-      expect(singleState.processedData.rows[0]).toEqual(['single', 42]);
+      expect(singleState.processedData.rows[0]).toEqual(['single', '42']);
     });
 
     it('should preserve row order customizations through data updates', () => {

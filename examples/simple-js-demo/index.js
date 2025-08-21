@@ -494,7 +494,6 @@ function setupRawDataDragAndDrop(rawData) {
   });
 }
 
-// Generic renderTable function that works with any field names
 function renderTable() {
   // Check current view mode
   if (currentViewMode === 'raw') {
@@ -569,7 +568,7 @@ function renderTable() {
       th.style.textAlign = 'center';
       th.dataset.fieldName = columnFieldName;
       th.dataset.fieldValue = columnValue;
-      th.dataset.columnIndex = index; // Store original index
+      th.dataset.columnIndex = index;
       th.setAttribute('draggable', 'true');
       th.style.cursor = 'move';
       th.className = 'column-header';
@@ -668,58 +667,50 @@ function renderTable() {
       tr.appendChild(rowCell);
 
       uniqueColumnValues.forEach(columnValue => {
-        const filteredDataForCell = state.rawData.filter(
-          item =>
-            item[rowFieldName] === rowValue &&
-            item[columnFieldName] === columnValue
-        );
-
         state.measures.forEach(measure => {
           const td = document.createElement('td');
           td.style.padding = '8px';
           td.style.borderBottom = '1px solid #dee2e6';
           td.style.borderRight = '1px solid #dee2e6';
-          td.style.textAlign = 'right';
 
-          let value = 0;
-          if (filteredDataForCell.length > 0) {
-            switch (measure.aggregation) {
-              case 'sum':
-                value = filteredDataForCell.reduce(
-                  (sum, item) => sum + (item[measure.uniqueName] || 0),
-                  0
-                );
-                break;
-              case 'avg':
-                value =
-                  filteredDataForCell.reduce(
-                    (sum, item) => sum + (item[measure.uniqueName] || 0),
-                    0
-                  ) / filteredDataForCell.length;
-                break;
-              case 'max':
-                value = Math.max(
-                  ...filteredDataForCell.map(
-                    item => item[measure.uniqueName] || 0
-                  )
-                );
-                break;
-              case 'min':
-                value = Math.min(
-                  ...filteredDataForCell.map(
-                    item => item[measure.uniqueName] || 0
-                  )
-                );
-                break;
-              default:
-                value = 0;
-            }
-          }
+          // Use engine's calculateCellValue method
+          const value = pivotEngine.calculateCellValue(
+            rowValue,
+            columnValue,
+            measure,
+            rowFieldName,
+            columnFieldName
+          );
+
+          // Use engine's formatValue method
+          // const formattedValue = pivotEngine.formatValue(value, measure.uniqueName);
 
           const formattedValue = pivotEngine.formatValue(
             value,
             measure.uniqueName
           );
+          const format = measure.format || {};
+          if (
+            format.type === 'currency' &&
+            (format.align === 'right' || format.currencyAlign === 'right')
+          ) {
+            // Move symbol to right if needed
+            const symbol = formattedValue.replace(/[\d.,\s]/g, '');
+            td.textContent =
+              formattedValue.replace(symbol, '').trim() + ' ' + symbol;
+          } else {
+            td.textContent = formattedValue;
+          }
+
+          // Apply text alignment from engine
+          td.style.textAlign = pivotEngine.getFieldAlignment(
+            measure.uniqueName
+          );
+
+          // Set the formatted value
+          td.textContent = formattedValue;
+
+          // Add drilldown functionality
           addDrillDownToDataCell(
             td,
             rowValue,
@@ -750,6 +741,79 @@ function renderTable() {
     }
   }
 }
+
+// Enhanced cell formatting function
+// function formatCellValue(value, measure) {
+//   // Handle null/undefined values
+//   if (value === null || value === undefined || isNaN(value)) {
+//     if (measure.format && measure.format.nullValue !== undefined) {
+//       return measure.format.nullValue;
+//     }
+//     return '';
+//   }
+
+//   // Get format configuration
+//   const format = measure.format || {};
+
+//   let num = parseFloat(value);
+//   if (isNaN(num)) return value.toString();
+
+//   // Handle percentage formatting
+//   if (format.percent) {
+//     num = num * 100;
+//   }
+
+//   // Determine decimal places
+//   let decimals = typeof format.decimals === 'number' ? format.decimals : 2;
+
+//   let formattedValue;
+
+//   // Format based on type
+//   if (format.type === 'currency') {
+//     const currency = format.currency || 'USD';
+//     const locale = format.locale || 'en-US';
+
+//     formattedValue = new Intl.NumberFormat(locale, {
+//       style: 'currency',
+//       currency: currency,
+//       minimumFractionDigits: decimals,
+//       maximumFractionDigits: decimals,
+//     }).format(num);
+//   } else if (format.percent || format.type === 'percentage') {
+//     const locale = format.locale || 'en-US';
+
+//     formattedValue = new Intl.NumberFormat(locale, {
+//       style: 'percent',
+//       minimumFractionDigits: decimals,
+//       maximumFractionDigits: decimals,
+//     }).format(num / 100); // Intl.NumberFormat expects decimal for percentage
+//   } else {
+//     // Number formatting
+//     const locale = format.locale || 'en-US';
+
+//     formattedValue = new Intl.NumberFormat(locale, {
+//       minimumFractionDigits: decimals,
+//       maximumFractionDigits: decimals,
+//     }).format(num);
+//   }
+
+//   // Apply custom thousand and decimal separators if specified
+//   if (format.thousandSeparator || format.decimalSeparator) {
+//     // This is a simplified approach - for complex scenarios, you might need more sophisticated logic
+//     if (format.decimalSeparator && format.decimalSeparator !== '.') {
+//       const parts = formattedValue.split('.');
+//       if (parts.length > 1) {
+//         formattedValue = parts[0] + format.decimalSeparator + parts[1];
+//       }
+//     }
+
+//     if (format.thousandSeparator && format.thousandSeparator !== ',') {
+//       formattedValue = formattedValue.replace(/,/g, format.thousandSeparator);
+//     }
+//   }
+
+//   return formattedValue;
+// }
 
 function setupColumnDragAndDropFixed(columnFieldName) {
   const columnHeaders = document.querySelectorAll(

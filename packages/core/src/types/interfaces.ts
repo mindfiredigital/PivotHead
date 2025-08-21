@@ -51,10 +51,15 @@ export interface Group {
 // Data formatting configuration
 export interface FormatOptions {
   type: 'currency' | 'number' | 'percentage' | 'date';
-  locale?: string;
   currency?: string;
+  locale?: string;
   decimals?: number;
-  dateFormat?: string;
+  thousandSeparator?: string;
+  decimalSeparator?: string;
+  align?: 'left' | 'right' | 'center';
+  currencyAlign?: 'left' | 'right';
+  nullValue?: string | null;
+  percent?: boolean;
 }
 
 // Supported aggregation types

@@ -13,6 +13,7 @@ import {
   FilterConfig,
   PaginationConfig,
   DataHandlingMode,
+  FormatOptions,
 } from '../types/interfaces';
 import { calculateAggregates } from './aggregator';
 import { processData } from './dataProcessor';
@@ -270,6 +271,12 @@ export class PivotEngine<T extends Record<string, any>> {
    * @returns {any[][]} A 2D array representing the rows.
    * @private
    */
+  /**
+   * Generates rows for the pivot table with enhanced formatting.
+   * @param {T[]} data - The data to generate rows from.
+   * @returns {any[][]} A 2D array representing the rows.
+   * @private
+   */
   private generateRows(data: T[]): any[][] {
     if (!data || !this.state.rows || !this.state.columns) {
       return [];
@@ -277,7 +284,10 @@ export class PivotEngine<T extends Record<string, any>> {
     return data.map(item => [
       ...this.state.rows.map(r => item[r.uniqueName]),
       ...this.state.columns.map(c => item[c.uniqueName]),
-      ...this.state.measures.map(m => this.calculateMeasureValue(item, m)),
+      ...this.state.measures.map(m => {
+        const rawValue = this.calculateMeasureValue(item, m);
+        return this.formatValue(rawValue, m.uniqueName);
+      }),
     ]);
   }
 
@@ -407,47 +417,420 @@ export class PivotEngine<T extends Record<string, any>> {
     this._emit(); // Notify subscribers after state change
   }
 
+  // /**
+  //  * Formats a value based on the specified field's format.
+  //  * @param {any} value - The value to format.
+  //  * @param {string} field - The field name to use for formatting.
+  //  * @returns {string} The formatted value as a string.
+  //  * @public
+  //  */
+  // public formatValue(value: any, field: string): string {
+  //   const format = this.state.formatting[field];
+  //   if (!format) return String(value);
+
+  //   try {
+  //     switch (format.type) {
+  //       case 'currency':
+  //         return new Intl.NumberFormat(format.locale || 'en-US', {
+  //           style: 'currency',
+  //           currency: format.currency || 'USD',
+  //           minimumFractionDigits: format.decimals || 0,
+  //           maximumFractionDigits: format.decimals || 0,
+  //         }).format(value);
+  //       case 'number':
+  //         return new Intl.NumberFormat(format.locale || 'en-US', {
+  //           minimumFractionDigits: format.decimals || 0,
+  //           maximumFractionDigits: format.decimals || 0,
+  //         }).format(value);
+  //       case 'percentage':
+  //         return new Intl.NumberFormat(format.locale || 'en-US', {
+  //           style: 'percent',
+  //           minimumFractionDigits: format.decimals || 0,
+  //         }).format(value);
+  //       case 'date':
+  //         return new Date(value).toLocaleDateString(format.locale || 'en-US', {
+  //           dateStyle: 'medium',
+  //         });
+  //       default:
+  //         return String(value);
+  //     }
+  //   } catch (error) {
+  //     console.error(`Error formatting value for field ${field}:`, error);
+  //     return String(value);
+  //   }
+  // }
+
   /**
-   * Formats a value based on the specified field's format.
+   * Enhanced formatValue method with comprehensive formatting support
    * @param {any} value - The value to format.
    * @param {string} field - The field name to use for formatting.
    * @returns {string} The formatted value as a string.
    * @public
    */
   public formatValue(value: any, field: string): string {
-    const format = this.state.formatting[field];
-    if (!format) return String(value);
+    // Handle null/undefined values first
+    if (
+      value === null ||
+      value === undefined ||
+      (typeof value === 'number' && isNaN(value))
+    ) {
+      const format = this.getFieldFormat(field);
+      if (format && format.nullValue !== undefined) {
+        return format.nullValue === null ? '' : String(format.nullValue);
+      }
+      return '';
+    }
+
+    const format = this.getFieldFormat(field);
+    if (!format) {
+      return String(value);
+    }
 
     try {
-      switch (format.type) {
-        case 'currency':
-          return new Intl.NumberFormat(format.locale || 'en-US', {
-            style: 'currency',
-            currency: format.currency || 'USD',
-            minimumFractionDigits: format.decimals || 0,
-            maximumFractionDigits: format.decimals || 0,
-          }).format(value);
-        case 'number':
-          return new Intl.NumberFormat(format.locale || 'en-US', {
-            minimumFractionDigits: format.decimals || 0,
-            maximumFractionDigits: format.decimals || 0,
-          }).format(value);
-        case 'percentage':
-          return new Intl.NumberFormat(format.locale || 'en-US', {
-            style: 'percent',
-            minimumFractionDigits: format.decimals || 0,
-          }).format(value);
-        case 'date':
-          return new Date(value).toLocaleDateString(format.locale || 'en-US', {
-            dateStyle: 'medium',
-          });
-        default:
-          return String(value);
-      }
+      return this.applyFormatting(value, format);
     } catch (error) {
       console.error(`Error formatting value for field ${field}:`, error);
       return String(value);
     }
+  }
+
+  /**
+   * Get formatting configuration for a field
+   * @param {string} field - The field name
+   * @returns {EnhancedMeasureFormat | null} The format configuration
+   * @private
+   */
+  private getFieldFormat(field: string): FormatOptions | null {
+    // First check measure-specific formatting
+    const measure = this.state.measures.find(m => m.uniqueName === field);
+    if (measure && measure.format) {
+      return measure.format as FormatOptions;
+    }
+
+    // Then check global formatting
+    const globalFormat = this.state.formatting[field];
+    if (globalFormat) {
+      return globalFormat as FormatOptions;
+    }
+
+    return null;
+  }
+
+  /**
+   * Apply comprehensive formatting to a value
+   * @param {any} value - The value to format
+   * @param {EnhancedMeasureFormat} format - The format configuration
+   * @returns {string} The formatted value
+   * @private
+   */
+  private applyFormatting(value: any, format: FormatOptions): string {
+    let num = parseFloat(value);
+    if (isNaN(num)) {
+      return String(value);
+    }
+
+    // Handle percentage formatting (multiply by 100 for display)
+    if (format.percent) {
+      num = num * 100;
+    }
+
+    // Determine decimal places
+    const decimals = typeof format.decimals === 'number' ? format.decimals : 2;
+
+    let formattedValue: string;
+
+    // Apply base formatting based on type
+    switch (format.type) {
+      case 'currency':
+        formattedValue = this.formatCurrency(num, format, decimals);
+        break;
+      case 'percentage':
+        formattedValue = this.formatPercentage(num, format, decimals);
+        break;
+      case 'date':
+        formattedValue = this.formatDate(value, format);
+        break;
+      case 'number':
+      default:
+        formattedValue = this.formatNumber(num, format, decimals);
+        break;
+    }
+
+    // Apply custom separators if specified
+    formattedValue = this.applyCustomSeparators(formattedValue, format);
+
+    return formattedValue;
+  }
+
+  /**
+   * Format as currency
+   * @param {number} num - The number to format
+   * @param {EnhancedMeasureFormat} format - The format configuration
+   * @param {number} decimals - Number of decimal places
+   * @returns {string} The formatted currency value
+   * @private
+   */
+
+  private formatCurrency(
+    num: number,
+    format: FormatOptions,
+    decimals: number
+  ): string {
+    const currency = format.currency || 'USD';
+    const locale = format.locale || 'en-US';
+    let formatted = new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    }).format(num);
+
+    // Custom currency alignment
+    if (format.align === 'right' || format.currencyAlign === 'right') {
+      // Move symbol to the right if not already
+      // Remove symbol from start and append to end
+      const symbol = formatted.replace(/[\d.,\s]/g, '');
+      formatted = formatted.replace(symbol, '').trim() + ' ' + symbol;
+    } else if (format.align === 'left' || format.currencyAlign === 'left') {
+      // Default: symbol on left (do nothing)
+    }
+    return formatted;
+  }
+
+  /**
+   * Format as percentage
+   * @param {number} num - The number to format
+   * @param {EnhancedMeasureFormat} format - The format configuration
+   * @param {number} decimals - Number of decimal places
+   * @returns {string} The formatted percentage value
+   * @private
+   */
+  private formatPercentage(
+    num: number,
+    format: FormatOptions,
+    decimals: number
+  ): string {
+    const locale = format.locale || 'en-US';
+
+    // For percentage formatting, Intl.NumberFormat expects the decimal value
+    // Since we already multiplied by 100, we need to divide by 100
+    return new Intl.NumberFormat(locale, {
+      style: 'percent',
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    }).format(num / 100);
+  }
+
+  /**
+   * Format as number
+   * @param {number} num - The number to format
+   * @param {EnhancedMeasureFormat} format - The format configuration
+   * @param {number} decimals - Number of decimal places
+   * @returns {string} The formatted number value
+   * @private
+   */
+  private formatNumber(
+    num: number,
+    format: FormatOptions,
+    decimals: number
+  ): string {
+    const locale = format.locale || 'en-US';
+
+    return new Intl.NumberFormat(locale, {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    }).format(num);
+  }
+
+  /**
+   * Format as date
+   * @param {any} value - The date value to format
+   * @param {EnhancedMeasureFormat} format - The format configuration
+   * @returns {string} The formatted date value
+   * @private
+   */
+  private formatDate(value: any, format: FormatOptions): string {
+    const locale = format.locale || 'en-US';
+
+    try {
+      const date = new Date(value);
+      return date.toLocaleDateString(locale, {
+        dateStyle: 'medium',
+      });
+    } catch (error) {
+      return String(value);
+    }
+  }
+
+  /**
+   * Apply custom thousand and decimal separators
+   * @param {string} formattedValue - The pre-formatted value
+   * @param {EnhancedMeasureFormat} format - The format configuration
+   * @returns {string} The value with custom separators applied
+   * @private
+   */
+  private applyCustomSeparators(
+    formattedValue: string,
+    format: FormatOptions
+  ): string {
+    let result = formattedValue;
+
+    // Apply custom decimal separator
+    if (format.decimalSeparator && format.decimalSeparator !== '.') {
+      const lastDotIndex = result.lastIndexOf('.');
+      if (lastDotIndex !== -1) {
+        result =
+          result.substring(0, lastDotIndex) +
+          format.decimalSeparator +
+          result.substring(lastDotIndex + 1);
+      }
+    }
+
+    // Apply custom thousand separator
+    if (format.thousandSeparator !== undefined) {
+      if (format.thousandSeparator === '') {
+        // Remove thousand separators
+        result = result.replace(/,/g, '');
+      } else if (format.thousandSeparator !== ',') {
+        // Replace default comma with custom separator
+        result = result.replace(/,/g, format.thousandSeparator);
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Calculate aggregated value for a cell intersection
+   * @param {string} rowValue - The row value
+   * @param {string} columnValue - The column value
+   * @param {MeasureConfig} measure - The measure configuration
+   * @param {string} rowFieldName - The row field name
+   * @param {string} columnFieldName - The column field name
+   * @returns {number} The calculated aggregated value
+   * @public
+   */
+  public calculateCellValue(
+    rowValue: string,
+    columnValue: string,
+    measure: MeasureConfig,
+    rowFieldName: string,
+    columnFieldName: string
+  ): number {
+    const filteredData = this.state.rawData.filter(
+      item =>
+        item[rowFieldName] === rowValue && item[columnFieldName] === columnValue
+    );
+
+    if (filteredData.length === 0) {
+      return 0;
+    }
+
+    let value = 0;
+    switch (measure.aggregation) {
+      case 'sum':
+        value = filteredData.reduce(
+          (sum, item) => sum + (item[measure.uniqueName] || 0),
+          0
+        );
+        break;
+      case 'avg':
+        value =
+          filteredData.reduce(
+            (sum, item) => sum + (item[measure.uniqueName] || 0),
+            0
+          ) / filteredData.length;
+        break;
+      case 'max':
+        value = Math.max(
+          ...filteredData.map(item => item[measure.uniqueName] || 0)
+        );
+        break;
+      case 'min':
+        value = Math.min(
+          ...filteredData.map(item => item[measure.uniqueName] || 0)
+        );
+        break;
+      case 'count':
+        value = filteredData.length;
+        break;
+      default:
+        value = 0;
+    }
+
+    return value;
+  }
+
+  /**
+   * Get text alignment for a field
+   * @param {string} field - The field name
+   * @returns {string} The text alignment ('left', 'right', 'center')
+   * @public
+   */
+  // public getFieldAlignment(field: string): string {
+  //   const format = this.getFieldFormat(field);
+  //   if (format && format.align) {
+  //     return format.align;
+  //   }
+
+  //     // For currency fields, use currencyAlign if no explicit align is set
+  // if (format && format.type === 'currency' && format.currencyAlign) {
+  //   return format.currencyAlign;
+  // }
+
+  //   // Default alignment: right for numbers, left for text
+  //   const measure = this.state.measures.find(m => m.uniqueName === field);
+  //   return measure ? 'right' : 'left';
+  // }
+
+  /**
+   * Get text alignment for a field
+   * @param {string} field - The field name
+   * @returns {string} The text alignment ('left', 'right', 'center')
+   * @public
+   */
+  public getFieldAlignment(field: string): string {
+    const format = this.getFieldFormat(field);
+
+    console.log(`getFieldAlignment for field: ${field}`, format); // Debug log
+
+    if (format && format.align) {
+      console.log(`Returning alignment: ${format.align}`); // Debug log
+      return format.align;
+    }
+
+    if (format && format.type === 'currency' && format.currencyAlign) {
+      return format.currencyAlign;
+    }
+
+    // Default alignment: right for numbers, left for text
+    const measure = this.state.measures.find(m => m.uniqueName === field);
+    const defaultAlign = measure ? 'right' : 'left';
+
+    console.log(`Using default alignment: ${defaultAlign}`); // Debug log
+    return defaultAlign;
+  }
+
+  /**
+   * Update formatting configuration for a specific field
+   * @param {string} field - The field name
+   * @param {EnhancedMeasureFormat} format - The format configuration
+   * @public
+   */
+  public updateFieldFormatting(field: string, format: FormatOptions) {
+    // Update measure-specific formatting if it's a measure
+    const measure = this.state.measures.find(m => m.uniqueName === field);
+    if (measure) {
+      measure.format = format;
+    }
+
+    // Update global formatting
+    this.state.formatting[field] = format;
+
+    // Regenerate processed data with new formatting
+    this.state.processedData = this.generateProcessedDataForDisplay();
+
+    this._emit(); // Notify subscribers after state change
   }
 
   /**

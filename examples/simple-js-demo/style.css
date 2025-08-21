@@ -38,3 +38,15 @@ th[draggable='true'],
 tr[draggable='true'] {
   cursor: move;
 }
+
+.align-left {
+  text-align: left !important;
+}
+
+.align-right {
+  text-align: right !important;
+}
+
+.align-center {
+  text-align: center !important;
+}
