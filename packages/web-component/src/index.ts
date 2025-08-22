@@ -1,3 +1,6 @@
 import './pivot-head/pivotHead';
-import type { EnhancedPivotEngine } from './types/types';
-export { EnhancedPivotEngine };
+export type {
+  EnhancedPivotEngine,
+  PivotDataRecord,
+  PivotOptions,
+} from './types/types';
