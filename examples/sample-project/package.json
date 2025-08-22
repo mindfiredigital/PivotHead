@@ -1,6 +1,6 @@
 {
   "name": "pivot-table-sample",
-   "private": true,
+  "private": true,
   "version": "1.0.0",
   "description": "A sample project to demonstrate the pivot table core logic.",
   "main": "app.js",

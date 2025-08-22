@@ -1245,7 +1245,7 @@ export class PivotEngine<T extends Record<string, any>> {
 
     const rowFieldName = rowField.uniqueName;
 
-    // Get unique values for the row field - use current custom order if it exists
+    // Get unique values for the row field from FULL DATASET - use current custom order if it exists
     const customRowOrder = (this.state as any).customRowOrder;
     let uniqueRowValues: string[];
 
@@ -1257,10 +1257,10 @@ export class PivotEngine<T extends Record<string, any>> {
       // Use the current custom order
       uniqueRowValues = [...customRowOrder.order];
     } else {
-      // Use original data order
+      // Use original FULL data order - THIS IS THE KEY FIX
       uniqueRowValues = [
         ...new Set(
-          this.state.data.map(
+          (this.config.data || []).map(
             (item: { [x: string]: any }) => item[rowFieldName]
           )
         ),
@@ -1269,6 +1269,11 @@ export class PivotEngine<T extends Record<string, any>> {
           typeof value === 'string' && value !== null && value !== undefined
       );
     }
+
+    console.log(
+      `Row swap validation: ${rowFieldName} has ${uniqueRowValues.length} unique values:`,
+      uniqueRowValues
+    );
 
     if (
       fromIndex < 0 ||
@@ -1294,15 +1299,15 @@ export class PivotEngine<T extends Record<string, any>> {
       const fromValue = uniqueRowValues[fromIndex];
       const toValue = uniqueRowValues[toIndex];
 
-      // Create new data array with swapped order
-      const newData = [...this.state.data];
+      // Create new data array with swapped order - use FULL dataset
+      const newData = [...(this.config.data || [])];
 
       // Create swapped value order
       const swappedValues = [...uniqueRowValues];
       swappedValues[fromIndex] = toValue;
       swappedValues[toIndex] = fromValue;
 
-      // Store the custom row order (similar to column order)
+      // Store the custom row order
       (this.state as any).customRowOrder = {
         fieldName: rowFieldName,
         order: swappedValues,
@@ -1315,9 +1320,12 @@ export class PivotEngine<T extends Record<string, any>> {
         return aIndex - bIndex;
       });
 
-      // Update the state
-      this.state.data = newData;
+      // Update the config data (source of truth)
+      this.config.data = newData;
+
+      // Update the state with full data, then let pagination handle the subset
       this.state.rawData = newData;
+      this.state.data = newData; // This will be re-paginated by refreshData
 
       // Regenerate processed data
       this.state.processedData = this.generateProcessedDataForDisplay();
@@ -1331,6 +1339,8 @@ export class PivotEngine<T extends Record<string, any>> {
       if (typeof this.config.onRowDragEnd === 'function') {
         this.config.onRowDragEnd(fromIndex, toIndex, this.state.rowGroups);
       }
+
+      console.log(`Row swap completed successfully for field: ${rowFieldName}`);
 
       // Emit state change to notify subscribers
       this._emit();
@@ -1357,7 +1367,7 @@ export class PivotEngine<T extends Record<string, any>> {
 
     const columnFieldName = columnField.uniqueName;
 
-    // Get unique values for the column field - use current custom order if it exists
+    // Get unique values for the column field from FULL DATASET - use current custom order if it exists
     const customColumnOrder = (this.state as any).customColumnOrder;
     let uniqueColumnValues: string[];
 
@@ -1369,10 +1379,10 @@ export class PivotEngine<T extends Record<string, any>> {
       // Use the current custom order
       uniqueColumnValues = [...customColumnOrder.order];
     } else {
-      // Use original data order
+      // Use original FULL data order - THIS IS THE KEY FIX
       uniqueColumnValues = [
         ...new Set(
-          this.state.data.map(
+          (this.config.data || []).map(
             (item: { [x: string]: any }) => item[columnFieldName]
           )
         ),
@@ -1381,6 +1391,11 @@ export class PivotEngine<T extends Record<string, any>> {
           typeof value === 'string' && value !== null && value !== undefined
       );
     }
+
+    console.log(
+      `Column swap validation: ${columnFieldName} has ${uniqueColumnValues.length} unique values:`,
+      uniqueColumnValues
+    );
 
     if (
       fromIndex < 0 ||
@@ -1434,7 +1449,7 @@ export class PivotEngine<T extends Record<string, any>> {
         }
       }
 
-      // Store the custom column order (generic key for any field)
+      // Store the custom column order
       (this.state as any).customColumnOrder = {
         fieldName: columnFieldName,
         order: swappedValues,
@@ -1471,17 +1486,57 @@ export class PivotEngine<T extends Record<string, any>> {
 
   /**
    * Generic method to get unique values for any field
+   * Uses the original config data, not the paginated state data
    * Utility method for UI components
    */
   public getUniqueFieldValues(fieldName: string): string[] {
-    return [
+    // Use the original config data, not the paginated state data
+    const dataSource = this.config.data || [];
+
+    console.log(
+      `Getting unique values for field: ${fieldName} from ${dataSource.length} total items`
+    );
+
+    const uniqueValues = [
       ...new Set(
-        this.state.data.map((item: { [x: string]: any }) => item[fieldName])
+        dataSource.map((item: { [x: string]: any }) => item[fieldName])
       ),
     ].filter(
       (value): value is string =>
         typeof value === 'string' && value !== null && value !== undefined
     );
+
+    console.log(
+      `Found ${uniqueValues.length} unique values for ${fieldName}:`,
+      uniqueValues
+    );
+
+    return uniqueValues;
+  }
+
+  // Also add this method to get unique values in their current custom order:
+  /**
+   * Get unique field values respecting any custom order that has been set
+   */
+  public getOrderedUniqueFieldValues(
+    fieldName: string,
+    isRowField = false
+  ): string[] {
+    // Check if there's a custom order for this field
+    const customOrderKey = isRowField ? 'customRowOrder' : 'customColumnOrder';
+    const customOrder = (this.state as any)[customOrderKey];
+
+    if (
+      customOrder &&
+      customOrder.fieldName === fieldName &&
+      customOrder.order
+    ) {
+      console.log(`Using custom order for ${fieldName}:`, customOrder.order);
+      return customOrder.order;
+    }
+
+    // Fall back to natural order from full dataset
+    return this.getUniqueFieldValues(fieldName);
   }
 
   /**
