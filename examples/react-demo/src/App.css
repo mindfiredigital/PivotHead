@@ -60,4 +60,13 @@ button:hover {
   border-radius: 4px;
   overflow: auto;
   max-height: 300px;
-} 
+}
+
+/* Minimal demo helpers */
+.grid-header .toolbar label { font-size: 12px; color: #374151; }
+.grid-header .toolbar select, .grid-header .toolbar input { padding: 6px 8px; }
+.grid .drag-over { outline: 2px dashed #60a5fa; }
+.grid th.sortable { cursor: pointer; user-select: none; }
+.grid th.sorted-asc::after { content: ' \25B2'; font-size: 11px; color: #6b7280; }
+.grid th.sorted-desc::after { content: ' \25BC'; font-size: 11px; color: #6b7280; }
+.grid td.drill-down-cell { cursor: pointer; }

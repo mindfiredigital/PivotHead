@@ -1,6 +1,4 @@
-import { PivotEngine } from '@mindfiredigital/pivothead';
 import type {
-  PivotTableConfig,
   FilterConfig,
   PivotTableState,
   Dimension,
@@ -10,57 +8,101 @@ import type {
   Group,
   PaginationConfig,
 } from '@mindfiredigital/pivothead';
-import { FieldFormat } from '../types/types';
-
-/**
- * Enhanced interface extending PivotEngine with additional methods
- * This ensures type safety when casting the engine instance
- */
-interface EnhancedPivotEngine<T extends Record<string, any>>
-  extends PivotEngine<T> {
-  state: any;
-  getPagination(): PaginationConfig;
-  applyFilters(filters: FilterConfig[]): void;
-  setMeasures(measures: MeasureConfig[]): void;
-  setDimensions(dimensions: Dimension[]): void;
-  getFilterState(): FilterConfig[];
-  reset(): void;
-  sort(field: string, direction: 'asc' | 'desc'): void;
-  setGroupConfig(config: GroupConfig | null): void;
-  setAggregation(type: AggregationType): void;
-  formatValue(value: any, field: string): string;
-  getGroupedData(): Group[];
-  exportToHTML(fileName: string): void;
-  exportToPDF(fileName: string): void;
-  exportToExcel(fileName: string): void;
-  openPrintDialog(): void;
-  // Drag methods from core
-  dragRow(fromIndex: number, toIndex: number): void;
-  dragColumn(fromIndex: number, toIndex: number): void;
-  setRowGroups(rowGroups: Group[]): void;
-  setColumnGroups(columnGroups: Group[]): void;
-  toggleRowExpansion(rowId: string): void;
-  isRowExpanded(rowId: string): boolean;
-  setPagination(config: PaginationConfig): void;
-  getPaginationState(): PaginationConfig;
-}
+import type {
+  EnhancedPivotEngine,
+  PivotDataRecord,
+  PivotOptions,
+} from '../types/types';
+import type { PivotHeadHost } from './internal/host';
+import {
+  renderSwitch as renderSwitchHelper,
+  renderFullUI as renderFullUIHelper,
+  renderRawTable as renderRawTableHelper,
+  handleEngineStateChange as handleEngineStateChangeHelper,
+} from './internal/render';
+import {
+  bindControls as bindControlsHelper,
+  updatePaginationInfo as updatePaginationInfoHelper,
+  addDragListeners as addDragListenersHelper,
+  handleSortClick as handleSortClickHelper,
+  handleDrillDownClick as handleDrillDownClickHelper,
+  createSortIcon as createSortIconHelper,
+  createProcessedSortIcon as createProcessedSortIconHelper,
+} from './internal/ui';
+import { tryInitializeEngine as tryInitializeEngineHelper } from './internal/engine';
+import {
+  parseAttributesIfNeeded as parseAttributesIfNeededHelper,
+  parseOtherAttributes as parseOtherAttributesHelper,
+  attributeChanged as attributeChangedHelper,
+} from './internal/attributes';
+import {
+  calculatePaginationForCurrentView as calculatePaginationForCurrentViewHelper,
+  updatePaginationForData as updatePaginationForDataHelper,
+  getPaginatedData as getPaginatedDataHelper,
+  previousPage as previousPageHelper,
+  nextPage as nextPageHelper,
+  setPageSize as setPageSizeHelper,
+  goToPage as goToPageHelper,
+} from './internal/pagination';
+import {
+  getState as getStateHelper,
+  sort as sortHelper,
+  setMeasures as setMeasuresHelper,
+  setDimensions as setDimensionsHelper,
+  setGroupConfig as setGroupConfigHelper,
+  setAggregation as setAggregationHelper,
+  formatValue as formatValueHelper,
+  getGroupedData as getGroupedDataHelper,
+  getData as getDataHelper,
+  getProcessedData as getProcessedDataHelper,
+} from './internal/api-engine';
+import {
+  setFilters as setFiltersHelper,
+  getFilters as getFiltersHelper,
+  refresh as refreshHelper,
+  reset as resetHelper,
+  clearFilterUI as clearFilterUIHelper,
+} from './internal/filters-refresh';
+import {
+  exportToHTML as exportToHTMLHelper,
+  exportToPDF as exportToPDFHelper,
+  exportToExcel as exportToExcelHelper,
+  openPrintDialog as openPrintDialogHelper,
+  loadFromFile as loadFromFileHelper,
+  loadFromUrl as loadFromUrlHelper,
+} from './internal/io';
+import {
+  dragRow as dragRowApiHelper,
+  dragColumn as dragColumnApiHelper,
+  swapRows as swapRowsApiHelper,
+  swapColumns as swapColumnsApiHelper,
+  swapRawDataColumns as swapRawDataColumnsApiHelper,
+  setDragAndDropEnabled as setDragAndDropEnabledHelper,
+  isDragAndDropEnabled as isDragAndDropEnabledHelper,
+} from './internal/dnd-api';
 
 export class PivotHeadElement extends HTMLElement {
-  private engine!: EnhancedPivotEngine<any>;
-  private _data: any[] = [];
-  private _options: any = {};
+  private engine!: EnhancedPivotEngine<PivotDataRecord>;
+  private _engineUnsubscribe: (() => void) | null = null;
+  private _data: PivotDataRecord[] = [];
+  private _originalData: PivotDataRecord[] = [];
+  private _options: PivotOptions = {};
   private _filters: FilterConfig[] = [];
+  private _rawFilters: FilterConfig[] = [];
+  private _processedFilters: FilterConfig[] = [];
   private _rowGroups: Group[] = [];
   private _columnGroups: Group[] = [];
   private _pagination: PaginationConfig = {
     currentPage: 1,
-    pageSize: 30,
+    pageSize: 10,
     totalPages: 1,
   };
+  private _showRawData = false;
+  private _rawDataColumnOrder: string[] = [];
+  private _processedColumnOrder: string[] = [];
 
-  // Define observed attributes for the custom element
   static get observedAttributes(): string[] {
-    return ['data', 'options', 'filters', 'pagination'];
+    return ['data', 'options', 'filters', 'pagination', 'mode'];
   }
 
   constructor() {
@@ -68,860 +110,256 @@ export class PivotHeadElement extends HTMLElement {
     this.attachShadow({ mode: 'open' });
   }
 
-  /**
-   * Data setter - automatically initializes/reinitializes when set
-   */
-  set data(value: any[]) {
+  set data(value: PivotDataRecord[]) {
     this._data = value || [];
+    this._originalData = [...(value || [])];
     this.tryInitializeEngine();
   }
-
-  get data(): any[] {
+  get data(): PivotDataRecord[] {
     return this._data;
   }
 
-  /**
-   * Options setter - automatically initializes/reinitializes when set
-   */
-  set options(value: any) {
+  set options(value: PivotOptions) {
     this._options = value || {};
     this.tryInitializeEngine();
   }
-
-  get options(): any {
+  get options(): PivotOptions {
     return this._options;
   }
 
-  /**
-   * Getter and setter for filters property
-   */
   set filters(value: FilterConfig[]) {
-    this._filters = value || [];
-    this.setAttribute('filters', JSON.stringify(value));
-    if (this.engine) {
-      this.engine.applyFilters(value);
-      this.notifyStateChange();
-    }
+    setFiltersHelper(this as unknown as PivotHeadHost, value);
   }
-
   get filters(): FilterConfig[] {
-    return this._filters;
+    return getFiltersHelper(this as unknown as PivotHeadHost);
   }
 
-  /**
-   * Getter and setter for pagination property
-   */
   set pagination(value: PaginationConfig) {
     this._pagination = { ...this._pagination, ...value };
     this.setAttribute('pagination', JSON.stringify(this._pagination));
-    if (this.engine) {
-      this.engine.setPagination(this._pagination);
-      this.notifyStateChange();
-    }
+    this._renderSwitch();
   }
-
   get pagination(): PaginationConfig {
     return this._pagination;
   }
 
-  /**
-   * Single method to handle engine initialization
-   * Only creates engine when BOTH data and options are available
-   */
-  private tryInitializeEngine(): void {
-    // Check if we have the minimum required data
-    const hasData = this._data && this._data.length > 0;
-    const hasOptions = this._options && Object.keys(this._options).length > 0;
-    console.log('has Data', hasData, 'hasOptions', hasOptions);
-    if (!hasData || !hasOptions) {
-      return;
-    }
-
-    try {
-      // Create the engine configuration
-      const config: PivotTableConfig<any> = {
-        data: this._data,
-        pageSize: this._pagination.pageSize,
-        ...this._options,
-      };
-
-      console.log('Options', this._options);
-      // Create or recreate the engine
-      this.engine = new PivotEngine(config) as EnhancedPivotEngine<any>;
-
-      // Apply existing configurations
-      if (this._filters.length > 0) {
-        this.engine.applyFilters(this._filters);
-      }
-
-      this.engine.setPagination(this._pagination);
-      this.notifyStateChange();
-    } catch (error) {
-      console.error('Error initializing PivotEngine:', error);
-    }
+  private handleEngineStateChange(
+    state: PivotTableState<PivotDataRecord>
+  ): void {
+    handleEngineStateChangeHelper(this as unknown as PivotHeadHost, state);
   }
 
-  /**
-   * Called when element is added to the DOM
-   */
+  private tryInitializeEngine(): void {
+    tryInitializeEngineHelper(this as unknown as PivotHeadHost);
+  }
+
   connectedCallback(): void {
-    // Only parse attributes if properties haven't been set yet
     if (!this._data.length && !Object.keys(this._options).length) {
-      this.parseAttributesIfNeeded();
+      parseAttributesIfNeededHelper(this as unknown as PivotHeadHost);
     }
+    this._renderSwitch();
   }
 
   private parseAttributesIfNeeded(): void {
-    // Parse data attribute
-    const rawData = this.getAttribute('data');
-    console.log('rawData', rawData);
-    if (rawData && !this._data.length) {
-      try {
-        this.data = JSON.parse(rawData); // Use setter
-      } catch (error) {
-        console.error('Error parsing data attribute:', error);
-      }
-    }
-
-    // Parse options attribute
-    const rawOptions = this.getAttribute('options');
-    console.log('rawOptions', rawOptions);
-    if (rawOptions && !Object.keys(this._options).length) {
-      try {
-        this.options = JSON.parse(rawOptions); // Use setter
-      } catch (error) {
-        console.error('Error parsing options attribute:', error);
-      }
-    }
-
-    // Parse other attributes
-    this.parseOtherAttributes();
+    parseAttributesIfNeededHelper(this as unknown as PivotHeadHost);
   }
-
   private parseOtherAttributes(): void {
-    // Parse filters
-    const rawFilters = this.getAttribute('filters');
-    if (rawFilters) {
-      try {
-        this.filters = JSON.parse(rawFilters);
-      } catch (error) {
-        console.error('Error parsing filters attribute:', error);
-      }
-    }
-
-    // Parse pagination
-    const rawPagination = this.getAttribute('pagination');
-    if (rawPagination) {
-      try {
-        this.pagination = { ...this._pagination, ...JSON.parse(rawPagination) };
-      } catch (error) {
-        console.error('Error parsing pagination attribute:', error);
-      }
-    }
+    parseOtherAttributesHelper(this as unknown as PivotHeadHost);
   }
 
-  /**
-   * Called when observed attributes change
-   */
   attributeChangedCallback(
     name: string,
     oldValue: string | null,
     newValue: string | null
   ): void {
-    if (oldValue === newValue) return;
-
-    switch (name) {
-      case 'data':
-        if (newValue) {
-          try {
-            this.data = JSON.parse(newValue); // Use setter
-          } catch (error) {
-            console.error('Error parsing data attribute:', error);
-          }
-        }
-        break;
-
-      case 'options':
-        if (newValue) {
-          try {
-            this.options = JSON.parse(newValue); // Use setter
-          } catch (error) {
-            console.error('Error parsing options attribute:', error);
-          }
-        }
-        break;
-
-      case 'filters':
-        if (newValue) {
-          try {
-            this.filters = JSON.parse(newValue);
-          } catch (error) {
-            console.error('Error parsing filters attribute:', error);
-          }
-        } else {
-          this.filters = [];
-        }
-        break;
-
-      case 'pagination':
-        if (newValue) {
-          try {
-            this.pagination = { ...this._pagination, ...JSON.parse(newValue) };
-          } catch (error) {
-            console.error('Error parsing pagination attribute:', error);
-          }
-        } else {
-          this.pagination = { currentPage: 1, pageSize: 30, totalPages: 1 };
-        }
-        break;
-    }
+    attributeChangedHelper(
+      this as unknown as PivotHeadHost,
+      name,
+      oldValue,
+      newValue
+    );
   }
 
-  /**
-   * Dispatches a custom event with the current state
-   */
-  private notifyStateChange(): void {
-    if (!this.engine) return;
-
-    try {
-      const state = this.engine.getState();
-      this.dispatchEvent(
-        new CustomEvent('stateChange', {
-          detail: state,
-          bubbles: true,
-          composed: true,
-        })
-      );
-      this.renderTable();
-    } catch (error) {
-      console.error('Error getting engine state:', error);
-    }
+  private _renderSwitch() {
+    renderSwitchHelper(this as unknown as PivotHeadHost);
   }
-
-  private renderTable(): void {
-    if (!this.engine) return;
-
-    const state = this.engine.getState();
-    const { headers, rows } = state.processedData;
-
-    let html =
-      '<style>\n' +
-      '  table { width: 100%; border-collapse: collapse; }\n' +
-      '  th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }\n' +
-      '  th { background-color: #f2f2f2; cursor: grab; }\n' +
-      '  tr[draggable=\"true\"] { cursor: grab; }\n' +
-      '  .dragging { opacity: 0.5; }\n' +
-      '</style>';
-
-    html += '<table>';
-    html += '<thead><tr>';
-    headers.forEach((header, index) => {
-      html += `<th draggable=\"true\" data-column-index="${index}">${header}</th>`;
-    });
-    html += '</tr></thead>';
-
-    html += '<tbody>';
-    rows.forEach((row, rowIndex) => {
-      html += `<tr draggable=\"true\" data-row-index="${rowIndex}">`;
-      row.forEach(cell => {
-        html += `<td>${cell}</td>`;
-      });
-      html += '</tr>';
-    });
-    html += '</tbody>';
-
-    html += '</table>';
-
-    this.shadowRoot!.innerHTML = html;
-    this.addDragListeners();
+  private renderFullUI(): void {
+    renderFullUIHelper(this as unknown as PivotHeadHost);
   }
-
+  private setupControls(): void {
+    bindControlsHelper(this as unknown as PivotHeadHost);
+  }
+  private updatePaginationInfo(): void {
+    updatePaginationInfoHelper(this as unknown as PivotHeadHost);
+  }
+  private calculatePaginationForCurrentView(): void {
+    calculatePaginationForCurrentViewHelper(this as unknown as PivotHeadHost);
+  }
+  private updatePaginationForData(data: unknown[]): void {
+    updatePaginationForDataHelper(this as unknown as PivotHeadHost, data);
+  }
+  private getPaginatedData<T>(data: T[]): T[] {
+    return getPaginatedDataHelper(this as unknown as PivotHeadHost, data);
+  }
+  private renderRawTable(): void {
+    renderRawTableHelper(this as unknown as PivotHeadHost);
+  }
+  private createSortIcon(field: string): string {
+    return createSortIconHelper(this as unknown as PivotHeadHost, field);
+  }
+  private createProcessedSortIcon(field: string): string {
+    return createProcessedSortIconHelper(
+      this as unknown as PivotHeadHost,
+      field
+    );
+  }
   private addDragListeners(): void {
-    const headers = this.shadowRoot!.querySelectorAll('th[draggable="true"]');
-    headers.forEach(header => {
-      header.addEventListener(
-        'dragstart',
-        this.handleColumnDragStart.bind(this) as EventListener
-      );
-      header.addEventListener(
-        'dragover',
-        this.handleColumnDragOver.bind(this) as EventListener
-      );
-      header.addEventListener(
-        'dragleave',
-        this.handleColumnDragLeave.bind(this) as EventListener
-      );
-      header.addEventListener(
-        'drop',
-        this.handleColumnDrop.bind(this) as EventListener
-      );
-      header.addEventListener(
-        'dragend',
-        this.handleColumnDragEnd.bind(this) as EventListener
-      );
-    });
-
-    const rows = this.shadowRoot!.querySelectorAll('tr[draggable="true"]');
-    rows.forEach(row => {
-      row.addEventListener(
-        'dragstart',
-        this.handleRowDragStart.bind(this) as EventListener
-      );
-      row.addEventListener(
-        'dragover',
-        this.handleRowDragOver.bind(this) as EventListener
-      );
-      row.addEventListener(
-        'dragleave',
-        this.handleRowDragLeave.bind(this) as EventListener
-      );
-      row.addEventListener(
-        'drop',
-        this.handleRowDrop.bind(this) as EventListener
-      );
-      row.addEventListener(
-        'dragend',
-        this.handleRowDragEnd.bind(this) as EventListener
-      );
-    });
+    addDragListenersHelper(this as unknown as PivotHeadHost);
+  }
+  private handleSortClick(e: Event): void {
+    handleSortClickHelper(this as unknown as PivotHeadHost, e);
+  }
+  private handleDrillDownClick(e: Event): void {
+    handleDrillDownClickHelper(this as unknown as PivotHeadHost, e);
   }
 
   private draggedColumn: HTMLElement | null = null;
   private draggedRow: HTMLElement | null = null;
 
-  private handleColumnDragStart(e: DragEvent): void {
-    this.draggedColumn = e.target as HTMLElement;
-    e.dataTransfer!.effectAllowed = 'move';
-    e.dataTransfer!.setData(
-      'text/plain',
-      this.draggedColumn.dataset.columnIndex || ''
-    );
-    setTimeout(() => {
-      this.draggedColumn!.classList.add('dragging');
-    }, 0);
-  }
-
-  private handleColumnDragOver(e: DragEvent): void {
-    e.preventDefault();
-    if (e.dataTransfer!.types.includes('text/plain')) {
-      const target = e.target as HTMLElement;
-      if (target.tagName === 'TH' && target !== this.draggedColumn) {
-        target.classList.add('drag-over');
-      }
-    }
-  }
-
-  private handleColumnDragLeave(e: DragEvent): void {
-    (e.target as HTMLElement).classList.remove('drag-over');
-  }
-
-  private handleColumnDrop(e: DragEvent): void {
-    e.preventDefault();
-    const target = e.target as HTMLElement;
-    target.classList.remove('drag-over');
-
-    if (this.draggedColumn && target.tagName === 'TH') {
-      const fromIndex = parseInt(this.draggedColumn.dataset.columnIndex || '0');
-      const toIndex = parseInt(target.dataset.columnIndex || '0');
-
-      if (fromIndex !== toIndex) {
-        this.engine.dragColumn(fromIndex, toIndex);
-        this.notifyStateChange();
-      }
-    }
-  }
-
-  private handleColumnDragEnd(e: DragEvent): void {
-    this.draggedColumn?.classList.remove('dragging');
-    this.draggedColumn = null;
-    this.shadowRoot!.querySelectorAll('.drag-over').forEach(el =>
-      el.classList.remove('drag-over')
-    );
-  }
-
-  private handleRowDragStart(e: DragEvent): void {
-    this.draggedRow = e.target as HTMLElement;
-    e.dataTransfer!.effectAllowed = 'move';
-    e.dataTransfer!.setData(
-      'text/plain',
-      this.draggedRow.dataset.rowIndex || ''
-    );
-    setTimeout(() => {
-      this.draggedRow!.classList.add('dragging');
-    }, 0);
-  }
-
-  private handleRowDragOver(e: DragEvent): void {
-    e.preventDefault();
-    if (e.dataTransfer!.types.includes('text/plain')) {
-      const target = e.target as HTMLElement;
-      if (target.tagName === 'TR' && target !== this.draggedRow) {
-        target.classList.add('drag-over');
-      }
-    }
-  }
-
-  private handleRowDragLeave(e: DragEvent): void {
-    (e.target as HTMLElement).classList.remove('drag-over');
-  }
-
-  private handleRowDrop(e: DragEvent): void {
-    e.preventDefault();
-    const target = e.target as HTMLElement;
-    target.classList.remove('drag-over');
-
-    if (this.draggedRow && target.tagName === 'TR') {
-      const fromIndex = parseInt(this.draggedRow.dataset.rowIndex || '0');
-      const toIndex = parseInt(target.dataset.rowIndex || '0');
-
-      if (fromIndex !== toIndex) {
-        this.engine.dragRow(fromIndex, toIndex);
-        this.notifyStateChange();
-      }
-    }
-  }
-
-  private handleRowDragEnd(e: DragEvent): void {
-    this.draggedRow?.classList.remove('dragging');
-    this.draggedRow = null;
-    this.shadowRoot!.querySelectorAll('.drag-over').forEach(el =>
-      el.classList.remove('drag-over')
-    );
-  }
-
-  // Public API methods for programmatic control
-
-  /**
-   * Returns the raw data from the pivot table
-   */
-
-  public getRawData(): any[] {
+  public getRawData(): PivotDataRecord[] {
     return this._data;
   }
-
-  /**
-   * Returns the pagination from the engine or local fallback
-   */
   public getPagination(): PaginationConfig {
-    return this.engine?.getPagination?.() ?? this._pagination;
+    return this._pagination;
   }
-
-  /**
-   * Get the current state of the pivot table
-   */
-  public getState(): PivotTableState<any> {
-    if (!this.engine) {
-      throw new Error('Engine not initialized');
-    }
-    return this.engine.getState();
+  public getState(): PivotTableState<PivotDataRecord> {
+    return getStateHelper(this as unknown as PivotHeadHost);
   }
-
-  /**
-   * Reset the pivot table to its initial state
-   */
   public refresh(): void {
-    if (!this.engine) {
-      console.error('Engine not initialized');
-      return;
-    }
-
-    this._filters = [];
-    this.engine.applyFilters([]);
-    this.engine.reset();
-    this.removeAttribute('filters');
-    this.notifyStateChange();
+    refreshHelper(this as unknown as PivotHeadHost);
   }
-
-  /**
-   * Sort the pivot table by a specific field
-   */
+  public reset(): void {
+    resetHelper(this as unknown as PivotHeadHost);
+  }
+  private clearFilterUI(): void {
+    clearFilterUIHelper(this as unknown as PivotHeadHost);
+  }
   public sort(field: string, direction: 'asc' | 'desc'): void {
-    if (!this.engine) {
-      console.error('Engine not initialized');
-      return;
-    }
-
-    this.engine.sort(field, direction);
-    this.notifyStateChange();
+    sortHelper(this as unknown as PivotHeadHost, field, direction);
   }
-
-  /**
-   * Set measures for the pivot table
-   */
   public setMeasures(measures: MeasureConfig[]): void {
-    if (!this.engine) {
-      console.error('Engine not initialized');
-      return;
-    }
-
-    this.engine.setMeasures(measures);
-    this.notifyStateChange();
+    setMeasuresHelper(this as unknown as PivotHeadHost, measures);
   }
-
-  /**
-   * Set dimensions for the pivot table
-   */
   public setDimensions(dimensions: Dimension[]): void {
-    if (!this.engine) {
-      console.error('Engine not initialized');
-      return;
-    }
-
-    this.engine.setDimensions(dimensions);
-    this.notifyStateChange();
+    setDimensionsHelper(this as unknown as PivotHeadHost, dimensions);
   }
-
-  /**
-   * Set grouping configuration
-   */
   public setGroupConfig(groupConfig: GroupConfig | null): void {
-    if (!this.engine) {
-      console.error('Engine not initialized');
-      return;
-    }
-
-    this.engine.setGroupConfig(groupConfig);
-    this.notifyStateChange();
+    setGroupConfigHelper(this as unknown as PivotHeadHost, groupConfig);
   }
-
-  /**
-   * Set aggregation type for measures
-   */
   public setAggregation(type: AggregationType): void {
-    if (!this.engine) {
-      console.error('Engine not initialized');
-      return;
-    }
-
-    this.engine.setAggregation(type);
-    this.notifyStateChange();
+    setAggregationHelper(this as unknown as PivotHeadHost, type);
   }
-
-  /**
-   * Format a value according to field formatting rules
-   */
-  public formatValue(value: any, field: string): string {
-    if (!this.engine) {
-      console.error('Engine not initialized');
-      return String(value);
-    }
-
-    return this.engine.formatValue(value, field);
+  public formatValue(value: unknown, field: string): string {
+    return formatValueHelper(this as unknown as PivotHeadHost, value, field);
   }
-
-  /**
-   * Get grouped data from the pivot table
-   */
   public getGroupedData(): Group[] {
-    if (!this.engine) {
-      console.error('Engine not initialized');
-      return [];
-    }
-
-    return this.engine.getGroupedData();
+    return getGroupedDataHelper(this as unknown as PivotHeadHost);
   }
-
-  /**
-   * Get current filter state
-   */
   public getFilters(): FilterConfig[] {
     return this._filters;
   }
-
-  /**
-   * Get the raw data from the pivot table
-   */
-  public getData(): any[] {
-    if (!this.engine) {
-      console.error('Engine not initialized');
-      return [];
-    }
-
-    return this.engine.getState().rawData;
+  public getData(): PivotDataRecord[] {
+    return getDataHelper(this as unknown as PivotHeadHost);
   }
-
-  /**
-   * Get the processed data (headers, rows, totals)
-   */
-  public getProcessedData(): any {
-    if (!this.engine) {
-      console.error('Engine not initialized');
-      return null;
-    }
-
-    return this.engine.getState().processedData;
+  public getProcessedData(): unknown {
+    return getProcessedDataHelper(this as unknown as PivotHeadHost);
   }
-
-  // Export methods
-
-  /**
-   * Export pivot table to HTML format
-   */
   public exportToHTML(fileName = 'pivot-table'): void {
-    if (!this.engine) {
-      console.error('Engine not initialized. Cannot export to HTML.');
-      return;
-    }
-    this.engine.exportToHTML(fileName);
+    exportToHTMLHelper(this as unknown as PivotHeadHost, fileName);
   }
-
-  /**
-   * Export pivot table to PDF format
-   */
   public exportToPDF(fileName = 'pivot-table'): void {
-    if (!this.engine) {
-      console.error('Engine not initialized. Cannot export to PDF.');
-      return;
-    }
-    this.engine.exportToPDF(fileName);
+    exportToPDFHelper(this as unknown as PivotHeadHost, fileName);
   }
-
-  /**
-   * Export pivot table to Excel format
-   */
   public exportToExcel(fileName = 'pivot-table'): void {
-    if (!this.engine) {
-      console.error('Engine not initialized. Cannot export to Excel.');
-      return;
-    }
-    this.engine.exportToExcel(fileName);
+    exportToExcelHelper(this as unknown as PivotHeadHost, fileName);
   }
-
-  /**
-   * Open print dialog for the pivot table
-   */
   public openPrintDialog(): void {
-    if (!this.engine) {
-      console.error('Engine not initialized. Cannot open print dialog.');
-      return;
-    }
-    this.engine.openPrintDialog();
+    openPrintDialogHelper(this as unknown as PivotHeadHost);
   }
-
-  // File loading methods
-
-  /**
-   * Load data from a file
-   */
   public loadFromFile(file: File): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = event => {
-        try {
-          const result = event.target?.result;
-          if (typeof result === 'string') {
-            const data = JSON.parse(result);
-            this.data = data;
-            resolve();
-          } else {
-            reject(new Error('Failed to read file as text'));
-          }
-        } catch (error) {
-          reject(error);
-        }
-      };
-      reader.onerror = () => reject(new Error('Failed to read file'));
-      reader.readAsText(file);
-    });
+    return loadFromFileHelper(this as unknown as PivotHeadHost, file);
   }
-
-  /**
-   * Load data from a URL
-   */
   public loadFromUrl(url: string): Promise<void> {
-    return fetch(url)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(
-            `Failed to fetch data from ${url}: ${response.status} ${response.statusText}`
-          );
-        }
-        return response.json();
-      })
-      .then(data => {
-        this.data = data;
-      });
+    return loadFromUrlHelper(this as unknown as PivotHeadHost, url);
   }
-
-  // Public drag API methods
-
-  /**
-   * Programmatically drag a row from one position to another
-   */
   public dragRow(fromIndex: number, toIndex: number): void {
-    if (!this.engine) {
-      console.error('Engine not initialized');
-      return;
-    }
-
-    this.engine.dragRow(fromIndex, toIndex);
-    this.notifyStateChange();
+    dragRowApiHelper(this as unknown as PivotHeadHost, fromIndex, toIndex);
   }
-
-  /**
-   * Programmatically drag a column from one position to another
-   */
   public dragColumn(fromIndex: number, toIndex: number): void {
-    if (!this.engine) {
-      console.error('Engine not initialized');
-      return;
-    }
-
-    this.engine.dragColumn(fromIndex, toIndex);
-    this.notifyStateChange();
+    dragColumnApiHelper(this as unknown as PivotHeadHost, fromIndex, toIndex);
   }
-
-  /**
-   * Set row groups for the pivot table
-   */
-  public setRowGroups(rowGroups: Group[]): void {
-    this._rowGroups = rowGroups || [];
-
-    // Also update the engine if it's initialized
-    if (this.engine && typeof this.engine.setRowGroups === 'function') {
-      this.engine.setRowGroups(rowGroups);
-      this.notifyStateChange();
-    } else {
-      // If engine not ready, reinitialize with new row groups
-      this.reinitialize();
-    }
+  public swapRows(fromIndex: number, toIndex: number): void {
+    swapRowsApiHelper(this as unknown as PivotHeadHost, fromIndex, toIndex);
   }
-
-  /**
-   * Set column groups for the pivot table
-   */
-  public setColumnGroups(columnGroups: Group[]): void {
-    this._columnGroups = columnGroups || [];
-
-    // Also update the engine if it's initialized
-    if (this.engine && typeof this.engine.setColumnGroups === 'function') {
-      this.engine.setColumnGroups(columnGroups);
-      this.notifyStateChange();
-    } else {
-      // If engine not ready, reinitialize with new column groups
-      this.reinitialize();
-    }
+  public swapColumns(fromIndex: number, toIndex: number): void {
+    swapColumnsApiHelper(this as unknown as PivotHeadHost, fromIndex, toIndex);
   }
-
-  /**
-   * Toggles the expansion state of a row via the engine.
-   * @param rowId - The unique ID of the row to toggle.
-   */
-  public toggleRowExpansion(rowId: string): void {
-    if (!this.engine || typeof this.engine.toggleRowExpansion !== 'function') {
-      console.error('Engine not initialized or method not available');
-      return;
-    }
-    this.engine.toggleRowExpansion(rowId);
-    this.notifyStateChange();
+  private swapRawDataColumns(fromIndex: number, toIndex: number): void {
+    swapRawDataColumnsApiHelper(
+      this as unknown as PivotHeadHost,
+      fromIndex,
+      toIndex
+    );
   }
-
-  /**
-   * Checks if a row is expanded via the engine.
-   * @param rowId - The unique ID of the row.
-   * @returns boolean indicating whether the row is expanded.
-   */
-  public isRowExpanded(rowId: string): boolean {
-    if (!this.engine || typeof this.engine.isRowExpanded !== 'function') {
-      console.error('Engine not initialized or method not available');
-      return false;
-    }
-    return this.engine.isRowExpanded(rowId);
+  public setDragAndDropEnabled(enabled: boolean): void {
+    setDragAndDropEnabledHelper(this as unknown as PivotHeadHost, enabled);
   }
-
-  /**
-   * Set pagination configuration
-   */
-  public setPagination(config: PaginationConfig): void {
-    if (!this.engine) {
-      console.error('Engine not initialized');
-      return;
-    }
-
-    this._pagination = { ...this._pagination, ...config };
-    this.engine.setPagination(this._pagination);
-    this.setAttribute('pagination', JSON.stringify(this._pagination));
-    this.notifyStateChange();
+  public isDragAndDropEnabled(): boolean {
+    return isDragAndDropEnabledHelper(this as unknown as PivotHeadHost);
   }
-
-  /**
-   * Get current pagination state
-   */
-  public getPaginationState(): PaginationConfig {
-    if (!this.engine || typeof this.engine.getPaginationState !== 'function') {
-      console.error('Engine not initialized or method not available');
-      return this._pagination;
-    }
-
-    // Always return engine state, update local cache
-    const engineState = this.engine.getPaginationState();
-    this._pagination = engineState;
-    return engineState;
+  public swapDataRowsByIndex(fromIndex: number, toIndex: number): void {
+    this.swapRows(fromIndex, toIndex);
   }
-
-  /**
-   * Navigate to a specific page
-   */
-  public goToPage(page: number): void {
-    const paginationState = this.getPaginationState();
-    if (page >= 1 && page <= paginationState.totalPages) {
-      this.setPagination({ ...paginationState, currentPage: page });
-    }
+  public swapDataColumnsByIndex(fromIndex: number, toIndex: number): void {
+    this.swapColumns(fromIndex, toIndex);
   }
-
-  /**
-   * Navigate to the next page
-   */
-  public nextPage(): void {
-    const paginationState = this.getPaginationState();
-    if (paginationState.currentPage < paginationState.totalPages) {
-      this.goToPage(paginationState.currentPage + 1);
-    }
-  }
-
-  /**
-   * Navigate to the previous page
-   */
   public previousPage(): void {
-    const paginationState = this.getPaginationState();
-    if (paginationState.currentPage > 1) {
-      this.goToPage(paginationState.currentPage - 1);
-    }
+    previousPageHelper(this as unknown as PivotHeadHost);
   }
-
-  /**
-   * Change the page size
-   */
+  public nextPage(): void {
+    nextPageHelper(this as unknown as PivotHeadHost);
+  }
   public setPageSize(pageSize: number): void {
-    if (pageSize <= 0) {
-      console.error('Page size must be greater than 0');
-      return;
-    }
-
-    this.setPagination({
-      ...this.getPaginationState(),
-      pageSize,
-      currentPage: 1, // Reset to first page when changing page size
-    });
+    setPageSizeHelper(this as unknown as PivotHeadHost, pageSize);
   }
-
-  /**
-   * Method to reinitialize the engine
-   */
-  private reinitialize(): void {
-    console.log(this._options);
-    this.tryInitializeEngine();
+  public goToPage(page: number): void {
+    goToPageHelper(this as unknown as PivotHeadHost, page);
   }
-
-  public setFormatting(field: string, format: any): void {
-    if (!this._options.formatting) {
-      this._options.formatting = {};
+  public setViewMode(mode: 'raw' | 'processed'): void {
+    const wantRaw = mode === 'raw';
+    if (this._showRawData === wantRaw) return;
+    this._showRawData = wantRaw;
+    if (!this.engine) return;
+    try {
+      this.engine.setDataHandlingMode(wantRaw ? 'raw' : 'processed');
+      const currentFilters = wantRaw
+        ? this._rawFilters
+        : this._processedFilters;
+      this.engine.applyFilters(currentFilters);
+      this.dispatchEvent(
+        new CustomEvent('viewModeChange', {
+          detail: { mode },
+          bubbles: true,
+          composed: true,
+        })
+      );
+    } catch (err) {
+      console.error('Failed to set view mode:', err);
     }
-
-    this._options.formatting[field] = format;
-    this.reinitialize();
+  }
+  public getViewMode(): 'raw' | 'processed' {
+    return this._showRawData ? 'raw' : 'processed';
   }
 }
 
-// Register the web component
 customElements.define('pivot-head', PivotHeadElement);

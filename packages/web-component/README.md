@@ -1,6 +1,10 @@
-# PivotHead Headless Web Component
+# PivotHead Web Component
 
-A headless web component implementation of PivotHead that provides core pivot table functionality without any UI opinions. This allows you to build your own UI while leveraging the powerful PivotHead engine.
+A flexible web component for PivotHead. It supports three rendering modes so you can choose how much UI the component provides:
+
+- Default: built-in UI rendered by the component.
+- Minimal: component provides shell/slots; you own the inner markup.
+- None (headless): component renders nothing; you fully own the UI and just use its APIs/events.
 
 ## Installation
 
@@ -10,12 +14,82 @@ npm install @mindfiredigital/pivothead-web-component
 
 ## Core Concepts
 
-This is a headless component, meaning it:
+- Provides all pivot processing, state, and events.
+- You decide the rendering approach via the `mode` attribute: `default` | `minimal` | `none`.
+- Interact through properties/attributes, methods, and events (see API below).
 
-- Provides all data processing functionality
-- Handles state management
-- Emits state changes
-- Leaves UI rendering completely up to you
+## Modes
+
+### Default (full UI)
+
+The component renders a complete UI (filters, pagination, table, etc.).
+
+```html
+<pivot-head
+  data="[...]"
+  options='{"rows":[...],"columns":[...],"measures":[...]}'
+></pivot-head>
+```
+
+Notes:
+
+- Omit `mode` or set `mode="default"`.
+- Use events like `stateChange`, and methods like `sort`, `setPageSize` if needed.
+
+### Minimal (slots-based shell)
+
+The component renders a lightweight container with two slots you can fill:
+
+```html
+<pivot-head
+  mode="minimal"
+  data="[...]"
+  options='{"rows":[...],"columns":[...],"measures":[...]}'
+>
+  <div slot="header">...your toolbar...</div>
+  <div slot="body">...your table...</div>
+</pivot-head>
+```
+
+Notes:
+
+- You own the DOM inside `header` and `body` slots.
+- Read state via `getState()` and listen to `stateChange` to re-render.
+- Use exported helpers like `getGroupedData()`, `sort()`, pagination APIs, and export methods.
+
+### None (headless)
+
+The component renders no markup but exposes the full API and events.
+
+```html
+<pivot-head id="pivot" mode="none"></pivot-head>
+<script type="module">
+  const pivot = document.getElementById('pivot');
+  pivot.data = yourData;
+  pivot.options = yourOptions;
+  pivot.addEventListener('stateChange', e => {
+    const state = e.detail;
+    // Render your own UI here from state
+  });
+  // Call APIs like pivot.sort(...), pivot.setPageSize(...), pivot.exportToPDF(...)
+</script>
+```
+
+## Demos
+
+Run any demo with Vite from its folder:
+
+- `examples/pivothead-default-demo` – Default mode UI
+  - cd examples/pivothead-default-demo && npx vite
+- `examples/pivothead-minimal-demo` – Minimal mode with slots
+  - cd examples/pivothead-minimal-demo && npx vite
+- `examples/pivothead-none-demo` – Headless (mode="none") usage
+  - cd examples/pivothead-none-demo && npx vite
+
+Notes:
+
+- In this monorepo the demos alias the local build: `packages/web-component/dist/pivot-head.js`.
+- If using the published package outside the repo, install it and remove the alias in each demo’s `vite.config.js`.
 
 ## Usage
 
@@ -39,8 +113,7 @@ pivot.setAttribute('options', JSON.stringify(yourOptions));
 // Listen for state changes
 pivot.addEventListener('stateChange', e => {
   const state = e.detail;
-  const yourUI = renderPivotTable(state);
-  // Update your UI with the new state
+  renderPivotTable(state);
 });
 ```
 
