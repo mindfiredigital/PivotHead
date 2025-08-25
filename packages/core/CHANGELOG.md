@@ -1,5 +1,23 @@
 # @mindfiredigital/pivothead
 
+## 1.3.0
+
+### Minor Changes
+
+- update pnpm-lock.yaml for release error (#162)
+
+## 1.2.0
+
+### Minor Changes
+
+- fix unwanted private true (#160)
+
+## 1.1.1
+
+### Patch Changes
+
+- add types and update readme
+
 ## 1.1.0
 
 ### Minor Changes
