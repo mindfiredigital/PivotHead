@@ -1,5 +1,11 @@
 # @mindfiredigital/pivothead-web-component
 
+## 1.1.0
+
+### Minor Changes
+
+- release (#176)
+
 ## 1.0.5
 
 ### Patch Changes
