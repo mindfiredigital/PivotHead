@@ -44,6 +44,12 @@ export interface EnhancedPivotEngine<T extends Record<string, unknown>>
   getGroupedData(): Group[];
   getOrderedColumnValues(): string[] | null;
   getOrderedRowValues(): string[] | null;
+  // Allow UI to set a custom row/column order based on user sorting in processed mode
+  setCustomFieldOrder(
+    fieldName: string,
+    order: string[],
+    isRowField?: boolean
+  ): void;
 
   // exporting/printing
   exportToHTML(fileName: string): void;

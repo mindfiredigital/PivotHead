@@ -103,11 +103,11 @@ function renderProcessed(state) {
   const rowSortClass =
     store.sort.field === rowField.uniqueName ? ` sorted-${store.sort.dir}` : '';
   html += `<tr class="measures"><th class="sortable${rowSortClass}" data-sort-field="${rowField.uniqueName}">${rowField.caption}</th>`;
-  uniqueCols.forEach(() => {
+  uniqueCols.forEach(c => {
     measures.forEach(m => {
       const mSortClass =
         store.sort.field === m.uniqueName ? ` sorted-${store.sort.dir}` : '';
-      html += `<th class="sortable${mSortClass}" data-sort-field="${m.uniqueName}">${m.caption}</th>`;
+      html += `<th class="sortable${mSortClass}" data-sort-field="${m.uniqueName}" data-column-value="${c}" data-measure-unique="${m.uniqueName}" data-measure-agg="${m.aggregation}">${m.caption}</th>`;
     });
   });
   html += '</tr></thead><tbody>';
@@ -304,8 +304,74 @@ function wireTableInteractions() {
             ? 'desc'
             : 'asc';
         store.sort = { field, dir: nextDir };
+
+        // Determine if sorting the row header or a measure header under a specific column
+        let state;
+        try {
+          state = pivot.getState();
+        } catch {
+          state = null;
+        }
+        const groups =
+          typeof pivot.getGroupedData === 'function'
+            ? pivot.getGroupedData()
+            : [];
+        const rowFieldName = state?.rows?.[0]?.uniqueName || '';
+        const columnValue = th.getAttribute('data-column-value') || '';
+
+        if (rowFieldName && field === rowFieldName) {
+          // Alphabetical sort of row labels
+          const rowSet = new Set();
+          groups.forEach(g => {
+            const keys = g.key ? g.key.split('|') : [];
+            if (keys[0]) rowSet.add(keys[0]);
+          });
+          const rows = Array.from(rowSet);
+          rows.sort((a, b) =>
+            nextDir === 'asc'
+              ? String(a).localeCompare(String(b))
+              : String(b).localeCompare(String(a))
+          );
+          store.rowOrder = rows;
+        } else if (columnValue) {
+          // Sort rows by the selected column's measure aggregate
+          const measures = state?.measures || [];
+          const measureCfg = measures.find(m => m.uniqueName === field);
+          const aggregation =
+            measureCfg && measureCfg.aggregation
+              ? measureCfg.aggregation
+              : 'sum';
+          const aggKey = `${aggregation}_${field}`;
+
+          const allRowSet = new Set();
+          groups.forEach(g => {
+            const keys = g.key ? g.key.split('|') : [];
+            if (keys[0]) allRowSet.add(keys[0]);
+          });
+          const allRows = Array.from(allRowSet);
+
+          const pairs = allRows.map(rv => {
+            const grp = groups.find(gr => {
+              const keys = gr.key ? gr.key.split('|') : [];
+              return keys[0] === rv && keys[1] === columnValue;
+            });
+            const val = Number((grp?.aggregates || {})[aggKey] ?? 0);
+            return { row: rv, val: Number.isFinite(val) ? val : 0 };
+          });
+          pairs.sort((a, b) =>
+            nextDir === 'asc' ? a.val - b.val : b.val - a.val
+          );
+          store.rowOrder = pairs.map(p => p.row);
+        } else {
+          // Fallback: clear custom order
+          store.rowOrder = [];
+        }
+
         if (pivot.sort) pivot.sort(field, nextDir);
-        store.rowOrder = [];
+        // Re-render immediately so arrows and order update synchronously
+        try {
+          renderFromState(pivot.getState());
+        } catch {}
       } else {
         const store = getCurrentStore();
         const nextDir =
@@ -315,6 +381,9 @@ function wireTableInteractions() {
         store.sort = { field, dir: nextDir };
         // Delegate RAW sorting to engine to keep indices in sync
         if (field && pivot.sort) pivot.sort(field, nextDir);
+        try {
+          renderFromState(pivot.getState());
+        } catch {}
       }
     };
   });
@@ -332,6 +401,9 @@ function wireTableInteractions() {
             : 'asc';
         store.sort = { field, dir: nextDir };
         if (pivot.sort) pivot.sort(field, nextDir);
+        try {
+          renderFromState(pivot.getState());
+        } catch {}
       });
     });
   }

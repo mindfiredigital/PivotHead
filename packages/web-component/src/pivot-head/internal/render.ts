@@ -254,15 +254,18 @@ export function renderFullUI(host: PivotHeadHost) {
       </div>
     `;
 
+  // Determine column labels using engine's custom column order if any
   const groupedData = engine.getGroupedData();
-  let uniqueColumnValues = [
-    ...new Set(
-      groupedData.map((g: Group) => {
-        const keys = g.key ? g.key.split('|') : [];
-        return keys[1] || keys[0];
-      })
-    ),
-  ].filter(Boolean) as string[];
+  let uniqueColumnValues =
+    engine.getOrderedColumnValues() ||
+    ([
+      ...new Set(
+        groupedData.map((g: Group) => {
+          const keys = g.key ? g.key.split('|') : [];
+          return keys[1] || keys[0];
+        })
+      ),
+    ].filter(Boolean) as string[]);
   if (host._processedColumnOrder.length === 0) {
     host._processedColumnOrder = [...uniqueColumnValues];
   }
@@ -277,7 +280,7 @@ export function renderFullUI(host: PivotHeadHost) {
   html += '<tr>';
   html += `<th class="corner-cell">${rowField.caption} / ${columnField.caption}</th>`;
   uniqueColumnValues.forEach((colValue, index) => {
-    html += `<th class="column-header" draggable="true" data-column-index="${index}" colspan="${measures.length}">${colValue}</th>`;
+    html += `<th class="column-header" draggable="true" data-column-index="${index}" data-column-value="${colValue}" colspan="${measures.length}">${colValue}</th>`;
   });
   html += '</tr>';
   html += '<tr>';
@@ -285,10 +288,10 @@ export function renderFullUI(host: PivotHeadHost) {
   html += `<th class="row-cell sortable-header" data-field="${rowField.uniqueName}">
       ${rowField.caption}${rowSortIcon}
     </th>`;
-  uniqueColumnValues.forEach(() => {
+  uniqueColumnValues.forEach(colValue => {
     measures.forEach((measure: MeasureConfig, measureIndex: number) => {
       const sortIcon = host.createProcessedSortIcon(measure.uniqueName);
-      html += `<th class="measure-header sortable-header" data-measure-index="${measureIndex}" data-field="${measure.uniqueName}">
+      html += `<th class="measure-header sortable-header" data-measure-index="${measureIndex}" data-field="${measure.uniqueName}" data-column-value="${colValue}">
           ${measure.caption}${sortIcon}
         </th>`;
     });
@@ -297,17 +300,21 @@ export function renderFullUI(host: PivotHeadHost) {
   html += '</thead>';
   html += '<tbody>';
 
-  const engineState = engine.getState();
-  const processedRows = engineState.processedData.rows || [];
-  const uniqueRowValues: string[] = [];
-  const seenRowValues = new Set<string>();
-  processedRows.forEach((row: unknown[]) => {
-    const rowValue = row[0] as string;
-    if (!seenRowValues.has(rowValue)) {
-      uniqueRowValues.push(rowValue);
-      seenRowValues.add(rowValue);
-    }
-  });
+  // Prefer engine-provided ordered row values (custom or due to sorting)
+  const orderedFromEngine = engine.getOrderedRowValues() || [];
+  let uniqueRowValues: string[] = [...orderedFromEngine];
+  if (uniqueRowValues.length === 0) {
+    // Fallback: derive row values from all grouped data keys so we don't miss any groups
+    const allGroups = engine.getGroupedData();
+    uniqueRowValues = [
+      ...new Set(
+        allGroups.map((g: Group) => {
+          const keys = g.key ? g.key.split('|') : [];
+          return keys[0];
+        })
+      ),
+    ].filter(Boolean) as string[];
+  }
   const paginatedRowValues = host.getPaginatedData(uniqueRowValues);
   paginatedRowValues.forEach((rowValue, rowIndex) => {
     html += `<tr draggable="true" data-row-index="${rowIndex}" data-row-value="${rowValue}">`;
@@ -364,7 +371,8 @@ export function renderRawTable(host: PivotHeadHost) {
   const engine = host.engine;
   if (!engine) return;
   const state = engine.getState();
-  const allRawData = state.data || state.rawData || [];
+  // Prefer full rawData first; state.data could be limited by engine defaults
+  const allRawData = state.rawData || state.data || [];
   if (!allRawData.length) return;
   host.updatePaginationForData(allRawData);
   const displayData = host.getPaginatedData(allRawData);

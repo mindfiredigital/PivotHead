@@ -282,6 +282,8 @@ export function handleSortClick(host: PivotHeadHost, e: Event): void {
   if (!header) return;
   const field = header.dataset.field;
   if (!field) return;
+
+  // Calculate next direction based on current engine state
   const state = host.engine.getState();
   const current =
     state.sortConfig && state.sortConfig.length > 0
@@ -291,6 +293,90 @@ export function handleSortClick(host: PivotHeadHost, e: Event): void {
     current && current.field === field && current.direction === 'asc'
       ? 'desc'
       : 'asc';
+
+  // In processed mode, clicking a measure header under a specific column
+  // should sort ROWS by that column's measure aggregate. We compute the row
+  // order and store it in the engine as a custom row order so rendering uses it.
+  if (!host._showRawData) {
+    const isMeasureHeader = header.hasAttribute('data-measure-index');
+    const columnValue = header.getAttribute('data-column-value') || '';
+
+    if (isMeasureHeader && columnValue) {
+      try {
+        const measures = (host._options.measures || []) as Array<{
+          uniqueName: string;
+          aggregation?: string;
+        }>;
+        const measureCfg = measures.find(m => m.uniqueName === field);
+        const aggregation = (measureCfg?.aggregation as string) || 'sum';
+        const aggKey = `${aggregation}_${field}`;
+
+        const groups = host.engine.getGroupedData();
+
+        // Build the full set of row values across ALL groups (not just those that appear for the selected column)
+        const allRowSet = new Set<string>();
+        groups.forEach(g => {
+          const keys = g.key ? g.key.split('|') : [];
+          if (keys[0]) allRowSet.add(keys[0]);
+        });
+        const allRowValues = Array.from(allRowSet);
+
+        // Create [row, value] pairs for the target column; treat missing intersections as 0
+        const pairs = allRowValues.map(rv => {
+          const grp = groups.find(gr => {
+            const keys = gr.key ? gr.key.split('|') : [];
+            return keys[0] === rv && keys[1] === columnValue;
+          });
+          const aggregates = (grp?.aggregates || {}) as Record<string, number>;
+          const val = Number(aggregates[aggKey] ?? 0);
+          return { row: rv, val: isFinite(val) ? val : 0 };
+        });
+
+        // Sort according to nextDir, keeping zero-value rows included
+        pairs.sort((a, b) =>
+          nextDir === 'asc' ? a.val - b.val : b.val - a.val
+        );
+        const orderedRows = pairs.map(p => p.row);
+
+        const rowFieldName = host._options.rows?.[0]?.uniqueName || '';
+        if (rowFieldName && orderedRows.length > 0) {
+          host.engine.setCustomFieldOrder(rowFieldName, orderedRows, true);
+        }
+      } catch (err) {
+        console.error(
+          'Failed to compute/set custom row order for processed sort:',
+          err
+        );
+      }
+    } else {
+      // If sorting by the row dimension header, compute alphabetical order
+      const rowFieldName = host._options.rows?.[0]?.uniqueName || '';
+      if (rowFieldName && field === rowFieldName) {
+        try {
+          const groups = host.engine.getGroupedData();
+          const rowSet = new Set<string>();
+          groups.forEach(g => {
+            const keys = g.key ? g.key.split('|') : [];
+            if (keys[0]) rowSet.add(keys[0]);
+          });
+          const rows = Array.from(rowSet);
+          rows.sort((a, b) =>
+            nextDir === 'asc' ? a.localeCompare(b) : b.localeCompare(a)
+          );
+          if (rows.length > 0) {
+            host.engine.setCustomFieldOrder(rowFieldName, rows, true);
+          }
+        } catch (err) {
+          console.error(
+            'Failed to set custom row order for dimension sort:',
+            err
+          );
+        }
+      }
+    }
+  }
+
+  // Also call engine.sort to update its sort state (icons) and internal groups
   host.engine.sort(field, nextDir);
 }
 
