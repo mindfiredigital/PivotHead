@@ -40,7 +40,7 @@ const PivotHeadDemo = () => {
             console.log('✅ Engine state from polling:', s);
             setState(s);
             clearInterval(interval);
-          } catch (error) {
+          } catch {
             console.log('Engine not ready yet, continuing to poll...');
           }
         }
