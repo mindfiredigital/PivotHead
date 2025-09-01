@@ -117,6 +117,7 @@ export function renderFullUI(host: PivotHeadHost) {
         .drag-over { outline: 2px dashed #2672dd; background: #f3f8fd !important; }
         tbody tr:nth-child(even) td { background: #f8fafc; }
         button { padding: 5px 10px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #45a049; }
         button:disabled { background-color: #cccccc; cursor: not-allowed; }
         select, input { padding: 5px; border-radius: 4px; border: 1px solid #ddd; }
         
@@ -247,6 +248,7 @@ export function renderFullUI(host: PivotHeadHost) {
           <button id="nextPage">Next</button>
         </div>
         <button id="switchView">Switch to Raw Data</button>
+        <button id="formatButton">Format</button>
         <button id="exportHTML">Export HTML</button>
         <button id="exportPDF">Export PDF</button>
         <button id="exportExcel">Export Excel</button>
@@ -333,11 +335,7 @@ export function renderFullUI(host: PivotHeadHost) {
           | null;
         let formattedValue = '0';
         if (value !== undefined && value !== null) {
-          if (typeof value === 'number') {
-            formattedValue = value.toLocaleString();
-          } else if (String(value).trim() !== '') {
-            formattedValue = String(value);
-          }
+          formattedValue = engine.formatValue(value, measure.uniqueName);
         }
         const hasData =
           value !== undefined && value !== null && Number(value) > 0;
@@ -345,7 +343,9 @@ export function renderFullUI(host: PivotHeadHost) {
         const cellTitle = hasData
           ? `Double-click to see details for ${rowField.caption}: ${rowValue} - ${columnField.caption}: ${colValue}`
           : '';
+        const textAlign = engine.getFieldAlignment(measure.uniqueName);
         html += `<td class="${cellClass}" 
+                      style="text-align: ${textAlign};"
                       title="${cellTitle}"
                       data-row-value="${rowValue}" 
                       data-column-value="${colValue}" 
@@ -403,6 +403,7 @@ export function renderRawTable(host: PivotHeadHost) {
         .drag-over { outline: 2px dashed #2672dd; background: #f3f8fd !important; }
         tbody tr:nth-child(even) td { background: #f8fafc; }
         button { padding: 5px 10px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #45a049; }
         button:disabled { background-color: #cccccc; cursor: not-allowed; }
         select, input { padding: 5px; border-radius: 4px; border: 1px solid #ddd; }
       </style>
@@ -433,6 +434,7 @@ export function renderRawTable(host: PivotHeadHost) {
           <button id="nextPage">Next</button>
         </div>
         <button id="switchView">Switch to Processed Data</button>
+        <button id="formatButton">Format</button>
         <button id="exportHTML">Export HTML</button>
         <button id="exportPDF">Export PDF</button>
         <button id="exportExcel">Export Excel</button>
@@ -453,7 +455,13 @@ export function renderRawTable(host: PivotHeadHost) {
     const pivotRow = row as Record<string, unknown>;
     html += `<tr draggable="true" data-row-index="${rowIndex}">`;
     headers.forEach(header => {
-      html += `<td>${pivotRow[header]}</td>`;
+      const cellValue = pivotRow[header];
+      let formattedValue = cellValue;
+      if (cellValue !== undefined && cellValue !== null) {
+        formattedValue = engine.formatValue(cellValue, header);
+      }
+      const textAlign = engine.getFieldAlignment(header);
+      html += `<td style="text-align: ${textAlign};">${formattedValue}</td>`;
     });
     html += '</tr>';
   });
