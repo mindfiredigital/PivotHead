@@ -1,0 +1,11 @@
+body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:24px;color:#111}
+h2{margin:0 0 8px}
+.toolbar{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.toolbar .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.grid table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #e5e7eb}
+.grid th,.grid td{border:1px solid #e5e7eb;padding:8px;text-align:left}
+.grid th{background:#f8fafc;font-weight:600}
+.grid th.sortable{cursor:pointer}
+.grid th.draggable[draggable="true"], .grid tr.draggable[draggable="true"]{cursor:grab}
+.grid .drag-over{outline:2px dashed #2563eb;background:#eff6ff}
+.grid tbody tr:nth-child(even) td{background:#f9fafb}

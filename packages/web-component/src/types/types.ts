@@ -7,142 +7,89 @@ import type {
   AggregationType,
   Group,
   MeasureConfig,
-  ProcessedData,
-  RowSize,
-  SortConfig,
+  PivotEngine,
+  PivotTableState,
+  AxisConfig,
 } from '@mindfiredigital/pivothead';
 
-export interface EnhancedPivotEngine<T extends Record<string, any>> {
+// Define a type for pivot data records
+export type PivotDataRecord = Record<string, unknown>;
+
+// Enhanced interface extending PivotEngine with additional methods (superset)
+// Supports both legacy and current method signatures used across the web-component
+export interface EnhancedPivotEngine<T extends Record<string, unknown>>
+  extends PivotEngine<T> {
+  // state helpers
+  state: PivotTableState<T>;
+  subscribe(fn: (state: PivotTableState<T>) => void): () => void;
+
+  // filtering
   applyFilters(filters: FilterConfig[]): void;
-  setPagination(config: PaginationConfig): void;
-  setMeasures(measures: Measure[]): void;
-  setDimensions(dimensions: Dimension[]): void;
   getFilterState(): FilterConfig[];
-  getPaginationState(): PaginationConfig;
-  reset(): void;
-  sort(field: string, direction: 'asc' | 'desc'): void;
+
+  // measures/dimensions (overloads to support Measure and MeasureConfig)
+  setMeasures(measures: Measure[]): void;
+  setMeasures(measures: MeasureConfig[]): void;
+  setDimensions(dimensions: Dimension[]): void;
+
+  // grouping/aggregation
   setGroupConfig(config: GroupConfig | null): void;
+  setAggregation(type: AggregationType): void;
+
+  // sorting
+  sort(field: string, direction: 'asc' | 'desc'): void;
+
+  // formatting & data access
+  formatValue(value: unknown, field: string): string;
+  getGroupedData(): Group[];
+  getOrderedColumnValues(): string[] | null;
+  getOrderedRowValues(): string[] | null;
+  // Allow UI to set a custom row/column order based on user sorting in processed mode
+  setCustomFieldOrder(
+    fieldName: string,
+    order: string[],
+    isRowField?: boolean
+  ): void;
+
+  // exporting/printing
+  exportToHTML(fileName: string): void;
+  exportToPDF(fileName: string): void;
+  exportToExcel(fileName: string): void;
+  openPrintDialog(): void;
+
+  // dnd / structure
+  dragRow(fromIndex: number, toIndex: number): void;
+  dragColumn(fromIndex: number, toIndex: number): void;
+  swapDataRows(fromIndex: number, toIndex: number): void;
+  swapRawDataRows(fromIndex: number, toIndex: number): void;
+  swapDataColumns(fromIndex: number, toIndex: number): void;
+  setRowGroups(rowGroups: Group[]): void;
+  setColumnGroups(columnGroups: Group[]): void;
+  toggleRowExpansion(rowId: string): void;
+  isRowExpanded(rowId: string): boolean;
+
+  // pagination
+  setPagination(config: PaginationConfig): void;
+  getPagination(): PaginationConfig;
+  getPaginationState(): PaginationConfig;
+
+  // data handling modes & updates
+  setDataHandlingMode(mode: 'raw' | 'processed'): void;
+  getDataHandlingMode(): 'raw' | 'processed';
+  updateDataSource(newData: T[]): void;
+
+  // reset
+  reset(): void;
 }
-export interface FieldFormat {
-  type: 'currency' | 'number' | 'percentage' | 'date';
-  decimals?: number;
-  locale?: string;
-  currency?: string;
+
+// Define a type for pivot options used by the component
+export interface PivotOptions {
+  rows?: AxisConfig[];
+  columns?: AxisConfig[];
+  measures?: MeasureConfig[];
+  groupConfig?: GroupConfig;
+  [key: string]: unknown;
 }
 
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-// // export type AggregationType = "sum" | "avg" | "count" | "min" | "max"
-
-// // export interface Dimension {
-// //   uniqueName: string
-// //   caption?: string
-// //   dataType?: "string" | "number" | "date" | "boolean"
-// //   hierarchyName?: string
-// //   levelName?: string
-// // }
-
-// // export interface MeasureConfig {
-// //   uniqueName: string
-// //   caption?: string
-// //   aggregation?: AggregationType
-// //   formula?: (item: any) => number
-// //   format?: FormatConfig
-// // }
-
-// // export interface FormatConfig {
-// //   type: "currency" | "number" | "percentage" | "date"
-// //   locale?: string
-// //   currency?: string
-// //   decimals?: number
-// // }
-
-// // export interface SortConfig {
-// //   field: string
-// //   direction: "asc" | "desc"
-// //   type: "measure" | "dimension"
-// //   aggregation?: AggregationType
-// // }
-
-// // export interface FilterConfig {
-// //   field: string
-// //   operator: "equals" | "contains" | "greaterThan" | "lessThan" | "between"
-// //   value: any
-// // }
-
-// // export interface PaginationConfig {
-// //   currentPage: number
-// //   pageSize: number
-// //   totalPages: number
-// // }
-
-// // export interface GroupConfig {
-// //   rowFields: string[]
-// //   columnFields: string[]
-// //   grouper: (item: any, fields: string[]) => string
-// // }
-
-// // export interface Group {
-// //   key: string
-// //   items: any[]
-// //   subgroups?: Group[]
-// //   aggregates: Record<string, number>
-// // }
-
-// // export interface RowSize {
-// //   index: number
-// //   height: number
-// // }
-
-// // export interface ProcessedData {
-// //   headers: string[]
-// //   rows: any[][]
-// //   totals: Record<string, number>
-// // }
-
-// export interface DataSource {
-//   type: "remote" | "file"
-//   url?: string
-//   file?: File
-// }
-
-// export interface PivotTableConfig<T extends Record<string, any>> {
-//   data?: T[]
-//   dataSource?: DataSource
-//   rows?: Dimension[]
-//   columns?: Dimension[]
-//   setMeasures(measures: Measure[]): void;
-//   dimensions?: Dimension[]
-//   defaultAggregation?: AggregationType
-//   formatting?: Record<string, SortConfig>
-//   groupConfig?: GroupConfig | null
-//   initialSort?: SortConfig[]
-//   pageSize?: number
-//   isResponsive?: boolean
-//   onRowDragEnd?: (fromIndex: number, toIndex: number, data: T[]) => void
-//   onColumnDragEnd?: (fromIndex: number, toIndex: number, columns: Dimension[]) => void
-// }
-
-// export interface PivotTableState<T extends Record<string, any>> {
-//   data: T[]
-//   processedData: ProcessedData
-//   rows: Dimension[]
-//   columns: Dimension[]
-//   measures: MeasureConfig[]
-//   sortConfig: SortConfig[]
-//   rowSizes: RowSize[]
-//   expandedRows: Record<string, boolean>
-//   groupConfig: GroupConfig | null
-//   groups: Group[]
-//   selectedMeasures: MeasureConfig[]
-//   selectedDimensions: Dimension[]
-//   selectedAggregation: AggregationType
-//   formatting: Record<string, SortConfig>
-//   columnWidths: Record<string, number>
-//   isResponsive: boolean
-//   rowGroups: Group[]
-//   columnGroups: Group[]
-//   filterConfig: FilterConfig[]
-//   paginationConfig: PaginationConfig
-// }
+// The following legacy types are kept for compatibility with prior codegen (commented)
+// export interface FieldFormat { type: 'currency' | 'number' | 'percentage' | 'date'; decimals?: number; locale?: string; currency?: string; }
