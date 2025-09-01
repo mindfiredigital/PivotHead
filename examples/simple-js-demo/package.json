@@ -3,7 +3,9 @@
   "private": true,
   "version": "1.0.8",
   "dependencies": {
-    "@mindfiredigital/pivothead": "workspace:*"
+    "@mindfiredigital/pivothead": "workspace:*",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.2"
   },
   "scripts": {
     "dev": "vite"

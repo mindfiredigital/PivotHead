@@ -94,14 +94,17 @@ export function createHeader(config) {
               break;
             case 'To HTML':
               dropdown.style.display = 'none';
+              console.log('Exporting to HTML...');
               exportToHTML(pivotEngine);
               break;
             case 'To Excel':
               dropdown.style.display = 'none';
+              console.log('Exporting to Excel...');
               exportToExcel(pivotEngine);
               break;
             case 'To PDF':
               dropdown.style.display = 'none';
+              console.log('Exporting to PDF...');
               exportToPDF(pivotEngine);
               break;
             default:

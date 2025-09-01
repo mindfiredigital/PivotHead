@@ -1,8 +1,8 @@
-/* PivotHead Demo
+/* PivotHead Demo - Fixed Sorting Implementation
  *
  * This file demonstrates the usage of the PivotheadCore library to create an interactive pivot table.
  * Features include:
- * - Sorting
+ * - Sorting (FIXED)
  * - Grouping
  * - Column resizing
  * - Column reordering (drag and drop)
@@ -70,11 +70,14 @@ function getPaginatedData(data, paginationState) {
   return data.slice(start, end);
 }
 
-// Helper function to create sort icons
+// FIXED: Helper function to create sort icons with proper state tracking
 function createSortIcon(field, currentSortConfig) {
   const sortIcon = document.createElement('span');
   sortIcon.style.marginLeft = '5px';
   sortIcon.style.display = 'inline-block';
+  sortIcon.style.cursor = 'pointer';
+  sortIcon.style.fontSize = '12px';
+  sortIcon.style.userSelect = 'none';
 
   // Check if this field is currently being sorted
   const isCurrentlySorted =
@@ -82,19 +85,35 @@ function createSortIcon(field, currentSortConfig) {
 
   if (isCurrentlySorted) {
     if (currentSortConfig.direction === 'asc') {
-      sortIcon.innerHTML = '&#9650;'; // Up arrow
-      sortIcon.title = 'Sorted ascending';
+      sortIcon.innerHTML = '▲'; // Up triangle
+      sortIcon.title = `Sorted by ${field} ascending - click to sort descending`;
+      sortIcon.style.color = '#007bff';
     } else {
-      sortIcon.innerHTML = '&#9660;'; // Down arrow
-      sortIcon.title = 'Sorted descending';
+      sortIcon.innerHTML = '▼'; // Down triangle
+      sortIcon.title = `Sorted by ${field} descending - click to sort ascending`;
+      sortIcon.style.color = '#007bff';
     }
-    sortIcon.style.color = '#007bff';
   } else {
-    sortIcon.innerHTML = '&#8693;'; // Up/down arrow
-    sortIcon.title = 'Click to sort';
+    sortIcon.innerHTML = '↕'; // Up/down arrow
+    sortIcon.title = `Click to sort by ${field}`;
     sortIcon.style.color = '#6c757d';
-    sortIcon.style.opacity = '0.5';
+    sortIcon.style.opacity = '0.7';
   }
+
+  // Add hover effect
+  sortIcon.addEventListener('mouseenter', () => {
+    if (!isCurrentlySorted) {
+      sortIcon.style.opacity = '1';
+      sortIcon.style.color = '#007bff';
+    }
+  });
+
+  sortIcon.addEventListener('mouseleave', () => {
+    if (!isCurrentlySorted) {
+      sortIcon.style.opacity = '0.7';
+      sortIcon.style.color = '#6c757d';
+    }
+  });
 
   return sortIcon;
 }
@@ -199,6 +218,7 @@ function swapRawDataColumns(fromIndex, toIndex) {
   renderRawDataTable();
 }
 
+// FIXED: Raw data table rendering with proper sort icons
 function renderRawDataTable() {
   try {
     console.log('Rendering raw data table');
@@ -247,6 +267,9 @@ function renderRawDataTable() {
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
 
+    // Get current sort state for raw data
+    const currentSort = window.rawDataSort || {};
+
     headers.forEach((headerText, index) => {
       const th = document.createElement('th');
       th.style.padding = '12px';
@@ -255,6 +278,7 @@ function renderRawDataTable() {
       th.style.borderRight = '1px solid #dee2e6';
       th.style.cursor = 'pointer';
       th.style.position = 'relative';
+      th.style.userSelect = 'none';
 
       th.setAttribute('draggable', 'true');
       th.dataset.columnIndex = index;
@@ -270,15 +294,19 @@ function renderRawDataTable() {
       headerSpan.textContent = getFieldDisplayName(headerText);
       headerContent.appendChild(headerSpan);
 
-      const sortIcon = document.createElement('span');
-      sortIcon.innerHTML = '↕️';
-      sortIcon.style.marginLeft = '5px';
-      sortIcon.style.fontSize = '12px';
+      // FIXED: Use the proper sort icon function with current state
+      const sortIcon = createSortIcon(headerText, {
+        field: currentSort.column,
+        direction: currentSort.direction,
+      });
       headerContent.appendChild(sortIcon);
 
       th.appendChild(headerContent);
 
-      th.addEventListener('click', () => {
+      // FIXED: Click handler for sorting
+      th.addEventListener('click', e => {
+        // Prevent drag when clicking on sort
+        e.stopPropagation();
         sortRawDataByColumn(headerText, rawDataToUse);
       });
 
@@ -381,22 +409,165 @@ function getOrderedColumnValues() {
     console.warn('PivotEngine not initialized');
     return [];
   }
+
+  const state = pivotEngine.getState();
   const columnFieldName = pivotEngine.getColumnFieldName();
   if (!columnFieldName) return [];
+
+  // For processed mode, get unique values from processed data (which is already sorted)
+  if (
+    state.dataHandlingMode === 'processed' &&
+    state.processedData &&
+    state.processedData.rows
+  ) {
+    // Extract unique column values from processed data rows
+    // Column field values are after row field values
+    const rowFieldCount = state.rows ? state.rows.length : 0;
+    const uniqueColumnValues = [
+      ...new Set(state.processedData.rows.map(row => row[rowFieldCount])),
+    ];
+    console.log('Using processed data column values:', uniqueColumnValues);
+    return uniqueColumnValues;
+  }
 
   return pivotEngine.getOrderedUniqueFieldValues(columnFieldName, false);
 }
 
 // Generic function to get ordered row values
+// function getOrderedRowValues() {
+//   if (!pivotEngine) {
+//     console.warn('PivotEngine not initialized');
+//     return [];
+//   }
+//   const rowFieldName = pivotEngine.getRowFieldName();
+//   if (!rowFieldName) return [];
+
+//   return pivotEngine.getOrderedUniqueFieldValues(rowFieldName, true);
+// }
+
 function getOrderedRowValues() {
   if (!pivotEngine) {
     console.warn('PivotEngine not initialized');
     return [];
   }
+
+  const state = pivotEngine.getState();
   const rowFieldName = pivotEngine.getRowFieldName();
+
   if (!rowFieldName) return [];
 
-  return pivotEngine.getOrderedUniqueFieldValues(rowFieldName, true);
+  // For processed mode, handle sorting correctly
+  if (state.dataHandlingMode === 'processed') {
+    // Check if we have a sort configuration
+    const sortConfig =
+      state.sortConfig && state.sortConfig.length > 0
+        ? state.sortConfig[0]
+        : null;
+
+    if (sortConfig && sortConfig.type === 'measure') {
+      // For measure sorting in processed mode, sort rows by their aggregated totals
+      return getSortedRowValuesByMeasure(
+        rowFieldName,
+        pivotEngine.getColumnFieldName(),
+        sortConfig
+      );
+    } else if (sortConfig && sortConfig.field === rowFieldName) {
+      // For row field sorting in processed mode, sort alphabetically
+      const uniqueRowValues = pivotEngine.getUniqueFieldValues(rowFieldName);
+      return [...uniqueRowValues].sort((a, b) => {
+        const result = a.localeCompare(b);
+        return sortConfig.direction === 'asc' ? result : -result;
+      });
+    } else {
+      // No sorting or different field sorting, use default order
+      return pivotEngine.getUniqueFieldValues(rowFieldName);
+    }
+  }
+
+  // For raw mode, use the existing sorting logic
+  // Check if we have a sort configuration
+  const sortConfig =
+    state.sortConfig && state.sortConfig.length > 0
+      ? state.sortConfig[0]
+      : null;
+
+  if (sortConfig && sortConfig.type === 'measure') {
+    // For measure sorting, sort rows by their aggregated totals
+    return getSortedRowValuesByMeasure(
+      rowFieldName,
+      pivotEngine.getColumnFieldName(),
+      sortConfig
+    );
+  } else if (sortConfig && sortConfig.field === rowFieldName) {
+    // For row field sorting, sort alphabetically
+    const uniqueRowValues = pivotEngine.getUniqueFieldValues(rowFieldName);
+    return [...uniqueRowValues].sort((a, b) => {
+      const result = a.localeCompare(b);
+      return sortConfig.direction === 'asc' ? result : -result;
+    });
+  }
+
+  // Default: return unique row values in original order
+  return pivotEngine.getUniqueFieldValues(rowFieldName);
+}
+
+function getSortedRowValuesByMeasure(
+  rowFieldName,
+  columnFieldName,
+  sortConfig
+) {
+  const state = pivotEngine.getState();
+  const uniqueRowValues = pivotEngine.getUniqueFieldValues(rowFieldName);
+  const uniqueColumnValues = pivotEngine.getUniqueFieldValues(columnFieldName);
+
+  console.log(
+    'Sorting rows by measure:',
+    sortConfig.field,
+    'direction:',
+    sortConfig.direction
+  );
+
+  // Find the measure configuration
+  const measure = state.measures.find(m => m.uniqueName === sortConfig.field);
+  if (!measure) {
+    console.error('Measure not found:', sortConfig.field);
+    return uniqueRowValues;
+  }
+
+  // Calculate total aggregated value for each row across all columns
+  const rowTotals = uniqueRowValues.map(rowValue => {
+    let total = 0;
+
+    // Sum the measure values across all columns for this row
+    uniqueColumnValues.forEach(columnValue => {
+      const cellValue = pivotEngine.calculateCellValue(
+        rowValue,
+        columnValue,
+        measure,
+        rowFieldName,
+        columnFieldName
+      );
+      total += cellValue || 0;
+    });
+
+    return {
+      rowValue,
+      total,
+    };
+  });
+
+  console.log('Row totals before sorting:', rowTotals.slice(0, 3));
+
+  // Sort by total
+  rowTotals.sort((a, b) => {
+    const result = a.total - b.total;
+    return sortConfig.direction === 'asc' ? result : -result;
+  });
+
+  console.log('Row totals after sorting:', rowTotals.slice(0, 3));
+
+  // Return just the sorted row values
+  return rowTotals.map(item => item.rowValue);
 }
 
 function setupRawDataDragAndDrop(rawData) {
@@ -494,6 +665,7 @@ function setupRawDataDragAndDrop(rawData) {
   });
 }
 
+// FIXED: Main table rendering function with proper pivot engine sorting
 function renderTable() {
   // Check current view mode
   if (currentViewMode === 'raw') {
@@ -577,7 +749,12 @@ function renderTable() {
     thead.appendChild(columnHeaderRow);
 
     const measureHeaderRow = document.createElement('tr');
-    const currentSortConfig = state.sortConfig?.[0];
+
+    // FIXED: Get current sort configuration from the engine
+    const currentSortConfig =
+      state.sortConfig && state.sortConfig.length > 0
+        ? state.sortConfig[0]
+        : null;
 
     const rowHeader = document.createElement('th');
     rowHeader.style.padding = '12px';
@@ -585,24 +762,39 @@ function renderTable() {
     rowHeader.style.borderBottom = '2px solid #dee2e6';
     rowHeader.style.borderRight = '1px solid #dee2e6';
     rowHeader.style.cursor = 'pointer';
+    rowHeader.style.userSelect = 'none';
 
     const rowHeaderContent = document.createElement('div');
     rowHeaderContent.style.display = 'flex';
     rowHeaderContent.style.alignItems = 'center';
+    rowHeaderContent.style.justifyContent = 'space-between';
+
     const rowText = document.createElement('span');
     rowText.textContent = getFieldDisplayName(rowFieldName);
     rowHeaderContent.appendChild(rowText);
 
+    // FIXED: Use the proper sort icon function
     const rowSortIcon = createSortIcon(rowFieldName, currentSortConfig);
     rowHeaderContent.appendChild(rowSortIcon);
     rowHeader.appendChild(rowHeaderContent);
 
-    rowHeader.addEventListener('click', () => {
+    // FIXED: Proper sort event handler
+    rowHeader.addEventListener('click', e => {
+      e.stopPropagation();
+      console.log(
+        'Sorting by row field:',
+        rowFieldName,
+        'Current sort:',
+        currentSortConfig
+      );
+
       const direction =
         currentSortConfig?.field === rowFieldName &&
         currentSortConfig?.direction === 'asc'
           ? 'desc'
           : 'asc';
+
+      console.log('Applying sort direction:', direction);
       pivotEngine.sort(rowFieldName, direction);
     });
     measureHeaderRow.appendChild(rowHeader);
@@ -615,25 +807,39 @@ function renderTable() {
         th.style.borderBottom = '2px solid #dee2e6';
         th.style.borderRight = '1px solid #dee2e6';
         th.style.cursor = 'pointer';
+        th.style.userSelect = 'none';
 
         const headerContent = document.createElement('div');
         headerContent.style.display = 'flex';
         headerContent.style.alignItems = 'center';
         headerContent.style.justifyContent = 'space-between';
+
         const measureText = document.createElement('span');
         measureText.textContent = measure.caption;
         headerContent.appendChild(measureText);
 
+        // FIXED: Use the proper sort icon function
         const sortIcon = createSortIcon(measure.uniqueName, currentSortConfig);
         headerContent.appendChild(sortIcon);
         th.appendChild(headerContent);
 
-        th.addEventListener('click', () => {
+        // FIXED: Proper sort event handler for measures
+        th.addEventListener('click', e => {
+          e.stopPropagation();
+          console.log(
+            'Sorting by measure:',
+            measure.uniqueName,
+            'Current sort:',
+            currentSortConfig
+          );
+
           const direction =
             currentSortConfig?.field === measure.uniqueName &&
             currentSortConfig?.direction === 'asc'
               ? 'desc'
               : 'asc';
+
+          console.log('Applying sort direction:', direction);
           pivotEngine.sort(measure.uniqueName, direction);
         });
         measureHeaderRow.appendChild(th);
@@ -683,24 +889,10 @@ function renderTable() {
           );
 
           // Use engine's formatValue method
-          // const formattedValue = pivotEngine.formatValue(value, measure.uniqueName);
-
           const formattedValue = pivotEngine.formatValue(
             value,
             measure.uniqueName
           );
-          const format = measure.format || {};
-          if (
-            format.type === 'currency' &&
-            (format.align === 'right' || format.currencyAlign === 'right')
-          ) {
-            // Move symbol to right if needed
-            const symbol = formattedValue.replace(/[\d.,\s]/g, '');
-            td.textContent =
-              formattedValue.replace(symbol, '').trim() + ' ' + symbol;
-          } else {
-            td.textContent = formattedValue;
-          }
 
           // Apply text alignment from engine
           td.style.textAlign = pivotEngine.getFieldAlignment(
@@ -741,79 +933,6 @@ function renderTable() {
     }
   }
 }
-
-// Enhanced cell formatting function
-// function formatCellValue(value, measure) {
-//   // Handle null/undefined values
-//   if (value === null || value === undefined || isNaN(value)) {
-//     if (measure.format && measure.format.nullValue !== undefined) {
-//       return measure.format.nullValue;
-//     }
-//     return '';
-//   }
-
-//   // Get format configuration
-//   const format = measure.format || {};
-
-//   let num = parseFloat(value);
-//   if (isNaN(num)) return value.toString();
-
-//   // Handle percentage formatting
-//   if (format.percent) {
-//     num = num * 100;
-//   }
-
-//   // Determine decimal places
-//   let decimals = typeof format.decimals === 'number' ? format.decimals : 2;
-
-//   let formattedValue;
-
-//   // Format based on type
-//   if (format.type === 'currency') {
-//     const currency = format.currency || 'USD';
-//     const locale = format.locale || 'en-US';
-
-//     formattedValue = new Intl.NumberFormat(locale, {
-//       style: 'currency',
-//       currency: currency,
-//       minimumFractionDigits: decimals,
-//       maximumFractionDigits: decimals,
-//     }).format(num);
-//   } else if (format.percent || format.type === 'percentage') {
-//     const locale = format.locale || 'en-US';
-
-//     formattedValue = new Intl.NumberFormat(locale, {
-//       style: 'percent',
-//       minimumFractionDigits: decimals,
-//       maximumFractionDigits: decimals,
-//     }).format(num / 100); // Intl.NumberFormat expects decimal for percentage
-//   } else {
-//     // Number formatting
-//     const locale = format.locale || 'en-US';
-
-//     formattedValue = new Intl.NumberFormat(locale, {
-//       minimumFractionDigits: decimals,
-//       maximumFractionDigits: decimals,
-//     }).format(num);
-//   }
-
-//   // Apply custom thousand and decimal separators if specified
-//   if (format.thousandSeparator || format.decimalSeparator) {
-//     // This is a simplified approach - for complex scenarios, you might need more sophisticated logic
-//     if (format.decimalSeparator && format.decimalSeparator !== '.') {
-//       const parts = formattedValue.split('.');
-//       if (parts.length > 1) {
-//         formattedValue = parts[0] + format.decimalSeparator + parts[1];
-//       }
-//     }
-
-//     if (format.thousandSeparator && format.thousandSeparator !== ',') {
-//       formattedValue = formattedValue.replace(/,/g, format.thousandSeparator);
-//     }
-//   }
-
-//   return formattedValue;
-// }
 
 function setupColumnDragAndDropFixed(columnFieldName) {
   const columnHeaders = document.querySelectorAll(
@@ -979,7 +1098,7 @@ export function formatTable(newConfig) {
   }
 }
 
-// Event Listeners
+// FIXED: Event Listeners with proper sorting integration
 function setupEventListeners() {
   const switchButton = document.getElementById('switchView');
   if (switchButton) {
@@ -1054,6 +1173,7 @@ function setupEventListeners() {
   }
 }
 
+// FIXED: Enhanced draggable styles with better sort indicators
 function addDraggableStyles() {
   if (document.querySelector('#pivot-table-styles')) return;
 
@@ -1083,6 +1203,45 @@ function addDraggableStyles() {
         .drill-down-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         .drill-down-table th { background: #f8f9fa; padding: 8px; border: 1px solid #dee2e6; font-weight: bold; text-align: left; }
         .drill-down-table td { padding: 6px 8px; border: 1px solid #dee2e6; }
+        
+        /* Enhanced sort icon styles */
+        th span[title*="sort"], th span[title*="Sort"] {
+            transition: all 0.2s ease;
+            display: inline-block;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        
+        th span[title*="sort"]:hover, th span[title*="Sort"]:hover {
+            background-color: rgba(0, 123, 255, 0.1);
+            transform: scale(1.1);
+        }
+        
+        th[style*="cursor: pointer"]:hover {
+            background-color: #e9ecef !important;
+        }
+        
+        /* Visual feedback for sortable headers */
+        th[style*="cursor: pointer"] {
+            position: relative;
+            transition: background-color 0.2s ease;
+        }
+        
+        th[style*="cursor: pointer"]::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background-color: #007bff;
+            transition: width 0.3s ease;
+            transform: translateX(-50%);
+        }
+        
+        th[style*="cursor: pointer"]:hover::after {
+            width: 80%;
+        }
     `;
   document.head.appendChild(styleEl);
 }
@@ -1110,7 +1269,7 @@ function createDrillDownModal(
   header.className = 'drill-down-header';
   const title = document.createElement('div');
   title.className = 'drill-down-title';
-  title.textContent = 'Details';
+  title.textContent = `Details: ${getFieldDisplayName(rowFieldName)} = ${rowValue}, ${getFieldDisplayName(columnFieldName)} = ${columnValue}`;
   const closeButton = document.createElement('button');
   closeButton.className = 'drill-down-close';
   closeButton.innerHTML = '×';
@@ -1194,7 +1353,9 @@ function addDrillDownToDataCell(
       columnFieldName
     );
     if (rawDetails.length === 0) {
-      alert(`No detailed data found`);
+      alert(
+        `No detailed data found for ${rowFieldName}: ${rowValue}, ${columnFieldName}: ${columnValue}`
+      );
       return;
     }
     createDrillDownModal(
@@ -1285,7 +1446,7 @@ export function onSectionItemDrop(droppedFields) {
   }
 }
 
-// Initialize everything when the DOM is loaded
+// FIXED: Initialize everything when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   try {
     if (!sampleData || !Array.isArray(sampleData) || sampleData.length === 0) {
@@ -1304,8 +1465,14 @@ document.addEventListener('DOMContentLoaded', () => {
       data: sampleData, // Initialize with the full dataset
     });
 
-    // Subscribe to state changes to re-render the UI automatically
+    // FIXED: Subscribe to state changes to re-render the UI automatically with proper sorting
     pivotEngine.subscribe(state => {
+      console.log('PivotEngine state changed:', {
+        sortConfig: state.sortConfig,
+        dataHandlingMode: state.dataHandlingMode,
+        processedDataLength: state.processedData?.rows?.length || 0,
+      });
+
       // The engine's state reflects the latest data after any operation (filtering, sorting, etc.)
       currentData = state.rawData; // Keep track of the engine's current data view
       renderTable();
@@ -1325,7 +1492,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial render
     renderTable();
 
-    console.log('Initialization completed successfully');
+    console.log(
+      'Initialization completed successfully with sorting functionality'
+    );
   } catch (error) {
     console.error('Error during initialization:', error);
     const tableContainer = document.getElementById('myTable');
@@ -1334,3 +1503,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 });
+
+window.debugPivotState = function () {
+  const state = pivotEngine.getState();
+  console.log('Sort config:', state.sortConfig);
+  console.log('Groups count:', state.groups.length);
+  console.log('Data handling mode:', state.dataHandlingMode);
+};
