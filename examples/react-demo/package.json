@@ -11,6 +11,7 @@
   "dependencies": {
     "@mindfiredigital/pivothead": "workspace:^1.3.0",
     "@mindfiredigital/pivothead-web-component": "workspace:*",
+    "@mindfiredigital/pivothead-react": "workspace:*",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

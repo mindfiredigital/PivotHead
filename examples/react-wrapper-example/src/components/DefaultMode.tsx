@@ -15,6 +15,7 @@ export default function DefaultMode({ data, options }: Props) {
       <div style={{ marginBottom: 8, display: 'flex', gap: 8 }}>
         <button onClick={() => ref.current?.methods.setViewMode('processed')}>Processed</button>
         <button onClick={() => ref.current?.methods.setViewMode('raw')}>Raw</button>
+        <button onClick={() => ref.current?.methods.showFormatPopup?.()}>Format</button>
         <button onClick={() => ref.current?.methods.exportToExcel('pivot-data')}>Export Excel</button>
       </div>
       <PivotHeadComponent

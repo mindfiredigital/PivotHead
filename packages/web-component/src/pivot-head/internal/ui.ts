@@ -200,6 +200,15 @@ export function bindControls(host: PivotHeadHost) {
     printBtn.parentNode?.replaceChild(newPrintBtn, printBtn);
     newPrintBtn.addEventListener('click', () => host.openPrintDialog());
   }
+
+  const formatBtn = host.shadowRoot?.getElementById('formatButton');
+  if (formatBtn) {
+    const newFormatBtn = formatBtn.cloneNode(true);
+    formatBtn.parentNode?.replaceChild(newFormatBtn, formatBtn);
+    newFormatBtn.addEventListener('click', () => {
+      host.showFormatPopup();
+    });
+  }
 }
 
 export function updatePaginationInfo(host: PivotHeadHost) {

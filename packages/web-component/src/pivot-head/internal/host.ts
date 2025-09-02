@@ -31,6 +31,7 @@ export interface PivotHeadHost {
   // methods used across helpers
   renderRawTable(): void;
   renderFullUI(): void;
+  _renderSwitch(): void;
   setupControls(): void;
   addDragListeners(): void;
   createProcessedSortIcon(field: string): string;
@@ -56,6 +57,7 @@ export interface PivotHeadHost {
   exportToPDF(fileName?: string): void;
   exportToExcel(fileName?: string): void;
   openPrintDialog(): void;
+  showFormatPopup(): void;
 
   // data/options setters used by attribute helpers
   data: PivotDataRecord[];
