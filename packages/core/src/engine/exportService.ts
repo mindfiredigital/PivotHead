@@ -16,9 +16,10 @@ export class PivotExportService {
   public static convertToHtml<T extends Record<string, any>>(
     state: PivotTableState<T>
   ): string {
-    const { rows, columns, selectedMeasures, formatting, groups, data } = state;
+    const { rows, columns, selectedMeasures, formatting, groups, rawData } =
+      state;
 
-    if (data.length === 0) {
+    if (rawData.length === 0) {
       return '<div>No data to display</div>';
     }
 
@@ -29,14 +30,14 @@ export class PivotExportService {
     // Get unique column values
     const uniqueColumns = [
       ...new Set(
-        data.map((item: { [x: string]: any }) => item[columns[0].uniqueName])
+        rawData.map((item: { [x: string]: any }) => item[columns[0].uniqueName])
       ),
     ];
 
     // Get unique row values
     const uniqueRows = [
       ...new Set(
-        data.map((item: { [x: string]: any }) => item[rows[0].uniqueName])
+        rawData.map((item: { [x: string]: any }) => item[rows[0].uniqueName])
       ),
     ];
 
@@ -44,14 +45,14 @@ export class PivotExportService {
       if (value === 0) return '$0.00';
       if (!value && value !== 0) return '';
 
-      if (formatConfig.type === 'currency') {
+      if (formatConfig && formatConfig.type === 'currency') {
         return new Intl.NumberFormat(formatConfig.locale, {
           style: 'currency',
           currency: formatConfig.currency,
           minimumFractionDigits: formatConfig.decimals,
           maximumFractionDigits: formatConfig.decimals,
         }).format(value);
-      } else if (formatConfig.type === 'number') {
+      } else if (formatConfig && formatConfig.type === 'number') {
         return new Intl.NumberFormat(formatConfig.locale, {
           minimumFractionDigits: formatConfig.decimals,
           maximumFractionDigits: formatConfig.decimals,
@@ -156,12 +157,63 @@ export class PivotExportService {
 
       // Add cells for each column (region)
       uniqueColumns.forEach(column => {
-        // Find the group that matches this row and column
-        const group = groups.find(g => g.key === `${row} - ${column}`);
-
         selectedMeasures.forEach(measure => {
-          const measureKey = `sum_${measure.uniqueName}`;
-          let value = group ? group.aggregates[measureKey] : 0;
+          // Filter data for this row and column intersection
+          const filteredData = rawData.filter(
+            (item: any) =>
+              item[rows[0].uniqueName] === row &&
+              item[columns[0].uniqueName] === column
+          );
+
+          // Calculate the aggregated value
+          let value = 0;
+          if (filteredData.length > 0) {
+            switch (measure.aggregation) {
+              case 'sum':
+                value = filteredData.reduce(
+                  (sum: any, item: any) =>
+                    sum + (item[measure.uniqueName] || 0),
+                  0
+                );
+                break;
+              case 'avg':
+                if (measure?.formula && typeof measure.formula === 'function') {
+                  value =
+                    filteredData.reduce(
+                      (sum: number, item: any) =>
+                        sum + (measure.formula?.(item) || 0),
+                      0
+                    ) / filteredData.length;
+                } else {
+                  value =
+                    filteredData.reduce(
+                      (sum: any, item: any) =>
+                        sum + (item[measure.uniqueName] || 0),
+                      0
+                    ) / filteredData.length;
+                }
+                break;
+              case 'max':
+                value = Math.max(
+                  ...filteredData.map(
+                    (item: any) => item[measure.uniqueName] || 0
+                  )
+                );
+                break;
+              case 'min':
+                value = Math.min(
+                  ...filteredData.map(
+                    (item: any) => item[measure.uniqueName] || 0
+                  )
+                );
+                break;
+              case 'count':
+                value = filteredData.length;
+                break;
+              default:
+                value = 0;
+            }
+          }
 
           // Apply conditional formatting
           const cellStyle = getCellStyle(value, measure.uniqueName);
@@ -206,19 +258,46 @@ export class PivotExportService {
     state: PivotTableState<T>,
     fileName = 'pivot-table'
   ): void {
-    const htmlContent = PivotExportService.convertToHtml(state);
+    console.log(
+      'PivotExportService.exportToHTML called with fileName:',
+      fileName
+    );
+    console.log('State rawData length:', state.rawData?.length || 0);
 
-    const blob = new Blob([htmlContent], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
+    const htmlContent = PivotExportService.convertToHtml(state);
+    console.log('HTML content length:', htmlContent.length);
+
+    // Wrap in full HTML document
+    const fullHtml = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>${fileName}</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .pivot-export { max-width: 100%; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  ${htmlContent}
+</body>
+</html>`;
+
+    console.log('Full HTML length:', fullHtml.length);
+
+    const dataUrl =
+      'data:text/html;charset=utf-8,' + encodeURIComponent(fullHtml);
+    console.log('Data URL created, length:', dataUrl.length);
 
     const a = document.createElement('a');
-    a.href = url;
+    a.href = dataUrl;
     a.download = `${fileName}.html`;
     document.body.appendChild(a);
+    console.log('Clicking download link...');
     a.click();
 
     document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    console.log('HTML export completed');
   }
 
   /**
@@ -230,8 +309,15 @@ export class PivotExportService {
     state: PivotTableState<T>,
     fileName = 'pivot-table'
   ): void {
+    console.log(
+      'PivotExportService.exportToPDF called with fileName:',
+      fileName
+    );
+    console.log('State rawData length:', state.rawData?.length || 0);
+
     // Convert pivot data to an HTML table
     const htmlContent = PivotExportService.convertToHtml(state);
+    console.log('HTML content length for PDF:', htmlContent.length);
 
     // Create a temporary container for the HTML
     const container = document.createElement('div');
@@ -249,8 +335,11 @@ export class PivotExportService {
       return;
     }
 
+    console.log('Table element found, proceeding with PDF generation');
+
     try {
       // Create a new PDF document
+      console.log('Creating jsPDF instance...');
       const pdf = new jsPDF();
 
       // Add title
@@ -305,6 +394,12 @@ export class PivotExportService {
     state: PivotTableState<T>,
     fileName = 'pivot-table'
   ): void {
+    console.log(
+      'PivotExportService.exportToExcel called with fileName:',
+      fileName
+    );
+    console.log('State rawData length:', state.rawData?.length || 0);
+
     try {
       PivotExportService.generateExcel(state, fileName);
     } catch (error) {

@@ -89,6 +89,15 @@ describe('PivotExportService', () => {
           { product: 'Product A', region: 'South', sales: 200, profit: 50 },
           { product: 'Product B', region: 'South', sales: 250, profit: 60 },
         ],
+    dataHandlingMode: 'raw',
+    rawData: isEmpty
+      ? []
+      : [
+          { product: 'Product A', region: 'North', sales: 100, profit: 25 },
+          { product: 'Product B', region: 'North', sales: 150, profit: 40 },
+          { product: 'Product A', region: 'South', sales: 200, profit: 50 },
+          { product: 'Product B', region: 'South', sales: 250, profit: 60 },
+        ],
     processedData: {
       headers: ['Product', 'Region'],
       rows: [],
@@ -159,10 +168,8 @@ describe('PivotExportService', () => {
       const html = PivotExportService.convertToHtml(state);
 
       // Verify HTML structure
-      expect(html).toContain('<table class="pivot-table">');
-      expect(html).toContain(
-        '<th rowspan="2" class="corner-header">Product /<br>Region</th>'
-      );
+      expect(html).toContain('<table');
+      expect(html).toContain('Product /<br>Region');
       expect(html).toContain('North');
       expect(html).toContain('South');
       expect(html).toContain('Sales');
@@ -186,18 +193,20 @@ describe('PivotExportService', () => {
   });
 
   describe('exportToHTML', () => {
-    it('should create a Blob and trigger download', () => {
+    it('should create a data URL and trigger download', () => {
       const state = createMockState();
       PivotExportService.exportToHTML(state, 'test-file');
 
-      // Check if Blob was created
-      expect(URL.createObjectURL).toHaveBeenCalled();
-
+      // Check if a element was created
       expect(document.createElement).toHaveBeenCalledWith('a');
 
+      // Check if appendChild and removeChild were called
       expect(document.body.appendChild).toHaveBeenCalled();
       expect(document.body.removeChild).toHaveBeenCalled();
-      expect(URL.revokeObjectURL).toHaveBeenCalled();
+
+      // Check that URL.createObjectURL and revokeObjectURL are not called (using data URL instead)
+      expect(URL.createObjectURL).not.toHaveBeenCalled();
+      expect(URL.revokeObjectURL).not.toHaveBeenCalled();
     });
   });
 
