@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig/base.json",
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "noEmit": true,
+    "strict": false,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "moduleResolution": "Bundler",
+    "lib": ["ES2020", "DOM"],
+    "types": ["vitest"],
+    "allowImportingTsExtensions": true,
+    "noImplicitAny": false
+  },
+  "include": ["src/**/*"]
+}
