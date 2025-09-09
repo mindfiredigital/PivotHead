@@ -1,0 +1,60 @@
+<div style="border:1px solid #e5e7eb; border-radius:8px; padding:12px; background:#fff;">
+  <pivot-head-angular
+    #ph
+    [mode]="'minimal'"
+    [data]="data"
+    [options]="options"
+    (stateChange)="onStateChange($event)"
+    (viewModeChange)="onViewMode($event)"
+    (paginationChange)="onPagination($event)"
+  ></pivot-head-angular>
+
+  <div class="minimal-toolbar" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:8px;">
+    <label>Field
+      <select [value]="filterFieldValue" (change)="onFilterFieldChange($event)" style="margin-left:6px;">
+        <option value="" disabled [selected]="!filterFieldValue">Select</option>
+        <option *ngFor="let f of fieldOptionsValue" [value]="f">{{ f }}</option>
+      </select>
+    </label>
+    <label>Operator
+      <select [value]="filterOperatorValue" (change)="onFilterOperatorChange($event)" style="margin-left:6px;">
+        <option value="equals">Equals</option>
+        <option value="contains">Contains</option>
+        <option value="greaterThan">Greater Than</option>
+        <option value="lessThan">Less Than</option>
+      </select>
+    </label>
+    <input type="text" [value]="filterValueValue" (input)="onFilterValueInput($event)" placeholder="Value"/>
+    <button (click)="applyFilter()">Apply</button>
+    <button (click)="resetFilter()">Reset</button>
+    <button (click)="showFormat()">Format</button>
+    <button (click)="toggleViewMode()">Switch to {{ viewModeValue === 'processed' ? 'Raw' : 'Processed' }}</button>
+    <span style="margin-left:auto"></span>
+    <label>Page Size
+      <select [value]="paginationValue.pageSize" (change)="onPageSizeChange($event)">
+        <option [value]="10">10</option>
+        <option [value]="25">25</option>
+        <option [value]="50">50</option>
+      </select>
+    </label>
+    <span>of {{ paginationValue.totalPages }}</span>
+    <button (click)="prevPage()">Prev</button>
+    <input type="number" [value]="paginationValue.currentPage" style="width:60px" (change)="onPageInputChange($event)"/>
+    <button (click)="nextPage()">Next</button>
+  </div>
+
+  <table class="minimal-table" style="width:100%; border-collapse:collapse;">
+    <thead>
+      <tr>
+        <th *ngFor="let col of state?.columns">{{ col.caption }}</th>
+        <th *ngFor="let measure of state?.measures">{{ measure.caption }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of state?.rows; let i = index">
+        <td>{{ row.caption }}</td>
+        <td *ngFor="let measure of state?.measures">{{ getCellValue(row.uniqueName, measure.uniqueName) }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

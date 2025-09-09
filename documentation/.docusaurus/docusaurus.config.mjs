@@ -26,7 +26,7 @@ export default {
       "classic",
       {
         "docs": {
-          "sidebarPath": "D:\\PivotHead\\documentation\\sidebars.js",
+          "sidebarPath": "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/documentation/sidebars.js",
           "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/"
         },
         "blog": {
@@ -34,7 +34,7 @@ export default {
           "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/"
         },
         "theme": {
-          "customCss": "D:\\PivotHead\\documentation\\src\\css\\custom.css"
+          "customCss": "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/documentation/src/css/custom.css"
         }
       }
     ]

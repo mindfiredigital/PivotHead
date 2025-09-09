@@ -417,49 +417,6 @@ export class PivotEngine<T extends Record<string, any>> {
     this._emit(); // Notify subscribers after state change
   }
 
-  // /**
-  //  * Formats a value based on the specified field's format.
-  //  * @param {any} value - The value to format.
-  //  * @param {string} field - The field name to use for formatting.
-  //  * @returns {string} The formatted value as a string.
-  //  * @public
-  //  */
-  // public formatValue(value: any, field: string): string {
-  //   const format = this.state.formatting[field];
-  //   if (!format) return String(value);
-
-  //   try {
-  //     switch (format.type) {
-  //       case 'currency':
-  //         return new Intl.NumberFormat(format.locale || 'en-US', {
-  //           style: 'currency',
-  //           currency: format.currency || 'USD',
-  //           minimumFractionDigits: format.decimals || 0,
-  //           maximumFractionDigits: format.decimals || 0,
-  //         }).format(value);
-  //       case 'number':
-  //         return new Intl.NumberFormat(format.locale || 'en-US', {
-  //           minimumFractionDigits: format.decimals || 0,
-  //           maximumFractionDigits: format.decimals || 0,
-  //         }).format(value);
-  //       case 'percentage':
-  //         return new Intl.NumberFormat(format.locale || 'en-US', {
-  //           style: 'percent',
-  //           minimumFractionDigits: format.decimals || 0,
-  //         }).format(value);
-  //       case 'date':
-  //         return new Date(value).toLocaleDateString(format.locale || 'en-US', {
-  //           dateStyle: 'medium',
-  //         });
-  //       default:
-  //         return String(value);
-  //     }
-  //   } catch (error) {
-  //     console.error(`Error formatting value for field ${field}:`, error);
-  //     return String(value);
-  //   }
-  // }
-
   /**
    * Enhanced formatValue method with comprehensive formatting support
    * @param {any} value - The value to format.
@@ -767,28 +724,6 @@ export class PivotEngine<T extends Record<string, any>> {
    * @returns {string} The text alignment ('left', 'right', 'center')
    * @public
    */
-  // public getFieldAlignment(field: string): string {
-  //   const format = this.getFieldFormat(field);
-  //   if (format && format.align) {
-  //     return format.align;
-  //   }
-
-  //     // For currency fields, use currencyAlign if no explicit align is set
-  // if (format && format.type === 'currency' && format.currencyAlign) {
-  //   return format.currencyAlign;
-  // }
-
-  //   // Default alignment: right for numbers, left for text
-  //   const measure = this.state.measures.find(m => m.uniqueName === field);
-  //   return measure ? 'right' : 'left';
-  // }
-
-  /**
-   * Get text alignment for a field
-   * @param {string} field - The field name
-   * @returns {string} The text alignment ('left', 'right', 'center')
-   * @public
-   */
   public getFieldAlignment(field: string): string {
     const format = this.getFieldFormat(field);
 
@@ -898,38 +833,6 @@ export class PivotEngine<T extends Record<string, any>> {
     this._emit(); // Notify subscribers of state change
   }
 
-  //   private applySort() {
-  //   console.log('Applying sort with config:', this.state.sortConfig[0]);
-
-  //   if (this.state.dataHandlingMode === 'raw') {
-  //     const sortedData = this.sortData(this.state.rawData, this.state.sortConfig[0]);
-  //     this.state.data = sortedData;
-  //     this.state.rawData = sortedData;
-  //   } else {
-  //     // FIXED: For processed data mode
-  //     if (this.state.groups.length > 0) {
-  //       // Sort the groups
-  //       this.state.groups = this.sortGroups(this.state.groups, this.state.sortConfig[0]);
-
-  //       // CRITICAL: Extract sorted data from groups in correct order
-  //       const sortedDataFromGroups = this.state.groups.flatMap(group => group.items);
-  //       this.state.data = sortedDataFromGroups;
-  //       this.state.rawData = sortedDataFromGroups;
-  //     } else {
-  //       const sortedData = this.sortData(this.state.rawData, this.state.sortConfig[0]);
-  //       this.state.data = sortedData;
-  //       this.state.rawData = sortedData;
-  //     }
-  //   }
-
-  //   // Regenerate processed data with new sort order
-  //   this.state.processedData = this.generateProcessedDataForDisplay();
-  //   this.updateAggregates();
-
-  //   // CRITICAL: Emit state change to trigger UI re-render
-  //   this._emit();
-  // }
-
   private sortData(data: T[], sortConfig: SortConfig): T[] {
     return [...data].sort((a, b) => {
       let aValue = this.getFieldValue(a, sortConfig);
@@ -1001,34 +904,6 @@ export class PivotEngine<T extends Record<string, any>> {
       return 0;
     });
   }
-
-  //   private sortGroups(groups: Group[], sortConfig: SortConfig): Group[] {
-  //   return [...groups].sort((a, b) => {
-  //     let aValue: any;
-  //     let bValue: any;
-
-  //     if (sortConfig.type === 'measure') {
-  //       // Sort by measure values
-  //       const aggregateKey = `${sortConfig.aggregation || 'sum'}_${sortConfig.field}`;
-  //       aValue = a.aggregates[aggregateKey] || 0;
-  //       bValue = b.aggregates[aggregateKey] || 0;
-  //     } else {
-  //       // Sort by dimension values - get from group key or first item
-  //       const keys = a.key ? a.key.split('|') : [];
-  //       const bKeys = b.key ? b.key.split('|') : [];
-
-  //       // Use first key for row field, second for column field
-  //       aValue = keys[0] || a.items[0]?.[sortConfig.field] || '';
-  //       bValue = bKeys[0] || b.items[0]?.[sortConfig.field] || '';
-
-  //       if (typeof aValue === 'string') aValue = aValue.toLowerCase();
-  //       if (typeof bValue === 'string') bValue = bValue.toLowerCase();
-  //     }
-
-  //     const result = aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-  //     return sortConfig.direction === 'asc' ? result : -result;
-  //   });
-  // }
 
   /**
    * Updates aggregates for all groups in the pivot table.

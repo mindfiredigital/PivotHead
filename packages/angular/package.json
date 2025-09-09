@@ -1,0 +1,47 @@
+{
+  "name": "@mindfiredigital/pivothead-angular",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/fesm2022/mindfiredigital-pivothead-angular.mjs",
+  "module": "./dist/fesm2022/mindfiredigital-pivothead-angular.mjs",
+  "types": "./dist/index.d.ts",
+  "typings": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/fesm2022/mindfiredigital-pivothead-angular.mjs",
+      "default": "./dist/fesm2022/mindfiredigital-pivothead-angular.mjs"
+    },
+    "./package.json": {
+      "default": "./package.json"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rimraf dist && ng-packagr -p ng-package.json",
+    "dev": "ng-packagr -p ng-package.json -w",
+    "clean": "rimraf dist",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "peerDependencies": {
+    "@angular/core": ">=15.0.0",
+    "@angular/common": ">=15.0.0",
+    "@mindfiredigital/pivothead-web-component": "workspace:*"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@angular/compiler-cli": "^18.2.13",
+    "@types/node": "^20.0.0",
+    "ng-packagr": "^18.2.0",
+    "rimraf": "^5.0.0",
+    "typescript": "~5.5.2",
+    "vitest": "^0.32.0",
+    "zone.js": "^0.14.0"
+  },
+  "sideEffects": false
+}

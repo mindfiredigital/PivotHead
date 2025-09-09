@@ -1,0 +1,15 @@
+{
+  "title": "Wrapper",
+  "slug": "/category/wrapper",
+  "permalink": "/PivotHead/docs/category/wrapper",
+  "navigation": {
+    "previous": {
+      "title": "web-component",
+      "permalink": "/PivotHead/docs/tutorial-basics/web-component"
+    },
+    "next": {
+      "title": "react-lib",
+      "permalink": "/PivotHead/docs/wrapper/react-lib"
+    }
+  }
+}
