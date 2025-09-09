@@ -128,11 +128,31 @@ function renderProcessed(state) {
         });
         const key = `${m.aggregation}_${m.uniqueName}`;
         const agg = group?.aggregates?.[key];
-        const display =
-          typeof agg === 'number' ? agg.toLocaleString() : (agg ?? '0');
+
+        // Use engine's formatValue method if available
+        let display = '0';
+        if (agg !== undefined && agg !== null) {
+          if (pivot.formatValue && typeof pivot.formatValue === 'function') {
+            display = pivot.formatValue(agg, m.uniqueName);
+          } else {
+            display =
+              typeof agg === 'number' ? agg.toLocaleString() : String(agg);
+          }
+        }
+
         const hasData = Number(agg) > 0;
+
+        // Get text alignment from engine if available
+        let textAlign = 'right'; // default for measures
+        if (
+          pivot.getFieldAlignment &&
+          typeof pivot.getFieldAlignment === 'function'
+        ) {
+          textAlign = pivot.getFieldAlignment(m.uniqueName);
+        }
+
         // Make processed cells clickable for drill-down with necessary data attributes
-        html += `<td class="${hasData ? 'drill-down-cell' : ''}"
+        html += `<td class="${hasData ? 'drill-down-cell' : ''}" style="text-align: ${textAlign};"
                    data-row-value="${String(rowVal)}"
                    data-column-value="${String(colVal)}"
                    data-measure-name="${m.uniqueName}"
@@ -202,7 +222,26 @@ function renderRaw() {
   pageRows.forEach((row, rIdx) => {
     html += `<tr class="draggable" draggable="true" data-type="row" data-index="${rIdx}" data-global-index="${start + rIdx}">`;
     colOrder.forEach(k => {
-      html += `<td>${row[k] ?? ''}</td>`;
+      let cellValue = row[k] ?? '';
+      // Use engine's formatValue method if available
+      if (
+        cellValue !== '' &&
+        pivot.formatValue &&
+        typeof pivot.formatValue === 'function'
+      ) {
+        cellValue = pivot.formatValue(cellValue, k);
+      }
+
+      // Get text alignment from engine if available
+      let textAlign = 'left'; // default for raw data
+      if (
+        pivot.getFieldAlignment &&
+        typeof pivot.getFieldAlignment === 'function'
+      ) {
+        textAlign = pivot.getFieldAlignment(k);
+      }
+
+      html += `<td style="text-align: ${textAlign};">${cellValue}</td>`;
     });
     html += '</tr>';
   });
@@ -289,6 +328,15 @@ function wireToolbar() {
     pivot.exportToExcel?.('pivot-table');
   document.getElementById('printTable').onclick = () =>
     pivot.openPrintDialog?.();
+
+  // Format button functionality
+  document.getElementById('formatButton').onclick = () => {
+    if (pivot.showFormatPopup && typeof pivot.showFormatPopup === 'function') {
+      pivot.showFormatPopup();
+    } else {
+      console.log('Format functionality not available');
+    }
+  };
 }
 
 function wireTableInteractions() {

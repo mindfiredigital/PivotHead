@@ -55,6 +55,8 @@ import {
   getGroupedData as getGroupedDataHelper,
   getData as getDataHelper,
   getProcessedData as getProcessedDataHelper,
+  updateFieldFormatting as updateFieldFormattingHelper,
+  getFieldAlignment as getFieldAlignmentHelper,
 } from './internal/api-engine';
 import {
   setFilters as setFiltersHelper,
@@ -80,6 +82,7 @@ import {
   setDragAndDropEnabled as setDragAndDropEnabledHelper,
   isDragAndDropEnabled as isDragAndDropEnabledHelper,
 } from './internal/dnd-api';
+import { showFormatPopup as showFormatPopupHelper } from './internal/format';
 
 export class PivotHeadElement extends HTMLElement {
   private engine!: EnhancedPivotEngine<PivotDataRecord>;
@@ -359,6 +362,22 @@ export class PivotHeadElement extends HTMLElement {
   }
   public getViewMode(): 'raw' | 'processed' {
     return this._showRawData ? 'raw' : 'processed';
+  }
+  public updateFieldFormatting(
+    field: string,
+    format: import('../types/types').FormatOptions
+  ): void {
+    updateFieldFormattingHelper(
+      this as unknown as PivotHeadHost,
+      field,
+      format
+    );
+  }
+  public getFieldAlignment(field: string): string {
+    return getFieldAlignmentHelper(this as unknown as PivotHeadHost, field);
+  }
+  public showFormatPopup(): void {
+    showFormatPopupHelper(this as unknown as PivotHeadHost);
   }
 }
 

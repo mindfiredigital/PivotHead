@@ -15,6 +15,20 @@ import type {
 // Define a type for pivot data records
 export type PivotDataRecord = Record<string, unknown>;
 
+// FormatOptions interface for field formatting
+export interface FormatOptions {
+  type?: 'currency' | 'number' | 'percentage' | 'date';
+  currency?: string;
+  locale?: string;
+  decimals?: number;
+  thousandSeparator?: string;
+  decimalSeparator?: string;
+  align?: 'left' | 'right' | 'center';
+  currencyAlign?: 'left' | 'right';
+  nullValue?: string | null;
+  percent?: boolean;
+}
+
 // Enhanced interface extending PivotEngine with additional methods (superset)
 // Supports both legacy and current method signatures used across the web-component
 export interface EnhancedPivotEngine<T extends Record<string, unknown>>
@@ -41,6 +55,8 @@ export interface EnhancedPivotEngine<T extends Record<string, unknown>>
 
   // formatting & data access
   formatValue(value: unknown, field: string): string;
+  updateFieldFormatting(field: string, format: FormatOptions): void;
+  getFieldAlignment(field: string): string;
   getGroupedData(): Group[];
   getOrderedColumnValues(): string[] | null;
   getOrderedRowValues(): string[] | null;

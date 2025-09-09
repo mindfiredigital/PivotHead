@@ -107,6 +107,12 @@ export default function MinimalMode({ data, options }: Props) {
   // Drill-down modal
   const [modal, setModal] = useState<{ open: boolean; title: string; summary: string; rows: Array<Record<string, unknown>> }>({ open: false, title: '', summary: '', rows: [] });
 
+  // Force re-render when formatting changes
+  const [formatVersion, setFormatVersion] = useState(0);
+
+  // Prevent re-render during drag operations
+  const [isDragging, setIsDragging] = useState(false);
+
   // Helpers
   const getPagination = () => ref.current?.methods.getPagination?.();
   const syncPagination = () => {
@@ -165,6 +171,12 @@ export default function MinimalMode({ data, options }: Props) {
 
   // Events from wrapper -> update local state
   const handleStateChange = (e: CustomEvent) => {
+    // Ignore state changes during drag operations to prevent interference
+    if (isDragging) {
+      console.log(`[DRAG] Ignoring state change during drag operation`);
+      return;
+    }
+    console.log(`[STATE] Handling state change, viewMode=${viewMode}`);
     setPivotState(e.detail as PivotTableState<PivotDataRecord>);
     // No engine-order mirroring; we control row order locally in minimal mode
     syncPagination();
@@ -200,6 +212,13 @@ export default function MinimalMode({ data, options }: Props) {
     if (!Number.isFinite(n)) n = pagination.currentPage;
     n = Math.max(1, Math.min(total, Math.trunc(n)));
     ref.current?.methods.goToPage(n);
+  };
+
+  // Custom format handler that triggers re-render
+  const handleFormat = () => {
+    ref.current?.methods.showFormatPopup?.();
+    // Force re-render after a short delay to pick up format changes
+    setTimeout(() => setFormatVersion(v => v + 1), 500);
   };
 
   // Sorting
@@ -317,10 +336,15 @@ export default function MinimalMode({ data, options }: Props) {
     setDnd({ type: null, fromIndex: -1 });
   };
 
-  // Row DnD
-  const handleRowDragStart = (index: number) => setDnd({ type: 'row', fromIndex: index });
+  // Row DnD - simple implementation that delegates to web component
+  const handleRowDragStart = (index: number) => {
+    console.log(`[DRAG] Starting row drag: index=${index}, viewMode=${viewMode}`);
+    setIsDragging(true);
+    setDnd({ type: 'row', fromIndex: index });
+  };
   const handleRowDropProcessed = (toIndex: number, visibleLabels: string[]) => {
     if (dnd.type !== 'row') return;
+    console.log(`[DRAG] Processing row drop: fromIndex=${dnd.fromIndex}, toIndex=${toIndex}, viewMode=${viewMode}`);
     setCurrentStore(s => {
       const order = s.rowOrder.length ? [...s.rowOrder] : [...visibleLabels];
       const from = dnd.fromIndex;
@@ -329,17 +353,29 @@ export default function MinimalMode({ data, options }: Props) {
       const tmp = order[from];
       order[from] = order[to];
       order[to] = tmp;
+      console.log(`[DRAG] Updated processed row order:`, order);
       return { ...s, rowOrder: order };
     });
     setDnd({ type: null, fromIndex: -1 });
+    setIsDragging(false);
   };
-  const handleRowDropRaw = (globalToIndex: number) => {
+  const handleRowDropRaw = (toIndex: number) => {
     if (dnd.type !== 'row') return;
+    console.log(`[DRAG] Raw row drop: fromIndex=${dnd.fromIndex}, toIndex=${toIndex}, viewMode=${viewMode}`);
     const elSwap = ref.current?.methods.swapRows;
     if (elSwap) {
-      try { elSwap(dnd.fromIndex, globalToIndex); } catch (err) { console.warn('swapRows failed', err); }
+      try { 
+        console.log(`[DRAG] Calling engine swapRows(${dnd.fromIndex}, ${toIndex})`);
+        elSwap(dnd.fromIndex, toIndex); 
+        console.log(`[DRAG] Engine swapRows completed successfully`);
+      } catch (err) { 
+        console.warn('[DRAG] swapRows failed', err); 
+      }
+    } else {
+      console.warn('[DRAG] No swapRows method available');
     }
     setDnd({ type: null, fromIndex: -1 });
+    setIsDragging(false);
   };
 
   // Helpers for drill-down and safe access
@@ -470,9 +506,19 @@ export default function MinimalMode({ data, options }: Props) {
                   const aggKey = `${m.aggregation}_${m.uniqueName}`;
                   const val = toNum((grp?.aggregates || {})[aggKey]);
                   const hasData = Number(val) > 0;
-                  const display = Number.isFinite(val) ? val.toLocaleString() : String((val as unknown) ?? '0');
+                  // Use the web component's formatValue method if available, otherwise fall back to toLocaleString
+                  let display = '0';
+                  if (Number.isFinite(val)) {
+                    const formatted = ref.current?.methods.formatValue?.(val, m.uniqueName);
+                    display = formatted || val.toLocaleString();
+                  } else {
+                    display = String((val as unknown) ?? '0');
+                  }
+                  
+                  // Get text alignment from the web component
+                  const textAlign = (ref.current?.methods.getFieldAlignment?.(m.uniqueName) || 'right') as 'left' | 'right' | 'center';
                   return (
-                    <td key={`${rowVal}-${colVal}-${m.uniqueName}`} onClick={() => openDrillDown(rowField.uniqueName, String(rowVal), colField.uniqueName, String(colVal), m.uniqueName, m.caption, m.aggregation, val)} title={hasData ? 'Click to view underlying records' : ''} style={{ padding: 8, borderBottom: '1px solid #eee', borderRight: '1px solid #f0f0f0', cursor: hasData ? 'pointer' : 'default' }}>
+                    <td key={`${rowVal}-${colVal}-${m.uniqueName}`} onClick={() => openDrillDown(rowField.uniqueName, String(rowVal), colField.uniqueName, String(colVal), m.uniqueName, m.caption, m.aggregation, val)} title={hasData ? 'Click to view underlying records' : ''} style={{ padding: 8, borderBottom: '1px solid #eee', borderRight: '1px solid #f0f0f0', cursor: hasData ? 'pointer' : 'default', textAlign }}>
                       {display}
                     </td>
                   );
@@ -494,27 +540,30 @@ export default function MinimalMode({ data, options }: Props) {
 
     const colOrder = (currentStore.colOrder.length ? currentStore.colOrder : keys).filter(k => keys.includes(k));
 
-    // Sort view
-    const sort = currentStore.sort;
+    // In raw mode, apply local sorting and row ordering only when not dragging
     let viewRows = [...rows];
-    if (sort.field) {
-      viewRows.sort((a, b) => {
-        const av = a[sort.field as keyof typeof a];
-        const bv = b[sort.field as keyof typeof b];
-        if (typeof av === 'number' && typeof bv === 'number') return sort.dir === 'asc' ? av - bv : (bv as number) - (av as number);
-        const as = String(av ?? '');
-        const bs = String(bv ?? '');
-        return sort.dir === 'asc' ? as.localeCompare(bs) : bs.localeCompare(as);
-      });
-    }
+    if (!isDragging) {
+      // Sort view
+      const sort = currentStore.sort;
+      if (sort.field) {
+        viewRows.sort((a, b) => {
+          const av = a[sort.field as keyof typeof a];
+          const bv = b[sort.field as keyof typeof b];
+          if (typeof av === 'number' && typeof bv === 'number') return sort.dir === 'asc' ? av - bv : (bv as number) - (av as number);
+          const as = String(av ?? '');
+          const bs = String(bv ?? '');
+          return sort.dir === 'asc' ? as.localeCompare(bs) : bs.localeCompare(as);
+        });
+      }
 
-    // Row order
-    if (currentStore.rowOrder.length) {
-      const firstKey = colOrder[0];
-      const orderSet = new Set(currentStore.rowOrder.map(String));
-      viewRows = viewRows
-        .sort((a, b) => currentStore.rowOrder.indexOf(String(a[firstKey as keyof typeof a])) - currentStore.rowOrder.indexOf(String(b[firstKey as keyof typeof b])))
-        .concat(viewRows.filter(r => !orderSet.has(String(r[firstKey as keyof typeof r]))));
+      // Row order (but don't apply during drag to avoid conflicts)
+      if (currentStore.rowOrder.length) {
+        const firstKey = colOrder[0];
+        const orderSet = new Set(currentStore.rowOrder.map(String));
+        viewRows = viewRows
+          .sort((a, b) => currentStore.rowOrder.indexOf(String(a[firstKey as keyof typeof a])) - currentStore.rowOrder.indexOf(String(b[firstKey as keyof typeof b])))
+          .concat(viewRows.filter(r => !orderSet.has(String(r[firstKey as keyof typeof r]))));
+      }
     }
 
     const p = pagination;
@@ -537,13 +586,26 @@ export default function MinimalMode({ data, options }: Props) {
           </tr>
         </thead>
         <tbody>
-          {pageRows.map((row, rIdx) => (
-            <tr key={start + rIdx} draggable onDragStart={() => handleRowDragStart(start + rIdx)} onDragOver={e => e.preventDefault()} onDrop={() => handleRowDropRaw(start + rIdx)} style={{ cursor: 'move' }}>
-              {colOrder.map(k => (
-                <td key={String(k)} style={{ padding: 8, borderBottom: '1px solid #eee', borderRight: '1px solid #f0f0f0' }}>{String(row[k as keyof typeof row] ?? '')}</td>
-              ))}
-            </tr>
-          ))}
+          {pageRows.map((row, rIdx) => {
+            const globalIndex = start + rIdx;
+            return (
+              <tr key={globalIndex} draggable onDragStart={() => handleRowDragStart(globalIndex)} onDragOver={e => e.preventDefault()} onDrop={() => handleRowDropRaw(globalIndex)} style={{ cursor: 'move' }}>
+                {colOrder.map(k => {
+                  const cellValue = row[k as keyof typeof row] ?? '';
+                  // Use the web component's formatValue method if available
+                  const formatted = ref.current?.methods.formatValue?.(cellValue, k);
+                  const display = formatted || String(cellValue);
+                  
+                  // Get text alignment from the web component
+                  const textAlign = (ref.current?.methods.getFieldAlignment?.(k) || 'left') as 'left' | 'right' | 'center';
+                  
+                  return (
+                    <td key={String(k)} style={{ padding: 8, borderBottom: '1px solid #eee', borderRight: '1px solid #f0f0f0', textAlign }}>{display}</td>
+                  );
+                })}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     );
@@ -594,8 +656,9 @@ export default function MinimalMode({ data, options }: Props) {
                 {viewMode === 'processed' ? 'Switch to Raw' : 'Switch to Processed'}
               </button>
 
-              {/* Export actions */}
+              {/* Format and Export actions */}
               <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                <button title="Format cells" onClick={handleFormat}>Format</button>
                 <button title="Export current view as HTML" onClick={() => ref.current?.methods.exportToHTML?.('pivot-export.html')}>Export HTML</button>
                 <button title="Export current view as Excel" onClick={() => ref.current?.methods.exportToExcel?.('pivot-export.xlsx')}>Export Excel</button>
                 <button title="Export current view as PDF" onClick={() => ref.current?.methods.exportToPDF?.('pivot-export.pdf')}>Export PDF</button>
