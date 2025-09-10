@@ -15,9 +15,9 @@
           "editUrlLocalized": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/i18n/en/docusaurus-plugin-content-docs/current",
           "isLast": true,
           "routePriority": -1,
-          "sidebarFilePath": "D:\\PivotHead\\documentation\\sidebars.js",
-          "contentPath": "D:\\PivotHead\\documentation\\docs",
-          "contentPathLocalized": "D:\\PivotHead\\documentation\\i18n\\en\\docusaurus-plugin-content-docs\\current",
+          "sidebarFilePath": "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/documentation/sidebars.js",
+          "contentPath": "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/documentation/docs",
+          "contentPathLocalized": "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/documentation/i18n/en/docusaurus-plugin-content-docs/current",
           "docs": [
             {
               "unversionedId": "contributors/code-of-conduct",
@@ -291,8 +291,32 @@
                 "permalink": "/PivotHead/docs/tutorial-basics/examples"
               },
               "next": {
-                "title": "Contribution Guide",
-                "permalink": "/PivotHead/docs/category/contribution-guide"
+                "title": "web-component",
+                "permalink": "/PivotHead/docs/tutorial-basics/web-component"
+              }
+            },
+            {
+              "unversionedId": "tutorial-basics/web-component",
+              "id": "tutorial-basics/web-component",
+              "title": "web-component",
+              "description": "xyz",
+              "source": "@site/docs/tutorial-basics/web-component.md",
+              "sourceDirName": "tutorial-basics",
+              "slug": "/tutorial-basics/web-component",
+              "permalink": "/PivotHead/docs/tutorial-basics/web-component",
+              "draft": false,
+              "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorial-basics/web-component.md",
+              "tags": [],
+              "version": "current",
+              "frontMatter": {},
+              "sidebar": "tutorialSidebar",
+              "previous": {
+                "title": "Troubleshooting",
+                "permalink": "/PivotHead/docs/tutorial-basics/troubleshooting"
+              },
+              "next": {
+                "title": "Wrapper",
+                "permalink": "/PivotHead/docs/category/wrapper"
               }
             },
             {
@@ -348,6 +372,30 @@
                 "title": "Tutorials",
                 "permalink": "/PivotHead/docs/category/tutorials"
               }
+            },
+            {
+              "unversionedId": "wrapper/react-lib",
+              "id": "wrapper/react-lib",
+              "title": "react-lib",
+              "description": "",
+              "source": "@site/docs/wrapper/react-lib.md",
+              "sourceDirName": "wrapper",
+              "slug": "/wrapper/react-lib",
+              "permalink": "/PivotHead/docs/wrapper/react-lib",
+              "draft": false,
+              "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/wrapper/react-lib.md",
+              "tags": [],
+              "version": "current",
+              "frontMatter": {},
+              "sidebar": "tutorialSidebar",
+              "previous": {
+                "title": "Wrapper",
+                "permalink": "/PivotHead/docs/category/wrapper"
+              },
+              "next": {
+                "title": "Contribution Guide",
+                "permalink": "/PivotHead/docs/category/contribution-guide"
+              }
             }
           ],
           "drafts": [],
@@ -386,12 +434,33 @@
                   {
                     "type": "doc",
                     "id": "tutorial-basics/troubleshooting"
+                  },
+                  {
+                    "type": "doc",
+                    "id": "tutorial-basics/web-component"
                   }
                 ],
                 "link": {
                   "type": "generated-index",
                   "slug": "/category/tutorials",
                   "permalink": "/PivotHead/docs/category/tutorials"
+                }
+              },
+              {
+                "type": "category",
+                "label": "Wrapper",
+                "collapsible": true,
+                "collapsed": true,
+                "items": [
+                  {
+                    "type": "doc",
+                    "id": "wrapper/react-lib"
+                  }
+                ],
+                "link": {
+                  "type": "generated-index",
+                  "slug": "/category/wrapper",
+                  "permalink": "/PivotHead/docs/category/wrapper"
                 }
               },
               {

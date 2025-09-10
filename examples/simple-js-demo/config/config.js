@@ -609,7 +609,7 @@ export const sampleData = [
 
 export const config = {
   data: sampleData,
-  rows: [{ uniqueName: 'country', caption: 'Country' }],
+  rows: [{ uniqueName: 'Country', caption: 'Country' }],
   columns: [{ uniqueName: 'category', caption: 'Category' }],
   measures: [
     {

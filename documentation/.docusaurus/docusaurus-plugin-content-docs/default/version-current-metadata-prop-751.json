@@ -56,9 +56,30 @@
             "label": "Troubleshooting",
             "href": "/PivotHead/docs/tutorial-basics/troubleshooting",
             "docId": "tutorial-basics/troubleshooting"
+          },
+          {
+            "type": "link",
+            "label": "web-component",
+            "href": "/PivotHead/docs/tutorial-basics/web-component",
+            "docId": "tutorial-basics/web-component"
           }
         ],
         "href": "/PivotHead/docs/category/tutorials"
+      },
+      {
+        "type": "category",
+        "label": "Wrapper",
+        "collapsible": true,
+        "collapsed": true,
+        "items": [
+          {
+            "type": "link",
+            "label": "react-lib",
+            "href": "/PivotHead/docs/wrapper/react-lib",
+            "docId": "wrapper/react-lib"
+          }
+        ],
+        "href": "/PivotHead/docs/category/wrapper"
       },
       {
         "type": "category",
@@ -162,6 +183,12 @@
       "description": "Troubleshooting and Best Practices of PivotHead",
       "sidebar": "tutorialSidebar"
     },
+    "tutorial-basics/web-component": {
+      "id": "tutorial-basics/web-component",
+      "title": "web-component",
+      "description": "xyz",
+      "sidebar": "tutorialSidebar"
+    },
     "what-is-pivothead": {
       "id": "what-is-pivothead",
       "title": "What is PivotHead",
@@ -172,6 +199,12 @@
       "id": "Why-we-use-pivothead",
       "title": "Why Use PivotHead",
       "description": "Discover the advantages of using PivotHead for your data visualization needs",
+      "sidebar": "tutorialSidebar"
+    },
+    "wrapper/react-lib": {
+      "id": "wrapper/react-lib",
+      "title": "react-lib",
+      "description": "",
       "sidebar": "tutorialSidebar"
     }
   }

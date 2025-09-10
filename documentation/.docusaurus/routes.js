@@ -4,24 +4,24 @@ import ComponentCreator from '@docusaurus/ComponentCreator';
 export default [
   {
     path: '/PivotHead/__docusaurus/debug',
-    component: ComponentCreator('/PivotHead/__docusaurus/debug', '968'),
+    component: ComponentCreator('/PivotHead/__docusaurus/debug', '39b'),
     exact: true,
   },
   {
     path: '/PivotHead/__docusaurus/debug/config',
-    component: ComponentCreator('/PivotHead/__docusaurus/debug/config', '96d'),
+    component: ComponentCreator('/PivotHead/__docusaurus/debug/config', '4a7'),
     exact: true,
   },
   {
     path: '/PivotHead/__docusaurus/debug/content',
-    component: ComponentCreator('/PivotHead/__docusaurus/debug/content', '174'),
+    component: ComponentCreator('/PivotHead/__docusaurus/debug/content', '6a0'),
     exact: true,
   },
   {
     path: '/PivotHead/__docusaurus/debug/globalData',
     component: ComponentCreator(
       '/PivotHead/__docusaurus/debug/globalData',
-      'a5a'
+      '2ef'
     ),
     exact: true,
   },
@@ -29,7 +29,7 @@ export default [
     path: '/PivotHead/__docusaurus/debug/metadata',
     component: ComponentCreator(
       '/PivotHead/__docusaurus/debug/metadata',
-      '4c7'
+      '306'
     ),
     exact: true,
   },
@@ -37,23 +37,23 @@ export default [
     path: '/PivotHead/__docusaurus/debug/registry',
     component: ComponentCreator(
       '/PivotHead/__docusaurus/debug/registry',
-      '682'
+      'f91'
     ),
     exact: true,
   },
   {
     path: '/PivotHead/__docusaurus/debug/routes',
-    component: ComponentCreator('/PivotHead/__docusaurus/debug/routes', 'bcd'),
+    component: ComponentCreator('/PivotHead/__docusaurus/debug/routes', 'd2b'),
     exact: true,
   },
   {
     path: '/PivotHead/markdown-page',
-    component: ComponentCreator('/PivotHead/markdown-page', 'c5b'),
+    component: ComponentCreator('/PivotHead/markdown-page', '616'),
     exact: true,
   },
   {
     path: '/PivotHead/docs',
-    component: ComponentCreator('/PivotHead/docs', '46b'),
+    component: ComponentCreator('/PivotHead/docs', '297'),
     routes: [
       {
         path: '/PivotHead/docs/category/contribution-guide',
@@ -70,6 +70,12 @@ export default [
           '/PivotHead/docs/category/tutorials',
           '061'
         ),
+        exact: true,
+        sidebar: 'tutorialSidebar',
+      },
+      {
+        path: '/PivotHead/docs/category/wrapper',
+        component: ComponentCreator('/PivotHead/docs/category/wrapper', '27e'),
         exact: true,
         sidebar: 'tutorialSidebar',
       },
@@ -158,6 +164,15 @@ export default [
         sidebar: 'tutorialSidebar',
       },
       {
+        path: '/PivotHead/docs/tutorial-basics/web-component',
+        component: ComponentCreator(
+          '/PivotHead/docs/tutorial-basics/web-component',
+          'af8'
+        ),
+        exact: true,
+        sidebar: 'tutorialSidebar',
+      },
+      {
         path: '/PivotHead/docs/what-is-pivothead',
         component: ComponentCreator('/PivotHead/docs/what-is-pivothead', '00a'),
         exact: true,
@@ -172,11 +187,17 @@ export default [
         exact: true,
         sidebar: 'tutorialSidebar',
       },
+      {
+        path: '/PivotHead/docs/wrapper/react-lib',
+        component: ComponentCreator('/PivotHead/docs/wrapper/react-lib', '8ba'),
+        exact: true,
+        sidebar: 'tutorialSidebar',
+      },
     ],
   },
   {
     path: '/PivotHead/',
-    component: ComponentCreator('/PivotHead/', '939'),
+    component: ComponentCreator('/PivotHead/', 'f8d'),
     exact: true,
   },
   {
