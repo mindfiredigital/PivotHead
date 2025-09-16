@@ -1,0 +1,23 @@
+{
+  "name": "vue-example",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:check": "vue-tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@mindfiredigital/pivothead-vue": "workspace:*",
+    "vue": "^3.5.21"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.1",
+    "@vitejs/plugin-vue": "^4.4.0",
+    "typescript": "^5.7.2",
+    "vite": "^4.4.5",
+    "vue-tsc": "^2.0.29"
+  }
+}
