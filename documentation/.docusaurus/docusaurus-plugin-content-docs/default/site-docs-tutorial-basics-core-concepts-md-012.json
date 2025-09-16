@@ -1,5 +1,4 @@
 {
-  "unversionedId": "tutorial-basics/core-concepts",
   "id": "tutorial-basics/core-concepts",
   "title": "Core Concepts",
   "description": "Understanding the fundamental building blocks of PivotHead",
@@ -8,6 +7,7 @@
   "slug": "/tutorial-basics/core-concepts",
   "permalink": "/PivotHead/docs/tutorial-basics/core-concepts",
   "draft": false,
+  "unlisted": false,
   "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorial-basics/core-concepts.md",
   "tags": [],
   "version": "current",

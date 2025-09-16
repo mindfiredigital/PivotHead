@@ -1,5 +1,4 @@
 {
-  "unversionedId": "Installation",
   "id": "Installation",
   "title": "Getting Started",
   "description": "Learn how to install and set up PivotHead in your project",
@@ -8,6 +7,7 @@
   "slug": "/Installation",
   "permalink": "/PivotHead/docs/Installation",
   "draft": false,
+  "unlisted": false,
   "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/Installation.md",
   "tags": [],
   "version": "current",

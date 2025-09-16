@@ -1,5 +1,4 @@
 {
-  "unversionedId": "tutorial-basics/examples",
   "id": "tutorial-basics/examples",
   "title": "Examples & Usage",
   "description": "Examples & Usage of PivotHead",
@@ -8,6 +7,7 @@
   "slug": "/tutorial-basics/examples",
   "permalink": "/PivotHead/docs/tutorial-basics/examples",
   "draft": false,
+  "unlisted": false,
   "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorial-basics/examples.md",
   "tags": [],
   "version": "current",

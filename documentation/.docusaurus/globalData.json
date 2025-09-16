@@ -61,11 +61,6 @@
               "sidebar": "tutorialSidebar"
             },
             {
-              "id": "tutorial-basics/web-component",
-              "path": "/PivotHead/docs/tutorial-basics/web-component",
-              "sidebar": "tutorialSidebar"
-            },
-            {
               "id": "what-is-pivothead",
               "path": "/PivotHead/docs/what-is-pivothead",
               "sidebar": "tutorialSidebar"
@@ -76,18 +71,8 @@
               "sidebar": "tutorialSidebar"
             },
             {
-              "id": "wrapper/react-lib",
-              "path": "/PivotHead/docs/wrapper/react-lib",
-              "sidebar": "tutorialSidebar"
-            },
-            {
               "id": "/category/tutorials",
               "path": "/PivotHead/docs/category/tutorials",
-              "sidebar": "tutorialSidebar"
-            },
-            {
-              "id": "/category/wrapper",
-              "path": "/PivotHead/docs/category/wrapper",
               "sidebar": "tutorialSidebar"
             },
             {

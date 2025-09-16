@@ -1,31 +1,308 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /**
- * Any CSS included here will be global. The classic template
+ * Any CSS included here will be global.
+ * The classic template
  * bundles Infima by default. Infima is a CSS framework designed to
  * work well for content-centric websites.
  */
 
 /* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #ff0000;
-  --ifm-color-primary-dark: #e60000;
-  --ifm-color-primary-darker: #d90000;
-  --ifm-color-primary-darkest: #b30000;
-  --ifm-color-primary-light: #ff1a1a;
-  --ifm-color-primary-lighter: #ff2626;
-  --ifm-color-primary-lightest: #ff4d4d;
+  --ifm-color-primary: #ee1a1a; /* red-500 */
+  --ifm-color-primary-dark: #f31c1c; /* red-600 */
+  --ifm-color-primary-darker: #b91c1c; /* red-700 */
+  --ifm-color-primary-darkest: #991b1b; /* red-800 */
+  --ifm-color-primary-light: #f52d2d; /* red-400 */
+  --ifm-color-primary-lighter: #ee1a1a; /* red-300 */
+  --ifm-color-primary-lightest: #fecaca; /* red-200 */
+  --ifm-background-color: #f8fafc;
+  --ifm-font-family-base: "Inter", sans-serif;
+  --ifm-font-family-monospace: "Fira Code", monospace;
+  --ifm-hero-text-color: #1e293b; /* slate-800 */
+  --ifm-heading-color: #0f172a; /* slate-900 */
+  --ifm-font-color-base: #334155; /* slate-700 */
+  --ifm-link-color: #ef4444;
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
-[data-theme='dark'] {
-  --ifm-color-primary: #ff0000;
-  --ifm-color-primary-dark: #e60000;
-  --ifm-color-primary-darker: #d90000;
-  --ifm-color-primary-darkest: #b30000;
-  --ifm-color-primary-light: #ff1a1a;
-  --ifm-color-primary-lighter: #ff2626;
-  --ifm-color-primary-lightest: #ff4d4d;
+[data-theme="dark"] {
+  --ifm-color-primary: #f51313; /* red-400 */
+  --ifm-color-primary-dark: #ef4444; /* red-500 */
+  --ifm-color-primary-darker: #eab308;
+  --ifm-color-primary-darkest: #d97706;
+  --ifm-color-primary-light: #fca5a5; /* red-300 */
+  --ifm-color-primary-lighter: #fecaca; /* red-200 */
+  --ifm-color-primary-lightest: #fee2e2; /* red-100 */
+  --ifm-background-color: #0f172a; /* slate-900 */
+  --ifm-hero-text-color: #cbd5e1; /* slate-300 */
+  --ifm-heading-color: #f1f5f9; /* slate-100 */
+  --ifm-font-color-base: #94a3b8; /* slate-400 */
+  --ifm-link-color: #f87171;
 }
 
 .navbar__title {
-  color: red;
+  color: var(--ifm-color-primary) !important;
+}
+
+.navbar {
+  position: sticky; /* Makes the navbar stick to the top */
+  top: 0;
+  width: 100%;
+  z-index: 1000; /* Ensures it stays on top of other content */
+  
+  border-bottom: 1px solid transparent;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+  background-color: whitesmoke;
+}
+
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Styling for the Boxes component */
+.boxes-core-container {
+  @apply absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2;
+}
+.boxes-row {
+  @apply flex h-10 w-fit;
+}
+.boxes-col {
+  @apply relative h-10 w-10 border-r border-t;
+}
+.boxes-icon {
+  @apply pointer-events-none absolute -left-2.5 -top-2.5 h-6 w-6;
+}
+
+[data-theme="light"] .boxes-col {
+  @apply border-slate-400;
+}
+[data-theme="light"] .boxes-icon {
+  @apply text-slate-300;
+}
+[data-theme="dark"] .boxes-col {
+  @apply border-slate-600;
+}
+[data-theme="dark"] .boxes-icon {
+  @apply text-slate-700;
+}
+
+/* Base styling for buttons in Hero section, can be extended with Tailwind */
+.btn-base {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg px-8 py-4 text-base font-semibold transition-all duration-300;
+}
+
+.chartContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.pieChartContainer {
+  gap: 1rem;
+}
+
+.chartSvg {
+  width: 100%;
+  height: auto;
+  max-height: 250px;
+}
+
+/* --- Bar Chart --- */
+@keyframes grow {
+  from {
+    transform: scaleY(0.1);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.barAnimate {
+  transform-origin: bottom;
+  animation: grow 1.5s ease-in-out infinite alternate;
+}
+
+.axisLabel,
+.barLabel {
+  fill: var(--ifm-font-color-base);
+}
+
+.axisLine,
+.gridLine {
+  stroke: var(--ifm-color-emphasis-200);
+  stroke-width: 1;
+  stroke-dasharray: 2, 2;
+}
+
+.axisLine {
+  stroke: var(--ifm-color-emphasis-300);
+  stroke-width: 1;
+}
+
+@keyframes growBar {
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* --- Line Chart --- */
+@keyframes shimmer {
+  0% {
+    stroke-dasharray: 200 800;
+    stroke-dashoffset: -1000;
+  }
+  100% {
+    stroke-dasharray: 200 800;
+    stroke-dashoffset: 1000;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.7;
+  }
+}
+
+.lineAnimate {
+  animation: shimmer 4s linear infinite;
+}
+
+.dotAnimate {
+  transform-origin: center;
+  animation: pulse 2.4s ease-in-out infinite;
+}
+
+/* --- Pie Chart --- */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.pieAnimate {
+  transform-origin: center;
+  animation: spin 20s linear infinite;
+}
+
+.pieSlice {
+  transition: transform 0.3s ease-in-out;
+}
+
+.pieSlice:hover {
+  transform: scale(1.05);
+}
+
+.pieChartContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .pieChartContainer {
+    flex-direction: row;
+  }
+}
+
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.legendColorBox {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 0.25rem;
+}
+
+.legendText {
+  color: var(--ifm-font-color-base);
+}
+
+/* Pie Chart Continuous Rotation Animation */
+@keyframes rotatePie {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.pieRotate {
+  animation: rotatePie 20s linear infinite;
+}
+
+/* Modern Developers Section Image Glow Animation */
+.dashboard-image-wrapper {
+  position: relative;
+  display: inline-block; /* Adjust based on your image container */
+  padding: 10px; /* Space for the glow */
+}
+
+.dashboard-image-wrapper::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 12px; /* Match image border-radius */
+  pointer-events: none;
+  z-index: -1;
+  animation: glowing-border 3s ease-in-out infinite alternate;
+  transform: translateZ(0); /* Improve rendering performance */
+}
+
+/* Light theme glow color */
+[data-theme="light"] .dashboard-image-wrapper::before {
+  background: linear-gradient(45deg, #fca5a5, #f87171, #fecaca); /* Red-ish gradient */
+  box-shadow: 0 0 15px rgba(252, 165, 165, 0.7), 0 0 30px rgba(248, 113, 113, 0.5);
+}
+
+/* Dark theme glow color */
+[data-theme="dark"] .dashboard-image-wrapper::before {
+  background: linear-gradient(45deg, #be123c, #4338ca, #c026d3); /* More vibrant gradient */
+  box-shadow: 0 0 15px rgba(190, 18, 60, 0.7), 0 0 30px rgba(67, 56, 202, 0.5);
+}
+
+@keyframes glowing-border {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.03);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
 }

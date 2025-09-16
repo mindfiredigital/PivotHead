@@ -1,5 +1,4 @@
 {
-  "unversionedId": "tutorial-basics/troubleshooting",
   "id": "tutorial-basics/troubleshooting",
   "title": "Troubleshooting",
   "description": "Troubleshooting and Best Practices of PivotHead",
@@ -8,6 +7,7 @@
   "slug": "/tutorial-basics/troubleshooting",
   "permalink": "/PivotHead/docs/tutorial-basics/troubleshooting",
   "draft": false,
+  "unlisted": false,
   "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorial-basics/troubleshooting.md",
   "tags": [],
   "version": "current",
@@ -23,7 +23,7 @@
     "permalink": "/PivotHead/docs/tutorial-basics/examples"
   },
   "next": {
-    "title": "web-component",
-    "permalink": "/PivotHead/docs/tutorial-basics/web-component"
+    "title": "Contribution Guide",
+    "permalink": "/PivotHead/docs/category/contribution-guide"
   }
 }

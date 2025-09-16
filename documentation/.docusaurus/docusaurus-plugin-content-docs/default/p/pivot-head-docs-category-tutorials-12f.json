@@ -1,0 +1,18 @@
+{
+  "categoryGeneratedIndex": {
+    "title": "Tutorials",
+    "slug": "/category/tutorials",
+    "permalink": "/PivotHead/docs/category/tutorials",
+    "sidebar": "tutorialSidebar",
+    "navigation": {
+      "previous": {
+        "title": "Why Use PivotHead",
+        "permalink": "/PivotHead/docs/Why-we-use-pivothead"
+      },
+      "next": {
+        "title": "Core Concepts",
+        "permalink": "/PivotHead/docs/tutorial-basics/core-concepts"
+      }
+    }
+  }
+}

@@ -1,14 +1,16 @@
-// @ts-check
+// @ts-nocheck
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const lightCodeTheme = require('prism-react-renderer/themes/github');
-const darkCodeTheme = require('prism-react-renderer/themes/dracula');
+const { themes } = require('prism-react-renderer');
+
+// const lightCodeTheme = require('prism-react-renderer/themes/github');
+// const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'PivotHead',
   tagline: 'Documentation for the PivotHead',
-  favicon: 'img/mindfire.ico',
+  favicon: 'img/logo.png',
 
   // Set the production url of your site here
   url: 'https://mindfiredigital.github.io',
@@ -58,6 +60,29 @@ const config = {
     ],
   ],
 
+  plugins: [
+    async function docusaurusTailwindcss(context, options) {
+      return {
+        name: 'docusaurus-tailwindcss',
+        configurePostCss(postcssOptions) {
+          // Appends Tailwind CSS and AutoPrefixer.
+          postcssOptions.plugins.push(require('tailwindcss'));
+          postcssOptions.plugins.push(require('autoprefixer'));
+          return postcssOptions;
+        },
+      };
+    },
+  ],
+
+  scripts: [
+    {
+      src: 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
+    },
+    {
+      src: 'https://cdn.jsdelivr.net/npm/vanta@0.5.21/dist/vanta.net.min.js',
+    },
+  ],
+
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
@@ -67,7 +92,7 @@ const config = {
         title: 'PivotHead',
         logo: {
           alt: 'PivotHead Logo',
-          src: 'img/logo.svg',
+          src: 'img/logo.png',
         },
         items: [
           {
@@ -96,11 +121,11 @@ const config = {
       footer: {
         style: 'dark',
 
-        copyright: `Copyright © ${new Date().getFullYear()} MindfireDigital`,
+        copyright: `© ${new Date().getFullYear()} Mindfire FOSS`,
       },
       prism: {
-        theme: lightCodeTheme,
-        darkTheme: darkCodeTheme,
+        theme: themes.github,
+        darkTheme: themes.dracula,
       },
     }),
 };

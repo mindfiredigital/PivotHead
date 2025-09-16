@@ -1,133 +1,127 @@
 {
-  "/PivotHead/__docusaurus/debug-39b": {
+  "/PivotHead/__docusaurus/debug-aa4": {
     "__comp": "__comp---theme-debug-config-23-a-2ff",
     "__context": {
-      "plugin": "plugin---pivot-head-docusaurus-debug-37-b-cab"
+      "plugin": "plugin---pivot-head-docusaurus-debugb-38-19d"
     }
   },
-  "/PivotHead/__docusaurus/debug/config-4a7": {
+  "/PivotHead/__docusaurus/debug/config-251": {
     "__comp": "__comp---theme-debug-config-23-a-2ff",
     "__context": {
-      "plugin": "plugin---pivot-head-docusaurus-debug-37-b-cab"
+      "plugin": "plugin---pivot-head-docusaurus-debugb-38-19d"
     }
   },
-  "/PivotHead/__docusaurus/debug/content-6a0": {
+  "/PivotHead/__docusaurus/debug/content-0aa": {
     "__comp": "__comp---theme-debug-contentba-8-ce7",
     "__context": {
-      "plugin": "plugin---pivot-head-docusaurus-debug-37-b-cab"
+      "plugin": "plugin---pivot-head-docusaurus-debugb-38-19d"
     },
-    "allContent": "allContent---pivot-head-docusaurus-debug-content-246-2b1"
+    "__props": "__props---pivot-head-docusaurus-debug-contentf-9-e-32b"
   },
-  "/PivotHead/__docusaurus/debug/globalData-2ef": {
+  "/PivotHead/__docusaurus/debug/globalData-6ba": {
     "__comp": "__comp---theme-debug-global-dataede-0fa",
     "__context": {
-      "plugin": "plugin---pivot-head-docusaurus-debug-37-b-cab"
+      "plugin": "plugin---pivot-head-docusaurus-debugb-38-19d"
     }
   },
-  "/PivotHead/__docusaurus/debug/metadata-306": {
+  "/PivotHead/__docusaurus/debug/metadata-a8d": {
     "__comp": "__comp---theme-debug-site-metadata-68-e-3d4",
     "__context": {
-      "plugin": "plugin---pivot-head-docusaurus-debug-37-b-cab"
+      "plugin": "plugin---pivot-head-docusaurus-debugb-38-19d"
     }
   },
-  "/PivotHead/__docusaurus/debug/registry-f91": {
+  "/PivotHead/__docusaurus/debug/registry-f54": {
     "__comp": "__comp---theme-debug-registry-679-501",
     "__context": {
-      "plugin": "plugin---pivot-head-docusaurus-debug-37-b-cab"
+      "plugin": "plugin---pivot-head-docusaurus-debugb-38-19d"
     }
   },
-  "/PivotHead/__docusaurus/debug/routes-d2b": {
+  "/PivotHead/__docusaurus/debug/routes-9ce": {
     "__comp": "__comp---theme-debug-routes-946-699",
     "__context": {
-      "plugin": "plugin---pivot-head-docusaurus-debug-37-b-cab"
+      "plugin": "plugin---pivot-head-docusaurus-debugb-38-19d"
     }
   },
-  "/PivotHead/markdown-page-616": {
+  "/PivotHead/markdown-page-9e2": {
     "__comp": "__comp---theme-mdx-page-1-f-3-b90",
     "__context": {
-      "plugin": "plugin---pivot-head-markdown-page-63-e-3b5"
+      "plugin": "plugin---pivot-head-markdown-pagea-74-230"
     },
     "content": "content---pivot-head-markdown-page-393-f56"
   },
-  "/PivotHead/docs-297": {
-    "__comp": "__comp---theme-doc-page-1-be-9be",
+  "/PivotHead/docs-97d": {
+    "__comp": "__comp---theme-docs-root-5-e-9-0b6",
     "__context": {
-      "plugin": "plugin---pivot-head-docs-601-bbe"
-    },
-    "versionMetadata": "versionMetadata---pivot-head-docs-935-254"
+      "plugin": "plugin---pivot-head-docsaba-41e"
+    }
   },
-  "/PivotHead/docs/category/contribution-guide-9c0": {
+  "/PivotHead/docs-a7e": {
+    "__comp": "__comp---theme-doc-version-roota-7-b-5de",
+    "__props": "__props---pivot-head-docs-162-87b"
+  },
+  "/PivotHead/docs-c22": {
+    "__comp": "__comp---theme-doc-roota-94-67a"
+  },
+  "/PivotHead/docs/category/contribution-guide-2e1": {
     "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
-    "categoryGeneratedIndex": "categoryGeneratedIndex---pivot-head-docs-category-contribution-guidec-53-a6d"
+    "__props": "__props---pivot-head-docs-category-contribution-guidea-3-d-5d9"
   },
-  "/PivotHead/docs/category/tutorials-061": {
+  "/PivotHead/docs/category/tutorials-ceb": {
     "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
-    "categoryGeneratedIndex": "categoryGeneratedIndex---pivot-head-docs-category-tutorials-644-041"
+    "__props": "__props---pivot-head-docs-category-tutorials-9-b-3-017"
   },
-  "/PivotHead/docs/category/wrapper-27e": {
-    "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
-    "categoryGeneratedIndex": "categoryGeneratedIndex---pivot-head-docs-category-wrapper-2-aa-877"
-  },
-  "/PivotHead/docs/contributors/-da1": {
+  "/PivotHead/docs/contributors/-f21": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---pivot-head-docs-contributors-6-f-4-1d5"
   },
-  "/PivotHead/docs/contributors/code-of-conduct-ea0": {
+  "/PivotHead/docs/contributors/code-of-conduct-e61": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---pivot-head-docs-contributors-code-of-conductf-3-e-e7d"
   },
-  "/PivotHead/docs/contributors/how-to-contribute-3df": {
+  "/PivotHead/docs/contributors/how-to-contribute-ca9": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---pivot-head-docs-contributors-how-to-contribute-42-f-4f6"
   },
-  "/PivotHead/docs/contributors/monorepo-setup-3e5": {
+  "/PivotHead/docs/contributors/monorepo-setup-c2e": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---pivot-head-docs-contributors-monorepo-setup-78-c-bb8"
   },
-  "/PivotHead/docs/contributors/quick-start-566": {
+  "/PivotHead/docs/contributors/quick-start-384": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---pivot-head-docs-contributors-quick-startbb-9-9e6"
   },
-  "/PivotHead/docs/Installation-05f": {
+  "/PivotHead/docs/Installation-15e": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---pivot-head-docs-installation-1-ff-9e1"
   },
-  "/PivotHead/docs/tutorial-basics/api-reference-e89": {
+  "/PivotHead/docs/tutorial-basics/api-reference-a6a": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---pivot-head-docs-tutorial-basics-api-reference-2-b-0-15f"
   },
-  "/PivotHead/docs/tutorial-basics/core-concepts-3c8": {
+  "/PivotHead/docs/tutorial-basics/core-concepts-37a": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---pivot-head-docs-tutorial-basics-core-concepts-012-95a"
   },
-  "/PivotHead/docs/tutorial-basics/examples-0e5": {
+  "/PivotHead/docs/tutorial-basics/examples-903": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---pivot-head-docs-tutorial-basics-examples-550-3ec"
   },
-  "/PivotHead/docs/tutorial-basics/troubleshooting-29e": {
+  "/PivotHead/docs/tutorial-basics/troubleshooting-988": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---pivot-head-docs-tutorial-basics-troubleshooting-18-f-fd8"
   },
-  "/PivotHead/docs/tutorial-basics/web-component-af8": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-tutorial-basics-web-component-841-478"
-  },
-  "/PivotHead/docs/what-is-pivothead-00a": {
+  "/PivotHead/docs/what-is-pivothead-24e": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---pivot-head-docs-what-is-pivothead-4-ce-56a"
   },
-  "/PivotHead/docs/Why-we-use-pivothead-40b": {
+  "/PivotHead/docs/Why-we-use-pivothead-71b": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---pivot-head-docs-why-we-use-pivotheada-8-b-7a9"
   },
-  "/PivotHead/docs/wrapper/react-lib-8ba": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-wrapper-react-libdc-6-af5"
-  },
-  "/PivotHead/-f8d": {
+  "/PivotHead/-409": {
     "__comp": "__comp---site-src-pages-index-jsc-4-f-f99",
     "__context": {
-      "plugin": "plugin---pivot-head-markdown-page-63-e-3b5"
+      "plugin": "plugin---pivot-head-markdown-pagea-74-230"
     },
     "config": "config---pivot-head-5-e-9-392"
   }

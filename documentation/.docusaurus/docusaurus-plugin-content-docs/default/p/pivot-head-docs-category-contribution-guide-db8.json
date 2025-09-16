@@ -1,0 +1,18 @@
+{
+  "categoryGeneratedIndex": {
+    "title": "Contribution Guide",
+    "slug": "/category/contribution-guide",
+    "permalink": "/PivotHead/docs/category/contribution-guide",
+    "sidebar": "tutorialSidebar",
+    "navigation": {
+      "previous": {
+        "title": "Troubleshooting",
+        "permalink": "/PivotHead/docs/tutorial-basics/troubleshooting"
+      },
+      "next": {
+        "title": "Contributors",
+        "permalink": "/PivotHead/docs/contributors/"
+      }
+    }
+  }
+}
