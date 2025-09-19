@@ -1,5 +1,6 @@
 export { PivotEngine } from './engine/pivotEngine';
 export * from './types/interfaces';
+export { FieldService } from './engine/fieldService';
 
 // Ensure all necessary types are exported
 export type {

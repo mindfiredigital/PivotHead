@@ -1,5 +1,439 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { PivotEngine } from './pivotEngine';
+import type { AxisConfig, MeasureConfig } from '../types/interfaces';
+
+type FieldType = 'number' | 'string' | 'date' | 'boolean' | 'null' | 'unknown';
+
+interface AutoLayoutResult {
+  rows: AxisConfig[];
+  columns: AxisConfig[];
+  measures: MeasureConfig[];
+  data: any[]; // possibly augmented with __all__
+  columnsList: string[];
+}
+
+/**
+ * Try to parse currency-like strings into a number.
+ * Handles symbols ($, €, £, ₹, etc.), spaces, thousands separators and decimal marks
+ * including both "," and ".", and negatives in parentheses.
+ */
+function parseCurrencyToNumber(input: unknown): number | null {
+  if (input === null || input === undefined) return null;
+  if (typeof input === 'number') return isFinite(input) ? input : null;
+  if (typeof input !== 'string') return null;
+
+  let s = input.trim();
+  if (!s) return null;
+
+  const hasCurrencySymbol = /[€£¥₹$]/.test(s);
+  const hasLetters = /[A-Za-z]/.test(s);
+  const hasSeparator = /[.,]/.test(s);
+  const hasParenNegRaw = s.startsWith('(') && s.endsWith(')');
+
+  // If contains letters but no currency symbol (e.g., 'value 1'), don't treat as currency/number here
+  if (hasLetters && !hasCurrencySymbol) return null;
+  // If no currency symbol, no separators and no parentheses negative, leave as-is (handled later by Number/Date checks)
+  if (!hasCurrencySymbol && !hasSeparator && !hasParenNegRaw) return null;
+
+  // Detect and handle negatives like (1,234.56)
+  let negative = false;
+  if (hasParenNegRaw) {
+    negative = true;
+    s = s.slice(1, -1);
+  }
+
+  // Remove currency symbols and any non digit/sep/minus
+  // Keep digits, comma, dot, minus
+  s = s.replace(/[^0-9,.-]/g, '');
+
+  // If there are multiple minus signs, invalid
+  if ((s.match(/-/g) || []).length > 1) return null;
+  // Normalize minus position
+  s = s.replace(/(.*)-(.*)/, '-$1$2');
+
+  const hasDot = s.includes('.');
+  const hasComma = s.includes(',');
+
+  const lastDot = s.lastIndexOf('.');
+  const lastComma = s.lastIndexOf(',');
+
+  let normalized = s;
+
+  if (hasDot && hasComma) {
+    // Use the rightmost separator as decimal separator
+    const decimalSep = lastDot > lastComma ? '.' : ',';
+    const thousandSep = decimalSep === '.' ? ',' : '.';
+    normalized = normalized.split(thousandSep).join('');
+    normalized = normalized.replace(decimalSep, '.');
+  } else if (hasComma && !hasDot) {
+    // Only comma present. If multiple commas -> treat all as thousands except possibly the last
+    const parts = s.split(',');
+    if (parts.length > 2) {
+      // Remove all commas, assume integer (rarely has multiple decimal commas)
+      normalized = parts.join('');
+    } else if (parts.length === 2) {
+      // Decide whether comma is decimal or thousand by digits after
+      const frac = parts[1];
+      if (frac.length === 2 || frac.length === 3) {
+        normalized = parts[0] + '.' + frac; // decimal comma
+      } else {
+        normalized = parts.join(''); // thousands comma
+      }
+    }
+  } else if (hasDot && !hasComma) {
+    // Only dot present. If multiple dots, keep the last as decimal, remove others
+    const pieces = s.split('.');
+    if (pieces.length > 2) {
+      const frac = pieces.pop() as string;
+      normalized = pieces.join('') + '.' + frac;
+    } else {
+      normalized = s; // single dot, assume decimal
+    }
+  } else {
+    normalized = s; // no separators, just digits (and maybe minus)
+  }
+
+  const n = Number(normalized);
+  if (isNaN(n)) return null;
+  return negative ? -n : n;
+}
+
+/**
+ * Infer field types from data sample
+ */
+function inferFieldTypes(
+  data: any[],
+  columns: string[]
+): Record<string, FieldType> {
+  const result: Record<string, FieldType> = {};
+  const sample = data.slice(0, Math.min(200, data.length));
+
+  for (const col of columns) {
+    let num = 0,
+      str = 0,
+      date = 0,
+      bool = 0,
+      nul = 0;
+    for (const row of sample) {
+      const v = row?.[col];
+      if (v === null || v === undefined || v === '') {
+        nul++;
+        continue;
+      }
+      if (typeof v === 'number') num++;
+      else if (typeof v === 'boolean') bool++;
+      else if (typeof v === 'string') {
+        // Currency-like strings should count as numbers
+        const currencyNum = parseCurrencyToNumber(v);
+        if (currencyNum !== null) {
+          num++;
+          continue;
+        }
+        const ts = Date.parse(v);
+        if (!isNaN(ts) && /\d{4}-\d{2}-\d{2}|\//.test(v)) date++;
+        else if (!isNaN(Number(v))) num++;
+        else str++;
+      } else if (v instanceof Date) date++;
+      else str++;
+    }
+    const counts = { num, str, date, bool, nul } as const;
+    const maxKey = (Object.entries(counts).sort((a, b) => b[1] - a[1])[0] || [
+      'str',
+    ])[0];
+    switch (maxKey) {
+      case 'num':
+        result[col] = 'number';
+        break;
+      case 'date':
+        result[col] = 'date';
+        break;
+      case 'bool':
+        result[col] = 'boolean';
+        break;
+      case 'str':
+        result[col] = 'string';
+        break;
+      default:
+        result[col] = 'unknown';
+    }
+  }
+  return result;
+}
+
+/**
+ * Build automatic layout based on CSV/JSON data per product rules
+ */
+function buildAutoLayout(data: any[]): AutoLayoutResult {
+  const columns = data.length > 0 ? Object.keys(data[0]) : [];
+  let workingData = data;
+
+  // Single-column CSV special-case
+  if (columns.length === 1) {
+    const [only] = columns;
+    const measures: MeasureConfig[] = [];
+    // If the only column is numeric -> add __all__ and make it a measure
+    const types = inferFieldTypes(workingData, columns);
+    if (types[only] === 'number') {
+      workingData = workingData.map(row => ({ ...row, __all__: 'All' }));
+      const rows: AxisConfig[] = [{ uniqueName: '__all__', caption: 'All' }];
+      // Changed: ensure there is always a column axis
+      const columnsAxis: AxisConfig[] = [
+        { uniqueName: '__all__', caption: 'All' },
+      ];
+      measures.push({
+        uniqueName: only,
+        caption: `Sum of ${only}`,
+        aggregation: 'sum',
+        format: {
+          type: 'number',
+          decimals: 2,
+          locale: 'en-US',
+        },
+      });
+      return {
+        rows,
+        columns: columnsAxis,
+        measures,
+        data: workingData,
+        columnsList: ['__all__', ...columns],
+      };
+    }
+    // Otherwise treat it as a row dimension but still create a single synthetic column
+    workingData = workingData.map(row => ({ ...row, __all__: 'All' }));
+    const rows: AxisConfig[] = [{ uniqueName: only, caption: only }];
+    const columnsAxis: AxisConfig[] = [
+      { uniqueName: '__all__', caption: 'All' },
+    ];
+    return {
+      rows,
+      columns: columnsAxis,
+      measures,
+      data: workingData,
+      columnsList: ['__all__', ...columns],
+    };
+  }
+
+  // General case
+  const types = inferFieldTypes(workingData, columns);
+  const numericFields = columns.filter(c => types[c] === 'number');
+  const nonNumericFields = columns.filter(c => types[c] !== 'number');
+
+  // Measures: all numeric columns -> sum with proper formatting
+  // Apply rule: If a column has all numeric values, set it as a measure
+  const measures: MeasureConfig[] = numericFields.map(f => {
+    // Detect if the field might contain currency values
+    const isCurrency = workingData.some(row => {
+      const value = row[f];
+      return typeof value === 'string' && /[$€£¥₹]/.test(value);
+    });
+
+    return {
+      uniqueName: f,
+      caption: `Sum of ${f}`,
+      aggregation: 'sum',
+      format: {
+        type: isCurrency ? 'currency' : 'number',
+        currency: 'USD',
+        locale: 'en-US',
+        decimals: 2,
+      },
+      sortabled: true,
+    };
+  });
+
+  // Decide rows/columns
+  let rows: AxisConfig[] = [];
+  let columnsAxis: AxisConfig[] = [];
+
+  // Utility to compute cardinality
+  const uniqueCount = (field: string) =>
+    new Set(workingData.map(r => r?.[field])).size;
+  const totalRows = workingData.length || 1;
+
+  if (nonNumericFields.length === 0) {
+    // All numeric -> add __all__ and set both rows and columns as All
+    workingData = workingData.map(row => ({ ...row, __all__: 'All' }));
+    rows = [{ uniqueName: '__all__', caption: 'All' }];
+    columnsAxis = [{ uniqueName: '__all__', caption: 'All' }];
+    return {
+      rows,
+      columns: columnsAxis,
+      measures,
+      data: workingData,
+      columnsList: ['__all__', ...columns],
+    };
+  }
+
+  // Rank non-numeric fields by cardinality (low to high), prefer repetitive fields
+  // Apply rule: If the table has repetitive records for non-numeric columns
+  const ranked = nonNumericFields
+    .map(f => ({ f, u: uniqueCount(f) }))
+    .sort((a, b) => a.u - b.u);
+
+  // Debug logging
+  console.log('DEBUG: Non-numeric fields:', nonNumericFields);
+  console.log('DEBUG: Ranked fields:', ranked);
+  console.log('DEBUG: Total rows:', totalRows);
+
+  // Select candidate dimensions - fields that have more than one unique value
+  // but fewer than the total number of rows (indicating repetition)
+  const candidateDims = ranked.filter(x => x.u > 1 && x.u < totalRows);
+
+  console.log('DEBUG: Candidate dimensions:', candidateDims);
+  console.log(
+    'DEBUG: Detailed ranked fields:',
+    ranked.map(r => ({ field: r.f, unique: r.u }))
+  );
+
+  if (candidateDims.length >= 2) {
+    // Use first two most repetitive fields for rows and columns
+    // Sort by cardinality first, then apply business logic for common field names
+    const sortedCandidates = candidateDims.sort((a, b) => {
+      if (a.u !== b.u) return a.u - b.u; // Sort by cardinality first
+
+      // Apply business logic for common field patterns
+      const aField = a.f.toLowerCase().trim();
+      const bField = b.f.toLowerCase().trim();
+
+      // Common row fields (geographical, organizational hierarchy)
+      const rowFields = [
+        'region',
+        'country',
+        'state',
+        'city',
+        'category',
+        'department',
+      ];
+      // Common column fields (products, time periods, categories)
+      const columnFields = [
+        'product',
+        'item',
+        'month',
+        'quarter',
+        'year',
+        'type',
+      ];
+
+      const aIsRow = rowFields.some(rf => aField.includes(rf));
+      const bIsRow = rowFields.some(rf => bField.includes(rf));
+      const aIsColumn = columnFields.some(cf => aField.includes(cf));
+      const bIsColumn = columnFields.some(cf => bField.includes(cf));
+
+      console.log('DEBUG: Field comparison:', {
+        aField,
+        bField,
+        aIsRow,
+        bIsRow,
+        aIsColumn,
+        bIsColumn,
+      });
+
+      // If one is clearly a row field and the other is not, prioritize the row field
+      if (aIsRow && !bIsRow) return -1;
+      if (bIsRow && !aIsRow) return 1;
+
+      // If one is clearly a column field and the other is not, the column field goes second
+      if (aIsColumn && !bIsColumn) return 1;
+      if (bIsColumn && !aIsColumn) return -1;
+
+      // Fall back to alphabetical ordering
+      return aField.localeCompare(bField);
+    });
+
+    console.log(
+      'DEBUG: Sorted candidates:',
+      sortedCandidates.map(c => ({ field: c.f, unique: c.u }))
+    );
+
+    // Assign the first field to rows, second to columns
+    // Ensure we use the exact field names from the data (preserve case and whitespace)
+    rows = [
+      { uniqueName: sortedCandidates[0].f, caption: sortedCandidates[0].f },
+    ];
+    columnsAxis = [
+      { uniqueName: sortedCandidates[1].f, caption: sortedCandidates[1].f },
+    ];
+
+    console.log(
+      'DEBUG: Final assignment - Rows:',
+      rows,
+      'Columns:',
+      columnsAxis
+    );
+  } else if (candidateDims.length === 1) {
+    // Only one repetitive non-numeric -> set as rows only
+    rows = [
+      { uniqueName: candidateDims[0].f, caption: candidateDims[0].f.trim() },
+    ];
+  } else if (nonNumericFields.length >= 2) {
+    // If we have at least 2 non-numeric fields, use the first two even if not highly repetitive
+    // Apply the same business logic as above
+    const sortedByCardinality = ranked.sort((a, b) => {
+      if (a.u !== b.u) return a.u - b.u;
+
+      const aField = a.f.toLowerCase().trim();
+      const bField = b.f.toLowerCase().trim();
+
+      const rowFields = [
+        'region',
+        'country',
+        'state',
+        'city',
+        'category',
+        'department',
+      ];
+      const columnFields = [
+        'product',
+        'item',
+        'month',
+        'quarter',
+        'year',
+        'type',
+      ];
+
+      const aIsRow = rowFields.some(rf => aField.includes(rf));
+      const bIsRow = rowFields.some(rf => bField.includes(rf));
+      const aIsColumn = columnFields.some(cf => aField.includes(cf));
+      const bIsColumn = columnFields.some(cf => bField.includes(cf));
+
+      if (aIsRow && !bIsRow) return -1;
+      if (bIsRow && !aIsRow) return 1;
+      if (aIsColumn && !bIsColumn) return 1;
+      if (bIsColumn && !aIsColumn) return -1;
+
+      return aField.localeCompare(bField);
+    });
+    rows = [
+      {
+        uniqueName: sortedByCardinality[0].f,
+        caption: sortedByCardinality[0].f.trim(),
+      },
+    ];
+    columnsAxis = [
+      {
+        uniqueName: sortedByCardinality[1].f,
+        caption: sortedByCardinality[1].f.trim(),
+      },
+    ];
+  } else {
+    // No repetitive non-numeric -> use first non-numeric as rows
+    rows = [{ uniqueName: ranked[0].f, caption: ranked[0].f.trim() }];
+  }
+
+  // NEW: If no column axis was selected, synthesize a single '__all__' column
+  if (!columnsAxis || columnsAxis.length === 0) {
+    workingData = workingData.map(row => ({ ...row, __all__: 'All' }));
+    columnsAxis = [{ uniqueName: '__all__', caption: 'All' }];
+  }
+
+  return {
+    rows,
+    columns: columnsAxis,
+    measures,
+    data: workingData,
+    columnsList: Object.keys(workingData[0] || {}),
+  };
+}
 
 /**
  * Interface for file connection result
@@ -65,10 +499,7 @@ export class ConnectService {
     options: ConnectionOptions = {}
   ): Promise<FileConnectionResult> {
     try {
-      const file = await this.openFilePicker(
-        this.SUPPORTED_CSV_EXTENSIONS,
-        'CSV'
-      );
+      const file = await this.openFilePicker(this.SUPPORTED_CSV_EXTENSIONS);
       if (!file) {
         return { success: false, error: 'No file selected' };
       }
@@ -95,10 +526,7 @@ export class ConnectService {
     options: ConnectionOptions = {}
   ): Promise<FileConnectionResult> {
     try {
-      const file = await this.openFilePicker(
-        this.SUPPORTED_JSON_EXTENSIONS,
-        'JSON'
-      );
+      const file = await this.openFilePicker(this.SUPPORTED_JSON_EXTENSIONS);
       if (!file) {
         return { success: false, error: 'No file selected' };
       }
@@ -130,7 +558,7 @@ export class ConnectService {
         ...this.SUPPORTED_JSON_EXTENSIONS,
       ];
 
-      const file = await this.openFilePicker(allExtensions, 'CSV and JSON');
+      const file = await this.openFilePicker(allExtensions);
       if (!file) {
         return { success: false, error: 'No file selected' };
       }
@@ -161,10 +589,7 @@ export class ConnectService {
    * Opens a file picker dialog
    * @private
    */
-  private static openFilePicker(
-    extensions: string[],
-    description: string
-  ): Promise<File | null> {
+  private static openFilePicker(extensions: string[]): Promise<File | null> {
     return new Promise(resolve => {
       const input = document.createElement('input');
       input.type = 'file';
@@ -212,7 +637,13 @@ export class ConnectService {
       };
 
       const text = await this.readFileAsText(file, options.onProgress);
-      const parsedData = this.parseCSV(text, csvOptions);
+      let parsedData = this.parseCSV(text, csvOptions);
+
+      // Apply record limit (use default if not provided)
+      const maxRecords = options.maxRecords ?? this.DEFAULT_MAX_RECORDS;
+      if (parsedData.length > maxRecords) {
+        parsedData = parsedData.slice(0, maxRecords);
+      }
 
       if (parsedData.length === 0) {
         return {
@@ -229,16 +660,68 @@ export class ConnectService {
         console.warn('Data validation warnings:', validationErrors);
       }
 
-      // Update the pivot engine with new data
-      engine.updateDataSource(parsedData);
+      // Process and normalize the data
+      const processedData = this.processCSVData(parsedData);
+
+      // Enable engine-level synthetic column behavior for imported datasets
+      engine.setAutoAllColumn(true);
+
+      // Update the pivot engine with new data (engine will handle '__all__' if needed)
+      engine.updateDataSource(processedData);
+
+      // Generate automatic layout based on data content
+      const layout = buildAutoLayout(processedData);
+      const { rows, columns: initialColumnsAxis, measures } = layout as any;
+      const columnsAxis = initialColumnsAxis as AxisConfig[];
+
+      // Apply automatic layout with proper formatting; engine will synthesize column axis if empty
+      engine.setLayout(rows, columnsAxis, measures);
+
+      // Apply conditional formatting if possible
+      // Use a try/catch block since we're not sure if the engine supports this feature
+      try {
+        const anyEngine = engine as any;
+        if (typeof anyEngine.setConditionalFormatting === 'function') {
+          anyEngine.setConditionalFormatting([
+            {
+              value: {
+                type: 'Number',
+                operator: 'Greater than',
+                value1: 1000,
+              },
+              format: {
+                backgroundColor: '#d4edda',
+                color: '#155724',
+              },
+            },
+            {
+              value: {
+                type: 'Number',
+                operator: 'Less than',
+                value1: 0,
+              },
+              format: {
+                backgroundColor: '#f8d7da',
+                color: '#721c24',
+              },
+            },
+          ]);
+        }
+      } catch (e) {
+        console.warn(
+          'Conditional formatting not supported by this engine version:',
+          e
+        );
+      }
 
       return {
         success: true,
-        data: parsedData,
+        data: processedData,
         fileName: file.name,
         fileSize: file.size,
-        recordCount: parsedData.length,
-        columns: columns,
+        recordCount: processedData.length,
+        // Return original columns (exclude helper fields like __all__)
+        columns,
         validationErrors:
           validationErrors.length > 0 ? validationErrors : undefined,
       };
@@ -297,6 +780,12 @@ export class ConnectService {
         };
       }
 
+      // Apply record limit (use default if not provided)
+      const maxRecords = options.maxRecords ?? this.DEFAULT_MAX_RECORDS;
+      if (arrayData.length > maxRecords) {
+        arrayData = arrayData.slice(0, maxRecords);
+      }
+
       // Validate data structure
       const columns = Object.keys(arrayData[0] || {});
       const validationErrors = this.validateDataStructure(arrayData, columns);
@@ -305,8 +794,18 @@ export class ConnectService {
         console.warn('Data validation warnings:', validationErrors);
       }
 
-      // Update the pivot engine with new data
+      // Enable engine-level synthetic column behavior for imported datasets
+      engine.setAutoAllColumn(true);
+
+      // Update the pivot engine with new data (engine will handle '__all__' if needed)
       engine.updateDataSource(arrayData);
+
+      const layout = buildAutoLayout(arrayData);
+      const { rows, columns: initialColumnsAxis, measures } = layout as any;
+      const columnsAxis = initialColumnsAxis as AxisConfig[];
+
+      // Apply automatic layout; engine will synthesize column axis if empty
+      engine.setLayout(rows, columnsAxis, measures);
 
       return {
         success: true,
@@ -314,7 +813,8 @@ export class ConnectService {
         fileName: file.name,
         fileSize: file.size,
         recordCount: arrayData.length,
-        columns: columns,
+        // Return original columns (exclude helper fields like __all__)
+        columns,
         validationErrors:
           validationErrors.length > 0 ? validationErrors : undefined,
       };
@@ -439,7 +939,7 @@ export class ConnectService {
           value = value.trim();
         }
 
-        // Try to convert to appropriate data type
+        // Try to convert to appropriate data type (with currency support)
         row[header] = this.convertValue(value);
       });
 
@@ -486,6 +986,10 @@ export class ConnectService {
 
     // Remove quotes if present
     const cleaned = value.replace(/^"(.*)"$/, '$1');
+
+    // Try to convert currency-like values first
+    const currencyNum = parseCurrencyToNumber(cleaned);
+    if (currencyNum !== null) return currencyNum;
 
     // Try to convert to number
     if (!isNaN(Number(cleaned)) && cleaned !== '') {
@@ -560,7 +1064,7 @@ export class ConnectService {
 
     // Check data consistency (sample first 100 rows)
     const sampleSize = Math.min(100, data.length);
-    const inconsistentRows = [];
+    const inconsistentRows = [] as number[];
 
     for (let i = 0; i < sampleSize; i++) {
       const row = data[i];
@@ -634,19 +1138,56 @@ export class ConnectService {
    * @param result - The file connection result
    */
   public static showImportNotification(result: FileConnectionResult): void {
-    if (result.success) {
-      console.log('Import successful:', this.createImportSummary(result));
-      // You can replace this with your preferred notification system
-      if (typeof window !== 'undefined' && 'Notification' in window) {
-        if (Notification.permission === 'granted') {
-          new Notification('Import Successful', {
-            body: `Imported ${result.recordCount} records from ${result.fileName}`,
-            icon: '/favicon.ico', // Replace with your app icon
-          });
+    const message = this.createImportSummary(result);
+
+    // Prefer the Web Notifications API if available and permitted
+    if ('Notification' in window) {
+      if (Notification.permission === 'granted') {
+        new Notification('PivotHead Import', { body: message });
+        return;
+      }
+      if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then(permission => {
+          if (permission === 'granted') {
+            new Notification('PivotHead Import', { body: message });
+          } else {
+            // Fallback if permission denied or default
+            console.log(message);
+          }
+        });
+        return;
+      }
+    }
+
+    // Final fallback
+    console.log(message);
+  }
+
+  /**
+   * Process CSV data to normalize and prepare it for the pivot engine
+   * @private
+   */
+  private static processCSVData(data: any[]): any[] {
+    if (!data || data.length === 0) return data;
+
+    // Make a deep copy to avoid modifying the original data
+    const processedData = JSON.parse(JSON.stringify(data));
+
+    const columns = Object.keys(processedData[0]);
+    const types = inferFieldTypes(processedData, columns);
+
+    // Convert all strings that could be numbers to numbers
+    for (const row of processedData) {
+      for (const col of columns) {
+        if (types[col] === 'number' && typeof row[col] === 'string') {
+          const parsed = parseFloat(row[col]);
+          if (!isNaN(parsed)) {
+            row[col] = parsed;
+          }
         }
       }
-    } else {
-      console.error('Import failed:', result.error);
     }
+
+    return processedData;
   }
 }
