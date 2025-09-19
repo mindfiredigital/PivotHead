@@ -15,6 +15,7 @@ import { PivotEngine } from '@mindfiredigital/pivothead';
 import { sampleData, config } from './config/config.js';
 
 import { ConnectService } from '../../packages/core/src/engine/connectService.ts';
+import { FieldService } from '../../packages/core/src/engine/fieldService.ts';
 
 // Create a single instance of PivotEngine that will be used throughout the app's lifecycle
 export let pivotEngine;
@@ -39,12 +40,28 @@ function initializeFilters() {
     return;
   }
 
-  filterField.innerHTML = `
-    <option value="country">Country</option>
-    <option value="category">Category</option>
-     <option value="price">Price</option>
-    <option value="discount">Discount</option>
-  `;
+  // Build field list dynamically from current engine data
+  let fields = [];
+  try {
+    if (pivotEngine) {
+      const stateNow = pivotEngine.getState();
+      const sample = (stateNow.rawData && stateNow.rawData[0]) || null;
+      if (sample) {
+        fields = Object.keys(sample).filter(k => k !== '__all__');
+      }
+    }
+  } catch (e) {
+    console.warn('Unable to infer fields for filters from engine:', e);
+  }
+
+  // Fallback to defaults if no fields were detected
+  if (!fields || fields.length === 0) {
+    fields = ['country', 'category', 'price', 'discount'];
+  }
+
+  filterField.innerHTML = fields
+    .map(f => `<option value="${f}">${getFieldDisplayName(f)}</option>`)
+    .join('');
 
   const filterOperator = document.getElementById('filterOperator');
   if (!filterOperator) {
@@ -678,7 +695,12 @@ function renderTable() {
     cornerCell.style.backgroundColor = '#f8f9fa';
     cornerCell.style.borderBottom = '2px solid #dee2e6';
     cornerCell.style.borderRight = '1px solid #dee2e6';
-    cornerCell.textContent = `${getFieldDisplayName(rowFieldName)} / ${getFieldDisplayName(columnFieldName)}`;
+    // Hide the column axis label when using synthesized '__all__'
+    if (columnFieldName === '__all__') {
+      cornerCell.textContent = `${getFieldDisplayName(rowFieldName)}`;
+    } else {
+      cornerCell.textContent = `${getFieldDisplayName(rowFieldName)} / ${getFieldDisplayName(columnFieldName)}`;
+    }
     columnHeaderRow.appendChild(cornerCell);
 
     // Get unique column values in their correct order
@@ -691,7 +713,8 @@ function renderTable() {
 
     uniqueColumnValues.forEach((columnValue, index) => {
       const th = document.createElement('th');
-      th.textContent = columnValue;
+      // Optionally hide the 'All' header label for synthesized column axis
+      th.textContent = columnFieldName === '__all__' ? '' : columnValue;
       th.colSpan = state.measures.length;
       th.style.padding = '12px';
       th.style.backgroundColor = '#f8f9fa';
@@ -916,6 +939,11 @@ function renderTable() {
       rowCell.style.borderBottom = '1px solid #dee2e6';
       rowCell.style.borderRight = '1px solid #dee2e6';
       rowCell.className = 'row-cell';
+      // Make the cell itself draggable for better browser compatibility
+      rowCell.setAttribute('draggable', 'true');
+      // Store dataset on the draggable element as well
+      rowCell.dataset.fieldName = rowFieldName;
+      rowCell.dataset.fieldValue = rowValue;
       tr.appendChild(rowCell);
 
       uniqueColumnValues.forEach(columnValue => {
@@ -1188,7 +1216,10 @@ function addEnhancedDragStyles() {
 }
 
 function setupRowDragAndDrop(rowFieldName) {
-  const rows = document.querySelectorAll('tbody tr[draggable="true"]');
+  // Prefer attaching drag to the first cell for broader browser support with table rows
+  const rowCells = document.querySelectorAll(
+    'tbody td.row-cell[draggable="true"]'
+  );
   let draggedRowValue = null;
 
   if (!pivotEngine) return;
@@ -1197,31 +1228,37 @@ function setupRowDragAndDrop(rowFieldName) {
     true
   );
 
-  rows.forEach(row => {
-    const fieldValue = row.dataset.fieldValue;
+  rowCells.forEach(cell => {
+    const fieldValue = cell.dataset.fieldValue;
+    const row = cell.parentElement;
 
-    row.addEventListener('dragstart', e => {
+    cell.addEventListener('dragstart', e => {
       draggedRowValue = fieldValue;
-      e.dataTransfer.setData('text/plain', fieldValue);
-      setTimeout(() => row.classList.add('dragging'), 0);
+      try {
+        e.dataTransfer.setData('text/plain', fieldValue);
+      } catch {}
+      setTimeout(() => row && row.classList.add('dragging'), 0);
     });
 
-    row.addEventListener('dragend', () => {
-      row.classList.remove('dragging');
+    cell.addEventListener('dragend', () => {
+      if (row) row.classList.remove('dragging');
       draggedRowValue = null;
     });
 
-    row.addEventListener('dragover', e => e.preventDefault());
-    row.addEventListener('dragenter', e => {
+    cell.addEventListener('dragover', e => e.preventDefault());
+    cell.addEventListener('dragenter', e => {
       e.preventDefault();
-      if (draggedRowValue && draggedRowValue !== fieldValue) {
+      if (draggedRowValue && draggedRowValue !== fieldValue && row) {
         row.classList.add('drag-over');
       }
     });
-    row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
-    row.addEventListener('drop', e => {
+    cell.addEventListener(
+      'dragleave',
+      () => row && row.classList.remove('drag-over')
+    );
+    cell.addEventListener('drop', e => {
       e.preventDefault();
-      row.classList.remove('drag-over');
+      if (row) row.classList.remove('drag-over');
 
       const targetRowValue = fieldValue;
       const fromIndex = uniqueRowValues.indexOf(draggedRowValue);
@@ -1229,6 +1266,8 @@ function setupRowDragAndDrop(rowFieldName) {
 
       if (fromIndex !== -1 && toIndex !== -1 && fromIndex !== toIndex) {
         pivotEngine.swapDataRows(fromIndex, toIndex);
+        // Force re-render to reflect new order
+        setTimeout(renderTable, 0);
       }
     });
   });
@@ -1340,6 +1379,10 @@ function setupEventListeners() {
         );
       }
 
+      // Also update pagination info label immediately for better UX
+      updatePaginationInfo(
+        currentViewMode === 'processed' ? 'Processed Data' : 'Raw Data'
+      );
       renderTable();
     });
   }
@@ -1388,20 +1431,32 @@ function setupEventListeners() {
         return;
       }
 
-      // Parse numeric values for numeric fields
+      // Infer type dynamically from current data for robust filtering after import
       let parsedValue = value;
-      if (
-        (field === 'price' || field === 'discount') &&
-        (operator === 'equals' ||
-          operator === 'greaterThan' ||
-          operator === 'lessThan')
-      ) {
-        const numValue = parseFloat(value);
-        if (isNaN(numValue)) {
-          alert('Please enter a valid number for ' + field);
-          return;
+      try {
+        const stateNow = pivotEngine.getState();
+        const dataNow = stateNow?.rawData || [];
+        const sampleVal = (dataNow.find(
+          r => r[field] !== null && r[field] !== undefined
+        ) || {})[field];
+        const isNumberField =
+          typeof sampleVal === 'number' && isFinite(sampleVal);
+        if (
+          isNumberField &&
+          (operator === 'equals' ||
+            operator === 'greaterThan' ||
+            operator === 'lessThan')
+        ) {
+          const numValue = parseFloat(String(value).trim());
+          if (isNaN(numValue)) {
+            alert('Please enter a valid number for ' + field);
+            return;
+          }
+          parsedValue = numValue;
         }
-        parsedValue = numValue;
+      } catch (e) {
+        // If inference fails, fall back to string-based filtering
+        parsedValue = value;
       }
 
       const filter = { field, operator, value: parsedValue };
@@ -1725,6 +1780,9 @@ export async function handleFileConnection(fileType) {
         updateConfigFromImportedData(result);
       }
 
+      // Rebuild filter UI to reflect newly imported fields
+      initializeFilters();
+
       // Show success notification
       showImportNotification(result, true);
 
@@ -1760,19 +1818,6 @@ function updateConfigFromImportedData(result) {
   const columns = result.columns;
   const sampleData = result.data.slice(0, 5); // Look at first 5 rows
 
-  // Detect potential dimension fields (text/categorical data)
-  const dimensionFields = columns.filter(col => {
-    const sampleValues = sampleData
-      .map(row => row[col])
-      .filter(val => val != null);
-    const uniqueValues = [...new Set(sampleValues)];
-    // Consider it a dimension if: has text values OR has limited unique values
-    return (
-      sampleValues.some(val => typeof val === 'string') ||
-      uniqueValues.length <= Math.max(10, sampleData.length * 0.5)
-    );
-  });
-
   // Detect potential measure fields (numeric data)
   const measureFields = columns.filter(col => {
     const sampleValues = sampleData
@@ -1784,18 +1829,45 @@ function updateConfigFromImportedData(result) {
     );
   });
 
+  // Detect potential dimension fields (text/categorical data only)
+  // IMPORTANT: Exclude measure fields to avoid using numeric columns as dimensions
+  const measureSet = new Set(measureFields);
+  const dimensionFields = columns.filter(col => {
+    if (measureSet.has(col)) return false; // never treat numeric as a dimension
+    const sampleValues = sampleData
+      .map(row => row[col])
+      .filter(val => val != null);
+    const uniqueValues = [...new Set(sampleValues)];
+    // Consider it a dimension if it has text values OR has limited unique values
+    return (
+      sampleValues.some(val => typeof val === 'string') ||
+      uniqueValues.length <= Math.max(10, sampleData.length * 0.5)
+    );
+  });
+
+  // Respect engine's synthesized single column axis when appropriate
+  const engineHasAllColumn =
+    pivotEngine &&
+    pivotEngine.getColumnFieldName &&
+    pivotEngine.getColumnFieldName() === '__all__';
+
   // Auto-configure pivot table if we have good candidates
   if (dimensionFields.length >= 1 && measureFields.length >= 1) {
     const newConfig = {
       ...config,
       rows: dimensionFields.slice(0, 1).map(field => ({
-        uniqueName: field.toLowerCase(),
+        uniqueName: field,
         caption: field,
       })),
-      columns: dimensionFields.slice(1, 2).map(field => ({
-        uniqueName: field.toLowerCase(),
-        caption: field,
-      })),
+      // If we only found a single dimension or engine already decided on '__all__',
+      // keep a single synthesized column axis
+      columns:
+        engineHasAllColumn || dimensionFields.length < 2
+          ? [{ uniqueName: '__all__', caption: 'All' }]
+          : dimensionFields.slice(1, 2).map(field => ({
+              uniqueName: field,
+              caption: field,
+            })),
       measures: measureFields.slice(0, 3).map(field => ({
         uniqueName: field,
         caption: field,
@@ -1975,30 +2047,25 @@ function formatFileSize(bytes) {
 }
 
 export function onSectionItemDrop(droppedFields) {
-  let droppedFieldsInSections = JSON.stringify({
-    rows: Array.from(droppedFields.rows),
-    columns: Array.from(droppedFields.columns),
-    values: Array.from(droppedFields.values),
-    filters: Array.from(droppedFields.filters),
-  });
-  const parsedDroppedFieldsInSections = JSON.parse(droppedFieldsInSections);
+  // droppedFields.rows: Set<string>
+  // droppedFields.columns: Set<string>
+  // droppedFields.values: Map<string, AggregationType>
+  const selection = {
+    rows: Array.from(droppedFields.rows || []),
+    columns: Array.from(droppedFields.columns || []),
+    values: Array.from(droppedFields.values || new Map()).map(
+      ([field, aggregation]) => ({ field, aggregation })
+    ),
+  };
 
-  const transformedRows = parsedDroppedFieldsInSections.rows.map(rowField => ({
-    uniqueName: rowField,
-    caption: rowField,
-  }));
-  const transformedColumns = parsedDroppedFieldsInSections.columns.map(
-    columnField => ({
-      uniqueName: columnField,
-      caption: columnField,
-    })
-  );
+  const layout = FieldService.buildLayout(selection);
 
   if (pivotEngine) {
     const newConfig = {
       ...config,
-      rows: transformedRows,
-      columns: transformedColumns,
+      rows: layout.rows,
+      columns: layout.columns,
+      measures: layout.measures,
     };
     formatTable(newConfig);
   }
