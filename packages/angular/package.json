@@ -1,6 +1,6 @@
 {
   "name": "@mindfiredigital/pivothead-angular",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "dependencies": {
     "@mindfiredigital/pivothead": "workspace:*",
     "@mindfiredigital/pivothead-web-component": "workspace:*",
