@@ -1,0 +1,29 @@
+{
+  "id": "tutorial-basics/core/core-concepts",
+  "title": "Core Concepts",
+  "description": "Understanding the fundamental building blocks of the PivotHead engine.",
+  "source": "@site/docs/tutorial-basics/core/core-concepts.md",
+  "sourceDirName": "tutorial-basics/core",
+  "slug": "/tutorial-basics/core/core-concepts",
+  "permalink": "/PivotHead/docs/tutorial-basics/core/core-concepts",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorial-basics/core/core-concepts.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "sidebar_position": 1,
+    "title": "Core Concepts",
+    "description": "Understanding the fundamental building blocks of the PivotHead engine."
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Tutorials",
+    "permalink": "/PivotHead/docs/category/tutorials"
+  },
+  "next": {
+    "title": "Api Reference",
+    "permalink": "/PivotHead/docs/tutorial-basics/core/api-reference"
+  }
+}

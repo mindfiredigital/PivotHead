@@ -1,24 +1,27 @@
 {
-  "unversionedId": "tutorial-basics/web-component",
   "id": "tutorial-basics/web-component",
-  "title": "web-component",
-  "description": "xyz",
+  "title": "PivotHead Web Component",
+  "description": "The PivotHead Web Component provides a flexible, framework-agnostic solution for integrating pivot table functionality into any web application. Built as a native Web Component, it offers three distinct rendering modes to accommodate different use cases and UI requirements.",
   "source": "@site/docs/tutorial-basics/web-component.md",
   "sourceDirName": "tutorial-basics",
   "slug": "/tutorial-basics/web-component",
   "permalink": "/PivotHead/docs/tutorial-basics/web-component",
   "draft": false,
+  "unlisted": false,
   "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorial-basics/web-component.md",
   "tags": [],
   "version": "current",
-  "frontMatter": {},
+  "sidebarPosition": 5,
+  "frontMatter": {
+    "sidebar_position": 5
+  },
   "sidebar": "tutorialSidebar",
   "previous": {
-    "title": "Troubleshooting",
-    "permalink": "/PivotHead/docs/tutorial-basics/troubleshooting"
+    "title": "Examples & Usage",
+    "permalink": "/PivotHead/docs/tutorial-basics/core/examples"
   },
   "next": {
-    "title": "Wrapper",
-    "permalink": "/PivotHead/docs/category/wrapper"
+    "title": "React Wrapper",
+    "permalink": "/PivotHead/docs/tutorial-basics/wrappers/react"
   }
 }

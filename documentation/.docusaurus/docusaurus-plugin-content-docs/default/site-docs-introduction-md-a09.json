@@ -1,0 +1,25 @@
+{
+  "id": "introduction",
+  "title": "Introduction",
+  "description": "An introduction to the first truly headless pivot table library for JavaScript.",
+  "source": "@site/docs/introduction.md",
+  "sourceDirName": ".",
+  "slug": "/introduction",
+  "permalink": "/PivotHead/docs/introduction",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/introduction.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "sidebar_position": 1,
+    "title": "Introduction",
+    "description": "An introduction to the first truly headless pivot table library for JavaScript."
+  },
+  "sidebar": "tutorialSidebar",
+  "next": {
+    "title": "Why Use PivotHead",
+    "permalink": "/PivotHead/docs/Why-we-use-pivothead"
+  }
+}

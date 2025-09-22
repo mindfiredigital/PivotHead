@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 3
 title: Getting Started
 description: Learn how to install and set up PivotHead in your project
 ---

@@ -1,0 +1,99 @@
+
+.chartContainer {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.pieChartContainer {
+    gap: 1rem;
+}
+  
+.chartSvg {
+    width: 100%;
+    height: auto;
+    max-height: 250px;
+}
+  
+/* Bar Chart Animation */
+.barAnimate {
+    animation: growBar 0.8s ease-out forwards;
+    transform-origin: bottom;
+    transform: scaleY(0);
+}
+
+.axisLabel, .barLabel {
+    fill: var(--ifm-font-color-base);
+}
+
+.gridLine {
+    stroke: var(--ifm-color-emphasis-200);
+    stroke-width: 1;
+    stroke-dasharray: 2, 2;
+}
+
+.axisLine {
+    stroke: var(--ifm-color-emphasis-300);
+    stroke-width: 1;
+}
+  
+@keyframes growBar {
+    to {
+        transform: scaleY(1);
+    }
+}
+  
+/* Line Chart Animation */
+.lineAnimate {
+    animation: drawLine 1s ease-out forwards;
+}
+  
+@keyframes drawLine {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+  
+.dotAnimate {
+    opacity: 0;
+    animation: fadeInDot 0.3s ease-out forwards;
+}
+  
+@keyframes fadeInDot {
+    to {
+        opacity: 1;
+    }
+}
+
+/* Pie Chart Animation */
+.pieSlice {
+    transition: stroke-dashoffset 1s cubic-bezier(0.5, 0, 0.5, 1);
+}
+  
+.legend {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+  
+.legendItem {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+}
+  
+.legendColorBox {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 0.25rem;
+}
+
+.legendText {
+    color: var(--ifm-font-color-base);
+}

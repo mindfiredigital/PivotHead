@@ -6,7 +6,7 @@
 export default {
   "title": "PivotHead",
   "tagline": "Documentation for the PivotHead",
-  "favicon": "img/mindfire.ico",
+  "favicon": "img/logo.png",
   "url": "https://mindfiredigital.github.io",
   "baseUrl": "/PivotHead/",
   "organizationName": "mindfiredigital",
@@ -39,13 +39,24 @@ export default {
       }
     ]
   ],
+  "plugins": [
+    null
+  ],
+  "scripts": [
+    {
+      "src": "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
+    },
+    {
+      "src": "https://cdn.jsdelivr.net/npm/vanta@0.5.21/dist/vanta.net.min.js"
+    }
+  ],
   "themeConfig": {
     "image": "img/pivothead.webp",
     "navbar": {
       "title": "PivotHead",
       "logo": {
         "alt": "PivotHead Logo",
-        "src": "img/logo.svg"
+        "src": "img/logo.png"
       },
       "items": [
         {
@@ -68,8 +79,8 @@ export default {
       "hideOnScroll": false
     },
     "footer": {
-      "style": "dark",
-      "copyright": "Copyright © 2025 MindfireDigital",
+      "copyright": "© 2025 Mindfire FOSS",
+      "style": "light",
       "links": []
     },
     "prism": {
@@ -288,6 +299,11 @@ export default {
         "autoCollapseCategories": false
       }
     },
+    "blog": {
+      "sidebar": {
+        "groupByYear": true
+      }
+    },
     "metadata": [],
     "tableOfContents": {
       "minHeadingLevel": 2,
@@ -295,20 +311,49 @@ export default {
     }
   },
   "baseUrlIssueBanner": true,
+  "future": {
+    "v4": {
+      "removeLegacyPostBuildHeadAttribute": false,
+      "useCssCascadeLayers": false
+    },
+    "experimental_faster": {
+      "swcJsLoader": false,
+      "swcJsMinimizer": false,
+      "swcHtmlMinimizer": false,
+      "lightningCssMinimizer": false,
+      "mdxCrossCompilerCache": false,
+      "rspackBundler": false,
+      "rspackPersistentCache": false,
+      "ssgWorkerThreads": false
+    },
+    "experimental_storage": {
+      "type": "localStorage",
+      "namespace": false
+    },
+    "experimental_router": "browser"
+  },
+  "onBrokenAnchors": "warn",
   "onDuplicateRoutes": "warn",
   "staticDirectories": [
     "static"
   ],
   "customFields": {},
-  "plugins": [],
   "themes": [],
-  "scripts": [],
   "headTags": [],
   "stylesheets": [],
   "clientModules": [],
   "titleDelimiter": "|",
   "noIndex": false,
   "markdown": {
-    "mermaid": false
+    "format": "mdx",
+    "mermaid": false,
+    "mdx1Compat": {
+      "comments": true,
+      "admonitions": true,
+      "headingIds": true
+    },
+    "anchors": {
+      "maintainCase": false
+    }
   }
 };
