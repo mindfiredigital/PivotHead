@@ -17,5 +17,5 @@ export default defineConfig({
       },
     },
   },
-  plugins: [dts()],
+  plugins: [dts({ include: ['src/**/*'] })],
 });
