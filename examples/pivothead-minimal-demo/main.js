@@ -103,11 +103,11 @@ function renderProcessed(state) {
   const rowSortClass =
     store.sort.field === rowField.uniqueName ? ` sorted-${store.sort.dir}` : '';
   html += `<tr class="measures"><th class="sortable${rowSortClass}" data-sort-field="${rowField.uniqueName}">${rowField.caption}</th>`;
-  uniqueCols.forEach(() => {
+  uniqueCols.forEach(c => {
     measures.forEach(m => {
       const mSortClass =
         store.sort.field === m.uniqueName ? ` sorted-${store.sort.dir}` : '';
-      html += `<th class="sortable${mSortClass}" data-sort-field="${m.uniqueName}">${m.caption}</th>`;
+      html += `<th class="sortable${mSortClass}" data-sort-field="${m.uniqueName}" data-column-value="${c}" data-measure-unique="${m.uniqueName}" data-measure-agg="${m.aggregation}">${m.caption}</th>`;
     });
   });
   html += '</tr></thead><tbody>';
@@ -128,11 +128,31 @@ function renderProcessed(state) {
         });
         const key = `${m.aggregation}_${m.uniqueName}`;
         const agg = group?.aggregates?.[key];
-        const display =
-          typeof agg === 'number' ? agg.toLocaleString() : (agg ?? '0');
+
+        // Use engine's formatValue method if available
+        let display = '0';
+        if (agg !== undefined && agg !== null) {
+          if (pivot.formatValue && typeof pivot.formatValue === 'function') {
+            display = pivot.formatValue(agg, m.uniqueName);
+          } else {
+            display =
+              typeof agg === 'number' ? agg.toLocaleString() : String(agg);
+          }
+        }
+
         const hasData = Number(agg) > 0;
+
+        // Get text alignment from engine if available
+        let textAlign = 'right'; // default for measures
+        if (
+          pivot.getFieldAlignment &&
+          typeof pivot.getFieldAlignment === 'function'
+        ) {
+          textAlign = pivot.getFieldAlignment(m.uniqueName);
+        }
+
         // Make processed cells clickable for drill-down with necessary data attributes
-        html += `<td class="${hasData ? 'drill-down-cell' : ''}"
+        html += `<td class="${hasData ? 'drill-down-cell' : ''}" style="text-align: ${textAlign};"
                    data-row-value="${String(rowVal)}"
                    data-column-value="${String(colVal)}"
                    data-measure-name="${m.uniqueName}"
@@ -202,7 +222,26 @@ function renderRaw() {
   pageRows.forEach((row, rIdx) => {
     html += `<tr class="draggable" draggable="true" data-type="row" data-index="${rIdx}" data-global-index="${start + rIdx}">`;
     colOrder.forEach(k => {
-      html += `<td>${row[k] ?? ''}</td>`;
+      let cellValue = row[k] ?? '';
+      // Use engine's formatValue method if available
+      if (
+        cellValue !== '' &&
+        pivot.formatValue &&
+        typeof pivot.formatValue === 'function'
+      ) {
+        cellValue = pivot.formatValue(cellValue, k);
+      }
+
+      // Get text alignment from engine if available
+      let textAlign = 'left'; // default for raw data
+      if (
+        pivot.getFieldAlignment &&
+        typeof pivot.getFieldAlignment === 'function'
+      ) {
+        textAlign = pivot.getFieldAlignment(k);
+      }
+
+      html += `<td style="text-align: ${textAlign};">${cellValue}</td>`;
     });
     html += '</tr>';
   });
@@ -289,6 +328,15 @@ function wireToolbar() {
     pivot.exportToExcel?.('pivot-table');
   document.getElementById('printTable').onclick = () =>
     pivot.openPrintDialog?.();
+
+  // Format button functionality
+  document.getElementById('formatButton').onclick = () => {
+    if (pivot.showFormatPopup && typeof pivot.showFormatPopup === 'function') {
+      pivot.showFormatPopup();
+    } else {
+      console.log('Format functionality not available');
+    }
+  };
 }
 
 function wireTableInteractions() {
@@ -304,8 +352,74 @@ function wireTableInteractions() {
             ? 'desc'
             : 'asc';
         store.sort = { field, dir: nextDir };
+
+        // Determine if sorting the row header or a measure header under a specific column
+        let state;
+        try {
+          state = pivot.getState();
+        } catch {
+          state = null;
+        }
+        const groups =
+          typeof pivot.getGroupedData === 'function'
+            ? pivot.getGroupedData()
+            : [];
+        const rowFieldName = state?.rows?.[0]?.uniqueName || '';
+        const columnValue = th.getAttribute('data-column-value') || '';
+
+        if (rowFieldName && field === rowFieldName) {
+          // Alphabetical sort of row labels
+          const rowSet = new Set();
+          groups.forEach(g => {
+            const keys = g.key ? g.key.split('|') : [];
+            if (keys[0]) rowSet.add(keys[0]);
+          });
+          const rows = Array.from(rowSet);
+          rows.sort((a, b) =>
+            nextDir === 'asc'
+              ? String(a).localeCompare(String(b))
+              : String(b).localeCompare(String(a))
+          );
+          store.rowOrder = rows;
+        } else if (columnValue) {
+          // Sort rows by the selected column's measure aggregate
+          const measures = state?.measures || [];
+          const measureCfg = measures.find(m => m.uniqueName === field);
+          const aggregation =
+            measureCfg && measureCfg.aggregation
+              ? measureCfg.aggregation
+              : 'sum';
+          const aggKey = `${aggregation}_${field}`;
+
+          const allRowSet = new Set();
+          groups.forEach(g => {
+            const keys = g.key ? g.key.split('|') : [];
+            if (keys[0]) allRowSet.add(keys[0]);
+          });
+          const allRows = Array.from(allRowSet);
+
+          const pairs = allRows.map(rv => {
+            const grp = groups.find(gr => {
+              const keys = gr.key ? gr.key.split('|') : [];
+              return keys[0] === rv && keys[1] === columnValue;
+            });
+            const val = Number((grp?.aggregates || {})[aggKey] ?? 0);
+            return { row: rv, val: Number.isFinite(val) ? val : 0 };
+          });
+          pairs.sort((a, b) =>
+            nextDir === 'asc' ? a.val - b.val : b.val - a.val
+          );
+          store.rowOrder = pairs.map(p => p.row);
+        } else {
+          // Fallback: clear custom order
+          store.rowOrder = [];
+        }
+
         if (pivot.sort) pivot.sort(field, nextDir);
-        store.rowOrder = [];
+        // Re-render immediately so arrows and order update synchronously
+        try {
+          renderFromState(pivot.getState());
+        } catch {}
       } else {
         const store = getCurrentStore();
         const nextDir =
@@ -315,6 +429,9 @@ function wireTableInteractions() {
         store.sort = { field, dir: nextDir };
         // Delegate RAW sorting to engine to keep indices in sync
         if (field && pivot.sort) pivot.sort(field, nextDir);
+        try {
+          renderFromState(pivot.getState());
+        } catch {}
       }
     };
   });
@@ -332,6 +449,9 @@ function wireTableInteractions() {
             : 'asc';
         store.sort = { field, dir: nextDir };
         if (pivot.sort) pivot.sort(field, nextDir);
+        try {
+          renderFromState(pivot.getState());
+        } catch {}
       });
     });
   }

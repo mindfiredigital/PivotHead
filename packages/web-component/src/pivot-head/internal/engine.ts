@@ -90,6 +90,15 @@ export function tryInitializeEngine(host: PivotHeadHost): void {
     host.engine = new PivotEngine(
       config
     ) as EnhancedPivotEngine<PivotDataRecord>;
+
+    // Disable core engine pagination; the web component manages pagination itself
+    // Use a very large page size so engine never slices the data internally
+    host.engine.setPagination({
+      currentPage: 1,
+      pageSize: Number.MAX_SAFE_INTEGER,
+      totalPages: 1,
+    });
+
     host.engine.setDataHandlingMode(host._showRawData ? 'raw' : 'processed');
 
     if (host._engineUnsubscribe) host._engineUnsubscribe();

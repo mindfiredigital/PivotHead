@@ -7,7 +7,8 @@ export function calculatePaginationForCurrentView(host: PivotHeadHost): void {
   if (host._showRawData) {
     if (!host.engine) return;
     const state = host.engine.getState();
-    const allRawData = (state.data || state.rawData || []) as unknown[];
+    // Use full rawData first; state.data may be limited
+    const allRawData = (state.rawData || state.data || []) as unknown[];
     updatePaginationForData(host, allRawData);
   } else {
     if (!host.engine) return;

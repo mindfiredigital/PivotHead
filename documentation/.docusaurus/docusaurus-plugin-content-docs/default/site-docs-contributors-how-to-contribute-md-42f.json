@@ -1,5 +1,4 @@
 {
-  "unversionedId": "contributors/how-to-contribute",
   "id": "contributors/how-to-contribute",
   "title": "How to Contribute",
   "description": "We genuinely appreciate your interest in contributing to the React Document Editor project. Your invaluable contributions play a pivotal role in enhancing this project. Before you embark on your journey, please take a moment to familiarize yourself with the following guidelines:",
@@ -8,6 +7,7 @@
   "slug": "/contributors/how-to-contribute",
   "permalink": "/PivotHead/docs/contributors/how-to-contribute",
   "draft": false,
+  "unlisted": false,
   "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/contributors/how-to-contribute.md",
   "tags": [],
   "version": "current",

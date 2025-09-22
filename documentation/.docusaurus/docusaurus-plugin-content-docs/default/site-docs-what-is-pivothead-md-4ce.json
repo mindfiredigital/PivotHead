@@ -1,5 +1,4 @@
 {
-  "unversionedId": "what-is-pivothead",
   "id": "what-is-pivothead",
   "title": "What is PivotHead",
   "description": "Introduction to the PivotHead library and its capabilities",
@@ -8,6 +7,7 @@
   "slug": "/what-is-pivothead",
   "permalink": "/PivotHead/docs/what-is-pivothead",
   "draft": false,
+  "unlisted": false,
   "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/what-is-pivothead.md",
   "tags": [],
   "version": "current",

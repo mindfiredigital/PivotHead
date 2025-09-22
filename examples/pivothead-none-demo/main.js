@@ -120,10 +120,29 @@ function renderProcessed(state) {
         });
         const key = `${m.aggregation}_${m.uniqueName}`;
         const agg = group?.aggregates?.[key];
-        const display =
-          typeof agg === 'number' ? agg.toLocaleString() : (agg ?? '0');
+
+        // Use pivot's formatting API
+        let display = '0';
+        if (typeof agg === 'number' && pivot.formatValue) {
+          try {
+            display = pivot.formatValue(agg, m.uniqueName);
+          } catch {
+            display = agg.toLocaleString();
+          }
+        } else if (agg != null) {
+          display = String(agg);
+        }
+
+        // Get text alignment from pivot API
+        let alignment = 'left';
+        if (pivot.getFieldAlignment) {
+          try {
+            alignment = pivot.getFieldAlignment(m.uniqueName) || 'left';
+          } catch {}
+        }
+
         const hasData = Number(agg) > 0;
-        html += `<td class="${hasData ? 'drill-down-cell' : ''}"
+        html += `<td class="${hasData ? 'drill-down-cell' : ''}" style="text-align: ${alignment}"
                  data-row-value="${String(rowVal)}"
                  data-column-value="${String(colVal)}"
                  data-measure-name="${m.uniqueName}"
@@ -190,7 +209,27 @@ function renderRaw() {
   pageRows.forEach((row, rIdx) => {
     html += `<tr class="draggable" draggable="true" data-type="row" data-index="${rIdx}" data-global-index="${start + rIdx}">`;
     colOrder.forEach(k => {
-      html += `<td>${row[k] ?? ''}</td>`;
+      const value = row[k];
+
+      // Use pivot's formatting API for numeric values
+      let display = value != null ? String(value) : '';
+      if (typeof value === 'number' && pivot.formatValue) {
+        try {
+          display = pivot.formatValue(value, k);
+        } catch {
+          display = value.toLocaleString();
+        }
+      }
+
+      // Get text alignment from pivot API
+      let alignment = 'left';
+      if (pivot.getFieldAlignment) {
+        try {
+          alignment = pivot.getFieldAlignment(k) || 'left';
+        } catch {}
+      }
+
+      html += `<td style="text-align: ${alignment}">${display}</td>`;
     });
     html += '</tr>';
   });
@@ -264,6 +303,14 @@ function wireToolbar() {
     try {
       renderFromState(pivot.getState());
     } catch {}
+  };
+
+  document.getElementById('formatButton').onclick = () => {
+    try {
+      showFormatPopup();
+    } catch (error) {
+      console.error('Error opening format popup:', error);
+    }
   };
 
   document.getElementById('exportHTML').onclick = () =>
@@ -423,6 +470,337 @@ function wireTableInteractions() {
       });
     });
   }
+}
+
+function showFormatPopup() {
+  let state;
+  try {
+    state = pivot.getState();
+  } catch {
+    console.error('Engine not initialized');
+    return;
+  }
+
+  const availableMeasures = state.measures || [];
+
+  // Get available fields based on current mode - only numeric/measure fields
+  let availableFields = [];
+  if (ui.mode === 'raw') {
+    // For raw data, get only numeric fields (measures) from the data
+    if (state.rawData && state.rawData.length > 0) {
+      const allFields = Object.keys(state.rawData[0]);
+      // Filter to only include measure fields (price, discount, etc.)
+      availableFields = allFields.filter(field => {
+        const sampleValue = state.rawData[0][field];
+        return typeof sampleValue === 'number';
+      });
+    }
+  } else {
+    // For processed data, get measure names
+    availableFields = availableMeasures.map(
+      measure => measure.caption || measure.uniqueName
+    );
+  }
+
+  const overlay = document.createElement('div');
+  Object.assign(overlay.style, {
+    position: 'fixed',
+    top: '0',
+    left: '0',
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: '1000',
+  });
+
+  const popup = document.createElement('div');
+  Object.assign(popup.style, {
+    width: '400px',
+    padding: '20px',
+    backgroundColor: '#fff',
+    borderRadius: '8px',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+  });
+
+  const header = document.createElement('h2');
+  header.textContent = 'Format cells';
+  Object.assign(header.style, {
+    margin: '0 0 10px 0',
+    textAlign: 'left',
+  });
+
+  const headerSeparator = document.createElement('hr');
+  Object.assign(headerSeparator.style, {
+    border: '0',
+    height: '1px',
+    backgroundColor: '#ccc',
+    margin: '10px 0',
+  });
+
+  const formContainer = document.createElement('div');
+
+  // Form fields configuration
+  const fields = [
+    {
+      name: 'Choose value',
+      options: ['Choose value', 'All values', ...availableFields],
+    },
+    { name: 'Text align', options: ['right', 'left', 'center'] },
+    {
+      name: 'Thousand separator',
+      options: ['(Space)', '(Comma)', '(None)', '(Dot)'],
+    },
+    { name: 'Decimal separator', options: ['.', ','] },
+    { name: 'Decimal places', options: ['None', '0', '1', '2', '3', '4', '5'] },
+    { name: 'Currency symbol', options: ['', '$', '₹', '€', '£'] },
+    { name: 'Currency align', options: ['left', 'right'] },
+    { name: 'Null value', options: ['', 'null', '0', 'N/A', '-'] },
+    { name: 'Format as percent', options: ['false', 'true'] },
+  ];
+
+  const formValues = {};
+  const dropdownElements = [];
+
+  fields.forEach((field, index) => {
+    const row = document.createElement('div');
+    Object.assign(row.style, {
+      display: 'flex',
+      alignItems: 'center',
+      marginBottom: '15px',
+    });
+
+    const label = document.createElement('label');
+    label.textContent = field.name;
+    Object.assign(label.style, {
+      flex: '1',
+      marginRight: '10px',
+      textAlign: 'left',
+    });
+
+    const dropdown = document.createElement('select');
+    Object.assign(dropdown.style, {
+      flex: '2',
+      padding: '8px',
+      borderRadius: '4px',
+      border: '1px solid #ccc',
+    });
+
+    // Populate dropdown options
+    field.options.forEach(optionText => {
+      const option = document.createElement('option');
+      option.value = optionText;
+      option.textContent = optionText;
+      dropdown.appendChild(option);
+    });
+
+    // Set initial value
+    formValues[field.name] = field.options[0];
+
+    // Disable all fields except first one initially
+    if (index !== 0) {
+      dropdown.disabled = true;
+    }
+
+    // Handle change events
+    dropdown.addEventListener('change', e => {
+      const target = e.target;
+      formValues[field.name] = target.value;
+
+      // Enable/disable other fields based on first field
+      if (index === 0) {
+        const selectedValue = target.value;
+        dropdownElements.forEach((el, i) => {
+          if (i !== 0) {
+            el.disabled = selectedValue === 'Choose value';
+          }
+        });
+      }
+    });
+
+    row.appendChild(label);
+    row.appendChild(dropdown);
+    formContainer.appendChild(row);
+    dropdownElements.push(dropdown);
+  });
+
+  const buttonContainer = document.createElement('div');
+  Object.assign(buttonContainer.style, {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    marginTop: '20px',
+  });
+
+  const applyButton = document.createElement('button');
+  applyButton.textContent = 'APPLY';
+  Object.assign(applyButton.style, {
+    padding: '10px 20px',
+    backgroundColor: '#666',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    marginRight: '10px',
+  });
+
+  const cancelButton = document.createElement('button');
+  cancelButton.textContent = 'CANCEL';
+  Object.assign(cancelButton.style, {
+    padding: '10px 20px',
+    backgroundColor: '#f5f5f5',
+    color: '#333',
+    border: '1px solid #ccc',
+    borderRadius: '4px',
+    cursor: 'pointer',
+  });
+
+  // Event handlers
+  cancelButton.addEventListener('click', () => {
+    document.body.removeChild(overlay);
+  });
+
+  applyButton.addEventListener('click', () => {
+    const selectedField = formValues['Choose value'];
+
+    if (selectedField && selectedField !== 'Choose value') {
+      // Map UI values to FormatOptions
+      const formatOptions = {};
+
+      // Text align
+      if (formValues['Text align']) {
+        formatOptions.align = formValues['Text align'];
+      }
+
+      // Thousand separator
+      const thousandSep = formValues['Thousand separator'];
+      if (thousandSep === '(Space)') formatOptions.thousandSeparator = ' ';
+      else if (thousandSep === '(Comma)') formatOptions.thousandSeparator = ',';
+      else if (thousandSep === '(None)') formatOptions.thousandSeparator = '';
+      else if (thousandSep === '(Dot)') formatOptions.thousandSeparator = '.';
+
+      // Decimal separator
+      if (formValues['Decimal separator']) {
+        formatOptions.decimalSeparator = formValues['Decimal separator'];
+      }
+
+      // Decimal places
+      if (
+        formValues['Decimal places'] &&
+        formValues['Decimal places'] !== 'None'
+      ) {
+        formatOptions.decimals = parseInt(formValues['Decimal places'], 10);
+      }
+
+      // Currency
+      const currencySymbol = formValues['Currency symbol'];
+      if (currencySymbol) {
+        formatOptions.type = 'currency';
+        if (currencySymbol === '$') formatOptions.currency = 'USD';
+        else if (currencySymbol === '₹') formatOptions.currency = 'INR';
+        else if (currencySymbol === '€') formatOptions.currency = 'EUR';
+        else if (currencySymbol === '£') formatOptions.currency = 'GBP';
+      }
+
+      // Currency align
+      if (formValues['Currency align']) {
+        formatOptions.currencyAlign = formValues['Currency align'];
+      }
+
+      // Null value
+      if (formValues['Null value']) {
+        formatOptions.nullValue =
+          formValues['Null value'] === 'null' ? null : formValues['Null value'];
+      }
+
+      // Format as percent
+      if (formValues['Format as percent'] === 'true') {
+        formatOptions.percent = true;
+        formatOptions.type = 'percentage';
+      }
+
+      // Apply formatting using pivot web component API
+      try {
+        if (selectedField === 'All values') {
+          // Apply to all numeric fields
+          if (ui.mode === 'raw') {
+            // For raw data, apply to all numeric fields
+            if (state.rawData && state.rawData.length > 0) {
+              const allFields = Object.keys(state.rawData[0]);
+              const numericFields = allFields.filter(field => {
+                const sampleValue = state.rawData[0][field];
+                return typeof sampleValue === 'number';
+              });
+              numericFields.forEach(field => {
+                if (pivot.updateFieldFormatting) {
+                  pivot.updateFieldFormatting(field, formatOptions);
+                }
+              });
+              console.log(
+                'Applied formatting to all numeric fields:',
+                numericFields
+              );
+            }
+          } else {
+            // For processed data, apply to all measures
+            availableMeasures.forEach(measure => {
+              if (pivot.updateFieldFormatting) {
+                pivot.updateFieldFormatting(measure.uniqueName, formatOptions);
+              }
+            });
+            console.log(
+              'Applied formatting to all measures:',
+              availableMeasures.map(m => m.uniqueName)
+            );
+          }
+        } else {
+          // Apply to specific field
+          let fieldName = selectedField;
+          if (ui.mode === 'processed') {
+            // For processed data, find the measure's uniqueName
+            const measure = availableMeasures.find(
+              m => m.caption === selectedField || m.uniqueName === selectedField
+            );
+            if (measure) {
+              fieldName = measure.uniqueName;
+            }
+          }
+
+          if (pivot.updateFieldFormatting) {
+            pivot.updateFieldFormatting(fieldName, formatOptions);
+          }
+          console.log(
+            'Applied formatting:',
+            formatOptions,
+            'to field:',
+            fieldName
+          );
+        }
+
+        // Trigger re-render
+        try {
+          renderFromState(pivot.getState());
+        } catch (e) {
+          console.error('Error re-rendering after format:', e);
+        }
+      } catch (error) {
+        console.error('Error applying formatting:', error);
+      }
+    }
+
+    document.body.removeChild(overlay);
+  });
+
+  buttonContainer.appendChild(applyButton);
+  buttonContainer.appendChild(cancelButton);
+
+  popup.appendChild(header);
+  popup.appendChild(headerSeparator);
+  popup.appendChild(formContainer);
+  popup.appendChild(buttonContainer);
+  overlay.appendChild(popup);
+  document.body.appendChild(overlay);
 }
 
 function showDrillDownModal({ title, summary, rows }) {

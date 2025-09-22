@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 2
 title: Why Use PivotHead
 description: Discover the advantages of using PivotHead for your data visualization needs
 ---

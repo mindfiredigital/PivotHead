@@ -1,5 +1,4 @@
 {
-  "unversionedId": "contributors/contributors",
   "id": "contributors/contributors",
   "title": "Contributors",
   "description": "- Anand Kumar",
@@ -8,6 +7,7 @@
   "slug": "/contributors/",
   "permalink": "/PivotHead/docs/contributors/",
   "draft": false,
+  "unlisted": false,
   "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/contributors/contributors.md",
   "tags": [],
   "version": "current",

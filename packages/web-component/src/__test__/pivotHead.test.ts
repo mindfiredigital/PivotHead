@@ -29,6 +29,21 @@ vi.mock('@mindfiredigital/pivothead', () => ({
   },
 }));
 
+// Define a structural type for the element instance used in tests
+type TPivotEl = HTMLElement & {
+  pagination?: { currentPage: number; pageSize: number; totalPages: number };
+  previousPage?: () => void;
+  nextPage?: () => void;
+  setPageSize?: (n: number) => void;
+  goToPage?: (n: number) => void;
+  setViewMode?: (m: 'raw' | 'processed') => void;
+  getViewMode?: () => 'raw' | 'processed';
+  setMeasures?: (m: unknown[]) => void;
+  setDimensions?: (d: unknown[]) => void;
+  setGroupConfig?: (g: unknown | null) => void;
+  sort?: (field: string, dir: 'asc' | 'desc') => void;
+};
+
 describe('PivotHeadElement', () => {
   beforeAll(async () => {
     // Import the web component after setting up the environment
@@ -111,6 +126,72 @@ describe('PivotHeadElement', () => {
       expect(() => {
         element.viewMode = 'processed';
       }).not.toThrow();
+    });
+  });
+
+  // New tests for ref/method coverage and pagination
+  describe('PivotHeadElement - ref and methods', () => {
+    beforeAll(async () => {
+      await import('../pivot-head/pivotHead');
+    });
+
+    let element: TPivotEl;
+
+    beforeEach(() => {
+      element = document.createElement('pivot-head') as TPivotEl;
+      element.setAttribute('mode', 'none');
+      document.body.appendChild(element);
+      // Initialize with base pagination
+      (
+        element as TPivotEl & { _pagination?: TPivotEl['pagination'] }
+      )._pagination = { currentPage: 1, pageSize: 10, totalPages: 5 };
+    });
+
+    afterEach(() => {
+      element?.parentNode?.removeChild(element as unknown as Node);
+    });
+
+    it('exposes pagination methods on the element', () => {
+      expect(typeof element.previousPage).toBe('function');
+      expect(typeof element.nextPage).toBe('function');
+      expect(typeof element.setPageSize).toBe('function');
+      expect(typeof element.goToPage).toBe('function');
+    });
+
+    it('dispatches paginationChange when calling pagination methods', () => {
+      const handler = vi.fn();
+      element.addEventListener('paginationChange', handler);
+
+      element.nextPage?.();
+      element.setPageSize?.(25);
+      element.goToPage?.(3);
+      element.previousPage?.();
+
+      expect(handler).toHaveBeenCalled();
+      const last = handler.mock.calls.at(-1)?.[0] as CustomEvent<{
+        currentPage: number;
+        pageSize: number;
+      }>;
+      expect(last.detail.currentPage).toBe(2);
+      expect(last.detail.pageSize).toBe(25);
+    });
+
+    it('supports setting and getting view mode (without engine)', () => {
+      // When engine isn't initialized, setViewMode should still update getViewMode, but may not emit an event
+      const vmHandler = vi.fn();
+      element.addEventListener('viewModeChange', vmHandler);
+      element.setViewMode?.('raw');
+      expect(element.getViewMode?.()).toBe('raw');
+      element.setViewMode?.('processed');
+      expect(element.getViewMode?.()).toBe('processed');
+      expect(vmHandler).not.toHaveBeenCalled();
+    });
+
+    it('exposes engine-driven APIs without throwing when engine is not initialized', () => {
+      expect(() => element.setMeasures?.([])).not.toThrow();
+      expect(() => element.setDimensions?.([])).not.toThrow();
+      expect(() => element.setGroupConfig?.(null)).not.toThrow();
+      expect(() => element.sort?.('field', 'asc')).not.toThrow();
     });
   });
 });

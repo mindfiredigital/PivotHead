@@ -7,7 +7,7 @@ import type {
   PivotTableState,
 } from '@mindfiredigital/pivothead';
 import type { PivotHeadHost } from './host';
-import type { PivotDataRecord } from '../../types/types';
+import type { PivotDataRecord, FormatOptions } from '../../types/types';
 
 export function getState(
   host: PivotHeadHost
@@ -108,4 +108,24 @@ export function getProcessedData(host: PivotHeadHost): unknown {
     return null;
   }
   return host.engine.getState().processedData;
+}
+
+export function updateFieldFormatting(
+  host: PivotHeadHost,
+  field: string,
+  format: FormatOptions
+): void {
+  if (!host.engine) {
+    console.error('Engine not initialized');
+    return;
+  }
+  host.engine.updateFieldFormatting(field, format);
+}
+
+export function getFieldAlignment(host: PivotHeadHost, field: string): string {
+  if (!host.engine) {
+    console.error('Engine not initialized');
+    return 'left';
+  }
+  return host.engine.getFieldAlignment(field);
 }

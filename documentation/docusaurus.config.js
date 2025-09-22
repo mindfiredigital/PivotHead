@@ -1,14 +1,16 @@
-// @ts-check
+// @ts-nocheck
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const lightCodeTheme = require('prism-react-renderer/themes/github');
-const darkCodeTheme = require('prism-react-renderer/themes/dracula');
+const { themes } = require('prism-react-renderer');
+
+// const lightCodeTheme = require('prism-react-renderer/themes/github');
+// const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'PivotHead',
   tagline: 'Documentation for the PivotHead',
-  favicon: 'img/mindfire.ico',
+  favicon: 'img/logo.png',
 
   // Set the production url of your site here
   url: 'https://mindfiredigital.github.io',
@@ -58,16 +60,40 @@ const config = {
     ],
   ],
 
+  plugins: [
+    async function docusaurusTailwindcss(context, options) {
+      return {
+        name: 'docusaurus-tailwindcss',
+        configurePostCss(postcssOptions) {
+          // Appends Tailwind CSS and AutoPrefixer.
+          postcssOptions.plugins.push(require('tailwindcss'));
+          postcssOptions.plugins.push(require('autoprefixer'));
+          return postcssOptions;
+        },
+      };
+    },
+  ],
+
+  scripts: [
+    {
+      src: 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
+    },
+    {
+      src: 'https://cdn.jsdelivr.net/npm/vanta@0.5.21/dist/vanta.net.min.js',
+    },
+  ],
+
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       // Replace with your project's social card
       image: 'img/pivothead.webp',
+
       navbar: {
         title: 'PivotHead',
         logo: {
           alt: 'PivotHead Logo',
-          src: 'img/logo.svg',
+          src: 'img/logo.png',
         },
         items: [
           {
@@ -91,16 +117,21 @@ const config = {
             label: 'GitHub',
             position: 'right',
           },
+          // {
+          //   type: 'html',
+          //   position: 'right',
+          //   value: '<div class="navbar__item dropdown dropdown--hoverable dropdown--right"><a class="navbar__link" href="#!" role="button" data-bs-toggle="dropdown" aria-expanded="false">Theme</a><ul class="dropdown__menu"><li><a class="dropdown__link" href="#!" onclick="window.setTheme(\'light\')">Light</a></li><li><a class="dropdown__link" href="#!" onclick="window.setTheme(\'dark\')">Dark</a></li></ul></div>',
+          // },
         ],
       },
       footer: {
-        style: 'dark',
+        // style: 'dark',
 
-        copyright: `Copyright © ${new Date().getFullYear()} MindfireDigital`,
+        copyright: `© ${new Date().getFullYear()} Mindfire FOSS`,
       },
       prism: {
-        theme: lightCodeTheme,
-        darkTheme: darkCodeTheme,
+        theme: themes.github,
+        darkTheme: themes.dracula,
       },
     }),
 };

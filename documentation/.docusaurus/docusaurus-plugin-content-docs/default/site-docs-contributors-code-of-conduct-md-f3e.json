@@ -1,5 +1,4 @@
 {
-  "unversionedId": "contributors/code-of-conduct",
   "id": "contributors/code-of-conduct",
   "title": "Code of conduct",
   "description": "As contributors and maintainers of the pivothead package, we are dedicated to demonstrating respect to all individuals who contribute to this project. This respect encompasses actions such as posting issues, updating documentation, submitting pull requests, providing constructive feedback in comments, and engaging in any other project-related activities.",
@@ -8,6 +7,7 @@
   "slug": "/contributors/code-of-conduct",
   "permalink": "/PivotHead/docs/contributors/code-of-conduct",
   "draft": false,
+  "unlisted": false,
   "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/contributors/code-of-conduct.md",
   "tags": [],
   "version": "current",

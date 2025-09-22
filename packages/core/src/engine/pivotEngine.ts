@@ -14,6 +14,7 @@ import {
   PaginationConfig,
   DataHandlingMode,
   FormatOptions,
+  AxisConfig,
 } from '../types/interfaces';
 import { calculateAggregates } from './aggregator';
 import { processData } from './dataProcessor';
@@ -33,6 +34,11 @@ export class PivotEngine<T extends Record<string, any>> {
     pageSize: 10,
     totalPages: 1,
   };
+
+  // Controls whether the engine should automatically synthesize a single
+  // column axis and augment data with __all__ when columns are empty.
+  // Disabled by default to preserve backward-compatible behavior and tests.
+  private autoAllColumnEnabled = false;
 
   // Add cache for expensive calculations
   // private cache: Map<string, any> = new Map();
@@ -72,13 +78,13 @@ export class PivotEngine<T extends Record<string, any>> {
       processedData: { headers: [], rows: [], totals: {} },
       rows: config.rows || [],
       columns: config.columns || [],
-      measures: config.measures || [],
+      measures: this.normalizeMeasures(config.measures || []),
       sortConfig: [],
       rowSizes: this.initializeRowSizes(config.data || []),
       expandedRows: {},
       groupConfig: config.groupConfig || null,
       groups: [],
-      selectedMeasures: config.measures || [],
+      selectedMeasures: this.normalizeMeasures(config.measures || []),
       selectedDimensions: config.dimensions || [],
       selectedAggregation: config.defaultAggregation || 'sum',
       formatting: config.formatting || {},
@@ -115,11 +121,52 @@ export class PivotEngine<T extends Record<string, any>> {
     // Initialize row sizes
     this.state.rowSizes = this.initializeRowSizes(this.state.rawData);
 
+    // Ensure column axis is never empty and data has '__all__' when needed (only if enabled)
+    this.ensureSyntheticAllColumn();
+
     // Process data after loading
     this.state.processedData = this.generateProcessedDataForDisplay();
 
     if (this.state.groupConfig) {
       this.applyGrouping();
+    }
+  }
+
+  // Ensure we always have a non-empty column axis and data augmented for '__all__' when needed
+  private ensureSyntheticAllColumn(): void {
+    // Only apply when explicitly enabled (e.g. by ConnectService after CSV/JSON import)
+    if (!this.autoAllColumnEnabled) return;
+
+    const needsAllColumn =
+      !this.state.columns || this.state.columns.length === 0;
+    const hasAllColumn = !!this.state.columns?.some(
+      c => c.uniqueName === '__all__'
+    );
+
+    if (needsAllColumn) {
+      this.state.columns = [
+        { uniqueName: '__all__', caption: 'All' } as AxisConfig,
+      ];
+    }
+
+    if (needsAllColumn || hasAllColumn) {
+      const augment = (arr: T[] | undefined): T[] => {
+        const source = Array.isArray(arr) ? arr : [];
+        let changed = false;
+        const out = source.map(row => {
+          if (row && (row as any).__all__ === undefined) {
+            changed = true;
+            return { ...(row as any), __all__: 'All' } as T;
+          }
+          return row;
+        });
+        return changed ? out : source;
+      };
+
+      // Augment all data sources consistently
+      this.config.data = augment(this.config.data as T[]);
+      this.state.rawData = augment(this.state.rawData as T[]);
+      this.state.data = augment(this.state.data as T[]);
     }
   }
 
@@ -129,13 +176,16 @@ export class PivotEngine<T extends Record<string, any>> {
     this._emit(); // Notify subscribers after state change
   }
 
-  /**
-   * Gets the current data handling mode
-   * @returns {DataHandlingMode}
-   * @public
-   */
-  public getDataHandlingMode(): DataHandlingMode {
-    return this.state.dataHandlingMode;
+  // Allow external callers (e.g., ConnectService) to enable/disable synthetic column mode
+  public setAutoAllColumn(enabled: boolean): void {
+    this.autoAllColumnEnabled = enabled;
+    // Re-ensure consistency if turning on after data is already present
+    if (enabled) {
+      this.ensureSyntheticAllColumn();
+      // Regenerate processed data to reflect any augmentation
+      this.state.processedData = this.generateProcessedDataForDisplay();
+      this._emit();
+    }
   }
 
   /**
@@ -151,6 +201,9 @@ export class PivotEngine<T extends Record<string, any>> {
     // Update the state data
     this.state.data = [...newData];
     this.state.rawData = [...newData];
+
+    // Ensure column axis/data consistency before refresh (only if enabled)
+    this.ensureSyntheticAllColumn();
 
     // Refresh with current filters applied
     this.refreshData();
@@ -361,7 +414,7 @@ export class PivotEngine<T extends Record<string, any>> {
    * @public
    */
   public setMeasures(measureFields: MeasureConfig[]) {
-    this.state.selectedMeasures = measureFields;
+    this.state.selectedMeasures = this.normalizeMeasures(measureFields);
     this.state.processedData = this.generateProcessedDataForDisplay();
     this.updateAggregates();
     this._emit(); // Notify subscribers after state change
@@ -417,49 +470,6 @@ export class PivotEngine<T extends Record<string, any>> {
     this._emit(); // Notify subscribers after state change
   }
 
-  // /**
-  //  * Formats a value based on the specified field's format.
-  //  * @param {any} value - The value to format.
-  //  * @param {string} field - The field name to use for formatting.
-  //  * @returns {string} The formatted value as a string.
-  //  * @public
-  //  */
-  // public formatValue(value: any, field: string): string {
-  //   const format = this.state.formatting[field];
-  //   if (!format) return String(value);
-
-  //   try {
-  //     switch (format.type) {
-  //       case 'currency':
-  //         return new Intl.NumberFormat(format.locale || 'en-US', {
-  //           style: 'currency',
-  //           currency: format.currency || 'USD',
-  //           minimumFractionDigits: format.decimals || 0,
-  //           maximumFractionDigits: format.decimals || 0,
-  //         }).format(value);
-  //       case 'number':
-  //         return new Intl.NumberFormat(format.locale || 'en-US', {
-  //           minimumFractionDigits: format.decimals || 0,
-  //           maximumFractionDigits: format.decimals || 0,
-  //         }).format(value);
-  //       case 'percentage':
-  //         return new Intl.NumberFormat(format.locale || 'en-US', {
-  //           style: 'percent',
-  //           minimumFractionDigits: format.decimals || 0,
-  //         }).format(value);
-  //       case 'date':
-  //         return new Date(value).toLocaleDateString(format.locale || 'en-US', {
-  //           dateStyle: 'medium',
-  //         });
-  //       default:
-  //         return String(value);
-  //     }
-  //   } catch (error) {
-  //     console.error(`Error formatting value for field ${field}:`, error);
-  //     return String(value);
-  //   }
-  // }
-
   /**
    * Enhanced formatValue method with comprehensive formatting support
    * @param {any} value - The value to format.
@@ -482,12 +492,26 @@ export class PivotEngine<T extends Record<string, any>> {
     }
 
     const format = this.getFieldFormat(field);
+    // Find measure to detect aggregation type
+    const measure = this.state.measures.find(m => m.uniqueName === field);
+
     if (!format) {
+      // For avg aggregation without explicit formatting, do not show decimals by default
+      if (measure?.aggregation === 'avg') {
+        const num = Number(value);
+        return Number.isFinite(num) ? String(Math.round(num)) : String(value);
+      }
       return String(value);
     }
 
     try {
-      return this.applyFormatting(value, format);
+      // If aggregation is avg and decimals are not explicitly set, default to 0 decimals
+      const effectiveFormat =
+        measure?.aggregation === 'avg' && typeof format.decimals !== 'number'
+          ? { ...format, decimals: 0 }
+          : format;
+
+      return this.applyFormatting(value, effectiveFormat);
     } catch (error) {
       console.error(`Error formatting value for field ${field}:`, error);
       return String(value);
@@ -760,28 +784,6 @@ export class PivotEngine<T extends Record<string, any>> {
 
     return value;
   }
-
-  /**
-   * Get text alignment for a field
-   * @param {string} field - The field name
-   * @returns {string} The text alignment ('left', 'right', 'center')
-   * @public
-   */
-  // public getFieldAlignment(field: string): string {
-  //   const format = this.getFieldFormat(field);
-  //   if (format && format.align) {
-  //     return format.align;
-  //   }
-
-  //     // For currency fields, use currencyAlign if no explicit align is set
-  // if (format && format.type === 'currency' && format.currencyAlign) {
-  //   return format.currencyAlign;
-  // }
-
-  //   // Default alignment: right for numbers, left for text
-  //   const measure = this.state.measures.find(m => m.uniqueName === field);
-  //   return measure ? 'right' : 'left';
-  // }
 
   /**
    * Get text alignment for a field
@@ -1401,6 +1403,11 @@ export class PivotEngine<T extends Record<string, any>> {
    * @public
    */
   public exportToHTML(fileName = 'pivot-table'): void {
+    console.log('PivotEngine.exportToHTML called with fileName:', fileName);
+    console.log(
+      'PivotEngine state rawData length:',
+      this.state.rawData?.length || 0
+    );
     PivotExportService.exportToHTML(this.getState(), fileName);
   }
 
@@ -1410,6 +1417,11 @@ export class PivotEngine<T extends Record<string, any>> {
    * @public
    */
   public exportToPDF(fileName = 'pivot-table'): void {
+    console.log('PivotEngine.exportToPDF called with fileName:', fileName);
+    console.log(
+      'PivotEngine state rawData length:',
+      this.state.rawData?.length || 0
+    );
     PivotExportService.exportToPDF(this.getState(), fileName);
   }
 
@@ -1419,6 +1431,11 @@ export class PivotEngine<T extends Record<string, any>> {
    * @public
    */
   public exportToExcel(fileName = 'pivot-table'): void {
+    console.log('PivotEngine.exportToExcel called with fileName:', fileName);
+    console.log(
+      'PivotEngine state rawData length:',
+      this.state.rawData?.length || 0
+    );
     PivotExportService.exportToExcel(this.getState(), fileName);
   }
 
@@ -2169,5 +2186,84 @@ export class PivotEngine<T extends Record<string, any>> {
     }
 
     return filteredData;
+  }
+
+  /**
+   * Sets the layout for the pivot table (rows, columns, measures) in one call.
+   * @param {AxisConfig[]} rows - Row fields
+   * @param {AxisConfig[]} columns - Column fields
+   * @param {MeasureConfig[]} measures - Measure fields
+   * @public
+   */
+  public setLayout(
+    rows: AxisConfig[],
+    columns: AxisConfig[],
+    measures: MeasureConfig[]
+  ) {
+    this.state.rows = rows || [];
+    this.state.columns = columns || [];
+    this.state.measures = this.normalizeMeasures(measures || []);
+
+    // Keep selections in sync
+    this.state.selectedMeasures = [...this.state.measures];
+    this.state.selectedDimensions = [
+      ...rows.map(
+        r =>
+          ({
+            field: r.uniqueName,
+            label: r.caption || r.uniqueName,
+            type: 'string',
+          }) as any
+      ),
+      ...columns.map(
+        c =>
+          ({
+            field: c.uniqueName,
+            label: c.caption || c.uniqueName,
+            type: 'string',
+          }) as any
+      ),
+    ];
+
+    // Guarantee a single synthetic column when none provided (only if enabled)
+    this.ensureSyntheticAllColumn();
+
+    // Recompute
+    this.state.processedData = this.generateProcessedDataForDisplay();
+    this.updateAggregates();
+    this._emit();
+  }
+
+  /**
+   * Set only rows and columns, keeping measures unchanged
+   * @param {AxisConfig[]} rows
+   * @param {AxisConfig[]} columns
+   * @public
+   */
+  public setRowsAndColumns(rows: AxisConfig[], columns: AxisConfig[]) {
+    this.state.rows = rows || [];
+    this.state.columns = columns || [];
+
+    // Guarantee a single synthetic column when none provided (only if enabled)
+    this.ensureSyntheticAllColumn();
+
+    this.state.processedData = this.generateProcessedDataForDisplay();
+    this.updateAggregates();
+    this._emit();
+  }
+
+  private normalizeMeasures(measures: MeasureConfig[] = []): MeasureConfig[] {
+    return (measures || []).map(m => {
+      const hasCustomCaption =
+        !!m.caption &&
+        m.caption.trim().toLowerCase() !== m.uniqueName.toLowerCase();
+      if (
+        !hasCustomCaption &&
+        (m.aggregation || this.config.defaultAggregation) === 'sum'
+      ) {
+        return { ...m, caption: `sum of ${m.uniqueName}` };
+      }
+      return m;
+    });
   }
 }

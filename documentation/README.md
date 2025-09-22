@@ -39,3 +39,36 @@ $ GIT_USER=<Your GitHub username> yarn deploy
 ```
 
 If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+
+/\*\*
+
+- Any CSS included here will be global. The classic template
+- bundles Infima by default. Infima is a CSS framework designed to
+- work well for content-centric websites.
+  \*/
+
+/_ You can override the default Infima variables here. _/
+:root {
+--ifm-color-primary: #ff0000;
+--ifm-color-primary-dark: #e60000;
+--ifm-color-primary-darker: #d90000;
+--ifm-color-primary-darkest: #b30000;
+--ifm-color-primary-light: #ff1a1a;
+--ifm-color-primary-lighter: #ff2626;
+--ifm-color-primary-lightest: #ff4d4d;
+}
+
+/_ For readability concerns, you should choose a lighter palette in dark mode. _/
+[data-theme='dark'] {
+--ifm-color-primary: #ff0000;
+--ifm-color-primary-dark: #e60000;
+--ifm-color-primary-darker: #d90000;
+--ifm-color-primary-darkest: #b30000;
+--ifm-color-primary-light: #ff1a1a;
+--ifm-color-primary-lighter: #ff2626;
+--ifm-color-primary-lightest: #ff4d4d;
+}
+
+.navbar\_\_title {
+color: red;
+}

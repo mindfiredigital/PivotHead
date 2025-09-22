@@ -117,6 +117,7 @@ export function renderFullUI(host: PivotHeadHost) {
         .drag-over { outline: 2px dashed #2672dd; background: #f3f8fd !important; }
         tbody tr:nth-child(even) td { background: #f8fafc; }
         button { padding: 5px 10px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #45a049; }
         button:disabled { background-color: #cccccc; cursor: not-allowed; }
         select, input { padding: 5px; border-radius: 4px; border: 1px solid #ddd; }
         
@@ -247,6 +248,7 @@ export function renderFullUI(host: PivotHeadHost) {
           <button id="nextPage">Next</button>
         </div>
         <button id="switchView">Switch to Raw Data</button>
+        <button id="formatButton">Format</button>
         <button id="exportHTML">Export HTML</button>
         <button id="exportPDF">Export PDF</button>
         <button id="exportExcel">Export Excel</button>
@@ -254,15 +256,18 @@ export function renderFullUI(host: PivotHeadHost) {
       </div>
     `;
 
+  // Determine column labels using engine's custom column order if any
   const groupedData = engine.getGroupedData();
-  let uniqueColumnValues = [
-    ...new Set(
-      groupedData.map((g: Group) => {
-        const keys = g.key ? g.key.split('|') : [];
-        return keys[1] || keys[0];
-      })
-    ),
-  ].filter(Boolean) as string[];
+  let uniqueColumnValues =
+    engine.getOrderedColumnValues() ||
+    ([
+      ...new Set(
+        groupedData.map((g: Group) => {
+          const keys = g.key ? g.key.split('|') : [];
+          return keys[1] || keys[0];
+        })
+      ),
+    ].filter(Boolean) as string[]);
   if (host._processedColumnOrder.length === 0) {
     host._processedColumnOrder = [...uniqueColumnValues];
   }
@@ -277,7 +282,7 @@ export function renderFullUI(host: PivotHeadHost) {
   html += '<tr>';
   html += `<th class="corner-cell">${rowField.caption} / ${columnField.caption}</th>`;
   uniqueColumnValues.forEach((colValue, index) => {
-    html += `<th class="column-header" draggable="true" data-column-index="${index}" colspan="${measures.length}">${colValue}</th>`;
+    html += `<th class="column-header" draggable="true" data-column-index="${index}" data-column-value="${colValue}" colspan="${measures.length}">${colValue}</th>`;
   });
   html += '</tr>';
   html += '<tr>';
@@ -285,10 +290,10 @@ export function renderFullUI(host: PivotHeadHost) {
   html += `<th class="row-cell sortable-header" data-field="${rowField.uniqueName}">
       ${rowField.caption}${rowSortIcon}
     </th>`;
-  uniqueColumnValues.forEach(() => {
+  uniqueColumnValues.forEach(colValue => {
     measures.forEach((measure: MeasureConfig, measureIndex: number) => {
       const sortIcon = host.createProcessedSortIcon(measure.uniqueName);
-      html += `<th class="measure-header sortable-header" data-measure-index="${measureIndex}" data-field="${measure.uniqueName}">
+      html += `<th class="measure-header sortable-header" data-measure-index="${measureIndex}" data-field="${measure.uniqueName}" data-column-value="${colValue}">
           ${measure.caption}${sortIcon}
         </th>`;
     });
@@ -297,17 +302,21 @@ export function renderFullUI(host: PivotHeadHost) {
   html += '</thead>';
   html += '<tbody>';
 
-  const engineState = engine.getState();
-  const processedRows = engineState.processedData.rows || [];
-  const uniqueRowValues: string[] = [];
-  const seenRowValues = new Set<string>();
-  processedRows.forEach((row: unknown[]) => {
-    const rowValue = row[0] as string;
-    if (!seenRowValues.has(rowValue)) {
-      uniqueRowValues.push(rowValue);
-      seenRowValues.add(rowValue);
-    }
-  });
+  // Prefer engine-provided ordered row values (custom or due to sorting)
+  const orderedFromEngine = engine.getOrderedRowValues() || [];
+  let uniqueRowValues: string[] = [...orderedFromEngine];
+  if (uniqueRowValues.length === 0) {
+    // Fallback: derive row values from all grouped data keys so we don't miss any groups
+    const allGroups = engine.getGroupedData();
+    uniqueRowValues = [
+      ...new Set(
+        allGroups.map((g: Group) => {
+          const keys = g.key ? g.key.split('|') : [];
+          return keys[0];
+        })
+      ),
+    ].filter(Boolean) as string[];
+  }
   const paginatedRowValues = host.getPaginatedData(uniqueRowValues);
   paginatedRowValues.forEach((rowValue, rowIndex) => {
     html += `<tr draggable="true" data-row-index="${rowIndex}" data-row-value="${rowValue}">`;
@@ -326,11 +335,7 @@ export function renderFullUI(host: PivotHeadHost) {
           | null;
         let formattedValue = '0';
         if (value !== undefined && value !== null) {
-          if (typeof value === 'number') {
-            formattedValue = value.toLocaleString();
-          } else if (String(value).trim() !== '') {
-            formattedValue = String(value);
-          }
+          formattedValue = engine.formatValue(value, measure.uniqueName);
         }
         const hasData =
           value !== undefined && value !== null && Number(value) > 0;
@@ -338,7 +343,9 @@ export function renderFullUI(host: PivotHeadHost) {
         const cellTitle = hasData
           ? `Double-click to see details for ${rowField.caption}: ${rowValue} - ${columnField.caption}: ${colValue}`
           : '';
+        const textAlign = engine.getFieldAlignment(measure.uniqueName);
         html += `<td class="${cellClass}" 
+                      style="text-align: ${textAlign};"
                       title="${cellTitle}"
                       data-row-value="${rowValue}" 
                       data-column-value="${colValue}" 
@@ -364,7 +371,8 @@ export function renderRawTable(host: PivotHeadHost) {
   const engine = host.engine;
   if (!engine) return;
   const state = engine.getState();
-  const allRawData = state.data || state.rawData || [];
+  // Prefer full rawData first; state.data could be limited by engine defaults
+  const allRawData = state.rawData || state.data || [];
   if (!allRawData.length) return;
   host.updatePaginationForData(allRawData);
   const displayData = host.getPaginatedData(allRawData);
@@ -395,6 +403,7 @@ export function renderRawTable(host: PivotHeadHost) {
         .drag-over { outline: 2px dashed #2672dd; background: #f3f8fd !important; }
         tbody tr:nth-child(even) td { background: #f8fafc; }
         button { padding: 5px 10px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #45a049; }
         button:disabled { background-color: #cccccc; cursor: not-allowed; }
         select, input { padding: 5px; border-radius: 4px; border: 1px solid #ddd; }
       </style>
@@ -425,6 +434,7 @@ export function renderRawTable(host: PivotHeadHost) {
           <button id="nextPage">Next</button>
         </div>
         <button id="switchView">Switch to Processed Data</button>
+        <button id="formatButton">Format</button>
         <button id="exportHTML">Export HTML</button>
         <button id="exportPDF">Export PDF</button>
         <button id="exportExcel">Export Excel</button>
@@ -445,7 +455,13 @@ export function renderRawTable(host: PivotHeadHost) {
     const pivotRow = row as Record<string, unknown>;
     html += `<tr draggable="true" data-row-index="${rowIndex}">`;
     headers.forEach(header => {
-      html += `<td>${pivotRow[header]}</td>`;
+      const cellValue = pivotRow[header];
+      let formattedValue = cellValue;
+      if (cellValue !== undefined && cellValue !== null) {
+        formattedValue = engine.formatValue(cellValue, header);
+      }
+      const textAlign = engine.getFieldAlignment(header);
+      html += `<td style="text-align: ${textAlign};">${formattedValue}</td>`;
     });
     html += '</tr>';
   });

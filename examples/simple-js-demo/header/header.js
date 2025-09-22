@@ -1,9 +1,7 @@
 import { formatCellPopUp } from '../services/formatCell.js';
-import { createOptionsPopup } from '../services/optionsPopup.js';
-import { conditionFormattingPopUp } from '../services/conditionFormattingPopUp.js';
 import { createFieldsPopup } from '../services/fieldsPopup.js';
 import { dataSourceOptions } from '../services/dataSourceOptions.js';
-import { pivotEngine } from '../index.js';
+import { pivotEngine, handleFileConnection } from '../index.js'; // Import the new function
 import {
   exportToHTML,
   exportToExcel,
@@ -73,35 +71,52 @@ export function createHeader(config) {
         dropdownItem.style.transition = 'background-color 0.3s';
 
         // Dropdown item click logic
-        dropdownItem.addEventListener('click', () => {
+        dropdownItem.addEventListener('click', async () => {
           console.log(optionName);
+
+          // Hide dropdown immediately when clicked
+          dropdown.style.display = 'none';
+
           switch (optionName) {
+            // Connect options - NEW FUNCTIONALITY
+            case 'Connect to Local CSV':
+              try {
+                await handleFileConnection('CSV');
+              } catch (error) {
+                console.error('Error connecting to CSV:', error);
+                alert('Failed to connect to CSV file: ' + error.message);
+              }
+              break;
+
+            case 'Connect to Local JSON':
+              try {
+                await handleFileConnection('JSON');
+              } catch (error) {
+                console.error('Error connecting to JSON:', error);
+                alert('Failed to connect to JSON file: ' + error.message);
+              }
+              break;
+
+            // Existing functionality
             case 'Format Cell':
               formatCellPopUp(config);
-              break;
-            case 'Condition Formatting':
-              conditionFormattingPopUp();
-              break;
-            case 'Options':
-              createOptionsPopup();
               break;
             case 'To Local JSON':
               dataSourceOptions(config);
               break;
             case 'Print':
-              dropdown.style.display = 'none';
               openPrintDialog(pivotEngine);
               break;
             case 'To HTML':
-              dropdown.style.display = 'none';
+              console.log('Exporting to HTML...');
               exportToHTML(pivotEngine);
               break;
             case 'To Excel':
-              dropdown.style.display = 'none';
+              console.log('Exporting to Excel...');
               exportToExcel(pivotEngine);
               break;
             case 'To PDF':
-              dropdown.style.display = 'none';
+              console.log('Exporting to PDF...');
               exportToPDF(pivotEngine);
               break;
             default:
@@ -125,8 +140,8 @@ export function createHeader(config) {
       option.addEventListener('click', () => {
         console.log('label clicked: ' + label);
         switch (label) {
-          case 'Options':
-            createOptionsPopup();
+          case 'Format':
+            formatCellPopUp(config);
             break;
           case 'Fields':
             createFieldsPopup();
@@ -165,9 +180,8 @@ export function createHeader(config) {
     {
       icon: '🔗',
       label: 'Connect',
-      dropdownOptions: ['To Local CSV', 'To Local JSON'],
+      dropdownOptions: ['Connect to Local CSV', 'Connect to Local JSON'],
     },
-
     {
       icon: '📤',
       label: 'Export',
@@ -179,9 +193,8 @@ export function createHeader(config) {
     {
       icon: '↕️',
       label: 'Format',
-      dropdownOptions: ['Format Cell', 'Condition Formatting'],
+      dropdownOptions: ['Format Cell'],
     },
-    // { icon: '⚙️', label: 'Options', dropdownOptions: [] },
     { icon: '📋', label: 'Fields', dropdownOptions: [] },
   ];
 

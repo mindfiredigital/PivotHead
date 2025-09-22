@@ -1,0 +1,24 @@
+{
+  "id": "tutorial-basics/wrappers/vue",
+  "title": "Vue Wrapper",
+  "description": "A powerful Vue 3 wrapper for PivotHead that provides seamless integration with reactive data binding, TypeScript support, and Vue-specific optimizations. The wrapper bridges Vue applications with the PivotHead web component while maintaining full Vue ecosystem compatibility.",
+  "source": "@site/docs/tutorial-basics/wrappers/vue.md",
+  "sourceDirName": "tutorial-basics/wrappers",
+  "slug": "/tutorial-basics/wrappers/vue",
+  "permalink": "/PivotHead/docs/tutorial-basics/wrappers/vue",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorial-basics/wrappers/vue.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "React Wrapper",
+    "permalink": "/PivotHead/docs/tutorial-basics/wrappers/react"
+  },
+  "next": {
+    "title": "Troubleshooting",
+    "permalink": "/PivotHead/docs/tutorial-basics/troubleshooting"
+  }
+}
