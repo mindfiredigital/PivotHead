@@ -1,9 +1,12 @@
-import { onSectionItemDrop } from '../index.js';
+import { onSectionItemDrop, pivotEngine } from '../index.js';
+import { FieldService } from '../../../packages/core/src/engine/fieldService.ts';
 
+// Track dropped fields per section
 const droppedFields = {
   rows: new Set(),
   columns: new Set(),
-  values: new Set(),
+  // Map<string, AggregationType>
+  values: new Map(),
   filters: new Set(),
 };
 
@@ -302,17 +305,6 @@ li .field-info input {
     `;
     document.head.appendChild(style);
 
-    // TODO: will add the following in next iteration once functioanlity is ready
-    //     <div id="reportFilters" class="section">
-    //                           <h3>Report Filters</h3>
-    //                           <ul id="reportFiltersList" class="section-list"></ul>
-    //                       </div>
-
-    //  <div id="values" class="section">
-    //                           <h3>Values</h3>
-    //                           <ul id="valuesList" class="section-list"></ul>
-    //                       </div>
-
     const container = document.createElement('div');
     container.innerHTML = `
       <div id="myTableContainer">
@@ -332,7 +324,6 @@ li .field-info input {
                       <ul id="fieldsList" class="section-list"></ul>
                   </div>
                   <div id="rightSection" class="right-section">
-                      
                       <div id="columns" class="section">
                           <h3>Columns</h3>
                           <ul id="columnsList" class="section-list"></ul>
@@ -341,7 +332,10 @@ li .field-info input {
                           <h3>Rows</h3>
                           <ul id="rowsList" class="section-list"></ul>
                       </div>
-                     
+                      <div id="values" class="section">
+                          <h3>Values</h3>
+                          <ul id="valuesList" class="section-list"></ul>
+                      </div>
                   </div>
               </div>
           </div>
@@ -355,13 +349,21 @@ li .field-info input {
     const fieldsList = document.getElementById('fieldsList');
     const allSections = document.querySelectorAll('.section-list');
 
-    const fields = [
-      { name: 'Product', type: 'string' },
-      { name: 'Date', type: 'string' },
-      { name: 'Region', type: 'string' },
-      { name: 'Sales', type: 'number' },
-      { name: 'Quantity', type: 'number' },
-    ];
+    const rowsList = document.getElementById('rowsList');
+    const columnsList = document.getElementById('columnsList');
+    const valuesList = document.getElementById('valuesList');
+
+    const getFieldsFromEngine = () => {
+      if (!pivotEngine) return [];
+      try {
+        return FieldService.getAvailableFields(pivotEngine);
+      } catch (e) {
+        console.error('Failed to get fields from engine', e);
+        return [];
+      }
+    };
+
+    const fields = getFieldsFromEngine();
 
     const populateFields = () => {
       fieldsList.innerHTML = '';
@@ -394,7 +396,47 @@ li .field-info input {
 
         li.setAttribute('draggable', 'true');
         li.setAttribute('data-field-name', field.name);
+        li.setAttribute('data-field-type', field.type);
         fieldsList.appendChild(li);
+      });
+    };
+
+    const populateInitialSelections = () => {
+      if (!pivotEngine) return;
+      const state = pivotEngine.getState();
+
+      // Initialize droppedFields from engine state
+      droppedFields.rows = new Set((state.rows || []).map(r => r.uniqueName));
+      droppedFields.columns = new Set(
+        (state.columns || []).map(c => c.uniqueName)
+      );
+      droppedFields.values = new Map(
+        (state.measures || []).map(m => [m.uniqueName, m.aggregation])
+      );
+
+      // Render items into respective lists
+      rowsList.innerHTML = '';
+      columnsList.innerHTML = '';
+      valuesList.innerHTML = '';
+
+      droppedFields.rows.forEach(name => {
+        const li = document.createElement('li');
+        li.textContent = name;
+        createMoveBackIcon(name, li, droppedFields.rows, rowsList);
+      });
+
+      droppedFields.columns.forEach(name => {
+        const li = document.createElement('li');
+        li.textContent = name;
+        createMoveBackIcon(name, li, droppedFields.columns, columnsList);
+      });
+
+      droppedFields.values.forEach((agg, name) => {
+        const li = document.createElement('li');
+        li.textContent = name;
+        addAggregationControls(li, name, agg);
+        li.classList.add('sigma-li');
+        createMoveBackIcon(name, li, droppedFields.values, valuesList);
       });
     };
 
@@ -403,16 +445,31 @@ li .field-info input {
       fieldSettingsPopup.classList.add('visible');
 
       populateFields();
+      populateInitialSelections();
 
       attachEventListeners();
     };
 
     const attachEventListeners = () => {
-      closeBtn.removeEventListener('click', hidePopup); // Clean up previous listener
-      applyBtn.removeEventListener('click', hidePopup); // Clean up previous listener
+      // Reset listeners
+      closeBtn.replaceWith(closeBtn.cloneNode(true));
+      applyBtn.replaceWith(applyBtn.cloneNode(true));
 
-      closeBtn.addEventListener('click', hidePopup);
-      applyBtn.addEventListener('click', hidePopup);
+      const newCloseBtn = document.getElementById('cancelBtn');
+      const newApplyBtn = document.getElementById('applyBtn');
+
+      newCloseBtn.addEventListener('click', () => {
+        // Just hide, no apply
+        fieldSettingsPopup.classList.add('hidden');
+        fieldSettingsPopup.classList.remove('visible');
+      });
+
+      newApplyBtn.addEventListener('click', () => {
+        // Apply current selection to engine and hide
+        onSectionItemDrop(droppedFields);
+        fieldSettingsPopup.classList.add('hidden');
+        fieldSettingsPopup.classList.remove('visible');
+      });
 
       fieldsList.addEventListener('dragstart', dragStart);
       fieldsList.addEventListener('dragend', dragEnd);
@@ -423,12 +480,6 @@ li .field-info input {
       });
     };
 
-    function hidePopup() {
-      fieldSettingsPopup.classList.add('hidden');
-      fieldSettingsPopup.classList.remove('visible');
-      onSectionItemDrop(droppedFields);
-    }
-
     function dragStart(event) {
       const draggedElement = event.target;
       if (draggedElement && draggedElement.classList.contains('draggable')) {
@@ -436,6 +487,10 @@ li .field-info input {
         event.dataTransfer.setData(
           'text',
           draggedElement.getAttribute('data-field-name')
+        );
+        event.dataTransfer.setData(
+          'type',
+          draggedElement.getAttribute('data-field-type')
         );
       }
     }
@@ -449,10 +504,48 @@ li .field-info input {
       event.preventDefault();
     }
 
+    function addAggregationControls(li, fieldName, currentAgg) {
+      const sigmaButton = document.createElement('button');
+      sigmaButton.textContent = '∑';
+      sigmaButton.classList.add('aggregation-button');
+
+      const dropdown = document.createElement('ul');
+      dropdown.classList.add('aggregation-dropdown');
+      dropdown.style.display = 'none';
+      const aggregationOptions = FieldService.getSupportedAggregations();
+
+      aggregationOptions.forEach(option => {
+        const optionItem = document.createElement('li');
+        optionItem.textContent = option;
+        optionItem.addEventListener('click', () => {
+          dropdown.style.display = 'none';
+          droppedFields.values.set(fieldName, option);
+          // Defer applying changes until Apply is clicked
+          sigmaButton.title = `Aggregation: ${option}`;
+        });
+        dropdown.appendChild(optionItem);
+      });
+
+      sigmaButton.addEventListener('click', e => {
+        e.stopPropagation();
+        dropdown.style.display =
+          dropdown.style.display === 'none' ? 'block' : 'none';
+      });
+
+      // Reflect current selection
+      if (currentAgg) {
+        sigmaButton.title = `Aggregation: ${currentAgg}`;
+      }
+
+      li.appendChild(sigmaButton);
+      li.appendChild(dropdown);
+    }
+
     function drop(event) {
       event.preventDefault();
       const target = event.target.closest('.section-list');
       const fieldName = event.dataTransfer.getData('text');
+      const fieldType = event.dataTransfer.getData('type');
 
       if (target && fieldName) {
         const sectionId = target.id;
@@ -464,58 +557,33 @@ li .field-info input {
         else if (sectionId === 'valuesList') sectionType = 'values';
         else return;
 
-        const section = droppedFields[sectionType];
-
-        // Check if the field is already present in the section
-        if (section.has(fieldName)) {
-          return; // Don't add if the field is already in the section
-        }
+        // Don't add duplicates
         if (sectionType === 'values') {
-          const field = fields.find(f => f.name === fieldName);
-          if (field && field.type !== 'number') {
-            alert('Only numerical fields can be added to Values.');
+          if (droppedFields.values.has(fieldName)) return;
+          // Only allow numeric fields for values by default
+          if (fieldType !== 'number') {
+            alert('Only numeric fields can be added to Values.');
             return;
           }
+        } else if (droppedFields[sectionType].has(fieldName)) {
+          return;
         }
 
-        section.add(fieldName);
-
-        // Create list item for dropped field
         const li = document.createElement('li');
         li.textContent = fieldName;
 
-        // Add Sigma button (for aggregation options)
         if (sectionType === 'values') {
-          const sigmaButton = document.createElement('button');
-          sigmaButton.textContent = '∑';
-          sigmaButton.classList.add('aggregation-button');
-
-          const dropdown = document.createElement('ul');
-          dropdown.classList.add('aggregation-dropdown');
-          dropdown.style.display = 'none';
-          const aggregationOptions = ['Sum', 'Average', 'Count'];
-
-          aggregationOptions.forEach(option => {
-            const optionItem = document.createElement('li');
-            optionItem.textContent = option;
-            optionItem.addEventListener('click', () => {
-              dropdown.style.display = 'none';
-            });
-            dropdown.appendChild(optionItem);
-          });
-
-          sigmaButton.addEventListener('click', () => {
-            dropdown.style.display =
-              dropdown.style.display === 'none' ? 'block' : 'none';
-          });
-
           li.classList.add('sigma-li');
-          li.appendChild(sigmaButton);
-          li.appendChild(dropdown);
-          createMoveBackIcon(fieldName, li, section, target);
+          // default to sum
+          droppedFields.values.set(fieldName, 'sum');
+          addAggregationControls(li, fieldName, 'sum');
+          createMoveBackIcon(fieldName, li, droppedFields.values, target);
+        } else {
+          droppedFields[sectionType].add(fieldName);
+          createMoveBackIcon(fieldName, li, droppedFields[sectionType], target);
         }
 
-        createMoveBackIcon(fieldName, li, section, target);
+        // Defer live update; apply on Apply button
       }
     }
 
@@ -535,14 +603,21 @@ li .field-info input {
     moveBackIcon.addEventListener('click', () => {
       // Move it back to All Fields
       target.removeChild(li);
-      section.delete(fieldName);
+      if (section instanceof Map) {
+        section.delete(fieldName);
+      } else if (section instanceof Set) {
+        section.delete(fieldName);
+      }
 
       const allFieldsItem = document.querySelector(
         `#fieldsList li[data-field-name="${fieldName}"]`
       );
       if (allFieldsItem) {
-        allFieldsItem.querySelector('input').checked = false;
+        const inputEl = allFieldsItem.querySelector('input');
+        if (inputEl) inputEl.checked = false;
       }
+
+      // Defer live update; apply on Apply button
     });
   }
 }

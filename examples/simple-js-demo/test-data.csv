@@ -1,0 +1,11 @@
+Region, Product , Sales, Quantity, Cost
+North , Widget A, 1500 , 10      , 100
+South , Widget B, 2500 , 15      , 150
+East  , Widget A, 1800 , 12      , 110
+West  , Widget C, 3200 , 20      , 200
+North , Widget B, 2200 , 14      , 140
+South , Widget A, 1700 , 11      , 105
+East  , Widget C, 2800 , 18      , 180
+West  , Widget A, 1900 , 13      , 115
+North , Widget C, 3000 , 19      , 190
+South , Widget C, 2600 , 16      , 160

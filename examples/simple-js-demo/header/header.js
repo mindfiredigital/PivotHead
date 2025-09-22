@@ -1,6 +1,4 @@
 import { formatCellPopUp } from '../services/formatCell.js';
-import { createOptionsPopup } from '../services/optionsPopup.js';
-import { conditionFormattingPopUp } from '../services/conditionFormattingPopUp.js';
 import { createFieldsPopup } from '../services/fieldsPopup.js';
 import { dataSourceOptions } from '../services/dataSourceOptions.js';
 import { pivotEngine, handleFileConnection } from '../index.js'; // Import the new function
@@ -103,12 +101,6 @@ export function createHeader(config) {
             case 'Format Cell':
               formatCellPopUp(config);
               break;
-            case 'Condition Formatting':
-              conditionFormattingPopUp();
-              break;
-            case 'Options':
-              createOptionsPopup();
-              break;
             case 'To Local JSON':
               dataSourceOptions(config);
               break;
@@ -148,8 +140,8 @@ export function createHeader(config) {
       option.addEventListener('click', () => {
         console.log('label clicked: ' + label);
         switch (label) {
-          case 'Options':
-            createOptionsPopup();
+          case 'Format':
+            formatCellPopUp(config);
             break;
           case 'Fields':
             createFieldsPopup();
@@ -188,7 +180,7 @@ export function createHeader(config) {
     {
       icon: '🔗',
       label: 'Connect',
-      dropdownOptions: ['Connect to Local CSV', 'Connect to Local JSON'], // Updated options
+      dropdownOptions: ['Connect to Local CSV', 'Connect to Local JSON'],
     },
     {
       icon: '📤',
@@ -203,8 +195,7 @@ export function createHeader(config) {
       label: 'Format',
       dropdownOptions: ['Format Cell'],
     },
-    // { icon: '⚙️', label: 'Options', dropdownOptions: [] },
-    // { icon: '📋', label: 'Fields', dropdownOptions: [] },
+    { icon: '📋', label: 'Fields', dropdownOptions: [] },
   ];
 
   leftOptions.forEach(option =>

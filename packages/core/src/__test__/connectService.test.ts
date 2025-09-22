@@ -1,11 +1,16 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import type { SpyInstance } from 'vitest';
 import { ConnectService, FileConnectionResult } from '../engine/connectService';
 import { PivotEngine } from '../engine/pivotEngine';
 
 // Mock the PivotEngine class, only mocking the methods we need
 const mockPivotEngine = {
   updateDataSource: vi.fn(),
-} as unknown as PivotEngine<any>;
+  // Added to satisfy new ConnectService behavior applying auto layout
+  setLayout: vi.fn(),
+  // Added to satisfy new ConnectService behavior enabling synthetic column logic in engine
+  setAutoAllColumn: vi.fn(),
+} as unknown as PivotEngine<Record<string, unknown>>;
 
 // A helper class to mock the browser's File object
 class MockFile {
@@ -28,11 +33,23 @@ class MockFile {
 }
 
 // Mock the global FileReader API
-const mockFileReader = {
+
+type FileReaderLike = {
+  result?: string;
+  onload?: (() => void) | null;
+  onerror?: (() => void) | null;
+  onprogress?: ((ev: ProgressEvent<FileReader>) => void) | null;
+  readAsText: (file: MockFile) => void;
+};
+
+const mockFileReader: FileReaderLike = {
   onload: vi.fn(),
   onerror: vi.fn(),
   onprogress: vi.fn(),
-  readAsText: vi.fn().mockImplementation(function (this: any, file: MockFile) {
+  readAsText: vi.fn().mockImplementation(function (
+    this: FileReaderLike,
+    file: MockFile
+  ) {
     // Simulate async file reading
     file.text().then(content => {
       this.result = content;
@@ -51,27 +68,41 @@ vi.stubGlobal(
 vi.stubGlobal('File', MockFile);
 
 // Mock Notification API for testing showImportNotification
-const NotificationMock = vi.fn();
-// Assign properties to the mock function itself to simulate a class with static properties
-(NotificationMock as any).permission = 'granted';
-(NotificationMock as any).requestPermission = vi
-  .fn()
-  .mockResolvedValue('granted');
-vi.stubGlobal('Notification', NotificationMock);
+interface NotificationCtorMock {
+  (title: string, options?: NotificationOptions): void;
+  permission: NotificationPermission;
+  requestPermission: () => Promise<NotificationPermission>;
+}
+
+const NotificationMock: NotificationCtorMock = Object.assign(vi.fn(), {
+  permission: 'granted' as NotificationPermission,
+  requestPermission: vi
+    .fn()
+    .mockResolvedValue('granted' as NotificationPermission),
+});
+vi.stubGlobal(
+  'Notification',
+  NotificationMock as unknown as typeof Notification
+);
 
 describe('ConnectService', () => {
   // Spy on the private method to control its behavior without DOM interaction
-  let openFilePickerSpy: any;
+  let openFilePickerSpy: SpyInstance;
 
   beforeEach(() => {
     // Mock the file picker to return a promise. We'll set the resolved value in each test.
     openFilePickerSpy = vi
-      .spyOn(ConnectService as any, 'openFilePicker')
+      .spyOn(
+        ConnectService as unknown as {
+          openFilePicker: (extensions: string[]) => Promise<File | null>;
+        },
+        'openFilePicker'
+      )
       .mockResolvedValue(null);
 
     // Suppress console messages during tests
-    vi.spyOn(console, 'error').mockImplementation(() => {});
-    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    vi.spyOn(console, 'warn').mockImplementation(() => undefined);
   });
 
   afterEach(() => {
@@ -144,7 +175,6 @@ describe('ConnectService', () => {
       openFilePickerSpy.mockResolvedValue(file);
 
       const result = await ConnectService.connectToLocalJSON(mockPivotEngine);
-
       expect(result.success).toBe(false);
       expect(result.error).toBe(
         'Invalid JSON format. Please check your file syntax.'
@@ -260,10 +290,14 @@ describe('ConnectService', () => {
       const columns = ['id', 'name', 'region', 'id'];
       const data = [{ id: 1, name: 'Test', region: 'NA' }]; // Data is not used for this specific check
       // Access private static method for testing purposes
-      const warnings = (ConnectService as any).validateDataStructure(
-        data,
-        columns
-      );
+      const warnings = (
+        ConnectService as unknown as {
+          validateDataStructure: (
+            data: unknown[],
+            columns: string[]
+          ) => string[];
+        }
+      ).validateDataStructure(data as unknown[], columns);
       expect(warnings).toContain('Found duplicate column names: id');
     });
 
@@ -273,10 +307,14 @@ describe('ConnectService', () => {
         { id: 1, name: 'Test1' },
         { id: 2, name: 'Test2', region: 'NA' }, // This row has an extra key
       ];
-      const warnings = (ConnectService as any).validateDataStructure(
-        data,
-        columns
-      );
+      const warnings = (
+        ConnectService as unknown as {
+          validateDataStructure: (
+            data: unknown[],
+            columns: string[]
+          ) => string[];
+        }
+      ).validateDataStructure(data as unknown[], columns);
       expect(warnings).toContain(
         'Found 1 rows with inconsistent column count in sample'
       );
@@ -311,7 +349,7 @@ describe('ConnectService', () => {
       expect(summary).toBe('Import failed: File is too large.');
     });
 
-    // CORRECTED: Use the mock directly instead of trying to spy on it.
+    // Updated to match current notification title and body structure
     it('showImportNotification should trigger a notification for a successful import', () => {
       const result: FileConnectionResult = {
         success: true,
@@ -319,9 +357,8 @@ describe('ConnectService', () => {
         fileName: 'import.csv',
       };
       ConnectService.showImportNotification(result);
-      expect(NotificationMock).toHaveBeenCalledWith('Import Successful', {
-        body: 'Imported 150 records from import.csv',
-        icon: '/favicon.ico',
+      expect(NotificationMock).toHaveBeenCalledWith('PivotHead Import', {
+        body: 'Successfully imported 150 records from import.csv',
       });
     });
   });
