@@ -6,6 +6,11 @@
       "dependsOn": ["^build", "test"],
       "outputs": ["dist/**"]
     },
+    "@mindfiredigital/pivothead-angular#build": {
+      "dependsOn": ["^build"],
+      "outputs": ["../../dist/angular/**"]
+    },
+
     "lint": {},
     "dev": {
       "cache": false,

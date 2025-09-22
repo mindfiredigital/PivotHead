@@ -17,6 +17,8 @@ import { GridBeams } from '../components/light-ray';
 import TextType from '../components/text-type';
 import BrowserOnly from '@docusaurus/BrowserOnly';
 
+import HeadlessDataVisualizationSection from '../components/dataVisualisation';
+
 // --- Icon Components ---
 const BarChartIcon = () => (
   <svg
@@ -304,7 +306,6 @@ function HeroSection() {
               text={[
                 'Headless by Design. Powerful by Nature.',
                 "Don't just analyze your data. Design it.",
-                "What would you build if your frontend wasn't tied to your backend?",
               ]}
               typingSpeed={80}
               deletingSpeed={50}
@@ -327,7 +328,7 @@ function HeroSection() {
             )}
           >
             <span className="font-semibold text-red-500">
-              PivotHead is now headless
+              The First Headless Pivot Table Library for Modern Developers
             </span>{' '}
             - let your creativity run wild
           </p>
@@ -1307,6 +1308,7 @@ export default function Home() {
         <main>
           <HeroSection />
           {/* <DataVisualizationSection /> */}
+          <HeadlessDataVisualizationSection />
           <HomepageFeatures />
           <ModernDevelopersSection />
           {/* <StackBlitzSection /> */}

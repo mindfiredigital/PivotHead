@@ -58,7 +58,14 @@
     "eslint-plugin-prettier": "^4.2.1",
     "husky": "^9.1.7",
     "lint-staged": "^15.2.9",
-    "turbo": "^2.3.3"
+    "ng-packagr": "^17.3.0",
+    "turbo": "^2.3.3",
+    "typescript": "5.4.5"
+  },
+  "pnpm": {
+    "overrides": {
+      "typescript": "5.4.5"
+    }
   },
   "lint-staged": {
     "**/*.{js,ts}": [
