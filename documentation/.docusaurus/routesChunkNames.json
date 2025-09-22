@@ -49,17 +49,17 @@
     },
     "content": "content---pivot-head-markdown-page-393-f56"
   },
-  "/PivotHead/docs-97d": {
+  "/PivotHead/docs-901": {
     "__comp": "__comp---theme-docs-root-5-e-9-0b6",
     "__context": {
       "plugin": "plugin---pivot-head-docsaba-41e"
     }
   },
-  "/PivotHead/docs-a7e": {
+  "/PivotHead/docs-3c0": {
     "__comp": "__comp---theme-doc-version-roota-7-b-5de",
     "__props": "__props---pivot-head-docs-162-87b"
   },
-  "/PivotHead/docs-c22": {
+  "/PivotHead/docs-4f9": {
     "__comp": "__comp---theme-doc-roota-94-67a"
   },
   "/PivotHead/docs/category/contribution-guide-2e1": {
@@ -94,25 +94,37 @@
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---pivot-head-docs-installation-1-ff-9e1"
   },
-  "/PivotHead/docs/tutorial-basics/api-reference-a6a": {
+  "/PivotHead/docs/introduction-db5": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-tutorial-basics-api-reference-2-b-0-15f"
+    "content": "content---pivot-head-docs-introductiona-09-d41"
   },
-  "/PivotHead/docs/tutorial-basics/core-concepts-37a": {
+  "/PivotHead/docs/tutorial-basics/core/api-reference-23f": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-tutorial-basics-core-concepts-012-95a"
+    "content": "content---pivot-head-docs-tutorial-basics-core-api-reference-190-54c"
   },
-  "/PivotHead/docs/tutorial-basics/examples-903": {
+  "/PivotHead/docs/tutorial-basics/core/core-concepts-52f": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-tutorial-basics-examples-550-3ec"
+    "content": "content---pivot-head-docs-tutorial-basics-core-core-conceptsb-6-f-842"
+  },
+  "/PivotHead/docs/tutorial-basics/core/examples-906": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-tutorial-basics-core-examples-8-fa-07f"
   },
   "/PivotHead/docs/tutorial-basics/troubleshooting-988": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---pivot-head-docs-tutorial-basics-troubleshooting-18-f-fd8"
   },
-  "/PivotHead/docs/what-is-pivothead-24e": {
+  "/PivotHead/docs/tutorial-basics/web-component-9dc": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-what-is-pivothead-4-ce-56a"
+    "content": "content---pivot-head-docs-tutorial-basics-web-component-841-478"
+  },
+  "/PivotHead/docs/tutorial-basics/wrappers/react-af3": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-tutorial-basics-wrappers-reactc-03-958"
+  },
+  "/PivotHead/docs/tutorial-basics/wrappers/vue-877": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-tutorial-basics-wrappers-vue-9-c-1-c95"
   },
   "/PivotHead/docs/Why-we-use-pivothead-71b": {
     "__comp": "__comp---theme-doc-item-178-a40",

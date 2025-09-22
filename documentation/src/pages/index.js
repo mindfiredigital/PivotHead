@@ -13,6 +13,9 @@ import clsx from 'clsx';
 
 import { Boxes } from '../components/bg-box';
 import { MorphingText } from '../components/morphing-text';
+import { GridBeams } from '../components/light-ray';
+import TextType from '../components/text-type';
+import BrowserOnly from '@docusaurus/BrowserOnly';
 
 // --- Icon Components ---
 const BarChartIcon = () => (
@@ -225,7 +228,7 @@ function HeroSection() {
       <div
         className={clsx(
           'absolute inset-0 z-10 h-full w-full [mask-image:radial-gradient(transparent,white)] pointer-events-none',
-          colorMode === 'dark' ? 'bg-slate-900' : 'bg-white'
+          colorMode === 'dark' ? 'bg-black' : 'bg-white'
         )}
       />
       <Boxes />
@@ -244,53 +247,91 @@ function HeroSection() {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75"></span>
               <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500"></span>
             </span>
-            Trusted by 10,000+ developers worldwide
+            PIVOT HEAD - YOUR UI. OUR ENGINE.
           </div>
         </div>
 
-        {/* Main Headline */}
-        <div className="animate-fade-in-up-delay mb-8 [animation-delay:200ms]">
+        {/* Main Headline with Light Rays */}
+        <div className="animate-fade-in-up-delay mb-8 [animation-delay:200ms] relative">
+          {/* Light Rays Container */}
+          <div className="absolute inset-0 pointer-events-none">
+            {/* <GridBeams
+              gridSize={20}
+              gridColor={colorMode === 'dark' ? '#ef4444' : '#dc2626'}
+              rayCount={8}
+              rayOpacity={0.3}
+              raySpeed={0.8}
+              rayLength="60vh"
+              gridFadeStart={10}
+              gridFadeEnd={80}
+              backgroundColor="transparent"
+              className="w-full h-full"
+            /> */}
+          </div>
+
           <h1
             className={clsx(
-              'mb-4 text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl',
+              'mb-4 text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl relative z-10',
               colorMode === 'dark' ? 'text-white' : 'text-slate-900'
             )}
           >
             Unlock the Stories Hidden in Your Data
           </h1>
-          <div className="inline-flex item-center backdrop-blur-sm">
+
+          <div className="flex justify-center items-center relative z-10">
             <span
               className={clsx(
-                'text-5xl font-black sm:text-6xl lg:text-7xl mt-4',
-                colorMode === 'dark' ? 'text-white' : 'text-slate-900'
+                'text-5xl font-black bg-clip-text text-transparent sm:text-6xl lg:text-7xl mt-4',
+                colorMode === 'dark'
+                  ? 'bg-gradient-to-r from-red-500 via-white to-slate-400' // Dark mode friendly
+                  : 'bg-gradient-to-r from-red-600 via-slate-700 to-black' // Light mode friendly
               )}
             >
-              Pivot
+              PivotHead
             </span>
-            <div className="ml-0 rounded-2xl  p-4 h-24 sm:h-28 lg:h-32 w-64 sm:w-80 lg:w-60">
-              <MorphingText
-                texts={['Head', 'Table', 'Grid']}
-                className="text-xl sm:text-6xl lg:text-7xl"
-              />
-            </div>
           </div>
         </div>
 
-        {/* Subtitle */}
-        <p
-          className={clsx(
-            'animate-fade-in-up-delay mx-auto mb-12 max-w-4xl text-lg leading-relaxed opacity-90 [animation-delay:400ms] sm:text-xl lg:text-2xl',
-            colorMode === 'dark' ? 'text-slate-300' : 'text-slate-600'
-          )}
-        >
-          PivotHead is a feature-rich JavaScript pivot table library for
-          creating
-          <span className="font-semibold text-red-400">
-            {' '}
-            interactive reports
-          </span>{' '}
-          inside your app or website. Created by industry experts.
-        </p>
+        {/* Animated Subtitle using TextType */}
+        <div className="animate-fade-in-up-delay mb-12 [animation-delay:400ms]">
+          <div
+            className={clsx(
+              'text-lg leading-relaxed opacity-90 sm:text-xl lg:text-2xl',
+              colorMode === 'dark' ? 'text-slate-300' : 'text-slate-600'
+            )}
+          >
+            <TextType
+              text={[
+                'Headless by Design. Powerful by Nature.',
+                "Don't just analyze your data. Design it.",
+                "What would you build if your frontend wasn't tied to your backend?",
+              ]}
+              typingSpeed={80}
+              deletingSpeed={50}
+              pauseDuration={3000}
+              loop={true}
+              showCursor={true}
+              cursorCharacter="|"
+              className="inline-block"
+              textColors={
+                colorMode === 'dark'
+                  ? ['#f8fafc', '#e2e8f0', '#cbd5e1']
+                  : ['#1e293b', '#334155', '#475569']
+              }
+            />
+          </div>
+          <p
+            className={clsx(
+              'mt-4 text-base leading-relaxed opacity-80 sm:text-lg',
+              colorMode === 'dark' ? 'text-slate-300' : 'text-slate-900'
+            )}
+          >
+            <span className="font-semibold text-red-500">
+              PivotHead is now headless
+            </span>{' '}
+            - let your creativity run wild
+          </p>
+        </div>
 
         {/* CTA Buttons */}
         <div className="animate-fade-in-up-delay mb-16 flex flex-col justify-center gap-6 [animation-delay:600ms] sm:flex-row">
@@ -589,59 +630,283 @@ function AnimatedPivotTableVisual() {
 }
 
 function DataVisualizationSection() {
-  const [copied, setCopied] = useState(false);
-  const code = `// 1. Initialize the headless engine
-const engine = new PivotEngine(config);
+  const [activeLayer, setActiveLayer] = useState(0);
+  const [dataPoints, setDataPoints] = useState([]);
+  const { colorMode } = useColorMode();
 
-// 2. Get the processed data state
-const state = engine.getState();
+  // Generate floating data points
+  useEffect(() => {
+    const points = Array.from({ length: 12 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      delay: Math.random() * 3,
+      value: ['Sales', 'Revenue', 'Profit', 'Orders', 'Users', 'Growth'][
+        Math.floor(Math.random() * 6)
+      ],
+    }));
+    setDataPoints(points);
 
-// 3. Render the state in any UI
-//    framework you choose.
-renderYourOwnTable(state);`;
+    const interval = setInterval(() => {
+      setActiveLayer(prev => (prev + 1) % 4);
+    }, 3000);
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className={`${styles.section} ${styles.sectionWhite}`}>
       <div className="container">
         <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>Powerful Visualization Core</h2>
+          <div className={styles.headlessTagline}>
+            What would you build if your frontend wasn't tied to your backend?
+          </div>
+          <div className={styles.headlessHighlight}>
+            PivotHead is now headless—let your creativity run wild.
+          </div>
+          <h2 className={styles.sectionTitle}>
+            One Engine, Infinite Table Possibilities
+          </h2>
           <p className={styles.sectionDescription}>
-            Visually grasp how PivotHead instantly structures your data, then
-            use the headless engine to build any interface you can imagine.
+            Watch data flow through our headless architecture to power any table
+            interface you can imagine
           </p>
         </div>
 
-        <div className={`${styles.grid} ${styles.lgGridCols2} items-center`}>
-          {/* Left Column: Animated Table */}
-          <div className={styles.visualizationColumn}>
-            <h3 className={styles.columnTitle}>See it in Action</h3>
-            <AnimatedPivotTableVisual />
+        <div className={styles.architectureStage}>
+          {/* Floating Data Background */}
+          <div className={styles.floatingDataLayer}>
+            {dataPoints.map(point => (
+              <div
+                key={point.id}
+                className={styles.floatingDataPoint}
+                style={{
+                  left: `${point.x}%`,
+                  top: `${point.y}%`,
+                  animationDelay: `${point.delay}s`,
+                }}
+              >
+                {point.value}
+              </div>
+            ))}
           </div>
 
-          {/* Right Column: Headless Code Example */}
-          <div className={styles.visualizationColumn}>
-            <h3 className={styles.columnTitle}>Use it Headlessly</h3>
-            <div className={styles.codeBlockContainer}>
-              <div className={styles.codeBlockHeader}>
-                <span>engine.js</span>
-                <button
-                  onClick={handleCopy}
-                  className={styles.copyButton}
-                  title="Copy code"
-                >
-                  {copied ? 'Copied!' : 'Copy'}
-                </button>
+          {/* Layered Architecture Diagram */}
+          <div className={styles.architectureLayers}>
+            {/* Layer 1: Raw Data */}
+            <div
+              className={`${styles.architectureLayer} ${styles.dataLayer} ${activeLayer >= 0 ? styles.activeLayer : ''}`}
+            >
+              <div className={styles.layerTitle}>Raw Data</div>
+              <div className={styles.layerContent}>
+                <div className={styles.dataSource}>
+                  <div className={styles.dataIcon}>📊</div>
+                  <div className={styles.dataLabel}>CSV, JSON, API</div>
+                </div>
+                <div className={styles.dataSource}>
+                  <div className={styles.dataIcon}>🗄️</div>
+                  <div className={styles.dataLabel}>Database</div>
+                </div>
+                <div className={styles.dataSource}>
+                  <div className={styles.dataIcon}>☁️</div>
+                  <div className={styles.dataLabel}>Cloud Services</div>
+                </div>
               </div>
-              <pre className={styles.codeBlock}>
-                <code>{code}</code>
-              </pre>
             </div>
+
+            {/* Layer 2: PivotHead Engine */}
+            <div
+              className={`${styles.architectureLayer} ${styles.engineLayer} ${activeLayer >= 1 ? styles.activeLayer : ''}`}
+            >
+              <div className={styles.layerTitle}>PivotHead Core Engine</div>
+              <div className={styles.layerContent}>
+                <div className={styles.engineCore}>
+                  <div className={styles.coreIcon}>⚡</div>
+                  <div className={styles.coreFeatures}>
+                    <div className={styles.coreFeature}>Aggregation</div>
+                    <div className={styles.coreFeature}>Filtering</div>
+                    <div className={styles.coreFeature}>Sorting</div>
+                    <div className={styles.coreFeature}>Grouping</div>
+                  </div>
+                  <div className={styles.processingIndicator}>
+                    <div className={styles.processingRing}></div>
+                    <div className={styles.processingRing}></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Layer 3: Framework Adapters */}
+            <div
+              className={`${styles.architectureLayer} ${styles.adapterLayer} ${activeLayer >= 2 ? styles.activeLayer : ''}`}
+            >
+              <div className={styles.layerTitle}>Framework Adapters</div>
+              <div className={styles.layerContent}>
+                <div className={styles.adapterWrapper}>
+                  <div className={styles.adapter}>
+                    <div className={styles.adapterIcon}>⚛️</div>
+                    <div className={styles.adapterLabel}>React</div>
+                  </div>
+                  <div className={styles.adapter}>
+                    <div className={styles.adapterIcon}>📗</div>
+                    <div className={styles.adapterLabel}>Vue</div>
+                  </div>
+                  <div className={styles.adapter}>
+                    <div className={styles.adapterIcon}>🅰️</div>
+                    <div className={styles.adapterLabel}>Angular</div>
+                  </div>
+                  <div className={styles.adapter}>
+                    <div className={styles.adapterIcon}>🟨</div>
+                    <div className={styles.adapterLabel}>JavaScript</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Layer 4: Custom UI Tables */}
+            <div
+              className={`${styles.architectureLayer} ${styles.uiLayer} ${activeLayer >= 3 ? styles.activeLayer : ''}`}
+            >
+              <div className={styles.layerTitle}>Your Custom Tables</div>
+              <div className={styles.layerContent}>
+                <div className={styles.tableGallery}>
+                  {/* Executive Dashboard Table */}
+                  <div className={styles.customTable}>
+                    <div className={styles.tableHeader}>
+                      <div className={styles.avatar}>
+                        <img
+                          src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face"
+                          alt="Executive"
+                        />
+                      </div>
+                      <span>Executive Dashboard</span>
+                    </div>
+                    <div className={styles.tableGrid}>
+                      <div className={styles.tableCell}>Product</div>
+                      <div className={styles.tableCell}>Revenue</div>
+                      <div className={styles.tableCell}>Growth</div>
+                      <div className={styles.tableRow}>Widget Pro</div>
+                      <div className={styles.tableRow}>$2.4M</div>
+                      <div className={styles.tableRow}>+24%</div>
+                      <div className={styles.tableRow}>Dashboard+</div>
+                      <div className={styles.tableRow}>$1.8M</div>
+                      <div className={styles.tableRow}>+18%</div>
+                    </div>
+                  </div>
+
+                  {/* Analytics Table */}
+                  <div className={styles.customTable}>
+                    <div className={styles.tableHeader}>
+                      <div className={styles.avatar}>
+                        <img
+                          src="https://images.unsplash.com/photo-1494790108755-2616b612b5e5?w=32&h=32&fit=crop&crop=face"
+                          alt="Analyst"
+                        />
+                      </div>
+                      <span>Analytics Portal</span>
+                    </div>
+                    <div className={styles.tableGrid}>
+                      <div className={styles.tableCell}>Region</div>
+                      <div className={styles.tableCell}>Sales</div>
+                      <div className={styles.tableCell}>Orders</div>
+                      <div className={styles.tableRow}>North</div>
+                      <div className={styles.tableRow}>$890K</div>
+                      <div className={styles.tableRow}>1,240</div>
+                      <div className={styles.tableRow}>South</div>
+                      <div className={styles.tableRow}>$760K</div>
+                      <div className={styles.tableRow}>980</div>
+                    </div>
+                  </div>
+
+                  {/* Custom Interface */}
+                  <div className={styles.customTable}>
+                    <div className={styles.tableHeader}>
+                      <div className={styles.avatar}>
+                        <img
+                          src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face"
+                          alt="Developer"
+                        />
+                      </div>
+                      <span>Your Vision</span>
+                    </div>
+                    <div className={styles.creativePlaceholder}>
+                      <div className={styles.creativeSpark}>✨</div>
+                      <div className={styles.creativeText}>
+                        Your Custom
+                        <br />
+                        Table Design
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Data Flow Arrows */}
+          <div className={styles.dataFlowArrows}>
+            <div
+              className={`${styles.flowArrow} ${styles.arrow1} ${activeLayer >= 1 ? styles.activeFlow : ''}`}
+            >
+              <div className={styles.arrowLine}></div>
+              <div className={styles.arrowHead}></div>
+            </div>
+            <div
+              className={`${styles.flowArrow} ${styles.arrow2} ${activeLayer >= 2 ? styles.activeFlow : ''}`}
+            >
+              <div className={styles.arrowLine}></div>
+              <div className={styles.arrowHead}></div>
+            </div>
+            <div
+              className={`${styles.flowArrow} ${styles.arrow3} ${activeLayer >= 3 ? styles.activeFlow : ''}`}
+            >
+              <div className={styles.arrowLine}></div>
+              <div className={styles.arrowHead}></div>
+            </div>
+          </div>
+
+          {/* Layer Indicators */}
+          <div className={styles.layerIndicators}>
+            {[0, 1, 2, 3].map(index => (
+              <button
+                key={index}
+                className={`${styles.layerIndicator} ${activeLayer >= index ? styles.activeIndicator : ''}`}
+                onClick={() => setActiveLayer(index)}
+              >
+                {index === 0 && '📊'}
+                {index === 1 && '⚡'}
+                {index === 2 && '🔧'}
+                {index === 3 && '🎨'}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Headless Benefits */}
+        <div className={styles.headlessBenefits}>
+          <div className={styles.benefitCard}>
+            <div className={styles.benefitIcon}>🎯</div>
+            <h3>Zero UI Constraints</h3>
+            <p>
+              Build tables that perfectly match your brand and user needs
+              without design limitations.
+            </p>
+          </div>
+          <div className={styles.benefitCard}>
+            <div className={styles.benefitIcon}>🚀</div>
+            <h3>Framework Freedom</h3>
+            <p>
+              Use React, Vue, Angular, or vanilla JS. The core engine works with
+              everything.
+            </p>
+          </div>
+          <div className={styles.benefitCard}>
+            <div className={styles.benefitIcon}>⚡</div>
+            <h3>Pure Performance</h3>
+            <p>
+              Lightweight engine processes data without UI overhead for maximum
+              speed.
+            </p>
           </div>
         </div>
       </div>
@@ -1041,10 +1306,10 @@ export default function Home() {
       <div>
         <main>
           <HeroSection />
-          <DataVisualizationSection />
+          {/* <DataVisualizationSection /> */}
           <HomepageFeatures />
           <ModernDevelopersSection />
-          <StackBlitzSection />
+          {/* <StackBlitzSection /> */}
           {/* <CtaSection /> */}
         </main>
         <Footer />

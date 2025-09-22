@@ -53,15 +53,15 @@ export default [
   },
   {
     path: '/PivotHead/docs',
-    component: ComponentCreator('/PivotHead/docs', '97d'),
+    component: ComponentCreator('/PivotHead/docs', '901'),
     routes: [
       {
         path: '/PivotHead/docs',
-        component: ComponentCreator('/PivotHead/docs', 'a7e'),
+        component: ComponentCreator('/PivotHead/docs', '3c0'),
         routes: [
           {
             path: '/PivotHead/docs',
-            component: ComponentCreator('/PivotHead/docs', 'c22'),
+            component: ComponentCreator('/PivotHead/docs', '4f9'),
             routes: [
               {
                 path: '/PivotHead/docs/category/contribution-guide',
@@ -136,28 +136,37 @@ export default [
                 sidebar: 'tutorialSidebar',
               },
               {
-                path: '/PivotHead/docs/tutorial-basics/api-reference',
+                path: '/PivotHead/docs/introduction',
                 component: ComponentCreator(
-                  '/PivotHead/docs/tutorial-basics/api-reference',
-                  'a6a'
+                  '/PivotHead/docs/introduction',
+                  'db5'
                 ),
                 exact: true,
                 sidebar: 'tutorialSidebar',
               },
               {
-                path: '/PivotHead/docs/tutorial-basics/core-concepts',
+                path: '/PivotHead/docs/tutorial-basics/core/api-reference',
                 component: ComponentCreator(
-                  '/PivotHead/docs/tutorial-basics/core-concepts',
-                  '37a'
+                  '/PivotHead/docs/tutorial-basics/core/api-reference',
+                  '23f'
                 ),
                 exact: true,
                 sidebar: 'tutorialSidebar',
               },
               {
-                path: '/PivotHead/docs/tutorial-basics/examples',
+                path: '/PivotHead/docs/tutorial-basics/core/core-concepts',
                 component: ComponentCreator(
-                  '/PivotHead/docs/tutorial-basics/examples',
-                  '903'
+                  '/PivotHead/docs/tutorial-basics/core/core-concepts',
+                  '52f'
+                ),
+                exact: true,
+                sidebar: 'tutorialSidebar',
+              },
+              {
+                path: '/PivotHead/docs/tutorial-basics/core/examples',
+                component: ComponentCreator(
+                  '/PivotHead/docs/tutorial-basics/core/examples',
+                  '906'
                 ),
                 exact: true,
                 sidebar: 'tutorialSidebar',
@@ -172,10 +181,28 @@ export default [
                 sidebar: 'tutorialSidebar',
               },
               {
-                path: '/PivotHead/docs/what-is-pivothead',
+                path: '/PivotHead/docs/tutorial-basics/web-component',
                 component: ComponentCreator(
-                  '/PivotHead/docs/what-is-pivothead',
-                  '24e'
+                  '/PivotHead/docs/tutorial-basics/web-component',
+                  '9dc'
+                ),
+                exact: true,
+                sidebar: 'tutorialSidebar',
+              },
+              {
+                path: '/PivotHead/docs/tutorial-basics/wrappers/react',
+                component: ComponentCreator(
+                  '/PivotHead/docs/tutorial-basics/wrappers/react',
+                  'af3'
+                ),
+                exact: true,
+                sidebar: 'tutorialSidebar',
+              },
+              {
+                path: '/PivotHead/docs/tutorial-basics/wrappers/vue',
+                component: ComponentCreator(
+                  '/PivotHead/docs/tutorial-basics/wrappers/vue',
+                  '877'
                 ),
                 exact: true,
                 sidebar: 'tutorialSidebar',

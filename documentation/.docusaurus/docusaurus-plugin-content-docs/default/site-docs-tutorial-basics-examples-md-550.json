@@ -19,11 +19,11 @@
   },
   "sidebar": "tutorialSidebar",
   "previous": {
-    "title": "Api Reference",
-    "permalink": "/PivotHead/docs/tutorial-basics/api-reference"
+    "title": "Core Concepts",
+    "permalink": "/PivotHead/docs/tutorial-basics/core-concepts"
   },
   "next": {
-    "title": "Troubleshooting",
-    "permalink": "/PivotHead/docs/tutorial-basics/troubleshooting"
+    "title": "Api Reference",
+    "permalink": "/PivotHead/docs/tutorial-basics/api-reference"
   }
 }

@@ -11,19 +11,19 @@
   "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/Installation.md",
   "tags": [],
   "version": "current",
-  "sidebarPosition": 2,
+  "sidebarPosition": 3,
   "frontMatter": {
-    "sidebar_position": 2,
+    "sidebar_position": 3,
     "title": "Getting Started",
     "description": "Learn how to install and set up PivotHead in your project"
   },
   "sidebar": "tutorialSidebar",
   "previous": {
-    "title": "What is PivotHead",
-    "permalink": "/PivotHead/docs/what-is-pivothead"
-  },
-  "next": {
     "title": "Why Use PivotHead",
     "permalink": "/PivotHead/docs/Why-we-use-pivothead"
+  },
+  "next": {
+    "title": "Tutorials",
+    "permalink": "/PivotHead/docs/category/tutorials"
   }
 }

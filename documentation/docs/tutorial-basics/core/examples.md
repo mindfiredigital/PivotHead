@@ -508,9 +508,8 @@ document.getElementById('prev-page').addEventListener('click', () => {
 
 function updatePaginationInfo() {
   const pagination = engine.getPaginationState();
-  document.getElementById(
-    'pagination-info'
-  ).textContent = `Page ${pagination.currentPage} of ${pagination.totalPages}`;
+  document.getElementById('pagination-info').textContent =
+    `Page ${pagination.currentPage} of ${pagination.totalPages}`;
 }
 
 // Initial pagination info

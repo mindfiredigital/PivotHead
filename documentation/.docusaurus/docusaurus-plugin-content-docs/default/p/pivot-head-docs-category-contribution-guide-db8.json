@@ -1,6 +1,7 @@
 {
   "categoryGeneratedIndex": {
     "title": "Contribution Guide",
+    "description": "Guides for setting up your development environment and contributing to the PivotHead project.",
     "slug": "/category/contribution-guide",
     "permalink": "/PivotHead/docs/category/contribution-guide",
     "sidebar": "tutorialSidebar",

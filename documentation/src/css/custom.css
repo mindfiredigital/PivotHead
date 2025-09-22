@@ -36,7 +36,7 @@
   --ifm-color-primary-light: #fca5a5; /* red-300 */
   --ifm-color-primary-lighter: #fecaca; /* red-200 */
   --ifm-color-primary-lightest: #fee2e2; /* red-100 */
-  --ifm-background-color: #0f172a; /* slate-900 */
+  --ifm-background-color: #000000; /* slate-900 */
   --ifm-hero-text-color: #cbd5e1; /* slate-300 */
   --ifm-heading-color: #f1f5f9; /* slate-100 */
   --ifm-font-color-base: #94a3b8; /* slate-400 */
@@ -55,7 +55,7 @@
   
   border-bottom: 1px solid transparent;
   transition: background-color 0.3s ease, border-color 0.3s ease;
-  background-color: whitesmoke;
+  background-color:var(--ifm-background-color);
 }
 
 

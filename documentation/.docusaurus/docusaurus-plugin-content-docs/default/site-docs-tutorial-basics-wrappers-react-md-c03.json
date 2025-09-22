@@ -1,0 +1,27 @@
+{
+  "id": "tutorial-basics/wrappers/react",
+  "title": "React Wrapper",
+  "description": "The PivotHead React Wrapper (@mindfiredigital/pivothead-react) is a thin, type-safe React component that bridges React applications with the PivotHead Web Component. It provides a seamless React developer experience while preserving all the functionality and modes of the underlying web component.",
+  "source": "@site/docs/tutorial-basics/wrappers/react.md",
+  "sourceDirName": "tutorial-basics/wrappers",
+  "slug": "/tutorial-basics/wrappers/react",
+  "permalink": "/PivotHead/docs/tutorial-basics/wrappers/react",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorial-basics/wrappers/react.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "sidebar_position": 1
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "PivotHead Web Component",
+    "permalink": "/PivotHead/docs/tutorial-basics/web-component"
+  },
+  "next": {
+    "title": "Vue Wrapper",
+    "permalink": "/PivotHead/docs/tutorial-basics/wrappers/vue"
+  }
+}

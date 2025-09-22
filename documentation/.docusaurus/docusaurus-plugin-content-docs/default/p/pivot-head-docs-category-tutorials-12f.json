@@ -1,17 +1,18 @@
 {
   "categoryGeneratedIndex": {
-    "title": "Tutorials",
+    "title": "PivotHead Tutorials",
+    "description": "Learn the core concepts and see practical examples of how to use PivotHead.",
     "slug": "/category/tutorials",
     "permalink": "/PivotHead/docs/category/tutorials",
     "sidebar": "tutorialSidebar",
     "navigation": {
       "previous": {
-        "title": "Why Use PivotHead",
-        "permalink": "/PivotHead/docs/Why-we-use-pivothead"
+        "title": "Getting Started",
+        "permalink": "/PivotHead/docs/Installation"
       },
       "next": {
         "title": "Core Concepts",
-        "permalink": "/PivotHead/docs/tutorial-basics/core-concepts"
+        "permalink": "/PivotHead/docs/tutorial-basics/core/core-concepts"
       }
     }
   }

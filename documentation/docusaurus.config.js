@@ -88,6 +88,7 @@ const config = {
     ({
       // Replace with your project's social card
       image: 'img/pivothead.webp',
+
       navbar: {
         title: 'PivotHead',
         logo: {
@@ -116,10 +117,15 @@ const config = {
             label: 'GitHub',
             position: 'right',
           },
+          // {
+          //   type: 'html',
+          //   position: 'right',
+          //   value: '<div class="navbar__item dropdown dropdown--hoverable dropdown--right"><a class="navbar__link" href="#!" role="button" data-bs-toggle="dropdown" aria-expanded="false">Theme</a><ul class="dropdown__menu"><li><a class="dropdown__link" href="#!" onclick="window.setTheme(\'light\')">Light</a></li><li><a class="dropdown__link" href="#!" onclick="window.setTheme(\'dark\')">Dark</a></li></ul></div>',
+          // },
         ],
       },
       footer: {
-        style: 'dark',
+        // style: 'dark',
 
         copyright: `© ${new Date().getFullYear()} Mindfire FOSS`,
       },

@@ -19,11 +19,11 @@
   },
   "sidebar": "tutorialSidebar",
   "previous": {
-    "title": "Core Concepts",
-    "permalink": "/PivotHead/docs/tutorial-basics/core-concepts"
-  },
-  "next": {
     "title": "Examples & Usage",
     "permalink": "/PivotHead/docs/tutorial-basics/examples"
+  },
+  "next": {
+    "title": "PivotHead Web Component",
+    "permalink": "/PivotHead/docs/tutorial-basics/web-component"
   }
 }

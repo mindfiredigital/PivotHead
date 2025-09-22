@@ -19,8 +19,8 @@
   },
   "sidebar": "tutorialSidebar",
   "previous": {
-    "title": "Examples & Usage",
-    "permalink": "/PivotHead/docs/tutorial-basics/examples"
+    "title": "Vue Wrapper",
+    "permalink": "/PivotHead/docs/tutorial-basics/wrappers/vue"
   },
   "next": {
     "title": "Contribution Guide",

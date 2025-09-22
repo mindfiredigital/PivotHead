@@ -199,29 +199,37 @@ export default {
     '@site/docs/Installation.md',
     require.resolveWeak('@site/docs/Installation.md'),
   ],
-  'content---pivot-head-docs-tutorial-basics-api-reference-2-b-0-15f': [
+  'content---pivot-head-docs-introductiona-09-d41': [
     () =>
       import(
-        /* webpackChunkName: "content---pivot-head-docs-tutorial-basics-api-reference-2-b-0-15f" */ '@site/docs/tutorial-basics/api-reference.md'
+        /* webpackChunkName: "content---pivot-head-docs-introductiona-09-d41" */ '@site/docs/introduction.md'
       ),
-    '@site/docs/tutorial-basics/api-reference.md',
-    require.resolveWeak('@site/docs/tutorial-basics/api-reference.md'),
+    '@site/docs/introduction.md',
+    require.resolveWeak('@site/docs/introduction.md'),
   ],
-  'content---pivot-head-docs-tutorial-basics-core-concepts-012-95a': [
+  'content---pivot-head-docs-tutorial-basics-core-api-reference-190-54c': [
     () =>
       import(
-        /* webpackChunkName: "content---pivot-head-docs-tutorial-basics-core-concepts-012-95a" */ '@site/docs/tutorial-basics/core-concepts.md'
+        /* webpackChunkName: "content---pivot-head-docs-tutorial-basics-core-api-reference-190-54c" */ '@site/docs/tutorial-basics/core/api-reference.md'
       ),
-    '@site/docs/tutorial-basics/core-concepts.md',
-    require.resolveWeak('@site/docs/tutorial-basics/core-concepts.md'),
+    '@site/docs/tutorial-basics/core/api-reference.md',
+    require.resolveWeak('@site/docs/tutorial-basics/core/api-reference.md'),
   ],
-  'content---pivot-head-docs-tutorial-basics-examples-550-3ec': [
+  'content---pivot-head-docs-tutorial-basics-core-core-conceptsb-6-f-842': [
     () =>
       import(
-        /* webpackChunkName: "content---pivot-head-docs-tutorial-basics-examples-550-3ec" */ '@site/docs/tutorial-basics/examples.md'
+        /* webpackChunkName: "content---pivot-head-docs-tutorial-basics-core-core-conceptsb-6-f-842" */ '@site/docs/tutorial-basics/core/core-concepts.md'
       ),
-    '@site/docs/tutorial-basics/examples.md',
-    require.resolveWeak('@site/docs/tutorial-basics/examples.md'),
+    '@site/docs/tutorial-basics/core/core-concepts.md',
+    require.resolveWeak('@site/docs/tutorial-basics/core/core-concepts.md'),
+  ],
+  'content---pivot-head-docs-tutorial-basics-core-examples-8-fa-07f': [
+    () =>
+      import(
+        /* webpackChunkName: "content---pivot-head-docs-tutorial-basics-core-examples-8-fa-07f" */ '@site/docs/tutorial-basics/core/examples.md'
+      ),
+    '@site/docs/tutorial-basics/core/examples.md',
+    require.resolveWeak('@site/docs/tutorial-basics/core/examples.md'),
   ],
   'content---pivot-head-docs-tutorial-basics-troubleshooting-18-f-fd8': [
     () =>
@@ -231,13 +239,29 @@ export default {
     '@site/docs/tutorial-basics/troubleshooting.md',
     require.resolveWeak('@site/docs/tutorial-basics/troubleshooting.md'),
   ],
-  'content---pivot-head-docs-what-is-pivothead-4-ce-56a': [
+  'content---pivot-head-docs-tutorial-basics-web-component-841-478': [
     () =>
       import(
-        /* webpackChunkName: "content---pivot-head-docs-what-is-pivothead-4-ce-56a" */ '@site/docs/what-is-pivothead.md'
+        /* webpackChunkName: "content---pivot-head-docs-tutorial-basics-web-component-841-478" */ '@site/docs/tutorial-basics/web-component.md'
       ),
-    '@site/docs/what-is-pivothead.md',
-    require.resolveWeak('@site/docs/what-is-pivothead.md'),
+    '@site/docs/tutorial-basics/web-component.md',
+    require.resolveWeak('@site/docs/tutorial-basics/web-component.md'),
+  ],
+  'content---pivot-head-docs-tutorial-basics-wrappers-reactc-03-958': [
+    () =>
+      import(
+        /* webpackChunkName: "content---pivot-head-docs-tutorial-basics-wrappers-reactc-03-958" */ '@site/docs/tutorial-basics/wrappers/react.md'
+      ),
+    '@site/docs/tutorial-basics/wrappers/react.md',
+    require.resolveWeak('@site/docs/tutorial-basics/wrappers/react.md'),
+  ],
+  'content---pivot-head-docs-tutorial-basics-wrappers-vue-9-c-1-c95': [
+    () =>
+      import(
+        /* webpackChunkName: "content---pivot-head-docs-tutorial-basics-wrappers-vue-9-c-1-c95" */ '@site/docs/tutorial-basics/wrappers/vue.md'
+      ),
+    '@site/docs/tutorial-basics/wrappers/vue.md',
+    require.resolveWeak('@site/docs/tutorial-basics/wrappers/vue.md'),
   ],
   'content---pivot-head-docs-why-we-use-pivotheada-8-b-7a9': [
     () =>

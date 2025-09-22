@@ -12,16 +12,9 @@
       "tutorialSidebar": [
         {
           "type": "link",
-          "label": "What is PivotHead",
-          "href": "/PivotHead/docs/what-is-pivothead",
-          "docId": "what-is-pivothead",
-          "unlisted": false
-        },
-        {
-          "type": "link",
-          "label": "Getting Started",
-          "href": "/PivotHead/docs/Installation",
-          "docId": "Installation",
+          "label": "Introduction",
+          "href": "/PivotHead/docs/introduction",
+          "docId": "introduction",
           "unlisted": false
         },
         {
@@ -32,31 +25,73 @@
           "unlisted": false
         },
         {
+          "type": "link",
+          "label": "Getting Started",
+          "href": "/PivotHead/docs/Installation",
+          "docId": "Installation",
+          "unlisted": false
+        },
+        {
           "type": "category",
           "label": "Tutorials",
-          "collapsible": true,
-          "collapsed": true,
           "items": [
             {
-              "type": "link",
-              "label": "Core Concepts",
-              "href": "/PivotHead/docs/tutorial-basics/core-concepts",
-              "docId": "tutorial-basics/core-concepts",
-              "unlisted": false
+              "type": "category",
+              "label": "Core",
+              "items": [
+                {
+                  "type": "link",
+                  "label": "Core Concepts",
+                  "href": "/PivotHead/docs/tutorial-basics/core/core-concepts",
+                  "docId": "tutorial-basics/core/core-concepts",
+                  "unlisted": false
+                },
+                {
+                  "type": "link",
+                  "label": "Api Reference",
+                  "href": "/PivotHead/docs/tutorial-basics/core/api-reference",
+                  "docId": "tutorial-basics/core/api-reference",
+                  "unlisted": false
+                },
+                {
+                  "type": "link",
+                  "label": "Examples & Usage",
+                  "href": "/PivotHead/docs/tutorial-basics/core/examples",
+                  "docId": "tutorial-basics/core/examples",
+                  "unlisted": false
+                }
+              ],
+              "collapsed": true,
+              "collapsible": true
             },
             {
               "type": "link",
-              "label": "Api Reference",
-              "href": "/PivotHead/docs/tutorial-basics/api-reference",
-              "docId": "tutorial-basics/api-reference",
+              "label": "PivotHead Web Component",
+              "href": "/PivotHead/docs/tutorial-basics/web-component",
+              "docId": "tutorial-basics/web-component",
               "unlisted": false
             },
             {
-              "type": "link",
-              "label": "Examples & Usage",
-              "href": "/PivotHead/docs/tutorial-basics/examples",
-              "docId": "tutorial-basics/examples",
-              "unlisted": false
+              "type": "category",
+              "label": "Framework Wrappers",
+              "items": [
+                {
+                  "type": "link",
+                  "label": "React Wrapper",
+                  "href": "/PivotHead/docs/tutorial-basics/wrappers/react",
+                  "docId": "tutorial-basics/wrappers/react",
+                  "unlisted": false
+                },
+                {
+                  "type": "link",
+                  "label": "Vue Wrapper",
+                  "href": "/PivotHead/docs/tutorial-basics/wrappers/vue",
+                  "docId": "tutorial-basics/wrappers/vue",
+                  "unlisted": false
+                }
+              ],
+              "collapsed": true,
+              "collapsible": true
             },
             {
               "type": "link",
@@ -66,13 +101,13 @@
               "unlisted": false
             }
           ],
+          "collapsed": true,
+          "collapsible": true,
           "href": "/PivotHead/docs/category/tutorials"
         },
         {
           "type": "category",
           "label": "Contribution Guide",
-          "collapsible": true,
-          "collapsed": true,
           "items": [
             {
               "type": "link",
@@ -110,6 +145,8 @@
               "unlisted": false
             }
           ],
+          "collapsed": true,
+          "collapsible": true,
           "href": "/PivotHead/docs/category/contribution-guide"
         }
       ]
@@ -151,20 +188,26 @@
         "description": "Learn how to install and set up PivotHead in your project",
         "sidebar": "tutorialSidebar"
       },
-      "tutorial-basics/api-reference": {
-        "id": "tutorial-basics/api-reference",
+      "introduction": {
+        "id": "introduction",
+        "title": "Introduction",
+        "description": "An introduction to the first truly headless pivot table library for JavaScript.",
+        "sidebar": "tutorialSidebar"
+      },
+      "tutorial-basics/core/api-reference": {
+        "id": "tutorial-basics/core/api-reference",
         "title": "Api Reference",
         "description": "Understanding the Api References of PivotHead",
         "sidebar": "tutorialSidebar"
       },
-      "tutorial-basics/core-concepts": {
-        "id": "tutorial-basics/core-concepts",
+      "tutorial-basics/core/core-concepts": {
+        "id": "tutorial-basics/core/core-concepts",
         "title": "Core Concepts",
-        "description": "Understanding the fundamental building blocks of PivotHead",
+        "description": "Understanding the fundamental building blocks of the PivotHead engine.",
         "sidebar": "tutorialSidebar"
       },
-      "tutorial-basics/examples": {
-        "id": "tutorial-basics/examples",
+      "tutorial-basics/core/examples": {
+        "id": "tutorial-basics/core/examples",
         "title": "Examples & Usage",
         "description": "Examples & Usage of PivotHead",
         "sidebar": "tutorialSidebar"
@@ -175,10 +218,22 @@
         "description": "Troubleshooting and Best Practices of PivotHead",
         "sidebar": "tutorialSidebar"
       },
-      "what-is-pivothead": {
-        "id": "what-is-pivothead",
-        "title": "What is PivotHead",
-        "description": "Introduction to the PivotHead library and its capabilities",
+      "tutorial-basics/web-component": {
+        "id": "tutorial-basics/web-component",
+        "title": "PivotHead Web Component",
+        "description": "The PivotHead Web Component provides a flexible, framework-agnostic solution for integrating pivot table functionality into any web application. Built as a native Web Component, it offers three distinct rendering modes to accommodate different use cases and UI requirements.",
+        "sidebar": "tutorialSidebar"
+      },
+      "tutorial-basics/wrappers/react": {
+        "id": "tutorial-basics/wrappers/react",
+        "title": "React Wrapper",
+        "description": "The PivotHead React Wrapper (@mindfiredigital/pivothead-react) is a thin, type-safe React component that bridges React applications with the PivotHead Web Component. It provides a seamless React developer experience while preserving all the functionality and modes of the underlying web component.",
+        "sidebar": "tutorialSidebar"
+      },
+      "tutorial-basics/wrappers/vue": {
+        "id": "tutorial-basics/wrappers/vue",
+        "title": "Vue Wrapper",
+        "description": "A powerful Vue 3 wrapper for PivotHead that provides seamless integration with reactive data binding, TypeScript support, and Vue-specific optimizations. The wrapper bridges Vue applications with the PivotHead web component while maintaining full Vue ecosystem compatibility.",
         "sidebar": "tutorialSidebar"
       },
       "Why-we-use-pivothead": {

@@ -79,8 +79,8 @@ export default {
       "hideOnScroll": false
     },
     "footer": {
-      "style": "dark",
       "copyright": "© 2025 Mindfire FOSS",
+      "style": "light",
       "links": []
     },
     "prism": {
