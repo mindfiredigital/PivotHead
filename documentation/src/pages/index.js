@@ -1231,7 +1231,8 @@ function Footer() {
               </li>
               <li>
                 <Link
-                  to="/docs/what-is-pivothead"
+                  // Corrected: Matches the 'introduction' ID in your sidebar.js
+                  to="/docs/introduction"
                   className={styles.footerLink}
                 >
                   About
@@ -1239,7 +1240,8 @@ function Footer() {
               </li>
               <li>
                 <Link
-                  to="/docs/what-is-pivothead"
+                  // Corrected: This should also point to the main entry point.
+                  to="/docs/introduction"
                   className={styles.footerLink}
                 >
                   Documentation
@@ -1252,7 +1254,8 @@ function Footer() {
             <ul className={styles.footerList}>
               <li>
                 <Link
-                  to="/docs/tutorial-basics/examples"
+                  // Corrected: Matches the nested path in your sidebar.js
+                  to="/docs/tutorial-basics/core/examples"
                   className={styles.footerLink}
                 >
                   Examples
