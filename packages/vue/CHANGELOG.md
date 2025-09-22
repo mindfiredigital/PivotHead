@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead-web-component@1.1.1
+
 All notable changes to the PivotHead Vue wrapper will be documented in this file.
 
 ## [0.1.0] - 2025-09-04
