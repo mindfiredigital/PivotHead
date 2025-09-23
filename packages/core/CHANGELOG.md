@@ -1,5 +1,11 @@
 # @mindfiredigital/pivothead
 
+## 1.5.0
+
+### Minor Changes
+
+- new release
+
 ## 1.4.0
 
 ### Minor Changes

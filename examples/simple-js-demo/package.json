@@ -1,7 +1,7 @@
 {
   "name": "simple-js-demo",
   "private": true,
-  "version": "1.0.12",
+  "version": "1.0.13",
   "dependencies": {
     "@mindfiredigital/pivothead": "workspace:*",
     "jspdf": "^2.5.1",
