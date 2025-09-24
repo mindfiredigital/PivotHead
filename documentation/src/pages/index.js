@@ -630,291 +630,6 @@ function AnimatedPivotTableVisual() {
   );
 }
 
-function DataVisualizationSection() {
-  const [activeLayer, setActiveLayer] = useState(0);
-  const [dataPoints, setDataPoints] = useState([]);
-  const { colorMode } = useColorMode();
-
-  // Generate floating data points
-  useEffect(() => {
-    const points = Array.from({ length: 12 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      delay: Math.random() * 3,
-      value: ['Sales', 'Revenue', 'Profit', 'Orders', 'Users', 'Growth'][
-        Math.floor(Math.random() * 6)
-      ],
-    }));
-    setDataPoints(points);
-
-    const interval = setInterval(() => {
-      setActiveLayer(prev => (prev + 1) % 4);
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div className={`${styles.section} ${styles.sectionWhite}`}>
-      <div className="container">
-        <div className={styles.sectionHeader}>
-          <div className={styles.headlessTagline}>
-            What would you build if your frontend wasn't tied to your backend?
-          </div>
-          <div className={styles.headlessHighlight}>
-            PivotHead is now headless—let your creativity run wild.
-          </div>
-          <h2 className={styles.sectionTitle}>
-            One Engine, Infinite Table Possibilities
-          </h2>
-          <p className={styles.sectionDescription}>
-            Watch data flow through our headless architecture to power any table
-            interface you can imagine
-          </p>
-        </div>
-
-        <div className={styles.architectureStage}>
-          {/* Floating Data Background */}
-          <div className={styles.floatingDataLayer}>
-            {dataPoints.map(point => (
-              <div
-                key={point.id}
-                className={styles.floatingDataPoint}
-                style={{
-                  left: `${point.x}%`,
-                  top: `${point.y}%`,
-                  animationDelay: `${point.delay}s`,
-                }}
-              >
-                {point.value}
-              </div>
-            ))}
-          </div>
-
-          {/* Layered Architecture Diagram */}
-          <div className={styles.architectureLayers}>
-            {/* Layer 1: Raw Data */}
-            <div
-              className={`${styles.architectureLayer} ${styles.dataLayer} ${activeLayer >= 0 ? styles.activeLayer : ''}`}
-            >
-              <div className={styles.layerTitle}>Raw Data</div>
-              <div className={styles.layerContent}>
-                <div className={styles.dataSource}>
-                  <div className={styles.dataIcon}>📊</div>
-                  <div className={styles.dataLabel}>CSV, JSON, API</div>
-                </div>
-                <div className={styles.dataSource}>
-                  <div className={styles.dataIcon}>🗄️</div>
-                  <div className={styles.dataLabel}>Database</div>
-                </div>
-                <div className={styles.dataSource}>
-                  <div className={styles.dataIcon}>☁️</div>
-                  <div className={styles.dataLabel}>Cloud Services</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Layer 2: PivotHead Engine */}
-            <div
-              className={`${styles.architectureLayer} ${styles.engineLayer} ${activeLayer >= 1 ? styles.activeLayer : ''}`}
-            >
-              <div className={styles.layerTitle}>PivotHead Core Engine</div>
-              <div className={styles.layerContent}>
-                <div className={styles.engineCore}>
-                  <div className={styles.coreIcon}>⚡</div>
-                  <div className={styles.coreFeatures}>
-                    <div className={styles.coreFeature}>Aggregation</div>
-                    <div className={styles.coreFeature}>Filtering</div>
-                    <div className={styles.coreFeature}>Sorting</div>
-                    <div className={styles.coreFeature}>Grouping</div>
-                  </div>
-                  <div className={styles.processingIndicator}>
-                    <div className={styles.processingRing}></div>
-                    <div className={styles.processingRing}></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Layer 3: Framework Adapters */}
-            <div
-              className={`${styles.architectureLayer} ${styles.adapterLayer} ${activeLayer >= 2 ? styles.activeLayer : ''}`}
-            >
-              <div className={styles.layerTitle}>Framework Adapters</div>
-              <div className={styles.layerContent}>
-                <div className={styles.adapterWrapper}>
-                  <div className={styles.adapter}>
-                    <div className={styles.adapterIcon}>⚛️</div>
-                    <div className={styles.adapterLabel}>React</div>
-                  </div>
-                  <div className={styles.adapter}>
-                    <div className={styles.adapterIcon}>📗</div>
-                    <div className={styles.adapterLabel}>Vue</div>
-                  </div>
-                  <div className={styles.adapter}>
-                    <div className={styles.adapterIcon}>🅰️</div>
-                    <div className={styles.adapterLabel}>Angular</div>
-                  </div>
-                  <div className={styles.adapter}>
-                    <div className={styles.adapterIcon}>🟨</div>
-                    <div className={styles.adapterLabel}>JavaScript</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Layer 4: Custom UI Tables */}
-            <div
-              className={`${styles.architectureLayer} ${styles.uiLayer} ${activeLayer >= 3 ? styles.activeLayer : ''}`}
-            >
-              <div className={styles.layerTitle}>Your Custom Tables</div>
-              <div className={styles.layerContent}>
-                <div className={styles.tableGallery}>
-                  {/* Executive Dashboard Table */}
-                  <div className={styles.customTable}>
-                    <div className={styles.tableHeader}>
-                      <div className={styles.avatar}>
-                        <img
-                          src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face"
-                          alt="Executive"
-                        />
-                      </div>
-                      <span>Executive Dashboard</span>
-                    </div>
-                    <div className={styles.tableGrid}>
-                      <div className={styles.tableCell}>Product</div>
-                      <div className={styles.tableCell}>Revenue</div>
-                      <div className={styles.tableCell}>Growth</div>
-                      <div className={styles.tableRow}>Widget Pro</div>
-                      <div className={styles.tableRow}>$2.4M</div>
-                      <div className={styles.tableRow}>+24%</div>
-                      <div className={styles.tableRow}>Dashboard+</div>
-                      <div className={styles.tableRow}>$1.8M</div>
-                      <div className={styles.tableRow}>+18%</div>
-                    </div>
-                  </div>
-
-                  {/* Analytics Table */}
-                  <div className={styles.customTable}>
-                    <div className={styles.tableHeader}>
-                      <div className={styles.avatar}>
-                        <img
-                          src="https://images.unsplash.com/photo-1494790108755-2616b612b5e5?w=32&h=32&fit=crop&crop=face"
-                          alt="Analyst"
-                        />
-                      </div>
-                      <span>Analytics Portal</span>
-                    </div>
-                    <div className={styles.tableGrid}>
-                      <div className={styles.tableCell}>Region</div>
-                      <div className={styles.tableCell}>Sales</div>
-                      <div className={styles.tableCell}>Orders</div>
-                      <div className={styles.tableRow}>North</div>
-                      <div className={styles.tableRow}>$890K</div>
-                      <div className={styles.tableRow}>1,240</div>
-                      <div className={styles.tableRow}>South</div>
-                      <div className={styles.tableRow}>$760K</div>
-                      <div className={styles.tableRow}>980</div>
-                    </div>
-                  </div>
-
-                  {/* Custom Interface */}
-                  <div className={styles.customTable}>
-                    <div className={styles.tableHeader}>
-                      <div className={styles.avatar}>
-                        <img
-                          src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face"
-                          alt="Developer"
-                        />
-                      </div>
-                      <span>Your Vision</span>
-                    </div>
-                    <div className={styles.creativePlaceholder}>
-                      <div className={styles.creativeSpark}>✨</div>
-                      <div className={styles.creativeText}>
-                        Your Custom
-                        <br />
-                        Table Design
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Data Flow Arrows */}
-          <div className={styles.dataFlowArrows}>
-            <div
-              className={`${styles.flowArrow} ${styles.arrow1} ${activeLayer >= 1 ? styles.activeFlow : ''}`}
-            >
-              <div className={styles.arrowLine}></div>
-              <div className={styles.arrowHead}></div>
-            </div>
-            <div
-              className={`${styles.flowArrow} ${styles.arrow2} ${activeLayer >= 2 ? styles.activeFlow : ''}`}
-            >
-              <div className={styles.arrowLine}></div>
-              <div className={styles.arrowHead}></div>
-            </div>
-            <div
-              className={`${styles.flowArrow} ${styles.arrow3} ${activeLayer >= 3 ? styles.activeFlow : ''}`}
-            >
-              <div className={styles.arrowLine}></div>
-              <div className={styles.arrowHead}></div>
-            </div>
-          </div>
-
-          {/* Layer Indicators */}
-          <div className={styles.layerIndicators}>
-            {[0, 1, 2, 3].map(index => (
-              <button
-                key={index}
-                className={`${styles.layerIndicator} ${activeLayer >= index ? styles.activeIndicator : ''}`}
-                onClick={() => setActiveLayer(index)}
-              >
-                {index === 0 && '📊'}
-                {index === 1 && '⚡'}
-                {index === 2 && '🔧'}
-                {index === 3 && '🎨'}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Headless Benefits */}
-        <div className={styles.headlessBenefits}>
-          <div className={styles.benefitCard}>
-            <div className={styles.benefitIcon}>🎯</div>
-            <h3>Zero UI Constraints</h3>
-            <p>
-              Build tables that perfectly match your brand and user needs
-              without design limitations.
-            </p>
-          </div>
-          <div className={styles.benefitCard}>
-            <div className={styles.benefitIcon}>🚀</div>
-            <h3>Framework Freedom</h3>
-            <p>
-              Use React, Vue, Angular, or vanilla JS. The core engine works with
-              everything.
-            </p>
-          </div>
-          <div className={styles.benefitCard}>
-            <div className={styles.benefitIcon}>⚡</div>
-            <h3>Pure Performance</h3>
-            <p>
-              Lightweight engine processes data without UI overhead for maximum
-              speed.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function FlashingTableVisual() {
   return (
     <div className={styles.flashingTableContainer}>
@@ -1179,125 +894,51 @@ function StackBlitzSection() {
   );
 }
 
-// function CtaSection() {
-//   const { colorMode } = useColorMode()
+function CtaSection() {
+  const { colorMode } = useColorMode();
 
-//   return (
-//     <div className={`${styles.section} ${styles.sectionGray}`}>
-//       <div className="container text--center">
-//         <h2 className={clsx(styles.ctaTitle, colorMode === "dark" ? "text-white" : "text-slate-900")}>Ready to Transform Your Data?</h2>
-//         <p className={clsx(styles.ctaDescription, colorMode === "dark" ? "text-slate-300" : "text-slate-600")}>Join thousands of developers who trust PivotHead for their data visualization needs.</p>
-//         <div className={styles.heroButtons}>
-//           <Link to="/docs/Installation" className={`${styles.button} ${styles.primaryButton}`}>
-//             Get Started Now <ArrowRightIcon style={{ marginLeft: "0.5rem" }} />
-//           </Link>
-//           <Link to="/docs/what-is-pivothead" className={clsx(styles.button, styles.secondaryButton, colorMode === "dark" ? "text-white border-slate-700 hover:bg-slate-800" : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50")}>
-//             View Documentation
-//           </Link>
-//         </div>
-//       </div>
-//     </div>
-//   )
-// }
-
-function Footer() {
-  const { siteConfig } = useDocusaurusContext();
   return (
-    <footer className={styles.footer}>
-      <div className="container">
-        <div className={styles.footerGrid}>
-          <div>
-            <div
-              className={styles.logoContainer}
-              style={{ marginBottom: '1rem' }}
-            >
-              <div className={styles.logoIconContainer}>
-                <BarChartIcon />
-              </div>
-              <span className={styles.logoText}>{siteConfig.title}</span>
-            </div>
-            <p style={{ fontSize: '0.875rem' }}>
-              The most powerful pivot table component for modern web
-              applications.
-            </p>
-          </div>
-          <div>
-            <h3 className={styles.footerTitle}>Product</h3>
-            <ul className={styles.footerList}>
-              <li>
-                <Link to="#features" className={styles.footerLink}>
-                  Features
-                </Link>
-              </li>
-              <li>
-                <Link
-                  // Corrected: Matches the 'introduction' ID in your sidebar.js
-                  to="/docs/introduction"
-                  className={styles.footerLink}
-                >
-                  About
-                </Link>
-              </li>
-              <li>
-                <Link
-                  // Corrected: This should also point to the main entry point.
-                  to="/docs/introduction"
-                  className={styles.footerLink}
-                >
-                  Documentation
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h3 className={styles.footerTitle}>Resources</h3>
-            <ul className={styles.footerList}>
-              <li>
-                <Link
-                  // Corrected: Matches the nested path in your sidebar.js
-                  to="/docs/tutorial-basics/core/examples"
-                  className={styles.footerLink}
-                >
-                  Examples
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="https://github.com/mindfiredigital/PivotHead"
-                  className={styles.footerLink}
-                >
-                  Community
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h3 className={styles.footerTitle}>Company</h3>
-            <ul className={styles.footerList}>
-              <li>
-                <Link to="#" className={styles.footerLink}>
-                  About
-                </Link>
-              </li>
-              <li>
-                <Link to="#" className={styles.footerLink}>
-                  Privacy
-                </Link>
-              </li>
-              <li>
-                <Link to="#" className={styles.footerLink}>
-                  Terms
-                </Link>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div className={styles.footerCopyright}>
-          © {new Date().getFullYear()} {siteConfig.title}. All rights reserved.
-          Built with ❤️ for developers.
+    <div className={`${styles.section} ${styles.sectionGray}`}>
+      <div className="container text--center">
+        <h2
+          className={clsx(
+            styles.ctaTitle,
+            colorMode === 'dark' ? 'text-white' : 'text-slate-900'
+          )}
+        >
+          Ready to Transform Your Data?
+        </h2>
+        <p
+          className={clsx(
+            styles.ctaDescription,
+            colorMode === 'dark' ? 'text-slate-300' : 'text-slate-600'
+          )}
+        >
+          Join the developers who trust PivotHead for their data visualization
+          needs.
+        </p>
+        <div className={styles.heroButtons}>
+          <Link
+            to="/docs/Installation"
+            className={`${styles.button} ${styles.primaryButton}`}
+          >
+            Get Started Now <ArrowRightIcon style={{ marginLeft: '0.5rem' }} />
+          </Link>
+          <Link
+            to="/docs/introduction"
+            className={clsx(
+              styles.button,
+              styles.secondaryButton,
+              colorMode === 'dark'
+                ? 'text-white border-slate-700 hover:bg-slate-800'
+                : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
+            )}
+          >
+            View Documentation
+          </Link>
         </div>
       </div>
-    </footer>
+    </div>
   );
 }
 
@@ -1315,9 +956,8 @@ export default function Home() {
           <HomepageFeatures />
           <ModernDevelopersSection />
           {/* <StackBlitzSection /> */}
-          {/* <CtaSection /> */}
+          <CtaSection />
         </main>
-        <Footer />
       </div>
     </Layout>
   );
