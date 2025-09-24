@@ -8,10 +8,17 @@ import type {
   Group,
   PaginationConfig,
 } from '@mindfiredigital/pivothead';
+import { ConnectService } from '@mindfiredigital/pivothead';
+import type {
+  ConnectionOptions,
+  FileConnectionResult,
+} from '@mindfiredigital/pivothead';
 import type {
   EnhancedPivotEngine,
   PivotDataRecord,
   PivotOptions,
+  FileImportResult,
+  ImportOptions,
 } from '../types/types';
 import type { PivotHeadHost } from './internal/host';
 import {
@@ -378,6 +385,296 @@ export class PivotHeadElement extends HTMLElement {
   }
   public showFormatPopup(): void {
     showFormatPopupHelper(this as unknown as PivotHeadHost);
+  }
+
+  // File import methods using core engine's ConnectService
+  public async connectToLocalCSV(
+    options: ImportOptions = {}
+  ): Promise<FileImportResult> {
+    try {
+      if (!this.engine) {
+        return { success: false, error: 'Engine not initialized' };
+      }
+
+      console.log('🔥 CSV Import: Using core ConnectService logic');
+
+      // Convert ImportOptions to ConnectionOptions
+      const connectionOptions: ConnectionOptions = {
+        csv: {
+          delimiter: ',',
+          hasHeader: true,
+          skipEmptyLines: true,
+          trimValues: true,
+        },
+        maxFileSize: options.maxFileSize,
+        maxRecords: options.maxRecords,
+      };
+
+      // Use core ConnectService which handles file picker, parsing, and auto-configuration
+      const result: FileConnectionResult =
+        await ConnectService.connectToLocalCSV(
+          this.engine as never, // Type assertion for core compatibility
+          connectionOptions
+        );
+
+      if (result.success) {
+        // Update web component state with the processed data
+        this._data = result.data || [];
+        this._originalData = [...this._data];
+
+        // The core ConnectService already configured the engine with proper layout
+        // We need to sync our options with what the engine configured
+        const engineState = this.engine.getState();
+        console.log('🔥 CSV Import: Engine state after import:', engineState);
+        console.log(
+          '🔥 CSV Import: Raw data length:',
+          engineState.rawData?.length
+        );
+        console.log('🔥 CSV Import: Rows config:', engineState.rows);
+        console.log('🔥 CSV Import: Columns config:', engineState.columns);
+        console.log('🔥 CSV Import: Measures config:', engineState.measures);
+        console.log('🔥 CSV Import: Group config:', engineState.groupConfig);
+        console.log(
+          '🔥 CSV Import: Grouped data length:',
+          this.engine.getGroupedData()?.length
+        );
+
+        // Completely replace web component options with engine state - THIS IS THE KEY FIX
+        this._options = {
+          rows: engineState.rows || [],
+          columns: engineState.columns || [],
+          measures: engineState.measures || [],
+          pageSize: this._options.pageSize || 10, // Keep current page size
+        };
+
+        // Clear any cached column orders to force fresh extraction
+        this._processedColumnOrder = [];
+        this._rawDataColumnOrder = [];
+
+        console.log(
+          '🔥 CSV Import: Completely replaced web component options:',
+          this._options
+        );
+        console.log('🔥 CSV Import: About to re-render table...');
+
+        // Dispatch event for external listeners
+        this.dispatchEvent(
+          new CustomEvent('dataImported', {
+            detail: {
+              type: 'csv',
+              result,
+              fileName: result.fileName,
+              recordCount: result.recordCount,
+            },
+            bubbles: true,
+            composed: true,
+          })
+        );
+
+        // Force a complete re-render
+        this._renderSwitch();
+
+        return {
+          success: true,
+          data: this._data,
+          fileName: result.fileName,
+          recordCount: result.recordCount,
+        };
+      }
+
+      return {
+        success: false,
+        error: result.error || 'Failed to import CSV file',
+      };
+    } catch (error) {
+      console.error('CSV Import Error:', error);
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : 'Unknown error occurred',
+      };
+    }
+  }
+
+  public async connectToLocalJSON(
+    options: ImportOptions = {}
+  ): Promise<FileImportResult> {
+    try {
+      if (!this.engine) {
+        return { success: false, error: 'Engine not initialized' };
+      }
+
+      console.log('🔥 JSON Import: Using core ConnectService logic');
+
+      // Convert ImportOptions to ConnectionOptions
+      const connectionOptions: ConnectionOptions = {
+        json: {
+          validateSchema: false,
+        },
+        maxFileSize: options.maxFileSize,
+        maxRecords: options.maxRecords,
+      };
+
+      // Use core ConnectService which handles file picker, parsing, and auto-configuration
+      const result: FileConnectionResult =
+        await ConnectService.connectToLocalJSON(
+          this.engine as never, // Type assertion for core compatibility
+          connectionOptions
+        );
+
+      if (result.success) {
+        // Update web component state with the processed data
+        this._data = result.data || [];
+        this._originalData = [...this._data];
+
+        // The core ConnectService already configured the engine with proper layout
+        // We need to sync our options with what the engine configured
+        const engineState = this.engine.getState();
+        console.log('🔥 JSON Import: Engine state after import:', engineState);
+
+        // Sync the web component options with the engine's configuration
+        this._options = {
+          ...this._options,
+          rows: engineState.rows || [],
+          columns: engineState.columns || [],
+          measures: engineState.measures || [],
+        };
+
+        console.log(
+          '🔥 JSON Import: Updated web component options:',
+          this._options
+        );
+
+        // Dispatch event for external listeners
+        this.dispatchEvent(
+          new CustomEvent('dataImported', {
+            detail: {
+              type: 'json',
+              result,
+              fileName: result.fileName,
+              recordCount: result.recordCount,
+            },
+            bubbles: true,
+            composed: true,
+          })
+        );
+
+        // Force a complete re-render
+        this._renderSwitch();
+
+        return {
+          success: true,
+          data: this._data,
+          fileName: result.fileName,
+          recordCount: result.recordCount,
+        };
+      }
+
+      return {
+        success: false,
+        error: result.error || 'Failed to import JSON file',
+      };
+    } catch (error) {
+      console.error('JSON Import Error:', error);
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : 'Unknown error occurred',
+      };
+    }
+  }
+
+  public async connectToLocalFile(
+    options: ImportOptions = {}
+  ): Promise<FileImportResult> {
+    try {
+      if (!this.engine) {
+        return { success: false, error: 'Engine not initialized' };
+      }
+
+      console.log('🔥 File Import: Using core ConnectService logic');
+
+      // Convert ImportOptions to ConnectionOptions
+      const connectionOptions: ConnectionOptions = {
+        csv: {
+          delimiter: ',',
+          hasHeader: true,
+          skipEmptyLines: true,
+          trimValues: true,
+        },
+        json: {
+          validateSchema: false,
+        },
+        maxFileSize: options.maxFileSize,
+        maxRecords: options.maxRecords,
+      };
+
+      // Use core ConnectService which handles file picker, parsing, and auto-configuration
+      const result: FileConnectionResult =
+        await ConnectService.connectToLocalFile(
+          this.engine as never, // Type assertion for core compatibility
+          connectionOptions
+        );
+
+      if (result.success) {
+        // Update web component state with the processed data
+        this._data = result.data || [];
+        this._originalData = [...this._data];
+
+        // The core ConnectService already configured the engine with proper layout
+        // We need to sync our options with what the engine configured
+        const engineState = this.engine.getState();
+        console.log('🔥 File Import: Engine state after import:', engineState);
+
+        // Sync the web component options with the engine's configuration
+        this._options = {
+          ...this._options,
+          rows: engineState.rows || [],
+          columns: engineState.columns || [],
+          measures: engineState.measures || [],
+        };
+
+        console.log(
+          '🔥 File Import: Updated web component options:',
+          this._options
+        );
+
+        // Dispatch event for external listeners
+        this.dispatchEvent(
+          new CustomEvent('dataImported', {
+            detail: {
+              type: result.fileName?.toLowerCase().endsWith('.json')
+                ? 'json'
+                : 'csv',
+              result,
+              fileName: result.fileName,
+              recordCount: result.recordCount,
+            },
+            bubbles: true,
+            composed: true,
+          })
+        );
+
+        // Force a complete re-render
+        this._renderSwitch();
+
+        return {
+          success: true,
+          data: this._data,
+          fileName: result.fileName,
+          recordCount: result.recordCount,
+        };
+      }
+
+      return { success: false, error: result.error || 'Failed to import file' };
+    } catch (error) {
+      console.error('File Import Error:', error);
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : 'Unknown error occurred',
+      };
+    }
   }
 }
 

@@ -32,11 +32,7 @@ export function tryInitializeEngine(host: PivotHeadHost): void {
       }
     }
 
-    if (
-      !options.columns ||
-      !Array.isArray(options.columns) ||
-      options.columns.length === 0
-    ) {
+    if (!options.columns || !Array.isArray(options.columns)) {
       const keys = host._data.length > 0 ? Object.keys(host._data[0]) : [];
       const colField = keys.length > 1 ? keys[1] : null;
       if (colField) {

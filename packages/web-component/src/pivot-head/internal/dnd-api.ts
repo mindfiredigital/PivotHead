@@ -75,9 +75,62 @@ export function swapColumns(
       host._rawDataColumnOrder[toIndex] = temp;
       host.renderRawTable();
     } else {
-      host.engine.swapDataColumns(fromIndex, toIndex);
-      const newOrder = host.engine.getOrderedColumnValues();
-      if (newOrder) host._processedColumnOrder = [...newOrder];
+      // For processed data, we need to swap in our local column order array
+      // Get current column order or create it from engine
+      const currentOrder =
+        host._processedColumnOrder.length > 0
+          ? [...host._processedColumnOrder]
+          : host.engine.getOrderedColumnValues() || [];
+
+      if (currentOrder.length === 0) {
+        console.error('No column order available for swap');
+        return;
+      }
+
+      if (
+        fromIndex < 0 ||
+        toIndex < 0 ||
+        fromIndex >= currentOrder.length ||
+        toIndex >= currentOrder.length
+      ) {
+        console.error(
+          `Invalid column indices for processed data swap: ${fromIndex}, ${toIndex}, total: ${currentOrder.length}`
+        );
+        return;
+      }
+
+      console.log('🔥 Column Swap: Before swap:', currentOrder);
+      console.log(
+        '🔥 Column Swap: Swapping indices:',
+        fromIndex,
+        'and',
+        toIndex
+      );
+
+      // Perform the actual swap
+      const temp = currentOrder[fromIndex];
+      currentOrder[fromIndex] = currentOrder[toIndex];
+      currentOrder[toIndex] = temp;
+
+      console.log('🔥 Column Swap: After swap:', currentOrder);
+
+      // Update our local order
+      host._processedColumnOrder = [...currentOrder];
+
+      // Set the new order directly in the engine state (like the engine does internally)
+      const engineState = host.engine.getState();
+      const columnField = host._options.columns?.[0];
+      if (columnField) {
+        // Manual approach: set the custom column order directly
+        (engineState as unknown as Record<string, unknown>).customColumnOrder =
+          {
+            fieldName: columnField.uniqueName,
+            order: currentOrder,
+          };
+      }
+
+      // Force re-render to show the new column order
+      host.renderFullUI();
     }
   } catch (error) {
     console.error('Column swap failed:', error);

@@ -44,6 +44,26 @@ export function handleEngineStateChange(host: PivotHeadHost, state: unknown) {
       composed: true,
     })
   );
+
+  // CRITICAL FIX: Sync host options with engine state after any change
+  if (host.engine) {
+    const engineState = host.engine.getState();
+
+    // Only update options if engine has valid configuration
+    if (engineState.rows && engineState.columns && engineState.measures) {
+      host._options = {
+        ...host._options,
+        rows: engineState.rows,
+        columns: engineState.columns,
+        measures: engineState.measures,
+      };
+      console.log(
+        '🔥 StateChange: Synced host options with engine state:',
+        host._options
+      );
+    }
+  }
+
   host.calculatePaginationForCurrentView();
   const mode = host.getAttribute('mode');
   if (mode === 'none') {
@@ -81,19 +101,35 @@ export function handleEngineStateChange(host: PivotHeadHost, state: unknown) {
 export function renderFullUI(host: PivotHeadHost) {
   const engine = host.engine;
   if (!engine) {
+    console.log('🔥 Render: No engine available');
     if (host.shadowRoot) host.shadowRoot.innerHTML = '';
     return;
   }
   const state = engine.getState();
+  console.log('🔥 Render: Engine state:', state);
+  console.log('🔥 Render: Host options:', host._options);
+
   if (!state.processedData) {
-    console.error('No processed data available');
+    console.error('🔥 Render: No processed data available');
     return;
   }
   const rowField = host._options.rows?.[0];
   const columnField = host._options.columns?.[0];
   const measures = host._options.measures || [];
+  console.log('🔥 Render: Row field:', rowField);
+  console.log('🔥 Render: Column field:', columnField);
+  console.log('🔥 Render: Measures:', measures);
+
   if (!rowField || !columnField || !measures.length) {
-    console.error('Missing row, column, or measures configuration');
+    console.error('🔥 Render: Missing row, column, or measures configuration');
+    console.error(
+      '🔥 Render: rowField:',
+      rowField,
+      'columnField:',
+      columnField,
+      'measures.length:',
+      measures.length
+    );
     return;
   }
   host.calculatePaginationForCurrentView();
@@ -101,7 +137,8 @@ export function renderFullUI(host: PivotHeadHost) {
       <style>
         :host { display: block; font-family: inherit; }
         .controls-container { margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-        .filter-container, .pagination-container { display: flex; gap: 10px; align-items: center; }
+        .import-container, .filter-container, .pagination-container { display: flex; gap: 10px; align-items: center; }
+        .import-container { padding: 10px; background: #f8f9fa; border-radius: 4px; border: 1px solid #dee2e6; }
         table { width: 100%; border-collapse: collapse; background: #ffffff; border: 1px solid #dee2e6; margin-top: 20px; }
         th, td { border: 1px solid #dee2e6; padding: 8px; text-align: left; }
         th { background-color: #f8f9fa; cursor: grab; font-weight: 600; }
@@ -222,6 +259,11 @@ export function renderFullUI(host: PivotHeadHost) {
         }
       </style>
       <div class="controls-container">
+        <div class="import-container">
+          <label>📁 Data Import:</label>
+          <button id="importCSV">Import CSV</button>
+          <button id="importJSON">Import JSON</button>
+        </div>
         <div class="filter-container">
           <label>Filter:</label>
           <select id="filterField"></select>
@@ -258,16 +300,45 @@ export function renderFullUI(host: PivotHeadHost) {
 
   // Determine column labels using engine's custom column order if any
   const groupedData = engine.getGroupedData();
-  let uniqueColumnValues =
-    engine.getOrderedColumnValues() ||
-    ([
+  console.log('🔥 Render: Grouped data:', groupedData);
+  console.log('🔥 Render: Grouped data length:', groupedData.length);
+
+  // Try multiple methods to get unique column values
+  let uniqueColumnValues: string[] = engine.getOrderedColumnValues() || [];
+
+  if (uniqueColumnValues.length === 0) {
+    // Extract from grouped data keys
+    uniqueColumnValues = [
       ...new Set(
         groupedData.map((g: Group) => {
           const keys = g.key ? g.key.split('|') : [];
-          return keys[1] || keys[0];
+          return keys[1] || keys[0]; // Use second key as column, fallback to first
         })
       ),
-    ].filter(Boolean) as string[]);
+    ].filter(Boolean) as string[];
+  }
+
+  if (uniqueColumnValues.length === 0) {
+    // Fallback: Extract directly from engine state data
+    const engineState = engine.getState();
+    const allData = engineState.rawData || engineState.data || [];
+    if (allData.length > 0 && columnField) {
+      uniqueColumnValues = [
+        ...new Set(
+          allData.map(
+            (item: Record<string, unknown>) => item[columnField.uniqueName]
+          )
+        ),
+      ].filter(Boolean) as string[];
+    }
+  }
+
+  // Final fallback: use synthetic "All" if no columns found
+  if (uniqueColumnValues.length === 0) {
+    uniqueColumnValues = ['All'];
+  }
+
+  console.log('🔥 Render: Final unique column values:', uniqueColumnValues);
   if (host._processedColumnOrder.length === 0) {
     host._processedColumnOrder = [...uniqueColumnValues];
   }
@@ -281,6 +352,11 @@ export function renderFullUI(host: PivotHeadHost) {
   html += '<thead>';
   html += '<tr>';
   html += `<th class="corner-cell">${rowField.caption} / ${columnField.caption}</th>`;
+  console.log(
+    '🔥 Render: Generating table headers for columns:',
+    uniqueColumnValues
+  );
+  console.log('🔥 Render: Each column will have colspan:', measures.length);
   uniqueColumnValues.forEach((colValue, index) => {
     html += `<th class="column-header" draggable="true" data-column-index="${index}" data-column-value="${colValue}" colspan="${measures.length}">${colValue}</th>`;
   });
@@ -290,6 +366,7 @@ export function renderFullUI(host: PivotHeadHost) {
   html += `<th class="row-cell sortable-header" data-field="${rowField.uniqueName}">
       ${rowField.caption}${rowSortIcon}
     </th>`;
+  console.log('🔥 Render: Generating measure headers for each column...');
   uniqueColumnValues.forEach(colValue => {
     measures.forEach((measure: MeasureConfig, measureIndex: number) => {
       const sortIcon = host.createProcessedSortIcon(measure.uniqueName);
@@ -301,6 +378,7 @@ export function renderFullUI(host: PivotHeadHost) {
   html += '</tr>';
   html += '</thead>';
   html += '<tbody>';
+  console.log('🔥 Render: Starting table body generation...');
 
   // Prefer engine-provided ordered row values (custom or due to sorting)
   const orderedFromEngine = engine.getOrderedRowValues() || [];
@@ -317,10 +395,29 @@ export function renderFullUI(host: PivotHeadHost) {
       ),
     ].filter(Boolean) as string[];
   }
+  console.log('🔥 Render: Unique row values:', uniqueRowValues);
+  console.log('🔥 Render: Ordered from engine:', orderedFromEngine);
+
   const paginatedRowValues = host.getPaginatedData(uniqueRowValues);
+  console.log('🔥 Render: Paginated row values:', paginatedRowValues);
+  console.log(
+    '🔥 Render: Will generate',
+    paginatedRowValues.length,
+    'rows with',
+    uniqueColumnValues.length,
+    'columns each having',
+    measures.length,
+    'measures'
+  );
+
   paginatedRowValues.forEach((rowValue, rowIndex) => {
     html += `<tr draggable="true" data-row-index="${rowIndex}" data-row-value="${rowValue}">`;
     html += `<td class="row-cell">${rowValue}</td>`;
+
+    console.log(
+      `🔥 Render: Row ${rowIndex} (${rowValue}) - generating ${uniqueColumnValues.length * measures.length} data cells`
+    );
+
     uniqueColumnValues.forEach(colValue => {
       measures.forEach((measure: MeasureConfig) => {
         const matchingGroup = groupedData.find((g: Group) => {

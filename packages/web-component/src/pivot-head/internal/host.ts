@@ -3,6 +3,8 @@ import type {
   Group,
   PaginationConfig,
   PivotTableState,
+  ConnectionOptions,
+  FileConnectionResult,
 } from '@mindfiredigital/pivothead';
 import type {
   EnhancedPivotEngine,
@@ -46,6 +48,7 @@ export interface PivotHeadHost {
   setAttribute(qualifiedName: string, value: string): void;
   removeAttribute(qualifiedName: string): void;
   handleEngineStateChange(state: PivotTableState<PivotDataRecord>): void;
+  tryInitializeEngine(): void;
 
   // API surfaced on the element used by event handlers
   filters: FilterConfig[];
@@ -58,6 +61,15 @@ export interface PivotHeadHost {
   exportToExcel(fileName?: string): void;
   openPrintDialog(): void;
   showFormatPopup(): void;
+
+  // File import methods
+  connectToLocalCSV(options?: ConnectionOptions): Promise<FileConnectionResult>;
+  connectToLocalJSON(
+    options?: ConnectionOptions
+  ): Promise<FileConnectionResult>;
+  connectToLocalFile(
+    options?: ConnectionOptions
+  ): Promise<FileConnectionResult>;
 
   // data/options setters used by attribute helpers
   data: PivotDataRecord[];

@@ -20,6 +20,10 @@ export function setFilters(host: PivotHeadHost, value: FilterConfig[]): void {
   if (host.engine) {
     host.engine.setDataHandlingMode(host._showRawData ? 'raw' : 'processed');
     host.engine.applyFilters(value || []);
+
+    // CRITICAL FIX: Re-render after applying filters
+    console.log('🔥 Filter: Re-rendering after filter application...');
+    host._renderSwitch();
   }
 
   host._filters = value || [];
@@ -43,7 +47,14 @@ export function refresh(host: PivotHeadHost): void {
 
   host._filters = [];
   host.removeAttribute('filters');
-  host.engine.reset();
+
+  // CRITICAL FIX: Only clear filters, don't reset the entire engine
+  console.log('🔥 Refresh: Clearing filters only, preserving imported data...');
+  host.engine.applyFilters([]); // Clear filters but keep data
+
+  // CRITICAL FIX: Re-render after refresh
+  console.log('🔥 Refresh: Re-rendering after refresh...');
+  host._renderSwitch();
 
   const filterValueInput = host.shadowRoot?.getElementById(
     'filterValue'
@@ -66,7 +77,27 @@ export function reset(host: PivotHeadHost): void {
 
   host._pagination.currentPage = 1;
 
-  host.engine.reset();
+  // CRITICAL FIX: For imported data, don't call engine.reset() as it wipes imported data
+  // Instead, just clear filters and refresh the view
+  console.log(
+    '🔥 Reset: Clearing filters and pagination, preserving imported data...'
+  );
+
+  const currentState = host.engine.getState();
+  if (currentState.rawData && currentState.rawData.length > 0) {
+    // We have imported data, just clear filters but keep the data
+    host.engine.applyFilters([]); // Clear filters but keep data
+
+    // Reset any custom sorting
+    host.engine.sort('', 'asc'); // Clear sorting
+  } else {
+    // No imported data, safe to do full reset
+    host.engine.reset();
+  }
+
+  // CRITICAL FIX: Re-render after reset
+  console.log('🔥 Reset: Re-rendering after reset...');
+  host._renderSwitch();
 
   clearFilterUI(host);
 }

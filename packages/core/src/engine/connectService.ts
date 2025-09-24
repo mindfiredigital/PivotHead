@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { PivotEngine } from './pivotEngine';
-import type { AxisConfig, MeasureConfig } from '../types/interfaces';
+import type {
+  AxisConfig,
+  MeasureConfig,
+  AggregationType,
+} from '../types/interfaces';
 
 type FieldType = 'number' | 'string' | 'date' | 'boolean' | 'null' | 'unknown';
 
@@ -171,14 +175,19 @@ function buildAutoLayout(data: any[]): AutoLayoutResult {
   if (columns.length === 1) {
     const [only] = columns;
     const measures: MeasureConfig[] = [];
-    // If the only column is numeric -> add __all__ and make it a measure
+    // If the only column is numeric -> add synthetic "All" row and column for aggregation
     const types = inferFieldTypes(workingData, columns);
     if (types[only] === 'number') {
-      workingData = workingData.map(row => ({ ...row, __all__: 'All' }));
-      const rows: AxisConfig[] = [{ uniqueName: '__all__', caption: 'All' }];
-      // Changed: ensure there is always a column axis
+      workingData = workingData.map(row => ({
+        ...row,
+        __all_row__: 'All',
+        __all_col__: 'All',
+      }));
+      const rows: AxisConfig[] = [
+        { uniqueName: '__all_row__', caption: 'All' },
+      ];
       const columnsAxis: AxisConfig[] = [
-        { uniqueName: '__all__', caption: 'All' },
+        { uniqueName: '__all_col__', caption: 'All' },
       ];
       measures.push({
         uniqueName: only,
@@ -195,7 +204,7 @@ function buildAutoLayout(data: any[]): AutoLayoutResult {
         columns: columnsAxis,
         measures,
         data: workingData,
-        columnsList: ['__all__', ...columns],
+        columnsList: ['__all_row__', '__all_col__', ...columns],
       };
     }
     // Otherwise treat it as a row dimension but still create a single synthetic column
@@ -251,16 +260,63 @@ function buildAutoLayout(data: any[]): AutoLayoutResult {
   const totalRows = workingData.length || 1;
 
   if (nonNumericFields.length === 0) {
-    // All numeric -> add __all__ and set both rows and columns as All
-    workingData = workingData.map(row => ({ ...row, __all__: 'All' }));
-    rows = [{ uniqueName: '__all__', caption: 'All' }];
-    columnsAxis = [{ uniqueName: '__all__', caption: 'All' }];
+    // All numeric -> handle special case where CSV has no row labels
+    // Create a single "All" row that will contain the sum of all numeric values
+    console.log(
+      'DEBUG: All numeric fields detected, count:',
+      numericFields.length
+    );
+
+    // Create a single row with "All" for both row and column dimensions
+    // This will cause the engine to aggregate all values into totals
+    workingData = workingData.map(row => ({
+      ...row,
+      __all_row__: 'All',
+      __all_col__: 'All',
+    }));
+
+    // Use 'All' as both row and column dimension
+    rows = [{ uniqueName: '__all_row__', caption: 'All' }];
+    columnsAxis = [{ uniqueName: '__all_col__', caption: 'All' }];
+
+    // All numeric fields become measures - these will be summed automatically
+    const updatedMeasures: MeasureConfig[] =
+      numericFields.length > 0
+        ? numericFields.map(f => {
+            // Detect if the field might contain currency values
+            const isCurrency = workingData.some(row => {
+              const value = row[f];
+              return typeof value === 'string' && /[$€£¥₹]/.test(value);
+            });
+
+            return {
+              uniqueName: f,
+              caption: `Sum of ${f}`,
+              aggregation: 'sum' as AggregationType,
+              format: {
+                type: isCurrency ? 'currency' : 'number',
+                currency: 'USD',
+                locale: 'en-US',
+                decimals: 2,
+              },
+              sortabled: true,
+            };
+          })
+        : [
+            {
+              uniqueName: '__count__',
+              caption: 'Count',
+              aggregation: 'count' as AggregationType,
+              format: { type: 'number' as const, locale: 'en-US', decimals: 0 },
+            },
+          ];
+
     return {
       rows,
       columns: columnsAxis,
-      measures,
+      measures: updatedMeasures,
       data: workingData,
-      columnsList: ['__all__', ...columns],
+      columnsList: ['__all_row__', '__all_col__', ...columns],
     };
   }
 
@@ -361,10 +417,19 @@ function buildAutoLayout(data: any[]): AutoLayoutResult {
       columnsAxis
     );
   } else if (candidateDims.length === 1) {
-    // Only one repetitive non-numeric -> set as rows only
+    // Only one repetitive non-numeric -> set as rows, add 'All' column for proper structure
     rows = [
       { uniqueName: candidateDims[0].f, caption: candidateDims[0].f.trim() },
     ];
+    // Always ensure we have a column dimension for proper pivot structure
+    workingData = workingData.map(row => ({ ...row, __all__: 'All' }));
+    columnsAxis = [{ uniqueName: '__all__', caption: 'All' }];
+    console.log(
+      'DEBUG: Single candidate dimension - rows:',
+      rows,
+      'columns:',
+      columnsAxis
+    );
   } else if (nonNumericFields.length >= 2) {
     // If we have at least 2 non-numeric fields, use the first two even if not highly repetitive
     // Apply the same business logic as above
@@ -416,8 +481,23 @@ function buildAutoLayout(data: any[]): AutoLayoutResult {
       },
     ];
   } else {
-    // No repetitive non-numeric -> use first non-numeric as rows
-    rows = [{ uniqueName: ranked[0].f, caption: ranked[0].f.trim() }];
+    // No repetitive non-numeric fields detected
+    console.log('DEBUG: No candidate dimensions found');
+
+    if (nonNumericFields.length >= 1) {
+      // Use first non-numeric as rows, add 'All' column for structure
+      rows = [{ uniqueName: ranked[0].f, caption: ranked[0].f.trim() }];
+      workingData = workingData.map(row => ({ ...row, __all__: 'All' }));
+      columnsAxis = [{ uniqueName: '__all__', caption: 'All' }];
+      console.log(
+        'DEBUG: Using first non-numeric field as rows:',
+        rows,
+        'with All column'
+      );
+    } else {
+      // This case should be handled above in the all-numeric section
+      console.log('DEBUG: Fallback case - no non-numeric fields');
+    }
   }
 
   // NEW: If no column axis was selected, synthesize a single '__all__' column
@@ -961,17 +1041,18 @@ export class ConnectService {
     for (let i = 0; i < line.length; i++) {
       const char = line[i];
 
-      if (char === '"' && (i === 0 || line[i - 1] === delimiter || inQuotes)) {
+      if (char === '"') {
         inQuotes = !inQuotes;
+        // Don't include the quote character in the result
       } else if (char === delimiter && !inQuotes) {
-        result.push(current);
+        result.push(current.trim());
         current = '';
       } else {
         current += char;
       }
     }
 
-    result.push(current);
+    result.push(current.trim());
     return result;
   }
 

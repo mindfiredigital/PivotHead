@@ -1,0 +1,16 @@
+{
+  "name": "pivothead-minimal-demo",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5176 --strictPort --open /index.html",
+    "build": "vite build"
+  },
+  "devDependencies": {
+    "vite": "^6.2.0"
+  },
+  "dependencies": {
+    "@mindfiredigital/pivothead-web-component": "workspace:*"
+  }
+}
