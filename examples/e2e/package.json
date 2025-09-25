@@ -1,0 +1,33 @@
+{
+  "name": "pivothead-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "cypress:run:simple-js-demo": "cypress run --config baseUrl=http://localhost:5174 --spec 'cypress/e2e/simple-js-demo.cy.ts'",
+    "cypress:run:pivothead-default": "cypress run --config baseUrl=http://localhost:5175 --spec 'cypress/e2e/pivothead-default-demo.cy.ts'",
+    "cypress:run:pivothead-minimal": "cypress run --config baseUrl=http://localhost:5176 --spec 'cypress/e2e/pivothead-minimal-demo.cy.ts'",
+    "cypress:run:react-demo": "cypress run --config baseUrl=http://localhost:5173 --spec 'cypress/e2e/react-demo*.cy.ts'",
+    "cypress:run:pivothead-none": "cypress run --config baseUrl=http://localhost:5177 --spec 'cypress/e2e/pivothead-none-demo.cy.ts'",
+    "test:react-demo": "bash -c 'fuser -k 5173/tcp || true' && start-server-and-test \"pnpm --filter react-demo preview\" http://localhost:5173 cypress:run:react-demo",
+    "test:open:react-demo": "bash -c 'fuser -k 5173/tcp || true' && start-server-and-test \"pnpm --filter react-demo preview\" http://localhost:5173 cypress:open",
+    "test:simple-js-demo": "bash -c 'fuser -k 5174/tcp || true' && start-server-and-test \"pnpm --filter simple-js-demo dev\" http://localhost:5174 cypress:run:simple-js-demo",
+    "test:open:simple-js-demo": "bash -c 'fuser -k 5174/tcp || true' && start-server-and-test \"pnpm --filter simple-js-demo dev\" http://localhost:5174 \"CYPRESS_BASE_URL=http://localhost:5174 cypress open\"",
+    "test:pivothead-default": "bash -c 'fuser -k 5175/tcp || true' && start-server-and-test \"pnpm --filter pivothead-default-demo dev\" http://localhost:5175 cypress:run:pivothead-default",
+    "test:open:pivothead-default": "bash -c 'fuser -k 5175/tcp || true' && start-server-and-test \"pnpm --filter pivothead-default-demo dev\" http://localhost:5175 \"CYPRESS_BASE_URL=http://localhost:5175 cypress open\"",
+    "test:pivothead-minimal": "bash -c 'fuser -k 5176/tcp || true' && start-server-and-test \"pnpm --filter pivothead-minimal-demo dev\" http://localhost:5176 cypress:run:pivothead-minimal",
+    "test:open:pivothead-minimal": "bash -c 'fuser -k 5176/tcp || true' && start-server-and-test \"pnpm --filter pivothead-minimal-demo dev\" http://localhost:5176 \"CYPRESS_BASE_URL=http://localhost:5176 cypress open\"",
+    "test:pivothead-none": "bash -c 'fuser -k 5177/tcp || true' && start-server-and-test \"pnpm --filter pivothead-none-demo dev\" http://localhost:5177 cypress:run:pivothead-none",
+    "test:open:pivothead-none": "bash -c 'fuser -k 5177/tcp || true' && start-server-and-test \"pnpm --filter pivothead-none-demo dev\" http://localhost:5177 \"CYPRESS_BASE_URL=http://localhost:5177 cypress open\""
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "cypress": "^15.2.0",
+    "start-server-and-test": "^2.1.2"
+  },
+  "dependencies": {
+    "react-demo": "workspace:*"
+  }
+}

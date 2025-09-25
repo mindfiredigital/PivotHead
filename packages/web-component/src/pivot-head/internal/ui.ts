@@ -209,6 +209,129 @@ export function bindControls(host: PivotHeadHost) {
       host.showFormatPopup();
     });
   }
+
+  // Import controls
+  const importCSVBtn = host.shadowRoot?.getElementById('importCSV');
+  if (importCSVBtn) {
+    const newImportCSVBtn = importCSVBtn.cloneNode(true);
+    importCSVBtn.parentNode?.replaceChild(newImportCSVBtn, importCSVBtn);
+    newImportCSVBtn.addEventListener('click', async () => {
+      try {
+        const result = await host.connectToLocalCSV();
+        if (result.success) {
+          console.log('CSV imported successfully:', result);
+        } else {
+          console.error('CSV import failed:', result.error);
+        }
+      } catch (error) {
+        console.error('CSV import error:', error);
+      }
+    });
+  }
+
+  const importJSONBtn = host.shadowRoot?.getElementById('importJSON');
+  if (importJSONBtn) {
+    const newImportJSONBtn = importJSONBtn.cloneNode(true);
+    importJSONBtn.parentNode?.replaceChild(newImportJSONBtn, importJSONBtn);
+    newImportJSONBtn.addEventListener('click', async () => {
+      try {
+        const result = await host.connectToLocalJSON();
+        if (result.success) {
+          console.log('JSON imported successfully:', result);
+        } else {
+          console.error('JSON import failed:', result.error);
+        }
+      } catch (error) {
+        console.error('JSON import error:', error);
+      }
+    });
+  }
+
+  // Connect controls
+  const connectBtn = host.shadowRoot?.getElementById('connectButton');
+  const connectDropdown = host.shadowRoot?.getElementById('connectDropdown');
+  if (connectBtn && connectDropdown) {
+    const newConnectBtn = connectBtn.cloneNode(true);
+    connectBtn.parentNode?.replaceChild(newConnectBtn, connectBtn);
+
+    // Toggle dropdown on button click
+    newConnectBtn.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      connectDropdown.classList.toggle('show');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', e => {
+      if (
+        !connectDropdown.contains(e.target as Node) &&
+        !newConnectBtn.contains(e.target as Node)
+      ) {
+        connectDropdown.classList.remove('show');
+      }
+    });
+
+    // Handle file import options
+    const connectOptions = connectDropdown.querySelectorAll('.connect-option');
+    connectOptions.forEach(option => {
+      const newOption = option.cloneNode(true);
+      option.parentNode?.replaceChild(newOption, option);
+      newOption.addEventListener('click', async e => {
+        e.preventDefault();
+        const fileType = (newOption as HTMLElement).getAttribute(
+          'data-file-type'
+        );
+        connectDropdown.classList.remove('show');
+
+        try {
+          let result;
+          switch (fileType) {
+            case 'csv':
+              result = await host.connectToLocalCSV({
+                csv: {
+                  delimiter: ',',
+                  hasHeader: true,
+                  skipEmptyLines: true,
+                  trimValues: true,
+                },
+                maxFileSize: 50 * 1024 * 1024, // 50MB
+              });
+              break;
+            case 'json':
+              result = await host.connectToLocalJSON({
+                json: {
+                  arrayPath: undefined, // Will auto-detect
+                  validateSchema: true,
+                },
+                maxFileSize: 50 * 1024 * 1024, // 50MB
+              });
+              break;
+            case 'any':
+            default:
+              result = await host.connectToLocalFile({
+                maxFileSize: 50 * 1024 * 1024, // 50MB
+              });
+              break;
+          }
+
+          if (result.success) {
+            console.log('File imported successfully:', result.fileName);
+            // Show success message (you can customize this)
+            const message = `Successfully imported ${result.recordCount} records from ${result.fileName}`;
+            console.log(message);
+          } else {
+            console.error('File import failed:', result.error);
+            alert(`Import failed: ${result.error}`);
+          }
+        } catch (error) {
+          console.error('Error during file import:', error);
+          alert(
+            `Import error: ${error instanceof Error ? error.message : 'Unknown error'}`
+          );
+        }
+      });
+    });
+  }
 }
 
 export function updatePaginationInfo(host: PivotHeadHost) {

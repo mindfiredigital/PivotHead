@@ -107,5 +107,16 @@ export interface PivotOptions {
   [key: string]: unknown;
 }
 
-// The following legacy types are kept for compatibility with prior codegen (commented)
-// export interface FieldFormat { type: 'currency' | 'number' | 'percentage' | 'date'; decimals?: number; locale?: string; currency?: string; }
+// File import interfaces
+export interface FileImportResult {
+  success: boolean;
+  data?: PivotDataRecord[];
+  fileName?: string;
+  recordCount?: number;
+  error?: string;
+}
+
+export interface ImportOptions {
+  maxFileSize?: number;
+  maxRecords?: number;
+}

@@ -59,24 +59,99 @@ function renderFromState(state) {
 }
 
 function renderProcessed(state) {
+  console.log('🔥 Minimal Demo: renderProcessed called with state:', state);
   const store = getCurrentStore();
   const rowField = state.rows?.[0];
   const colField = state.columns?.[0];
   const measures = state.measures || [];
+  console.log('🔥 Minimal Demo: Row field:', rowField);
+  console.log('🔥 Minimal Demo: Column field:', colField);
+  console.log('🔥 Minimal Demo: Measures:', measures);
+  console.log('🔥 Minimal Demo: State processedData:', state.processedData);
+  console.log('🔥 Minimal Demo: State rawData:', state.rawData);
+  console.log('🔥 Minimal Demo: State data:', state.data);
+
   if (!rowField || !colField || measures.length === 0) {
+    console.error(
+      '🔥 Minimal Demo: Missing configuration - rowField:',
+      rowField,
+      'colField:',
+      colField,
+      'measures.length:',
+      measures.length
+    );
     tableEl.innerHTML = '';
     return;
   }
 
   const groups = pivot.getGroupedData();
-  let uniqueCols = [
-    ...new Set(
-      groups.map(g => (g.key ? g.key.split('|')[1] || g.key.split('|')[0] : ''))
-    ),
-  ].filter(Boolean);
+  console.log('🔥 Minimal Demo: Groups data:', groups);
+  console.log('🔥 Minimal Demo: Groups data length:', groups.length);
+  console.log(
+    '🔥 Minimal Demo: Sample group keys:',
+    groups.slice(0, 3).map(g => g.key)
+  );
 
-  if (store.colOrder.length === 0) store.colOrder = [...uniqueCols];
+  // Try multiple methods to get unique column values (matching web-component logic)
+  let uniqueCols = [];
+
+  // Method 1: Try engine's ordered column values
+  if (
+    pivot.getOrderedColumnValues &&
+    typeof pivot.getOrderedColumnValues === 'function'
+  ) {
+    uniqueCols = pivot.getOrderedColumnValues() || [];
+    console.log('🔥 Minimal Demo: Ordered columns from engine:', uniqueCols);
+  }
+
+  // Method 2: Extract from grouped data keys
+  if (uniqueCols.length === 0) {
+    uniqueCols = [
+      ...new Set(
+        groups.map(g => {
+          const keys = g.key ? g.key.split('|') : [];
+          return keys[1] || keys[0]; // Use second key as column, fallback to first
+        })
+      ),
+    ].filter(Boolean);
+    console.log('🔥 Minimal Demo: Columns from grouped data keys:', uniqueCols);
+  }
+
+  // Method 3: Extract directly from engine state data
+  if (uniqueCols.length === 0) {
+    const engineState = pivot.getState();
+    const allData = engineState.rawData || engineState.data || [];
+    if (allData.length > 0 && colField) {
+      uniqueCols = [
+        ...new Set(allData.map(item => item[colField.uniqueName])),
+      ].filter(Boolean);
+      console.log('🔥 Minimal Demo: Columns from raw data:', uniqueCols);
+    }
+  }
+
+  // Final fallback: use synthetic "All" if no columns found
+  if (uniqueCols.length === 0) {
+    uniqueCols = ['All'];
+    console.log('🔥 Minimal Demo: Using fallback "All" column');
+  }
+
+  console.log('🔥 Minimal Demo: Final unique columns:', uniqueCols);
+  console.log('🔥 Minimal Demo: Store colOrder before:', store.colOrder);
+
+  // Reset column order if it doesn't match current columns (e.g., after CSV import)
+  if (
+    store.colOrder.length === 0 ||
+    !store.colOrder.some(c => uniqueCols.includes(c))
+  ) {
+    console.log(
+      '🔥 Minimal Demo: Resetting colOrder because it doesnt match current columns'
+    );
+    store.colOrder = [...uniqueCols];
+  }
   uniqueCols = store.colOrder.filter(c => uniqueCols.includes(c));
+
+  console.log('🔥 Minimal Demo: Store colOrder after:', store.colOrder);
+  console.log('🔥 Minimal Demo: Final filtered unique columns:', uniqueCols);
 
   const processedRows = state.processedData?.rows || [];
   let uniqueRows = [];
@@ -88,13 +163,34 @@ function renderProcessed(state) {
       uniqueRows.push(v);
     }
   });
+
+  // Reset row order if it doesn't match current rows (e.g., after CSV import)
+  if (
+    store.rowOrder.length > 0 &&
+    !store.rowOrder.some(r => uniqueRows.includes(r))
+  ) {
+    console.log(
+      '🔥 Minimal Demo: Resetting rowOrder because it doesnt match current rows'
+    );
+    store.rowOrder = [];
+  }
+
   if (store.rowOrder.length)
     uniqueRows = store.rowOrder.filter(v => uniqueRows.includes(v));
 
   // Build header with grouped category columns and measure sub-columns (no stacked cells)
+  console.log(
+    '🔥 Minimal Demo: Building table headers for columns:',
+    uniqueCols
+  );
+  console.log(
+    '🔥 Minimal Demo: Each column will have colspan:',
+    measures.length
+  );
   let html = '<thead>';
   html += `<tr class="groups"><th class="draggable" data-drag="row-header">${rowField.caption} / ${colField.caption}</th>`;
   uniqueCols.forEach((c, i) => {
+    console.log(`🔥 Minimal Demo: Adding column header: ${c} (index: ${i})`);
     html += `<th class="draggable" draggable="true" data-type="col" data-index="${i}" colspan="${measures.length}">${c}</th>`;
   });
   html += '</tr>';
@@ -178,7 +274,22 @@ function renderRaw() {
     typeof pivot.getData === 'function'
       ? pivot.getData() || []
       : pivot.getState?.().rawData || [];
-  const keys = rows.length ? Object.keys(rows[0]) : [];
+
+  // Filter out synthetic fields added by the engine (like __all__, __all_row__, __all_col__)
+  const allKeys = rows.length ? Object.keys(rows[0]) : [];
+  const keys = allKeys.filter(key => {
+    // Remove synthetic fields that the engine adds for internal processing
+    return (
+      !key.startsWith('__') &&
+      !key.endsWith('__') &&
+      !key.includes('_all_') &&
+      key !== 'All' &&
+      !key.startsWith('synthetic_')
+    );
+  });
+
+  console.log('🔥 Minimal Demo: All raw data keys:', allKeys);
+  console.log('🔥 Minimal Demo: Filtered keys (removing synthetic):', keys);
 
   if (store.colOrder.length === 0) store.colOrder = [...keys];
   const colOrder = store.colOrder.filter(k => keys.includes(k));
@@ -337,6 +448,93 @@ function wireToolbar() {
       console.log('Format functionality not available');
     }
   };
+
+  // Import CSV functionality - fully dependent on web-component -> core
+  document.getElementById('importCSV').onclick = async () => {
+    try {
+      console.log(
+        '🔥 Minimal Demo: Importing CSV via web-component -> core...'
+      );
+      const result = await pivot.connectToLocalCSV();
+      console.log('🔥 Minimal Demo: CSV import result:', result);
+      if (result.success) {
+        console.log('CSV imported successfully:', result);
+        // Wait a moment for the engine to process the data, then trigger refresh
+        setTimeout(() => {
+          try {
+            const newState = pivot.getState();
+            console.log('🔥 Minimal Demo: State after CSV import:', newState);
+
+            // Clear UI state for fresh import
+            console.log(
+              '🔥 Minimal Demo: Clearing UI state after CSV import...'
+            );
+            ui.processed.colOrder = [];
+            ui.processed.rowOrder = [];
+            ui.processed.sort = { field: null, dir: 'asc' };
+            ui.raw.colOrder = []; // This will force re-detection of columns, filtering out synthetic fields
+            ui.raw.rowOrder = [];
+            ui.raw.sort = { field: null, dir: 'asc' };
+
+            // Force refresh of the pivot component to ensure data is processed
+            if (pivot.refresh && typeof pivot.refresh === 'function') {
+              console.log('🔥 Minimal Demo: Calling pivot.refresh()...');
+              pivot.refresh();
+            }
+
+            ensureFilterFieldOptions(newState);
+            ui.mode = 'processed'; // Ensure we're in processed mode
+            renderFromState(newState);
+
+            // Also try to trigger another render after a longer delay
+            setTimeout(() => {
+              try {
+                const finalState = pivot.getState();
+                console.log('🔥 Minimal Demo: Final state check:', finalState);
+                renderFromState(finalState);
+              } catch (e) {
+                console.error('Final state check error:', e);
+              }
+            }, 500);
+          } catch (error) {
+            console.error('Error refreshing UI after CSV import:', error);
+          }
+        }, 200);
+      } else {
+        console.error('CSV import failed:', result.error);
+        alert('CSV import failed: ' + (result.error || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('CSV import error:', error);
+      alert('CSV import error: ' + error.message);
+    }
+  };
+
+  // Import JSON functionality - fully dependent on web-component -> core
+  document.getElementById('importJSON').onclick = async () => {
+    try {
+      console.log(
+        '🔥 Minimal Demo: Importing JSON via web-component -> core...'
+      );
+      const result = await pivot.connectToLocalJSON();
+      if (result.success) {
+        console.log('JSON imported successfully:', result);
+        // After import, refresh the UI to show new data
+        try {
+          ensureFilterFieldOptions(pivot.getState());
+          renderFromState(pivot.getState());
+        } catch (error) {
+          console.error('Error refreshing UI after JSON import:', error);
+        }
+      } else {
+        console.error('JSON import failed:', result.error);
+        alert('JSON import failed: ' + (result.error || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('JSON import error:', error);
+      alert('JSON import error: ' + error.message);
+    }
+  };
 }
 
 function wireTableInteractions() {
@@ -474,8 +672,13 @@ function wireTableInteractions() {
       if (ui.dnd.type !== 'col') return;
       const store = getCurrentStore();
       const arr = store.colOrder;
-      const [moved] = arr.splice(ui.dnd.fromIndex, 1);
-      arr.splice(toIndex, 0, moved);
+      // Swap logic: exchange the two columns
+      if (ui.dnd.fromIndex !== toIndex) {
+        [arr[ui.dnd.fromIndex], arr[toIndex]] = [
+          arr[toIndex],
+          arr[ui.dnd.fromIndex],
+        ];
+      }
       try {
         renderFromState(pivot.getState());
       } catch {}
@@ -505,10 +708,20 @@ function wireTableInteractions() {
       if (ui.dnd.type !== 'row') return;
       if (ui.mode === 'raw') {
         const toIndex = Number(tr.dataset.globalIndex);
+        // If you want to use a web component API for row swap, call it here
         if (typeof pivot.swapRows === 'function') {
           try {
             pivot.swapRows(ui.dnd.fromIndex, toIndex);
           } catch {}
+        } else {
+          // Fallback: swap in local rowOrder if available
+          const store = getCurrentStore();
+          if (store.rowOrder.length > 0 && ui.dnd.fromIndex !== toIndex) {
+            [store.rowOrder[ui.dnd.fromIndex], store.rowOrder[toIndex]] = [
+              store.rowOrder[toIndex],
+              store.rowOrder[ui.dnd.fromIndex],
+            ];
+          }
         }
         try {
           renderFromState(pivot.getState());
@@ -520,8 +733,13 @@ function wireTableInteractions() {
           tableEl.querySelectorAll('tbody tr td:first-child')
         ).map(td => td.textContent);
         store.rowOrder = labels;
-        const [moved] = store.rowOrder.splice(ui.dnd.fromIndex, 1);
-        store.rowOrder.splice(toIndex, 0, moved);
+        // Swap logic for processed mode
+        if (ui.dnd.fromIndex !== toIndex) {
+          [store.rowOrder[ui.dnd.fromIndex], store.rowOrder[toIndex]] = [
+            store.rowOrder[toIndex],
+            store.rowOrder[ui.dnd.fromIndex],
+          ];
+        }
         try {
           renderFromState(pivot.getState());
         } catch {}

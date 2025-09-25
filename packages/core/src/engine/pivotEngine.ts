@@ -137,10 +137,39 @@ export class PivotEngine<T extends Record<string, any>> {
     // Only apply when explicitly enabled (e.g. by ConnectService after CSV/JSON import)
     if (!this.autoAllColumnEnabled) return;
 
+    // --- NEW LOGIC: Check if raw data already has at least two non-numeric fields ---
+    const data = this.state.rawData;
+    if (Array.isArray(data) && data.length > 0) {
+      // Get all field names from the first row
+      const fieldNames = Object.keys(data[0] || {});
+      // Count non-numeric fields (fields where at least one value is not a number)
+      const nonNumericFields: string[] = [];
+      for (const field of fieldNames) {
+        // Ignore synthetic fields
+        if (field.startsWith('__all')) continue;
+        // If any value in the column is not a number, treat as non-numeric
+        if (
+          data.some(
+            row =>
+              typeof row[field] !== 'number' &&
+              row[field] !== undefined &&
+              row[field] !== null
+          )
+        ) {
+          nonNumericFields.push(field);
+        }
+      }
+      if (nonNumericFields.length >= 2) {
+        // Already have at least two non-numeric fields, do NOT add synthetic columns
+        return;
+      }
+    }
+    // --- END NEW LOGIC ---
+
     const needsAllColumn =
       !this.state.columns || this.state.columns.length === 0;
     const hasAllColumn = !!this.state.columns?.some(
-      c => c.uniqueName === '__all__'
+      c => c.uniqueName === '__all__' || c.uniqueName === '__all_col__'
     );
 
     if (needsAllColumn) {
@@ -154,9 +183,19 @@ export class PivotEngine<T extends Record<string, any>> {
         const source = Array.isArray(arr) ? arr : [];
         let changed = false;
         const out = source.map(row => {
-          if (row && (row as any).__all__ === undefined) {
+          const hasAllField =
+            row &&
+            ((row as any).__all__ !== undefined ||
+              (row as any).__all_col__ !== undefined ||
+              (row as any).__all_row__ !== undefined);
+          if (!hasAllField) {
             changed = true;
-            return { ...(row as any), __all__: 'All' } as T;
+            return {
+              ...(row as any),
+              __all__: 'All',
+              __all_row__: 'All',
+              __all_col__: 'All',
+            } as T;
           }
           return row;
         });
@@ -2225,8 +2264,38 @@ export class PivotEngine<T extends Record<string, any>> {
       ),
     ];
 
+    // Create groupConfig automatically when rows and columns are set
+    // This is essential for the web component to get grouped data
+    const rowFields = (this.state.rows || []).map(r => r.uniqueName);
+    const columnFields = (this.state.columns || []).map(c => c.uniqueName);
+
+    // Always create groupConfig when we have both rows and columns (including synthetic fields)
+    if (rowFields.length > 0 && columnFields.length > 0) {
+      this.state.groupConfig = {
+        rowFields,
+        columnFields,
+        grouper: (item: any, fields: string[]) => {
+          // Handle synthetic fields and missing properties gracefully
+          return fields
+            .map(f => {
+              if (f === 'All') return 'All';
+              const value = item[f];
+              return value !== undefined && value !== null
+                ? String(value)
+                : 'Unknown';
+            })
+            .join('|');
+        },
+      };
+    }
+
     // Guarantee a single synthetic column when none provided (only if enabled)
     this.ensureSyntheticAllColumn();
+
+    // Apply grouping if we now have a groupConfig
+    if (this.state.groupConfig) {
+      this.applyGrouping();
+    }
 
     // Recompute
     this.state.processedData = this.generateProcessedDataForDisplay();
@@ -2244,8 +2313,37 @@ export class PivotEngine<T extends Record<string, any>> {
     this.state.rows = rows || [];
     this.state.columns = columns || [];
 
+    // Create groupConfig automatically when rows and columns are set
+    const rowFields = (this.state.rows || []).map(r => r.uniqueName);
+    const columnFields = (this.state.columns || []).map(c => c.uniqueName);
+
+    // Always create groupConfig when we have both rows and columns (including synthetic fields)
+    if (rowFields.length > 0 && columnFields.length > 0) {
+      this.state.groupConfig = {
+        rowFields,
+        columnFields,
+        grouper: (item: any, fields: string[]) => {
+          // Handle synthetic fields and missing properties gracefully
+          return fields
+            .map(f => {
+              if (f === 'All') return 'All';
+              const value = item[f];
+              return value !== undefined && value !== null
+                ? String(value)
+                : 'Unknown';
+            })
+            .join('|');
+        },
+      };
+    }
+
     // Guarantee a single synthetic column when none provided (only if enabled)
     this.ensureSyntheticAllColumn();
+
+    // Apply grouping if we now have a groupConfig
+    if (this.state.groupConfig) {
+      this.applyGrouping();
+    }
 
     this.state.processedData = this.generateProcessedDataForDisplay();
     this.updateAggregates();

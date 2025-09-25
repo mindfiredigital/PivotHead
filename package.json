@@ -44,7 +44,17 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "changeset:autogenerate": "node .github/changeset-autogenerate.mjs",
-    "release": "changeset publish"
+    "release": "changeset publish",
+    "e2e": "pnpm --filter pivothead-e2e run test:react-demo",
+    "e2e:open": "pnpm --filter pivothead-e2e run test:open:react-demo",
+    "e2e:simple-js-demo": "pnpm --filter pivothead-e2e run test:simple-js-demo",
+    "e2e:open:simple-js-demo": "pnpm --filter pivothead-e2e run test:open:simple-js-demo",
+    "e2e:pivothead-default": "pnpm --filter pivothead-e2e run test:pivothead-default",
+    "e2e:pivothead-minimal": "pnpm --filter pivothead-e2e run test:pivothead-minimal",
+    "e2e:open:pivothead-minimal": "pnpm --filter pivothead-e2e run test:open:pivothead-minimal",
+    "e2e:pivothead-none": "pnpm --filter pivothead-e2e run test:pivothead-none",
+    "e2e:open:pivothead-none": "pnpm --filter pivothead-e2e run test:open:pivothead-none",
+    "e2e:all": "pnpm --filter pivothead-e2e run test:react-demo && pnpm --filter pivothead-e2e run test:simple-js-demo && pnpm --filter pivothead-e2e run test:pivothead-default && pnpm --filter pivothead-e2e run test:pivothead-minimal && pnpm --filter pivothead-e2e run test:pivothead-none"
   },
   "devDependencies": {
     "@changesets/changelog-github": "^0.5.1",

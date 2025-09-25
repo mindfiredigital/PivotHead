@@ -22,17 +22,25 @@
   >
     <div slot="header" class="grid-header">
       <div class="toolbar">
-        <label>Field</label>
-        <select id="filterField"></select>
-        <select id="filterOperator">
-          <option value="equals">Equals</option>
-          <option value="contains">Contains</option>
-          <option value="greaterThan">Greater Than</option>
-          <option value="lessThan">Less Than</option>
-        </select>
-        <input type="text" id="filterValue" placeholder="Value" />
-        <button id="applyFilter">Apply</button>
-        <button id="resetFilter">Reset</button>
+        <div class="import-section">
+          <label>📁 Data Import:</label>
+          <button id="importCSV">Import CSV</button>
+          <button id="importJSON">Import JSON</button>
+        </div>
+        
+        <div class="filter-section">
+          <label>Field</label>
+          <select id="filterField"></select>
+          <select id="filterOperator">
+            <option value="equals">Equals</option>
+            <option value="contains">Contains</option>
+            <option value="greaterThan">Greater Than</option>
+            <option value="lessThan">Less Than</option>
+          </select>
+          <input type="text" id="filterValue" placeholder="Value" />
+          <button id="applyFilter">Apply</button>
+          <button id="resetFilter">Reset</button>
+        </div>
 
         <span style="margin-left:auto"></span>
         <label>Page Size</label>

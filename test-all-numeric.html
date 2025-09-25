@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All-Numeric CSV Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-container { margin: 20px 0; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        pivot-head { display: block; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1>All-Numeric CSV Import Test</h1>
+    
+    <div class="test-container">
+        <h3>Expected Behavior:</h3>
+        <ul>
+            <li>✅ Single "All" row (not Row 1, Row 2, etc.)</li>
+            <li>✅ Single "All" column</li>
+            <li>✅ Three measures: Sum of 2004, Sum of 2005, Sum of 2006</li>
+            <li>✅ Aggregated totals displayed in one table cell per measure</li>
+        </ul>
+    </div>
+
+    <div class="test-container">
+        <h3>Test Data (all-numeric CSV):</h3>
+        <pre>2004,2005,2006
+6706,6976,7228
+6761,6889,7041
+3335,3363,3503
+1522,1514,1536
+1403,1395,1461</pre>
+    </div>
+
+    <div class="test-container">
+        <button onclick="testAllNumericCSV()">Test All-Numeric CSV Import</button>
+        <button onclick="testManualConfiguration()">Test Manual Configuration</button>
+        <div id="test-results"></div>
+    </div>
+
+    <div class="test-container">
+        <h3>PivotHead Component:</h3>
+        <pivot-head 
+            id="pivot-table"
+            ui-mode="default"
+            style="height: 400px; border: 1px solid #ccc;">
+        </pivot-head>
+    </div>
+
+    <script type="module">
+        import '../packages/web-component/dist/pivot-head.mjs';
+
+        const pivotElement = document.getElementById('pivot-table');
+        const resultsDiv = document.getElementById('test-results');
+
+        function showResult(message, isSuccess = true) {
+            const div = document.createElement('div');
+            div.className = `test-result ${isSuccess ? 'success' : 'error'}`;
+            div.textContent = message;
+            resultsDiv.appendChild(div);
+        }
+
+        window.testAllNumericCSV = async function() {
+            resultsDiv.innerHTML = '';
+            showResult('🧪 Starting all-numeric CSV test...');
+
+            const csvData = `2004,2005,2006
+6706,6976,7228
+6761,6889,7041
+3335,3363,3503
+1522,1514,1536
+1403,1395,1461`;
+
+            try {
+                // Create a mock file
+                const file = new File([csvData], 'test-all-numeric.csv', { type: 'text/csv' });
+                
+                // Test the CSV import directly
+                const result = await pivotElement.processCSVFile(file, {});
+                
+                if (result.success) {
+                    showResult(`✅ CSV parsed successfully: ${result.recordCount} records`);
+                    
+                    // Check the configuration
+                    const options = pivotElement._options;
+                    console.log('📊 Current options:', options);
+                    
+                    if (options.rows && options.rows[0]?.uniqueName === '__all_row__') {
+                        showResult('✅ Row dimension correctly set to "All"');
+                    } else {
+                        showResult('❌ Row dimension not configured correctly', false);
+                    }
+                    
+                    if (options.columns && options.columns[0]?.uniqueName === '__all_col__') {
+                        showResult('✅ Column dimension correctly set to "All"');
+                    } else {
+                        showResult('❌ Column dimension not configured correctly', false);
+                    }
+                    
+                    if (options.measures && options.measures.length === 3) {
+                        showResult(`✅ Measures configured: ${options.measures.map(m => m.caption).join(', ')}`);
+                    } else {
+                        showResult('❌ Measures not configured correctly', false);
+                    }
+                    
+                } else {
+                    showResult(`❌ CSV parsing failed: ${result.error}`, false);
+                }
+            } catch (error) {
+                showResult(`❌ Test error: ${error.message}`, false);
+            }
+        };
+
+        window.testManualConfiguration = function() {
+            resultsDiv.innerHTML = '';
+            showResult('🔧 Testing manual configuration...');
+
+            const testData = [
+                { '__all_row__': 'All', '__all_col__': 'All', '2004': 19727, '2005': 20137, '2006': 20769 }
+            ];
+
+            try {
+                pivotElement.data = testData;
+                pivotElement.options = {
+                    rows: [{ uniqueName: '__all_row__', caption: 'All' }],
+                    columns: [{ uniqueName: '__all_col__', caption: 'All' }],
+                    measures: [
+                        { uniqueName: '2004', caption: 'Sum of 2004', aggregation: 'sum' },
+                        { uniqueName: '2005', caption: 'Sum of 2005', aggregation: 'sum' },
+                        { uniqueName: '2006', caption: 'Sum of 2006', aggregation: 'sum' }
+                    ]
+                };
+                
+                showResult('✅ Manual configuration applied successfully');
+                showResult('📋 Check the pivot table above for the expected "All" row/column structure');
+                
+            } catch (error) {
+                showResult(`❌ Manual configuration failed: ${error.message}`, false);
+            }
+        };
+
+        // Auto-test on load
+        setTimeout(() => {
+            console.log('🎯 Element ready, running auto-test');
+            testAllNumericCSV();
+        }, 1000);
+    </script>
+</body>
+</html>

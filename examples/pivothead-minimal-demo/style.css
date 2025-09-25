@@ -16,6 +16,31 @@ body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; marg
 .toolbar button { padding: 6px 10px; border:1px solid var(--border); background:#fff; border-radius:6px; cursor:pointer; }
 .toolbar button:hover { background:#f8fafc; }
 
+/* Import section styles */
+.import-section { 
+  display: flex; 
+  gap: 8px; 
+  align-items: center; 
+  padding: 8px 12px; 
+  background: #f8f9fa; 
+  border-radius: 6px; 
+  border: 1px solid var(--border); 
+}
+.import-section button {
+  background: #4CAF50;
+  color: white;
+  border: none;
+}
+.import-section button:hover {
+  background: #45a049;
+}
+
+.filter-section {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
 table { width: 100%; border-collapse: separate; border-spacing: 0; }
 thead tr:first-child th { background: var(--header-1); border-bottom: 1px solid var(--border); }
 thead tr.measures th { background: var(--header-2); border-bottom: 2px solid var(--border); }
