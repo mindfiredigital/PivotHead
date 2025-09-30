@@ -20,14 +20,14 @@ export default defineConfig({
     resolve(),
     typescript({
       tsconfig: './tsconfig.json',
-      // declaration: true,
-      // declarationDir: './dist',
-      // outDir: './dist',
-      // compilerOptions: {
-      //   rootDir: './src',
-      //   declarationDir: './dist',
-      //   outDir: './dist'
-      // },
+      declaration: true,
+      declarationDir: './dist',
+      outDir: './dist',
+      compilerOptions: {
+        rootDir: './src',
+        declarationDir: './dist',
+        outDir: './dist'
+      },
       exclude: ['node_modules/**', 'dist/**']
     })
   ],

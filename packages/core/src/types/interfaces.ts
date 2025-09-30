@@ -217,3 +217,13 @@ export interface CellPosition {
   col: number;
   field?: string;
 }
+
+export interface LayoutSelection {
+  rows: string[]; // field names
+  columns: string[]; // field names
+  values: Array<{
+    field: string;
+    aggregation?: AggregationType;
+    caption?: string;
+  }>;
+}
