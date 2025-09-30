@@ -6,12 +6,12 @@
   "description": "Web Component implementation of PivotHead for use in any JavaScript framework",
   "main": "dist/pivot-head.js",
   "module": "dist/pivot-head.mjs",
-  "types": "dist/pivot-head.d.ts",
+  "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "rimraf dist && rollup -c",
+    "build": "rimraf dist && rollup -c && tsc --emitDeclarationOnly",
     "dev": "rollup -c -w",
     "clean": "rimraf dist",
     "test": "vitest run",

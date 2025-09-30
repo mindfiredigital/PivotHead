@@ -4,8 +4,5 @@
   "lib": {
     "entryFile": "src/public-api.ts"
   },
-  "allowedNonPeerDependencies": [
-    "@mindfiredigital/pivothead",
-    "@mindfiredigital/pivothead-web-component"
-  ]
+  "allowedNonPeerDependencies": ["@mindfiredigital/pivothead-web-component"]
 }
