@@ -38,10 +38,10 @@ export interface FormatOptions {
 
 // Enhanced interface extending PivotEngine with additional methods (superset)
 // Supports both legacy and current method signatures used across the web-component
-export interface EnhancedPivotEngine<T extends Record<string, unknown>>
-  extends PivotEngine<T> {
-  // state helpers
-  state: PivotTableState<T>;
+export interface EnhancedPivotEngine<T extends Record<string, unknown>> {
+  // // state helpers
+  // state: PivotTableState<T>;
+  getState(): PivotTableState<T>;
   subscribe(fn: (state: PivotTableState<T>) => void): () => void;
 
   setLayout(

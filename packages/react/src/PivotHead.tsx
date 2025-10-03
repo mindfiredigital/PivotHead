@@ -165,6 +165,10 @@ export const PivotHead = forwardRef<PivotHeadRef, PivotHeadProps>(function Pivot
       exportToPDF: (n?: string) => elRef.current?.exportToPDF?.(n),
       exportToExcel: (n?: string) => elRef.current?.exportToExcel?.(n),
       openPrintDialog: () => elRef.current?.openPrintDialog?.(),
+
+     
+      loadFromFile: (file: File) => elRef.current?.loadFromFile?.(file),
+      loadFromUrl: (url: string) => elRef.current?.loadFromUrl?.(url),
     },
   }), []);
 

@@ -16,8 +16,7 @@ export class PivotExportService {
   public static convertToHtml<T extends Record<string, any>>(
     state: PivotTableState<T>
   ): string {
-    const { rows, columns, selectedMeasures, formatting, groups, rawData } =
-      state;
+    const { rows, columns, selectedMeasures, formatting, rawData } = state;
 
     if (rawData.length === 0) {
       return '<div>No data to display</div>';
