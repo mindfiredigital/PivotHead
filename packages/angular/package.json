@@ -2,6 +2,11 @@
   "name": "@mindfiredigital/pivothead-angular",
   "version": "0.1.0",
   "private": true,
+  "files": [
+    "fesm2022",
+    "*.mjs",
+    "*.d.ts"
+  ],
   "peerDependencies": {
     "@angular/common": "^17.3.0",
     "@angular/core": "^17.3.0"

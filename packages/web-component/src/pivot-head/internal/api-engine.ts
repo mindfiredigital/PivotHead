@@ -129,7 +129,7 @@ export function updateFieldFormatting(
 }
 
 export function getAvailableFields(host: PivotHeadHost): FieldInfo[] {
-  return FieldService.getAvailableFields(host.engine);
+  return FieldService.getAvailableFields(host.engine as any);
 }
 
 export function getSupportedAggregations(): AggregationType[] {
@@ -141,7 +141,7 @@ export function setMeasureAggregation(
   field: string,
   aggregation: AggregationType
 ): void {
-  FieldService.setMeasureAggregation(host.engine, field, aggregation);
+  FieldService.setMeasureAggregation(host.engine as any, field, aggregation);
 }
 
 export function buildLayout(

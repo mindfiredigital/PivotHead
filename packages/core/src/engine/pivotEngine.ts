@@ -176,6 +176,10 @@ export class PivotEngine<T extends Record<string, any>> {
     this._emit(); // Notify subscribers after state change
   }
 
+  public getDataHandlingMode(): DataHandlingMode {
+    return this.state.dataHandlingMode;
+  }
+
   // Allow external callers (e.g., ConnectService) to enable/disable synthetic column mode
   public setAutoAllColumn(enabled: boolean): void {
     this.autoAllColumnEnabled = enabled;
