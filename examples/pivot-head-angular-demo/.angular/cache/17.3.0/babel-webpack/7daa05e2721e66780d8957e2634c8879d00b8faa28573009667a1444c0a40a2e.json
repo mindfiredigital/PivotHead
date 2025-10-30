@@ -1,0 +1,55 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nvar _asyncToGenerator = require(\"/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/@babel+runtime@7.24.0/node_modules/@babel/runtime/helpers/asyncToGenerator.js\").default;\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.DocsRenderer = void 0;\nconst core_events_1 = require(\"storybook/internal/core-events\");\nconst preview_api_1 = require(\"storybook/internal/preview-api\");\nconst AbstractRenderer_1 = require(\"./AbstractRenderer\");\nconst StoryUID_1 = require(\"./utils/StoryUID\");\nclass DocsRenderer extends AbstractRenderer_1.AbstractRenderer {\n  render(options) {\n    var _superprop_getRender = () => super.render,\n      _this = this;\n    return _asyncToGenerator(function* () {\n      const channel = preview_api_1.addons.getChannel();\n      /**\n       * Destroy and recreate the PlatformBrowserDynamic of angular For several stories to be rendered\n       * in the same docs we should not destroy angular between each rendering but do it when the\n       * rendered stories are not needed anymore.\n       *\n       * Note for improvement: currently there is one event per story rendered in the doc. But one\n       * event could be enough for the whole docs\n       */\n      channel.once(core_events_1.STORY_CHANGED, /*#__PURE__*/_asyncToGenerator(function* () {\n        yield DocsRenderer.resetApplications();\n      }));\n      /**\n       * Destroy and recreate the PlatformBrowserDynamic of angular when doc re render. Allows to call\n       * ngOnDestroy of angular for previous component\n       */\n      channel.once(core_events_1.DOCS_RENDERED, /*#__PURE__*/_asyncToGenerator(function* () {\n        yield DocsRenderer.resetApplications();\n      }));\n      yield _superprop_getRender().call(_this, {\n        ...options,\n        forced: false\n      });\n    })();\n  }\n  beforeFullRender(domNode) {\n    return _asyncToGenerator(function* () {\n      DocsRenderer.resetApplications(domNode);\n    })();\n  }\n  initAngularRootElement(targetDOMNode, targetSelector) {\n    super.initAngularRootElement(targetDOMNode, targetSelector);\n    targetDOMNode.setAttribute(AbstractRenderer_1.STORY_UID_ATTRIBUTE, (0, StoryUID_1.getNextStoryUID)(targetDOMNode.id));\n  }\n}\nexports.DocsRenderer = DocsRenderer;",
+  "map": {
+    "version": 3,
+    "names": [
+      "_asyncToGenerator",
+      "require",
+      "default",
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "DocsRenderer",
+      "core_events_1",
+      "preview_api_1",
+      "AbstractRenderer_1",
+      "StoryUID_1",
+      "AbstractRenderer",
+      "render",
+      "options",
+      "_superprop_getRender",
+      "_this",
+      "channel",
+      "addons",
+      "getChannel",
+      "once",
+      "STORY_CHANGED",
+      "resetApplications",
+      "DOCS_RENDERED",
+      "call",
+      "forced",
+      "beforeFullRender",
+      "domNode",
+      "initAngularRootElement",
+      "targetDOMNode",
+      "targetSelector",
+      "setAttribute",
+      "STORY_UID_ATTRIBUTE",
+      "getNextStoryUID",
+      "id"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/@storybook+angular@8.6.14_@angular-devkit+architect@0.1703.0_@angular-devkit+build-angular@17_a7aajamgs7bgz2yqzrp63bsev4/node_modules/@storybook/angular/dist/client/angular-beta/DocsRenderer.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.DocsRenderer = void 0;\nconst core_events_1 = require(\"storybook/internal/core-events\");\nconst preview_api_1 = require(\"storybook/internal/preview-api\");\nconst AbstractRenderer_1 = require(\"./AbstractRenderer\");\nconst StoryUID_1 = require(\"./utils/StoryUID\");\nclass DocsRenderer extends AbstractRenderer_1.AbstractRenderer {\n    async render(options) {\n        const channel = preview_api_1.addons.getChannel();\n        /**\n         * Destroy and recreate the PlatformBrowserDynamic of angular For several stories to be rendered\n         * in the same docs we should not destroy angular between each rendering but do it when the\n         * rendered stories are not needed anymore.\n         *\n         * Note for improvement: currently there is one event per story rendered in the doc. But one\n         * event could be enough for the whole docs\n         */\n        channel.once(core_events_1.STORY_CHANGED, async () => {\n            await DocsRenderer.resetApplications();\n        });\n        /**\n         * Destroy and recreate the PlatformBrowserDynamic of angular when doc re render. Allows to call\n         * ngOnDestroy of angular for previous component\n         */\n        channel.once(core_events_1.DOCS_RENDERED, async () => {\n            await DocsRenderer.resetApplications();\n        });\n        await super.render({ ...options, forced: false });\n    }\n    async beforeFullRender(domNode) {\n        DocsRenderer.resetApplications(domNode);\n    }\n    initAngularRootElement(targetDOMNode, targetSelector) {\n        super.initAngularRootElement(targetDOMNode, targetSelector);\n        targetDOMNode.setAttribute(AbstractRenderer_1.STORY_UID_ATTRIBUTE, (0, StoryUID_1.getNextStoryUID)(targetDOMNode.id));\n    }\n}\nexports.DocsRenderer = DocsRenderer;\n"
+    ],
+    "mappings": "AAAA,YAAY;;AAAC,IAAAA,iBAAA,GAAAC,OAAA,uKAAAC,OAAA;AACbC,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,YAAY,GAAG,KAAK,CAAC;AAC7B,MAAMC,aAAa,GAAGP,OAAO,CAAC,gCAAgC,CAAC;AAC/D,MAAMQ,aAAa,GAAGR,OAAO,CAAC,gCAAgC,CAAC;AAC/D,MAAMS,kBAAkB,GAAGT,OAAO,CAAC,oBAAoB,CAAC;AACxD,MAAMU,UAAU,GAAGV,OAAO,CAAC,kBAAkB,CAAC;AAC9C,MAAMM,YAAY,SAASG,kBAAkB,CAACE,gBAAgB,CAAC;EACrDC,MAAMA,CAACC,OAAO,EAAE;IAAA,IAAAC,oBAAA,GAAAA,CAAA,WAAAF,MAAA;MAAAG,KAAA;IAAA,OAAAhB,iBAAA;MAClB,MAAMiB,OAAO,GAAGR,aAAa,CAACS,MAAM,CAACC,UAAU,CAAC,CAAC;MACjD;AACR;AACA;AACA;AACA;AACA;AACA;AACA;MACQF,OAAO,CAACG,IAAI,CAACZ,aAAa,CAACa,aAAa,eAAArB,iBAAA,CAAE,aAAY;QAClD,MAAMO,YAAY,CAACe,iBAAiB,CAAC,CAAC;MAC1C,CAAC,EAAC;MACF;AACR;AACA;AACA;MACQL,OAAO,CAACG,IAAI,CAACZ,aAAa,CAACe,aAAa,eAAAvB,iBAAA,CAAE,aAAY;QAClD,MAAMO,YAAY,CAACe,iBAAiB,CAAC,CAAC;MAC1C,CAAC,EAAC;MACF,MAAMP,oBAAA,GAAAS,IAAA,CAAAR,KAAA,EAAa;QAAE,GAAGF,OAAO;QAAEW,MAAM,EAAE;MAAM,CAAC,CAAC;IAAC;EACtD;EACMC,gBAAgBA,CAACC,OAAO,EAAE;IAAA,OAAA3B,iBAAA;MAC5BO,YAAY,CAACe,iBAAiB,CAACK,OAAO,CAAC;IAAC;EAC5C;EACAC,sBAAsBA,CAACC,aAAa,EAAEC,cAAc,EAAE;IAClD,KAAK,CAACF,sBAAsB,CAACC,aAAa,EAAEC,cAAc,CAAC;IAC3DD,aAAa,CAACE,YAAY,CAACrB,kBAAkB,CAACsB,mBAAmB,EAAE,CAAC,CAAC,EAAErB,UAAU,CAACsB,eAAe,EAAEJ,aAAa,CAACK,EAAE,CAAC,CAAC;EACzH;AACJ;AACA7B,OAAO,CAACE,YAAY,GAAGA,YAAY",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

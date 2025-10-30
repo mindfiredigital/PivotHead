@@ -1,0 +1,42 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.scanInternals = void 0;\nvar OperatorSubscriber_1 = require(\"./OperatorSubscriber\");\nfunction scanInternals(accumulator, seed, hasSeed, emitOnNext, emitBeforeComplete) {\n  return function (source, subscriber) {\n    var hasState = hasSeed;\n    var state = seed;\n    var index = 0;\n    source.subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, function (value) {\n      var i = index++;\n      state = hasState ? accumulator(state, value, i) : (hasState = true, value);\n      emitOnNext && subscriber.next(state);\n    }, emitBeforeComplete && function () {\n      hasState && subscriber.next(state);\n      subscriber.complete();\n    }));\n  };\n}\nexports.scanInternals = scanInternals;\n//# sourceMappingURL=scanInternals.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "scanInternals",
+      "OperatorSubscriber_1",
+      "require",
+      "accumulator",
+      "seed",
+      "hasSeed",
+      "emitOnNext",
+      "emitBeforeComplete",
+      "source",
+      "subscriber",
+      "hasState",
+      "state",
+      "index",
+      "subscribe",
+      "createOperatorSubscriber",
+      "i",
+      "next",
+      "complete"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/operators/scanInternals.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.scanInternals = void 0;\nvar OperatorSubscriber_1 = require(\"./OperatorSubscriber\");\nfunction scanInternals(accumulator, seed, hasSeed, emitOnNext, emitBeforeComplete) {\n    return function (source, subscriber) {\n        var hasState = hasSeed;\n        var state = seed;\n        var index = 0;\n        source.subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, function (value) {\n            var i = index++;\n            state = hasState\n                ?\n                    accumulator(state, value, i)\n                :\n                    ((hasState = true), value);\n            emitOnNext && subscriber.next(state);\n        }, emitBeforeComplete &&\n            (function () {\n                hasState && subscriber.next(state);\n                subscriber.complete();\n            })));\n    };\n}\nexports.scanInternals = scanInternals;\n//# sourceMappingURL=scanInternals.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,aAAa,GAAG,KAAK,CAAC;AAC9B,IAAIC,oBAAoB,GAAGC,OAAO,CAAC,sBAAsB,CAAC;AAC1D,SAASF,aAAaA,CAACG,WAAW,EAAEC,IAAI,EAAEC,OAAO,EAAEC,UAAU,EAAEC,kBAAkB,EAAE;EAC/E,OAAO,UAAUC,MAAM,EAAEC,UAAU,EAAE;IACjC,IAAIC,QAAQ,GAAGL,OAAO;IACtB,IAAIM,KAAK,GAAGP,IAAI;IAChB,IAAIQ,KAAK,GAAG,CAAC;IACbJ,MAAM,CAACK,SAAS,CAACZ,oBAAoB,CAACa,wBAAwB,CAACL,UAAU,EAAE,UAAUV,KAAK,EAAE;MACxF,IAAIgB,CAAC,GAAGH,KAAK,EAAE;MACfD,KAAK,GAAGD,QAAQ,GAERP,WAAW,CAACQ,KAAK,EAAEZ,KAAK,EAAEgB,CAAC,CAAC,IAE1BL,QAAQ,GAAG,IAAI,EAAGX,KAAK,CAAC;MAClCO,UAAU,IAAIG,UAAU,CAACO,IAAI,CAACL,KAAK,CAAC;IACxC,CAAC,EAAEJ,kBAAkB,IAChB,YAAY;MACTG,QAAQ,IAAID,UAAU,CAACO,IAAI,CAACL,KAAK,CAAC;MAClCF,UAAU,CAACQ,QAAQ,CAAC,CAAC;IACzB,CAAE,CAAC,CAAC;EACZ,CAAC;AACL;AACAnB,OAAO,CAACE,aAAa,GAAGA,aAAa;AACrC",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

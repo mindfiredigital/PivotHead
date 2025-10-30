@@ -1,0 +1,50 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.storyPropsProvider = exports.STORY_PROPS = void 0;\nconst core_1 = require(\"@angular/core\");\nconst rxjs_1 = require(\"rxjs\");\nexports.STORY_PROPS = new core_1.InjectionToken('STORY_PROPS');\nconst storyPropsProvider = storyProps$ => ({\n  provide: exports.STORY_PROPS,\n  useFactory: storyDataFactory(storyProps$.asObservable()),\n  deps: [core_1.NgZone]\n});\nexports.storyPropsProvider = storyPropsProvider;\nfunction storyDataFactory(data) {\n  return ngZone => new rxjs_1.Observable(subscriber => {\n    const sub = data.subscribe(v => {\n      ngZone.run(() => subscriber.next(v));\n    }, err => {\n      ngZone.run(() => subscriber.error(err));\n    }, () => {\n      ngZone.run(() => subscriber.complete());\n    });\n    return () => {\n      sub.unsubscribe();\n    };\n  });\n}",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "storyPropsProvider",
+      "STORY_PROPS",
+      "core_1",
+      "require",
+      "rxjs_1",
+      "InjectionToken",
+      "storyProps$",
+      "provide",
+      "useFactory",
+      "storyDataFactory",
+      "asObservable",
+      "deps",
+      "NgZone",
+      "data",
+      "ngZone",
+      "Observable",
+      "subscriber",
+      "sub",
+      "subscribe",
+      "v",
+      "run",
+      "next",
+      "err",
+      "error",
+      "complete",
+      "unsubscribe"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/@storybook+angular@8.6.14_@angular-devkit+architect@0.1703.0_@angular-devkit+build-angular@17_a7aajamgs7bgz2yqzrp63bsev4/node_modules/@storybook/angular/dist/client/angular-beta/StorybookProvider.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.storyPropsProvider = exports.STORY_PROPS = void 0;\nconst core_1 = require(\"@angular/core\");\nconst rxjs_1 = require(\"rxjs\");\nexports.STORY_PROPS = new core_1.InjectionToken('STORY_PROPS');\nconst storyPropsProvider = (storyProps$) => ({\n    provide: exports.STORY_PROPS,\n    useFactory: storyDataFactory(storyProps$.asObservable()),\n    deps: [core_1.NgZone],\n});\nexports.storyPropsProvider = storyPropsProvider;\nfunction storyDataFactory(data) {\n    return (ngZone) => new rxjs_1.Observable((subscriber) => {\n        const sub = data.subscribe((v) => {\n            ngZone.run(() => subscriber.next(v));\n        }, (err) => {\n            ngZone.run(() => subscriber.error(err));\n        }, () => {\n            ngZone.run(() => subscriber.complete());\n        });\n        return () => {\n            sub.unsubscribe();\n        };\n    });\n}\n"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,kBAAkB,GAAGF,OAAO,CAACG,WAAW,GAAG,KAAK,CAAC;AACzD,MAAMC,MAAM,GAAGC,OAAO,CAAC,eAAe,CAAC;AACvC,MAAMC,MAAM,GAAGD,OAAO,CAAC,MAAM,CAAC;AAC9BL,OAAO,CAACG,WAAW,GAAG,IAAIC,MAAM,CAACG,cAAc,CAAC,aAAa,CAAC;AAC9D,MAAML,kBAAkB,GAAIM,WAAW,KAAM;EACzCC,OAAO,EAAET,OAAO,CAACG,WAAW;EAC5BO,UAAU,EAAEC,gBAAgB,CAACH,WAAW,CAACI,YAAY,CAAC,CAAC,CAAC;EACxDC,IAAI,EAAE,CAACT,MAAM,CAACU,MAAM;AACxB,CAAC,CAAC;AACFd,OAAO,CAACE,kBAAkB,GAAGA,kBAAkB;AAC/C,SAASS,gBAAgBA,CAACI,IAAI,EAAE;EAC5B,OAAQC,MAAM,IAAK,IAAIV,MAAM,CAACW,UAAU,CAAEC,UAAU,IAAK;IACrD,MAAMC,GAAG,GAAGJ,IAAI,CAACK,SAAS,CAAEC,CAAC,IAAK;MAC9BL,MAAM,CAACM,GAAG,CAAC,MAAMJ,UAAU,CAACK,IAAI,CAACF,CAAC,CAAC,CAAC;IACxC,CAAC,EAAGG,GAAG,IAAK;MACRR,MAAM,CAACM,GAAG,CAAC,MAAMJ,UAAU,CAACO,KAAK,CAACD,GAAG,CAAC,CAAC;IAC3C,CAAC,EAAE,MAAM;MACLR,MAAM,CAACM,GAAG,CAAC,MAAMJ,UAAU,CAACQ,QAAQ,CAAC,CAAC,CAAC;IAC3C,CAAC,CAAC;IACF,OAAO,MAAM;MACTP,GAAG,CAACQ,WAAW,CAAC,CAAC;IACrB,CAAC;EACL,CAAC,CAAC;AACN",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

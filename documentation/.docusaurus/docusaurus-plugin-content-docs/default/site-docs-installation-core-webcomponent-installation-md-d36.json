@@ -1,0 +1,15 @@
+{
+  "id": "installation/core-webcomponent-installation",
+  "title": "core-webcomponent-installation",
+  "description": "abc",
+  "source": "@site/docs/installation/core-webcomponent-installation.md",
+  "sourceDirName": "installation",
+  "slug": "/installation/core-webcomponent-installation",
+  "permalink": "/PivotHead/docs/installation/core-webcomponent-installation",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/installation/core-webcomponent-installation.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {}
+}

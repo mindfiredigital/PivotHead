@@ -1,0 +1,48 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.window = void 0;\nvar Subject_1 = require(\"../Subject\");\nvar lift_1 = require(\"../util/lift\");\nvar OperatorSubscriber_1 = require(\"./OperatorSubscriber\");\nvar noop_1 = require(\"../util/noop\");\nvar innerFrom_1 = require(\"../observable/innerFrom\");\nfunction window(windowBoundaries) {\n  return lift_1.operate(function (source, subscriber) {\n    var windowSubject = new Subject_1.Subject();\n    subscriber.next(windowSubject.asObservable());\n    var errorHandler = function (err) {\n      windowSubject.error(err);\n      subscriber.error(err);\n    };\n    source.subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, function (value) {\n      return windowSubject === null || windowSubject === void 0 ? void 0 : windowSubject.next(value);\n    }, function () {\n      windowSubject.complete();\n      subscriber.complete();\n    }, errorHandler));\n    innerFrom_1.innerFrom(windowBoundaries).subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, function () {\n      windowSubject.complete();\n      subscriber.next(windowSubject = new Subject_1.Subject());\n    }, noop_1.noop, errorHandler));\n    return function () {\n      windowSubject === null || windowSubject === void 0 ? void 0 : windowSubject.unsubscribe();\n      windowSubject = null;\n    };\n  });\n}\nexports.window = window;\n//# sourceMappingURL=window.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "window",
+      "Subject_1",
+      "require",
+      "lift_1",
+      "OperatorSubscriber_1",
+      "noop_1",
+      "innerFrom_1",
+      "windowBoundaries",
+      "operate",
+      "source",
+      "subscriber",
+      "windowSubject",
+      "Subject",
+      "next",
+      "asObservable",
+      "errorHandler",
+      "err",
+      "error",
+      "subscribe",
+      "createOperatorSubscriber",
+      "complete",
+      "innerFrom",
+      "noop",
+      "unsubscribe"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/operators/window.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.window = void 0;\nvar Subject_1 = require(\"../Subject\");\nvar lift_1 = require(\"../util/lift\");\nvar OperatorSubscriber_1 = require(\"./OperatorSubscriber\");\nvar noop_1 = require(\"../util/noop\");\nvar innerFrom_1 = require(\"../observable/innerFrom\");\nfunction window(windowBoundaries) {\n    return lift_1.operate(function (source, subscriber) {\n        var windowSubject = new Subject_1.Subject();\n        subscriber.next(windowSubject.asObservable());\n        var errorHandler = function (err) {\n            windowSubject.error(err);\n            subscriber.error(err);\n        };\n        source.subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, function (value) { return windowSubject === null || windowSubject === void 0 ? void 0 : windowSubject.next(value); }, function () {\n            windowSubject.complete();\n            subscriber.complete();\n        }, errorHandler));\n        innerFrom_1.innerFrom(windowBoundaries).subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, function () {\n            windowSubject.complete();\n            subscriber.next((windowSubject = new Subject_1.Subject()));\n        }, noop_1.noop, errorHandler));\n        return function () {\n            windowSubject === null || windowSubject === void 0 ? void 0 : windowSubject.unsubscribe();\n            windowSubject = null;\n        };\n    });\n}\nexports.window = window;\n//# sourceMappingURL=window.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,MAAM,GAAG,KAAK,CAAC;AACvB,IAAIC,SAAS,GAAGC,OAAO,CAAC,YAAY,CAAC;AACrC,IAAIC,MAAM,GAAGD,OAAO,CAAC,cAAc,CAAC;AACpC,IAAIE,oBAAoB,GAAGF,OAAO,CAAC,sBAAsB,CAAC;AAC1D,IAAIG,MAAM,GAAGH,OAAO,CAAC,cAAc,CAAC;AACpC,IAAII,WAAW,GAAGJ,OAAO,CAAC,yBAAyB,CAAC;AACpD,SAASF,MAAMA,CAACO,gBAAgB,EAAE;EAC9B,OAAOJ,MAAM,CAACK,OAAO,CAAC,UAAUC,MAAM,EAAEC,UAAU,EAAE;IAChD,IAAIC,aAAa,GAAG,IAAIV,SAAS,CAACW,OAAO,CAAC,CAAC;IAC3CF,UAAU,CAACG,IAAI,CAACF,aAAa,CAACG,YAAY,CAAC,CAAC,CAAC;IAC7C,IAAIC,YAAY,GAAG,SAAAA,CAAUC,GAAG,EAAE;MAC9BL,aAAa,CAACM,KAAK,CAACD,GAAG,CAAC;MACxBN,UAAU,CAACO,KAAK,CAACD,GAAG,CAAC;IACzB,CAAC;IACDP,MAAM,CAACS,SAAS,CAACd,oBAAoB,CAACe,wBAAwB,CAACT,UAAU,EAAE,UAAUX,KAAK,EAAE;MAAE,OAAOY,aAAa,KAAK,IAAI,IAAIA,aAAa,KAAK,KAAK,CAAC,GAAG,KAAK,CAAC,GAAGA,aAAa,CAACE,IAAI,CAACd,KAAK,CAAC;IAAE,CAAC,EAAE,YAAY;MACzMY,aAAa,CAACS,QAAQ,CAAC,CAAC;MACxBV,UAAU,CAACU,QAAQ,CAAC,CAAC;IACzB,CAAC,EAAEL,YAAY,CAAC,CAAC;IACjBT,WAAW,CAACe,SAAS,CAACd,gBAAgB,CAAC,CAACW,SAAS,CAACd,oBAAoB,CAACe,wBAAwB,CAACT,UAAU,EAAE,YAAY;MACpHC,aAAa,CAACS,QAAQ,CAAC,CAAC;MACxBV,UAAU,CAACG,IAAI,CAAEF,aAAa,GAAG,IAAIV,SAAS,CAACW,OAAO,CAAC,CAAE,CAAC;IAC9D,CAAC,EAAEP,MAAM,CAACiB,IAAI,EAAEP,YAAY,CAAC,CAAC;IAC9B,OAAO,YAAY;MACfJ,aAAa,KAAK,IAAI,IAAIA,aAAa,KAAK,KAAK,CAAC,GAAG,KAAK,CAAC,GAAGA,aAAa,CAACY,WAAW,CAAC,CAAC;MACzFZ,aAAa,GAAG,IAAI;IACxB,CAAC;EACL,CAAC,CAAC;AACN;AACAb,OAAO,CAACE,MAAM,GAAGA,MAAM;AACvB",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

@@ -19,11 +19,11 @@
   },
   "sidebar": "tutorialSidebar",
   "previous": {
-    "title": "Vue Wrapper",
-    "permalink": "/PivotHead/docs/tutorial-basics/wrappers/vue"
+    "title": "Vue",
+    "permalink": "/PivotHead/docs/reference/api-reference/vue-api-reference"
   },
   "next": {
-    "title": "Contribution Guide",
-    "permalink": "/PivotHead/docs/category/contribution-guide"
+    "title": "Contributors",
+    "permalink": "/PivotHead/docs/contributors/"
   }
 }

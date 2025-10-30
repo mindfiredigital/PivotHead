@@ -1,0 +1,33 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.reportUnhandledError = void 0;\nvar config_1 = require(\"../config\");\nvar timeoutProvider_1 = require(\"../scheduler/timeoutProvider\");\nfunction reportUnhandledError(err) {\n  timeoutProvider_1.timeoutProvider.setTimeout(function () {\n    var onUnhandledError = config_1.config.onUnhandledError;\n    if (onUnhandledError) {\n      onUnhandledError(err);\n    } else {\n      throw err;\n    }\n  });\n}\nexports.reportUnhandledError = reportUnhandledError;\n//# sourceMappingURL=reportUnhandledError.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "reportUnhandledError",
+      "config_1",
+      "require",
+      "timeoutProvider_1",
+      "err",
+      "timeoutProvider",
+      "setTimeout",
+      "onUnhandledError",
+      "config"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/util/reportUnhandledError.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.reportUnhandledError = void 0;\nvar config_1 = require(\"../config\");\nvar timeoutProvider_1 = require(\"../scheduler/timeoutProvider\");\nfunction reportUnhandledError(err) {\n    timeoutProvider_1.timeoutProvider.setTimeout(function () {\n        var onUnhandledError = config_1.config.onUnhandledError;\n        if (onUnhandledError) {\n            onUnhandledError(err);\n        }\n        else {\n            throw err;\n        }\n    });\n}\nexports.reportUnhandledError = reportUnhandledError;\n//# sourceMappingURL=reportUnhandledError.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,oBAAoB,GAAG,KAAK,CAAC;AACrC,IAAIC,QAAQ,GAAGC,OAAO,CAAC,WAAW,CAAC;AACnC,IAAIC,iBAAiB,GAAGD,OAAO,CAAC,8BAA8B,CAAC;AAC/D,SAASF,oBAAoBA,CAACI,GAAG,EAAE;EAC/BD,iBAAiB,CAACE,eAAe,CAACC,UAAU,CAAC,YAAY;IACrD,IAAIC,gBAAgB,GAAGN,QAAQ,CAACO,MAAM,CAACD,gBAAgB;IACvD,IAAIA,gBAAgB,EAAE;MAClBA,gBAAgB,CAACH,GAAG,CAAC;IACzB,CAAC,MACI;MACD,MAAMA,GAAG;IACb;EACJ,CAAC,CAAC;AACN;AACAN,OAAO,CAACE,oBAAoB,GAAGA,oBAAoB;AACnD",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

@@ -14,14 +14,5 @@
   "sidebarPosition": 1,
   "frontMatter": {
     "sidebar_position": 1
-  },
-  "sidebar": "tutorialSidebar",
-  "previous": {
-    "title": "PivotHead Web Component",
-    "permalink": "/PivotHead/docs/tutorial-basics/web-component"
-  },
-  "next": {
-    "title": "Vue Wrapper",
-    "permalink": "/PivotHead/docs/tutorial-basics/wrappers/vue"
   }
 }

@@ -1,0 +1,28 @@
+{
+  "id": "reference/api-reference/vue-api-reference",
+  "title": "Vue API",
+  "description": "API Reference",
+  "source": "@site/docs/reference/api-reference/vue.md",
+  "sourceDirName": "reference/api-reference",
+  "slug": "/reference/api-reference/vue-api-reference",
+  "permalink": "/PivotHead/docs/reference/api-reference/vue-api-reference",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/reference/api-reference/vue.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "vue-api-reference",
+    "title": "Vue API",
+    "sidebar_label": "Vue"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "React",
+    "permalink": "/PivotHead/docs/reference/api-reference/react-api-reference"
+  },
+  "next": {
+    "title": "Troubleshooting",
+    "permalink": "/PivotHead/docs/tutorial-basics/troubleshooting"
+  }
+}

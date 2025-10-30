@@ -1,0 +1,24 @@
+{
+  "id": "getting-started/installation/react-installation",
+  "title": "react-installation",
+  "description": "abc",
+  "source": "@site/docs/getting-started/installation/react-installation.md",
+  "sourceDirName": "getting-started/installation",
+  "slug": "/getting-started/installation/react-installation",
+  "permalink": "/PivotHead/docs/getting-started/installation/react-installation",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/getting-started/installation/react-installation.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Core Web Component",
+    "permalink": "/PivotHead/docs/getting-started/installation/core-webcomponent-installation"
+  },
+  "next": {
+    "title": "angular-installation",
+    "permalink": "/PivotHead/docs/getting-started/installation/angular-installation"
+  }
+}

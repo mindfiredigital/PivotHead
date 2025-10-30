@@ -1,0 +1,31 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.count = void 0;\nvar reduce_1 = require(\"./reduce\");\nfunction count(predicate) {\n  return reduce_1.reduce(function (total, value, i) {\n    return !predicate || predicate(value, i) ? total + 1 : total;\n  }, 0);\n}\nexports.count = count;\n//# sourceMappingURL=count.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "count",
+      "reduce_1",
+      "require",
+      "predicate",
+      "reduce",
+      "total",
+      "i"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/operators/count.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.count = void 0;\nvar reduce_1 = require(\"./reduce\");\nfunction count(predicate) {\n    return reduce_1.reduce(function (total, value, i) { return (!predicate || predicate(value, i) ? total + 1 : total); }, 0);\n}\nexports.count = count;\n//# sourceMappingURL=count.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,KAAK,GAAG,KAAK,CAAC;AACtB,IAAIC,QAAQ,GAAGC,OAAO,CAAC,UAAU,CAAC;AAClC,SAASF,KAAKA,CAACG,SAAS,EAAE;EACtB,OAAOF,QAAQ,CAACG,MAAM,CAAC,UAAUC,KAAK,EAAEN,KAAK,EAAEO,CAAC,EAAE;IAAE,OAAQ,CAACH,SAAS,IAAIA,SAAS,CAACJ,KAAK,EAAEO,CAAC,CAAC,GAAGD,KAAK,GAAG,CAAC,GAAGA,KAAK;EAAG,CAAC,EAAE,CAAC,CAAC;AAC7H;AACAP,OAAO,CAACE,KAAK,GAAGA,KAAK;AACrB",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

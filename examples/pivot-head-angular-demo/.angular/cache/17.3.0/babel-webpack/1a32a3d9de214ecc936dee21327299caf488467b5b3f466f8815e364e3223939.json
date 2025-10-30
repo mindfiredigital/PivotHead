@@ -1,0 +1,47 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.timer = void 0;\nvar Observable_1 = require(\"../Observable\");\nvar async_1 = require(\"../scheduler/async\");\nvar isScheduler_1 = require(\"../util/isScheduler\");\nvar isDate_1 = require(\"../util/isDate\");\nfunction timer(dueTime, intervalOrScheduler, scheduler) {\n  if (dueTime === void 0) {\n    dueTime = 0;\n  }\n  if (scheduler === void 0) {\n    scheduler = async_1.async;\n  }\n  var intervalDuration = -1;\n  if (intervalOrScheduler != null) {\n    if (isScheduler_1.isScheduler(intervalOrScheduler)) {\n      scheduler = intervalOrScheduler;\n    } else {\n      intervalDuration = intervalOrScheduler;\n    }\n  }\n  return new Observable_1.Observable(function (subscriber) {\n    var due = isDate_1.isValidDate(dueTime) ? +dueTime - scheduler.now() : dueTime;\n    if (due < 0) {\n      due = 0;\n    }\n    var n = 0;\n    return scheduler.schedule(function () {\n      if (!subscriber.closed) {\n        subscriber.next(n++);\n        if (0 <= intervalDuration) {\n          this.schedule(undefined, intervalDuration);\n        } else {\n          subscriber.complete();\n        }\n      }\n    }, due);\n  });\n}\nexports.timer = timer;\n//# sourceMappingURL=timer.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "timer",
+      "Observable_1",
+      "require",
+      "async_1",
+      "isScheduler_1",
+      "isDate_1",
+      "dueTime",
+      "intervalOrScheduler",
+      "scheduler",
+      "async",
+      "intervalDuration",
+      "isScheduler",
+      "Observable",
+      "subscriber",
+      "due",
+      "isValidDate",
+      "now",
+      "n",
+      "schedule",
+      "closed",
+      "next",
+      "undefined",
+      "complete"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/observable/timer.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.timer = void 0;\nvar Observable_1 = require(\"../Observable\");\nvar async_1 = require(\"../scheduler/async\");\nvar isScheduler_1 = require(\"../util/isScheduler\");\nvar isDate_1 = require(\"../util/isDate\");\nfunction timer(dueTime, intervalOrScheduler, scheduler) {\n    if (dueTime === void 0) { dueTime = 0; }\n    if (scheduler === void 0) { scheduler = async_1.async; }\n    var intervalDuration = -1;\n    if (intervalOrScheduler != null) {\n        if (isScheduler_1.isScheduler(intervalOrScheduler)) {\n            scheduler = intervalOrScheduler;\n        }\n        else {\n            intervalDuration = intervalOrScheduler;\n        }\n    }\n    return new Observable_1.Observable(function (subscriber) {\n        var due = isDate_1.isValidDate(dueTime) ? +dueTime - scheduler.now() : dueTime;\n        if (due < 0) {\n            due = 0;\n        }\n        var n = 0;\n        return scheduler.schedule(function () {\n            if (!subscriber.closed) {\n                subscriber.next(n++);\n                if (0 <= intervalDuration) {\n                    this.schedule(undefined, intervalDuration);\n                }\n                else {\n                    subscriber.complete();\n                }\n            }\n        }, due);\n    });\n}\nexports.timer = timer;\n//# sourceMappingURL=timer.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,KAAK,GAAG,KAAK,CAAC;AACtB,IAAIC,YAAY,GAAGC,OAAO,CAAC,eAAe,CAAC;AAC3C,IAAIC,OAAO,GAAGD,OAAO,CAAC,oBAAoB,CAAC;AAC3C,IAAIE,aAAa,GAAGF,OAAO,CAAC,qBAAqB,CAAC;AAClD,IAAIG,QAAQ,GAAGH,OAAO,CAAC,gBAAgB,CAAC;AACxC,SAASF,KAAKA,CAACM,OAAO,EAAEC,mBAAmB,EAAEC,SAAS,EAAE;EACpD,IAAIF,OAAO,KAAK,KAAK,CAAC,EAAE;IAAEA,OAAO,GAAG,CAAC;EAAE;EACvC,IAAIE,SAAS,KAAK,KAAK,CAAC,EAAE;IAAEA,SAAS,GAAGL,OAAO,CAACM,KAAK;EAAE;EACvD,IAAIC,gBAAgB,GAAG,CAAC,CAAC;EACzB,IAAIH,mBAAmB,IAAI,IAAI,EAAE;IAC7B,IAAIH,aAAa,CAACO,WAAW,CAACJ,mBAAmB,CAAC,EAAE;MAChDC,SAAS,GAAGD,mBAAmB;IACnC,CAAC,MACI;MACDG,gBAAgB,GAAGH,mBAAmB;IAC1C;EACJ;EACA,OAAO,IAAIN,YAAY,CAACW,UAAU,CAAC,UAAUC,UAAU,EAAE;IACrD,IAAIC,GAAG,GAAGT,QAAQ,CAACU,WAAW,CAACT,OAAO,CAAC,GAAG,CAACA,OAAO,GAAGE,SAAS,CAACQ,GAAG,CAAC,CAAC,GAAGV,OAAO;IAC9E,IAAIQ,GAAG,GAAG,CAAC,EAAE;MACTA,GAAG,GAAG,CAAC;IACX;IACA,IAAIG,CAAC,GAAG,CAAC;IACT,OAAOT,SAAS,CAACU,QAAQ,CAAC,YAAY;MAClC,IAAI,CAACL,UAAU,CAACM,MAAM,EAAE;QACpBN,UAAU,CAACO,IAAI,CAACH,CAAC,EAAE,CAAC;QACpB,IAAI,CAAC,IAAIP,gBAAgB,EAAE;UACvB,IAAI,CAACQ,QAAQ,CAACG,SAAS,EAAEX,gBAAgB,CAAC;QAC9C,CAAC,MACI;UACDG,UAAU,CAACS,QAAQ,CAAC,CAAC;QACzB;MACJ;IACJ,CAAC,EAAER,GAAG,CAAC;EACX,CAAC,CAAC;AACN;AACAhB,OAAO,CAACE,KAAK,GAAGA,KAAK;AACrB",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

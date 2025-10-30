@@ -1,0 +1,41 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.lastValueFrom = void 0;\nvar EmptyError_1 = require(\"./util/EmptyError\");\nfunction lastValueFrom(source, config) {\n  var hasConfig = typeof config === 'object';\n  return new Promise(function (resolve, reject) {\n    var _hasValue = false;\n    var _value;\n    source.subscribe({\n      next: function (value) {\n        _value = value;\n        _hasValue = true;\n      },\n      error: reject,\n      complete: function () {\n        if (_hasValue) {\n          resolve(_value);\n        } else if (hasConfig) {\n          resolve(config.defaultValue);\n        } else {\n          reject(new EmptyError_1.EmptyError());\n        }\n      }\n    });\n  });\n}\nexports.lastValueFrom = lastValueFrom;\n//# sourceMappingURL=lastValueFrom.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "lastValueFrom",
+      "EmptyError_1",
+      "require",
+      "source",
+      "config",
+      "hasConfig",
+      "Promise",
+      "resolve",
+      "reject",
+      "_hasValue",
+      "_value",
+      "subscribe",
+      "next",
+      "error",
+      "complete",
+      "defaultValue",
+      "EmptyError"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/lastValueFrom.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.lastValueFrom = void 0;\nvar EmptyError_1 = require(\"./util/EmptyError\");\nfunction lastValueFrom(source, config) {\n    var hasConfig = typeof config === 'object';\n    return new Promise(function (resolve, reject) {\n        var _hasValue = false;\n        var _value;\n        source.subscribe({\n            next: function (value) {\n                _value = value;\n                _hasValue = true;\n            },\n            error: reject,\n            complete: function () {\n                if (_hasValue) {\n                    resolve(_value);\n                }\n                else if (hasConfig) {\n                    resolve(config.defaultValue);\n                }\n                else {\n                    reject(new EmptyError_1.EmptyError());\n                }\n            },\n        });\n    });\n}\nexports.lastValueFrom = lastValueFrom;\n//# sourceMappingURL=lastValueFrom.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,aAAa,GAAG,KAAK,CAAC;AAC9B,IAAIC,YAAY,GAAGC,OAAO,CAAC,mBAAmB,CAAC;AAC/C,SAASF,aAAaA,CAACG,MAAM,EAAEC,MAAM,EAAE;EACnC,IAAIC,SAAS,GAAG,OAAOD,MAAM,KAAK,QAAQ;EAC1C,OAAO,IAAIE,OAAO,CAAC,UAAUC,OAAO,EAAEC,MAAM,EAAE;IAC1C,IAAIC,SAAS,GAAG,KAAK;IACrB,IAAIC,MAAM;IACVP,MAAM,CAACQ,SAAS,CAAC;MACbC,IAAI,EAAE,SAAAA,CAAUb,KAAK,EAAE;QACnBW,MAAM,GAAGX,KAAK;QACdU,SAAS,GAAG,IAAI;MACpB,CAAC;MACDI,KAAK,EAAEL,MAAM;MACbM,QAAQ,EAAE,SAAAA,CAAA,EAAY;QAClB,IAAIL,SAAS,EAAE;UACXF,OAAO,CAACG,MAAM,CAAC;QACnB,CAAC,MACI,IAAIL,SAAS,EAAE;UAChBE,OAAO,CAACH,MAAM,CAACW,YAAY,CAAC;QAChC,CAAC,MACI;UACDP,MAAM,CAAC,IAAIP,YAAY,CAACe,UAAU,CAAC,CAAC,CAAC;QACzC;MACJ;IACJ,CAAC,CAAC;EACN,CAAC,CAAC;AACN;AACAlB,OAAO,CAACE,aAAa,GAAGA,aAAa;AACrC",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

@@ -482,153 +482,153 @@ function HeroSection() {
 //   );
 // }
 
-function AnimatedPivotTableVisual() {
-  const [isPivoted, setIsPivoted] = useState(false);
-  const { colorMode } = useColorMode();
+// function AnimatedPivotTableVisual() {
+//   const [isPivoted, setIsPivoted] = useState(false);
+//   const { colorMode } = useColorMode();
 
-  useEffect(() => {
-    // This will toggle the animation back and forth to keep it looping
-    const interval = setInterval(() => {
-      setIsPivoted(prev => !prev);
-    }, 4000); // Toggles every 4 seconds
-    return () => clearInterval(interval);
-  }, []);
+//   useEffect(() => {
+//     // This will toggle the animation back and forth to keep it looping
+//     const interval = setInterval(() => {
+//       setIsPivoted(prev => !prev);
+//     }, 4000); // Toggles every 4 seconds
+//     return () => clearInterval(interval);
+//   }, []);
 
-  const rawData = [
-    { product: 'Widget A', region: 'North', sales: '$1,000' },
-    { product: 'Widget B', region: 'North', sales: '$1,500' },
-    { product: 'Widget A', region: 'South', sales: '$1,200' },
-    { product: 'Widget B', region: 'South', sales: '$1,800' },
-  ];
+//   const rawData = [
+//     { product: 'Widget A', region: 'North', sales: '$1,000' },
+//     { product: 'Widget B', region: 'North', sales: '$1,500' },
+//     { product: 'Widget A', region: 'South', sales: '$1,200' },
+//     { product: 'Widget B', region: 'South', sales: '$1,800' },
+//   ];
 
-  return (
-    <div className={styles.animTableWrapper}>
-      <div
-        className={clsx(
-          styles.animTable,
-          isPivoted && styles.pivoted,
-          colorMode === 'dark' && styles.darkMode
-        )}
-      >
-        {/* Headers */}
-        <div
-          className={clsx(styles.animCell, styles.header, styles.productHeader)}
-        >
-          Product
-        </div>
-        <div
-          className={clsx(styles.animCell, styles.header, styles.regionHeader)}
-        >
-          Region
-        </div>
-        <div
-          className={clsx(styles.animCell, styles.header, styles.salesHeader)}
-        >
-          Sales
-        </div>
+//   return (
+//     <div className={styles.animTableWrapper}>
+//       <div
+//         className={clsx(
+//           styles.animTable,
+//           isPivoted && styles.pivoted,
+//           colorMode === 'dark' && styles.darkMode
+//         )}
+//       >
+//         {/* Headers */}
+//         <div
+//           className={clsx(styles.animCell, styles.header, styles.productHeader)}
+//         >
+//           Product
+//         </div>
+//         <div
+//           className={clsx(styles.animCell, styles.header, styles.regionHeader)}
+//         >
+//           Region
+//         </div>
+//         <div
+//           className={clsx(styles.animCell, styles.header, styles.salesHeader)}
+//         >
+//           Sales
+//         </div>
 
-        {/* Data Cells from Raw Data */}
-        {rawData.map((row, index) => (
-          <React.Fragment key={index}>
-            <div
-              className={clsx(
-                styles.animCell,
-                styles.productCell,
-                `cell-${index}`
-              )}
-            >
-              {row.product}
-            </div>
-            <div
-              className={clsx(
-                styles.animCell,
-                styles.regionCell,
-                `cell-${index}`
-              )}
-            >
-              {row.region}
-            </div>
-            <div
-              className={clsx(
-                styles.animCell,
-                styles.salesCell,
-                `cell-${index}`
-              )}
-            >
-              {row.sales}
-            </div>
-          </React.Fragment>
-        ))}
+//         {/* Data Cells from Raw Data */}
+//         {rawData.map((row, index) => (
+//           <React.Fragment key={index}>
+//             <div
+//               className={clsx(
+//                 styles.animCell,
+//                 styles.productCell,
+//                 `cell-${index}`
+//               )}
+//             >
+//               {row.product}
+//             </div>
+//             <div
+//               className={clsx(
+//                 styles.animCell,
+//                 styles.regionCell,
+//                 `cell-${index}`
+//               )}
+//             >
+//               {row.region}
+//             </div>
+//             <div
+//               className={clsx(
+//                 styles.animCell,
+//                 styles.salesCell,
+//                 `cell-${index}`
+//               )}
+//             >
+//               {row.sales}
+//             </div>
+//           </React.Fragment>
+//         ))}
 
-        {/* Headers and Cells that only appear in the pivoted state */}
-        <div
-          className={clsx(
-            styles.animCell,
-            styles.pivotedOnly,
-            styles.header,
-            styles.northHeader
-          )}
-        >
-          North
-        </div>
-        <div
-          className={clsx(
-            styles.animCell,
-            styles.pivotedOnly,
-            styles.header,
-            styles.southHeader
-          )}
-        >
-          South
-        </div>
-        <div
-          className={clsx(
-            styles.animCell,
-            styles.pivotedOnly,
-            styles.data,
-            styles.waNorth
-          )}
-        >
-          {' '}
-          $1,000{' '}
-        </div>
-        <div
-          className={clsx(
-            styles.animCell,
-            styles.pivotedOnly,
-            styles.data,
-            styles.waSouth
-          )}
-        >
-          {' '}
-          $1,200{' '}
-        </div>
-        <div
-          className={clsx(
-            styles.animCell,
-            styles.pivotedOnly,
-            styles.data,
-            styles.wbNorth
-          )}
-        >
-          {' '}
-          $1,500{' '}
-        </div>
-        <div
-          className={clsx(
-            styles.animCell,
-            styles.pivotedOnly,
-            styles.data,
-            styles.wbSouth
-          )}
-        >
-          {' '}
-          $1,800{' '}
-        </div>
-      </div>
-    </div>
-  );
-}
+//         {/* Headers and Cells that only appear in the pivoted state */}
+//         <div
+//           className={clsx(
+//             styles.animCell,
+//             styles.pivotedOnly,
+//             styles.header,
+//             styles.northHeader
+//           )}
+//         >
+//           North
+//         </div>
+//         <div
+//           className={clsx(
+//             styles.animCell,
+//             styles.pivotedOnly,
+//             styles.header,
+//             styles.southHeader
+//           )}
+//         >
+//           South
+//         </div>
+//         <div
+//           className={clsx(
+//             styles.animCell,
+//             styles.pivotedOnly,
+//             styles.data,
+//             styles.waNorth
+//           )}
+//         >
+//           {' '}
+//           $1,000{' '}
+//         </div>
+//         <div
+//           className={clsx(
+//             styles.animCell,
+//             styles.pivotedOnly,
+//             styles.data,
+//             styles.waSouth
+//           )}
+//         >
+//           {' '}
+//           $1,200{' '}
+//         </div>
+//         <div
+//           className={clsx(
+//             styles.animCell,
+//             styles.pivotedOnly,
+//             styles.data,
+//             styles.wbNorth
+//           )}
+//         >
+//           {' '}
+//           $1,500{' '}
+//         </div>
+//         <div
+//           className={clsx(
+//             styles.animCell,
+//             styles.pivotedOnly,
+//             styles.data,
+//             styles.wbSouth
+//           )}
+//         >
+//           {' '}
+//           $1,800{' '}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
 
 function FlashingTableVisual() {
   return (
@@ -925,7 +925,7 @@ function CtaSection() {
             Get Started Now <ArrowRightIcon style={{ marginLeft: '0.5rem' }} />
           </Link>
           <Link
-            to="/docs/introduction"
+            to=""
             className={clsx(
               styles.button,
               styles.secondaryButton,
@@ -951,12 +951,23 @@ export default function Home() {
       <div>
         <main>
           <HeroSection />
+          {/* <section
+            className="relative rounded-t-3xl border border-border/60 backdrop-blur overflow-hidden
+        bg-[linear-gradient(to_bottom_right,_color-mix(in_oklab,var(--background),_transparent_30%),_color-mix(in_oklab,var(--background),_transparent_10%))]
+        after:bg-[radial-gradient(1200px_600px_at_50%_40%,_transparent_35%,_rgba(0,0,0,0.08)_85%)]
+        after:opacity-60
+        before:content-[''] before:absolute before:-inset-[35%] before:pointer-events-none before:blur-[70px]
+        before:opacity-55
+        before:bg-[radial-gradient(700px_360px_at_20%_15%,_color-mix(in_oklab,var(--primary),_transparent),_transparent),radial-gradient(700px_360px_at_80%_20%,_color-mix(in_oklab,var(--primary),_transparent),_transparent),radial-gradient(520px_260px_at_50%_110%,_color-mix(in_oklab,var(--primary),_transparent),_transparent)]"
+          > */}
+
           {/* <DataVisualizationSection /> */}
           <HeadlessDataVisualizationSection />
           <HomepageFeatures />
           <ModernDevelopersSection />
           {/* <StackBlitzSection /> */}
           <CtaSection />
+          {/* </section> */}
         </main>
       </div>
     </Layout>

@@ -1,0 +1,43 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.connect = void 0;\nvar Subject_1 = require(\"../Subject\");\nvar innerFrom_1 = require(\"../observable/innerFrom\");\nvar lift_1 = require(\"../util/lift\");\nvar fromSubscribable_1 = require(\"../observable/fromSubscribable\");\nvar DEFAULT_CONFIG = {\n  connector: function () {\n    return new Subject_1.Subject();\n  }\n};\nfunction connect(selector, config) {\n  if (config === void 0) {\n    config = DEFAULT_CONFIG;\n  }\n  var connector = config.connector;\n  return lift_1.operate(function (source, subscriber) {\n    var subject = connector();\n    innerFrom_1.innerFrom(selector(fromSubscribable_1.fromSubscribable(subject))).subscribe(subscriber);\n    subscriber.add(source.subscribe(subject));\n  });\n}\nexports.connect = connect;\n//# sourceMappingURL=connect.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "connect",
+      "Subject_1",
+      "require",
+      "innerFrom_1",
+      "lift_1",
+      "fromSubscribable_1",
+      "DEFAULT_CONFIG",
+      "connector",
+      "Subject",
+      "selector",
+      "config",
+      "operate",
+      "source",
+      "subscriber",
+      "subject",
+      "innerFrom",
+      "fromSubscribable",
+      "subscribe",
+      "add"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/operators/connect.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.connect = void 0;\nvar Subject_1 = require(\"../Subject\");\nvar innerFrom_1 = require(\"../observable/innerFrom\");\nvar lift_1 = require(\"../util/lift\");\nvar fromSubscribable_1 = require(\"../observable/fromSubscribable\");\nvar DEFAULT_CONFIG = {\n    connector: function () { return new Subject_1.Subject(); },\n};\nfunction connect(selector, config) {\n    if (config === void 0) { config = DEFAULT_CONFIG; }\n    var connector = config.connector;\n    return lift_1.operate(function (source, subscriber) {\n        var subject = connector();\n        innerFrom_1.innerFrom(selector(fromSubscribable_1.fromSubscribable(subject))).subscribe(subscriber);\n        subscriber.add(source.subscribe(subject));\n    });\n}\nexports.connect = connect;\n//# sourceMappingURL=connect.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,OAAO,GAAG,KAAK,CAAC;AACxB,IAAIC,SAAS,GAAGC,OAAO,CAAC,YAAY,CAAC;AACrC,IAAIC,WAAW,GAAGD,OAAO,CAAC,yBAAyB,CAAC;AACpD,IAAIE,MAAM,GAAGF,OAAO,CAAC,cAAc,CAAC;AACpC,IAAIG,kBAAkB,GAAGH,OAAO,CAAC,gCAAgC,CAAC;AAClE,IAAII,cAAc,GAAG;EACjBC,SAAS,EAAE,SAAAA,CAAA,EAAY;IAAE,OAAO,IAAIN,SAAS,CAACO,OAAO,CAAC,CAAC;EAAE;AAC7D,CAAC;AACD,SAASR,OAAOA,CAACS,QAAQ,EAAEC,MAAM,EAAE;EAC/B,IAAIA,MAAM,KAAK,KAAK,CAAC,EAAE;IAAEA,MAAM,GAAGJ,cAAc;EAAE;EAClD,IAAIC,SAAS,GAAGG,MAAM,CAACH,SAAS;EAChC,OAAOH,MAAM,CAACO,OAAO,CAAC,UAAUC,MAAM,EAAEC,UAAU,EAAE;IAChD,IAAIC,OAAO,GAAGP,SAAS,CAAC,CAAC;IACzBJ,WAAW,CAACY,SAAS,CAACN,QAAQ,CAACJ,kBAAkB,CAACW,gBAAgB,CAACF,OAAO,CAAC,CAAC,CAAC,CAACG,SAAS,CAACJ,UAAU,CAAC;IACnGA,UAAU,CAACK,GAAG,CAACN,MAAM,CAACK,SAAS,CAACH,OAAO,CAAC,CAAC;EAC7C,CAAC,CAAC;AACN;AACAhB,OAAO,CAACE,OAAO,GAAGA,OAAO;AACzB",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

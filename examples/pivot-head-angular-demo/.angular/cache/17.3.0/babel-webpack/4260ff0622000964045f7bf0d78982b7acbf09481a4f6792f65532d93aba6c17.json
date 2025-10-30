@@ -1,0 +1,44 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.getApplication = void 0;\nconst ComputesTemplateFromComponent_1 = require(\"./ComputesTemplateFromComponent\");\nconst StorybookWrapperComponent_1 = require(\"./StorybookWrapperComponent\");\nconst getApplication = ({\n  storyFnAngular,\n  component,\n  targetSelector,\n  analyzedMetadata\n}) => {\n  const {\n    props,\n    styles,\n    moduleMetadata = {}\n  } = storyFnAngular;\n  let {\n    template\n  } = storyFnAngular;\n  const hasTemplate = !hasNoTemplate(template);\n  if (!hasTemplate && component) {\n    template = (0, ComputesTemplateFromComponent_1.computesTemplateFromComponent)(component, props, '');\n  }\n  /** Create a component that wraps generated template and gives it props */\n  return (0, StorybookWrapperComponent_1.createStorybookWrapperComponent)({\n    moduleMetadata,\n    selector: targetSelector,\n    template,\n    storyComponent: component,\n    styles,\n    initialProps: props,\n    analyzedMetadata\n  });\n};\nexports.getApplication = getApplication;\nfunction hasNoTemplate(template) {\n  return template === null || template === undefined;\n}",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "getApplication",
+      "ComputesTemplateFromComponent_1",
+      "require",
+      "StorybookWrapperComponent_1",
+      "storyFnAngular",
+      "component",
+      "targetSelector",
+      "analyzedMetadata",
+      "props",
+      "styles",
+      "moduleMetadata",
+      "template",
+      "hasTemplate",
+      "hasNoTemplate",
+      "computesTemplateFromComponent",
+      "createStorybookWrapperComponent",
+      "selector",
+      "storyComponent",
+      "initialProps",
+      "undefined"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/@storybook+angular@8.6.14_@angular-devkit+architect@0.1703.0_@angular-devkit+build-angular@17_a7aajamgs7bgz2yqzrp63bsev4/node_modules/@storybook/angular/dist/client/angular-beta/StorybookModule.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.getApplication = void 0;\nconst ComputesTemplateFromComponent_1 = require(\"./ComputesTemplateFromComponent\");\nconst StorybookWrapperComponent_1 = require(\"./StorybookWrapperComponent\");\nconst getApplication = ({ storyFnAngular, component, targetSelector, analyzedMetadata, }) => {\n    const { props, styles, moduleMetadata = {} } = storyFnAngular;\n    let { template } = storyFnAngular;\n    const hasTemplate = !hasNoTemplate(template);\n    if (!hasTemplate && component) {\n        template = (0, ComputesTemplateFromComponent_1.computesTemplateFromComponent)(component, props, '');\n    }\n    /** Create a component that wraps generated template and gives it props */\n    return (0, StorybookWrapperComponent_1.createStorybookWrapperComponent)({\n        moduleMetadata,\n        selector: targetSelector,\n        template,\n        storyComponent: component,\n        styles,\n        initialProps: props,\n        analyzedMetadata,\n    });\n};\nexports.getApplication = getApplication;\nfunction hasNoTemplate(template) {\n    return template === null || template === undefined;\n}\n"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,cAAc,GAAG,KAAK,CAAC;AAC/B,MAAMC,+BAA+B,GAAGC,OAAO,CAAC,iCAAiC,CAAC;AAClF,MAAMC,2BAA2B,GAAGD,OAAO,CAAC,6BAA6B,CAAC;AAC1E,MAAMF,cAAc,GAAGA,CAAC;EAAEI,cAAc;EAAEC,SAAS;EAAEC,cAAc;EAAEC;AAAkB,CAAC,KAAK;EACzF,MAAM;IAAEC,KAAK;IAAEC,MAAM;IAAEC,cAAc,GAAG,CAAC;EAAE,CAAC,GAAGN,cAAc;EAC7D,IAAI;IAAEO;EAAS,CAAC,GAAGP,cAAc;EACjC,MAAMQ,WAAW,GAAG,CAACC,aAAa,CAACF,QAAQ,CAAC;EAC5C,IAAI,CAACC,WAAW,IAAIP,SAAS,EAAE;IAC3BM,QAAQ,GAAG,CAAC,CAAC,EAAEV,+BAA+B,CAACa,6BAA6B,EAAET,SAAS,EAAEG,KAAK,EAAE,EAAE,CAAC;EACvG;EACA;EACA,OAAO,CAAC,CAAC,EAAEL,2BAA2B,CAACY,+BAA+B,EAAE;IACpEL,cAAc;IACdM,QAAQ,EAAEV,cAAc;IACxBK,QAAQ;IACRM,cAAc,EAAEZ,SAAS;IACzBI,MAAM;IACNS,YAAY,EAAEV,KAAK;IACnBD;EACJ,CAAC,CAAC;AACN,CAAC;AACDT,OAAO,CAACE,cAAc,GAAGA,cAAc;AACvC,SAASa,aAAaA,CAACF,QAAQ,EAAE;EAC7B,OAAOA,QAAQ,KAAK,IAAI,IAAIA,QAAQ,KAAKQ,SAAS;AACtD",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

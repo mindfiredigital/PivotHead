@@ -19,7 +19,7 @@
   },
   "sidebar": "tutorialSidebar",
   "next": {
-    "title": "Why Use PivotHead",
-    "permalink": "/PivotHead/docs/Why-we-use-pivothead"
+    "title": "Headless Architecture",
+    "permalink": "/PivotHead/docs/headless-architecture"
   }
 }

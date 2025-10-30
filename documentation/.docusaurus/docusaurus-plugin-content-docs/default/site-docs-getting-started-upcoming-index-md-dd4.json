@@ -1,0 +1,26 @@
+{
+  "id": "getting-started/upcoming/index",
+  "title": "Upcoming Features",
+  "description": "What's coming next in PivotHead - exciting features in development",
+  "source": "@site/docs/getting-started/upcoming/index.md",
+  "sourceDirName": "getting-started/upcoming",
+  "slug": "/getting-started/upcoming/",
+  "permalink": "/PivotHead/docs/getting-started/upcoming/",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/getting-started/upcoming/index.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Upcoming Features",
+    "description": "What's coming next in PivotHead - exciting features in development",
+    "keywords": [
+      "roadmap",
+      "upcoming",
+      "features",
+      "angular",
+      "high-volume",
+      "performance"
+    ]
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.argTypesEnhancers = exports.decorators = exports.parameters = void 0;\nconst docs_tools_1 = require(\"storybook/internal/docs-tools\");\nconst compodoc_1 = require(\"./compodoc\");\nconst sourceDecorator_1 = require(\"./sourceDecorator\");\nexports.parameters = {\n  docs: {\n    story: {\n      inline: true\n    },\n    extractArgTypes: compodoc_1.extractArgTypes,\n    extractComponentDescription: compodoc_1.extractComponentDescription,\n    source: {\n      type: docs_tools_1.SourceType.DYNAMIC,\n      language: 'html'\n    }\n  }\n};\nexports.decorators = [sourceDecorator_1.sourceDecorator];\nexports.argTypesEnhancers = [docs_tools_1.enhanceArgTypes];",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "argTypesEnhancers",
+      "decorators",
+      "parameters",
+      "docs_tools_1",
+      "require",
+      "compodoc_1",
+      "sourceDecorator_1",
+      "docs",
+      "story",
+      "inline",
+      "extractArgTypes",
+      "extractComponentDescription",
+      "source",
+      "type",
+      "SourceType",
+      "DYNAMIC",
+      "language",
+      "sourceDecorator",
+      "enhanceArgTypes"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/@storybook+angular@8.6.14_@angular-devkit+architect@0.1703.0_@angular-devkit+build-angular@17_a7aajamgs7bgz2yqzrp63bsev4/node_modules/@storybook/angular/dist/client/docs/config.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.argTypesEnhancers = exports.decorators = exports.parameters = void 0;\nconst docs_tools_1 = require(\"storybook/internal/docs-tools\");\nconst compodoc_1 = require(\"./compodoc\");\nconst sourceDecorator_1 = require(\"./sourceDecorator\");\nexports.parameters = {\n    docs: {\n        story: { inline: true },\n        extractArgTypes: compodoc_1.extractArgTypes,\n        extractComponentDescription: compodoc_1.extractComponentDescription,\n        source: {\n            type: docs_tools_1.SourceType.DYNAMIC,\n            language: 'html',\n        },\n    },\n};\nexports.decorators = [sourceDecorator_1.sourceDecorator];\nexports.argTypesEnhancers = [docs_tools_1.enhanceArgTypes];\n"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,iBAAiB,GAAGF,OAAO,CAACG,UAAU,GAAGH,OAAO,CAACI,UAAU,GAAG,KAAK,CAAC;AAC5E,MAAMC,YAAY,GAAGC,OAAO,CAAC,+BAA+B,CAAC;AAC7D,MAAMC,UAAU,GAAGD,OAAO,CAAC,YAAY,CAAC;AACxC,MAAME,iBAAiB,GAAGF,OAAO,CAAC,mBAAmB,CAAC;AACtDN,OAAO,CAACI,UAAU,GAAG;EACjBK,IAAI,EAAE;IACFC,KAAK,EAAE;MAAEC,MAAM,EAAE;IAAK,CAAC;IACvBC,eAAe,EAAEL,UAAU,CAACK,eAAe;IAC3CC,2BAA2B,EAAEN,UAAU,CAACM,2BAA2B;IACnEC,MAAM,EAAE;MACJC,IAAI,EAAEV,YAAY,CAACW,UAAU,CAACC,OAAO;MACrCC,QAAQ,EAAE;IACd;EACJ;AACJ,CAAC;AACDlB,OAAO,CAACG,UAAU,GAAG,CAACK,iBAAiB,CAACW,eAAe,CAAC;AACxDnB,OAAO,CAACE,iBAAiB,GAAG,CAACG,YAAY,CAACe,eAAe,CAAC",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

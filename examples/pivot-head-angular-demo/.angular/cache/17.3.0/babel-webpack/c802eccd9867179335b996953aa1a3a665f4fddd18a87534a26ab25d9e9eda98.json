@@ -1,0 +1,33 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.isObservable = void 0;\nvar Observable_1 = require(\"../Observable\");\nvar isFunction_1 = require(\"./isFunction\");\nfunction isObservable(obj) {\n  return !!obj && (obj instanceof Observable_1.Observable || isFunction_1.isFunction(obj.lift) && isFunction_1.isFunction(obj.subscribe));\n}\nexports.isObservable = isObservable;\n//# sourceMappingURL=isObservable.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "isObservable",
+      "Observable_1",
+      "require",
+      "isFunction_1",
+      "obj",
+      "Observable",
+      "isFunction",
+      "lift",
+      "subscribe"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/util/isObservable.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.isObservable = void 0;\nvar Observable_1 = require(\"../Observable\");\nvar isFunction_1 = require(\"./isFunction\");\nfunction isObservable(obj) {\n    return !!obj && (obj instanceof Observable_1.Observable || (isFunction_1.isFunction(obj.lift) && isFunction_1.isFunction(obj.subscribe)));\n}\nexports.isObservable = isObservable;\n//# sourceMappingURL=isObservable.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,YAAY,GAAG,KAAK,CAAC;AAC7B,IAAIC,YAAY,GAAGC,OAAO,CAAC,eAAe,CAAC;AAC3C,IAAIC,YAAY,GAAGD,OAAO,CAAC,cAAc,CAAC;AAC1C,SAASF,YAAYA,CAACI,GAAG,EAAE;EACvB,OAAO,CAAC,CAACA,GAAG,KAAKA,GAAG,YAAYH,YAAY,CAACI,UAAU,IAAKF,YAAY,CAACG,UAAU,CAACF,GAAG,CAACG,IAAI,CAAC,IAAIJ,YAAY,CAACG,UAAU,CAACF,GAAG,CAACI,SAAS,CAAE,CAAC;AAC7I;AACAV,OAAO,CAACE,YAAY,GAAGA,YAAY;AACnC",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

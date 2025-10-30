@@ -1,0 +1,36 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.toArray = void 0;\nvar reduce_1 = require(\"./reduce\");\nvar lift_1 = require(\"../util/lift\");\nvar arrReducer = function (arr, value) {\n  return arr.push(value), arr;\n};\nfunction toArray() {\n  return lift_1.operate(function (source, subscriber) {\n    reduce_1.reduce(arrReducer, [])(source).subscribe(subscriber);\n  });\n}\nexports.toArray = toArray;\n//# sourceMappingURL=toArray.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "toArray",
+      "reduce_1",
+      "require",
+      "lift_1",
+      "arrReducer",
+      "arr",
+      "push",
+      "operate",
+      "source",
+      "subscriber",
+      "reduce",
+      "subscribe"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/operators/toArray.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.toArray = void 0;\nvar reduce_1 = require(\"./reduce\");\nvar lift_1 = require(\"../util/lift\");\nvar arrReducer = function (arr, value) { return (arr.push(value), arr); };\nfunction toArray() {\n    return lift_1.operate(function (source, subscriber) {\n        reduce_1.reduce(arrReducer, [])(source).subscribe(subscriber);\n    });\n}\nexports.toArray = toArray;\n//# sourceMappingURL=toArray.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,OAAO,GAAG,KAAK,CAAC;AACxB,IAAIC,QAAQ,GAAGC,OAAO,CAAC,UAAU,CAAC;AAClC,IAAIC,MAAM,GAAGD,OAAO,CAAC,cAAc,CAAC;AACpC,IAAIE,UAAU,GAAG,SAAAA,CAAUC,GAAG,EAAEN,KAAK,EAAE;EAAE,OAAQM,GAAG,CAACC,IAAI,CAACP,KAAK,CAAC,EAAEM,GAAG;AAAG,CAAC;AACzE,SAASL,OAAOA,CAAA,EAAG;EACf,OAAOG,MAAM,CAACI,OAAO,CAAC,UAAUC,MAAM,EAAEC,UAAU,EAAE;IAChDR,QAAQ,CAACS,MAAM,CAACN,UAAU,EAAE,EAAE,CAAC,CAACI,MAAM,CAAC,CAACG,SAAS,CAACF,UAAU,CAAC;EACjE,CAAC,CAAC;AACN;AACAX,OAAO,CAACE,OAAO,GAAGA,OAAO;AACzB",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

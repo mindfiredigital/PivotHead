@@ -1,0 +1,46 @@
+{
+  "ast": null,
+  "code": "import _asyncToGenerator from \"/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/@babel+runtime@7.24.0/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js\";\nimport { expect, userEvent, within } from 'storybook/test';\nimport { PageComponent } from './page.component';\nconst meta = {\n  title: 'Example/Page',\n  component: PageComponent,\n  parameters: {\n    // More on how to position stories at: https://storybook.js.org/docs/configure/story-layout\n    layout: 'fullscreen'\n  }\n};\nexport default meta;\nexport const LoggedOut = {};\n// More on component testing: https://storybook.js.org/docs/writing-tests/interaction-testing\nexport const LoggedIn = {\n  play: function () {\n    var _ref = _asyncToGenerator(function* ({\n      canvasElement\n    }) {\n      const canvas = within(canvasElement);\n      const loginButton = canvas.getByRole('button', {\n        name: /Log in/i\n      });\n      yield expect(loginButton).toBeInTheDocument();\n      yield userEvent.click(loginButton);\n      yield expect(loginButton).not.toBeInTheDocument();\n      const logoutButton = canvas.getByRole('button', {\n        name: /Log out/i\n      });\n      yield expect(logoutButton).toBeInTheDocument();\n    });\n    return function play(_x) {\n      return _ref.apply(this, arguments);\n    };\n  }()\n};",
+  "map": {
+    "version": 3,
+    "names": [
+      "expect",
+      "userEvent",
+      "within",
+      "PageComponent",
+      "meta",
+      "title",
+      "component",
+      "parameters",
+      "layout",
+      "LoggedOut",
+      "LoggedIn",
+      "play",
+      "_ref",
+      "_asyncToGenerator",
+      "canvasElement",
+      "canvas",
+      "loginButton",
+      "getByRole",
+      "name",
+      "toBeInTheDocument",
+      "click",
+      "not",
+      "logoutButton",
+      "_x",
+      "apply",
+      "arguments"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/examples/pivot-head-angular-demo/src/stories/page.stories.ts"
+    ],
+    "sourcesContent": [
+      "import { expect, userEvent, within } from 'storybook/test';\nimport { PageComponent } from './page.component';\nconst meta = {\n    title: 'Example/Page',\n    component: PageComponent,\n    parameters: {\n        // More on how to position stories at: https://storybook.js.org/docs/configure/story-layout\n        layout: 'fullscreen',\n    },\n};\nexport default meta;\nexport const LoggedOut = {};\n// More on component testing: https://storybook.js.org/docs/writing-tests/interaction-testing\nexport const LoggedIn = {\n    play: async ({ canvasElement }) => {\n        const canvas = within(canvasElement);\n        const loginButton = canvas.getByRole('button', { name: /Log in/i });\n        await expect(loginButton).toBeInTheDocument();\n        await userEvent.click(loginButton);\n        await expect(loginButton).not.toBeInTheDocument();\n        const logoutButton = canvas.getByRole('button', { name: /Log out/i });\n        await expect(logoutButton).toBeInTheDocument();\n    },\n};\n"
+    ],
+    "mappings": ";AAAA,SAASA,MAAM,EAAEC,SAAS,EAAEC,MAAM,QAAQ,gBAAgB;AAC1D,SAASC,aAAa,QAAQ,kBAAkB;AAChD,MAAMC,IAAI,GAAG;EACTC,KAAK,EAAE,cAAc;EACrBC,SAAS,EAAEH,aAAa;EACxBI,UAAU,EAAE;IACR;IACAC,MAAM,EAAE;EACZ;AACJ,CAAC;AACD,eAAeJ,IAAI;AACnB,OAAO,MAAMK,SAAS,GAAG,CAAC,CAAC;AAC3B;AACA,OAAO,MAAMC,QAAQ,GAAG;EACpBC,IAAI;IAAA,IAAAC,IAAA,GAAAC,iBAAA,CAAE,WAAO;MAAEC;IAAc,CAAC,EAAK;MAC/B,MAAMC,MAAM,GAAGb,MAAM,CAACY,aAAa,CAAC;MACpC,MAAME,WAAW,GAAGD,MAAM,CAACE,SAAS,CAAC,QAAQ,EAAE;QAAEC,IAAI,EAAE;MAAU,CAAC,CAAC;MACnE,MAAMlB,MAAM,CAACgB,WAAW,CAAC,CAACG,iBAAiB,CAAC,CAAC;MAC7C,MAAMlB,SAAS,CAACmB,KAAK,CAACJ,WAAW,CAAC;MAClC,MAAMhB,MAAM,CAACgB,WAAW,CAAC,CAACK,GAAG,CAACF,iBAAiB,CAAC,CAAC;MACjD,MAAMG,YAAY,GAAGP,MAAM,CAACE,SAAS,CAAC,QAAQ,EAAE;QAAEC,IAAI,EAAE;MAAW,CAAC,CAAC;MACrE,MAAMlB,MAAM,CAACsB,YAAY,CAAC,CAACH,iBAAiB,CAAC,CAAC;IAClD,CAAC;IAAA,gBARDR,IAAIA,CAAAY,EAAA;MAAA,OAAAX,IAAA,CAAAY,KAAA,OAAAC,SAAA;IAAA;EAAA;AASR,CAAC",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "module",
+  "externalDependencies": []
+}

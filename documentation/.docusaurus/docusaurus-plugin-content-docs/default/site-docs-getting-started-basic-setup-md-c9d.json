@@ -1,0 +1,28 @@
+{
+  "id": "getting-started/basic-setup",
+  "title": "Basic Setup",
+  "description": "Once you've installed the appropriate PivotHead package for your framework, the basic setup is straightforward. You'll need to:",
+  "source": "@site/docs/getting-started/basic-setup.md",
+  "sourceDirName": "getting-started",
+  "slug": "/getting-started/basic-setup",
+  "permalink": "/PivotHead/docs/getting-started/basic-setup",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/getting-started/basic-setup.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "basic-setup",
+    "title": "Basic Setup",
+    "sidebar_label": "Basic Setup"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Installation",
+    "permalink": "/PivotHead/docs/getting-started/installation"
+  },
+  "next": {
+    "title": "Sample Project",
+    "permalink": "/PivotHead/docs/tutorials/core-webcomponent/core-webcomponent-sample-project"
+  }
+}

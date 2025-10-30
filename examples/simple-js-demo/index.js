@@ -1729,13 +1729,15 @@ export async function handleFileConnection(fileType) {
     switch (fileType) {
       case 'CSV':
         result = await ConnectService.connectToLocalCSV(pivotEngine, {
+          dimensions: [],
           csv: {
             delimiter: ',',
             hasHeader: true,
             skipEmptyLines: true,
             trimValues: true,
+            dynamicTyping: false,
           },
-          maxFileSize: 50 * 1024 * 1024, // 50MB
+          maxFileSize: 150 * 1024 * 1024, // 50MB
           onProgress: progress => {
             updateLoadingProgress(progress);
           },
@@ -1748,7 +1750,7 @@ export async function handleFileConnection(fileType) {
             arrayPath: null, // Will auto-detect
             validateSchema: true,
           },
-          maxFileSize: 50 * 1024 * 1024, // 50MB
+          maxFileSize: 150 * 1024 * 1024, // 50MB
           onProgress: progress => {
             updateLoadingProgress(progress);
           },

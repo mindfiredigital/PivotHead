@@ -1,0 +1,60 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.mergeInternals = void 0;\nvar innerFrom_1 = require(\"../observable/innerFrom\");\nvar executeSchedule_1 = require(\"../util/executeSchedule\");\nvar OperatorSubscriber_1 = require(\"./OperatorSubscriber\");\nfunction mergeInternals(source, subscriber, project, concurrent, onBeforeNext, expand, innerSubScheduler, additionalFinalizer) {\n  var buffer = [];\n  var active = 0;\n  var index = 0;\n  var isComplete = false;\n  var checkComplete = function () {\n    if (isComplete && !buffer.length && !active) {\n      subscriber.complete();\n    }\n  };\n  var outerNext = function (value) {\n    return active < concurrent ? doInnerSub(value) : buffer.push(value);\n  };\n  var doInnerSub = function (value) {\n    expand && subscriber.next(value);\n    active++;\n    var innerComplete = false;\n    innerFrom_1.innerFrom(project(value, index++)).subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, function (innerValue) {\n      onBeforeNext === null || onBeforeNext === void 0 ? void 0 : onBeforeNext(innerValue);\n      if (expand) {\n        outerNext(innerValue);\n      } else {\n        subscriber.next(innerValue);\n      }\n    }, function () {\n      innerComplete = true;\n    }, undefined, function () {\n      if (innerComplete) {\n        try {\n          active--;\n          var _loop_1 = function () {\n            var bufferedValue = buffer.shift();\n            if (innerSubScheduler) {\n              executeSchedule_1.executeSchedule(subscriber, innerSubScheduler, function () {\n                return doInnerSub(bufferedValue);\n              });\n            } else {\n              doInnerSub(bufferedValue);\n            }\n          };\n          while (buffer.length && active < concurrent) {\n            _loop_1();\n          }\n          checkComplete();\n        } catch (err) {\n          subscriber.error(err);\n        }\n      }\n    }));\n  };\n  source.subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, outerNext, function () {\n    isComplete = true;\n    checkComplete();\n  }));\n  return function () {\n    additionalFinalizer === null || additionalFinalizer === void 0 ? void 0 : additionalFinalizer();\n  };\n}\nexports.mergeInternals = mergeInternals;\n//# sourceMappingURL=mergeInternals.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "mergeInternals",
+      "innerFrom_1",
+      "require",
+      "executeSchedule_1",
+      "OperatorSubscriber_1",
+      "source",
+      "subscriber",
+      "project",
+      "concurrent",
+      "onBeforeNext",
+      "expand",
+      "innerSubScheduler",
+      "additionalFinalizer",
+      "buffer",
+      "active",
+      "index",
+      "isComplete",
+      "checkComplete",
+      "length",
+      "complete",
+      "outerNext",
+      "doInnerSub",
+      "push",
+      "next",
+      "innerComplete",
+      "innerFrom",
+      "subscribe",
+      "createOperatorSubscriber",
+      "innerValue",
+      "undefined",
+      "_loop_1",
+      "bufferedValue",
+      "shift",
+      "executeSchedule",
+      "err",
+      "error"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/operators/mergeInternals.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.mergeInternals = void 0;\nvar innerFrom_1 = require(\"../observable/innerFrom\");\nvar executeSchedule_1 = require(\"../util/executeSchedule\");\nvar OperatorSubscriber_1 = require(\"./OperatorSubscriber\");\nfunction mergeInternals(source, subscriber, project, concurrent, onBeforeNext, expand, innerSubScheduler, additionalFinalizer) {\n    var buffer = [];\n    var active = 0;\n    var index = 0;\n    var isComplete = false;\n    var checkComplete = function () {\n        if (isComplete && !buffer.length && !active) {\n            subscriber.complete();\n        }\n    };\n    var outerNext = function (value) { return (active < concurrent ? doInnerSub(value) : buffer.push(value)); };\n    var doInnerSub = function (value) {\n        expand && subscriber.next(value);\n        active++;\n        var innerComplete = false;\n        innerFrom_1.innerFrom(project(value, index++)).subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, function (innerValue) {\n            onBeforeNext === null || onBeforeNext === void 0 ? void 0 : onBeforeNext(innerValue);\n            if (expand) {\n                outerNext(innerValue);\n            }\n            else {\n                subscriber.next(innerValue);\n            }\n        }, function () {\n            innerComplete = true;\n        }, undefined, function () {\n            if (innerComplete) {\n                try {\n                    active--;\n                    var _loop_1 = function () {\n                        var bufferedValue = buffer.shift();\n                        if (innerSubScheduler) {\n                            executeSchedule_1.executeSchedule(subscriber, innerSubScheduler, function () { return doInnerSub(bufferedValue); });\n                        }\n                        else {\n                            doInnerSub(bufferedValue);\n                        }\n                    };\n                    while (buffer.length && active < concurrent) {\n                        _loop_1();\n                    }\n                    checkComplete();\n                }\n                catch (err) {\n                    subscriber.error(err);\n                }\n            }\n        }));\n    };\n    source.subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, outerNext, function () {\n        isComplete = true;\n        checkComplete();\n    }));\n    return function () {\n        additionalFinalizer === null || additionalFinalizer === void 0 ? void 0 : additionalFinalizer();\n    };\n}\nexports.mergeInternals = mergeInternals;\n//# sourceMappingURL=mergeInternals.js.map"
+    ],
+    "mappings": "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",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

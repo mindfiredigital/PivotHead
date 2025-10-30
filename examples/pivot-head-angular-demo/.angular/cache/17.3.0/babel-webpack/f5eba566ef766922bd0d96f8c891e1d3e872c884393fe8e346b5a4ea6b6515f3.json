@@ -1,0 +1,31 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.isInteropObservable = void 0;\nvar observable_1 = require(\"../symbol/observable\");\nvar isFunction_1 = require(\"./isFunction\");\nfunction isInteropObservable(input) {\n  return isFunction_1.isFunction(input[observable_1.observable]);\n}\nexports.isInteropObservable = isInteropObservable;\n//# sourceMappingURL=isInteropObservable.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "isInteropObservable",
+      "observable_1",
+      "require",
+      "isFunction_1",
+      "input",
+      "isFunction",
+      "observable"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/util/isInteropObservable.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.isInteropObservable = void 0;\nvar observable_1 = require(\"../symbol/observable\");\nvar isFunction_1 = require(\"./isFunction\");\nfunction isInteropObservable(input) {\n    return isFunction_1.isFunction(input[observable_1.observable]);\n}\nexports.isInteropObservable = isInteropObservable;\n//# sourceMappingURL=isInteropObservable.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,mBAAmB,GAAG,KAAK,CAAC;AACpC,IAAIC,YAAY,GAAGC,OAAO,CAAC,sBAAsB,CAAC;AAClD,IAAIC,YAAY,GAAGD,OAAO,CAAC,cAAc,CAAC;AAC1C,SAASF,mBAAmBA,CAACI,KAAK,EAAE;EAChC,OAAOD,YAAY,CAACE,UAAU,CAACD,KAAK,CAACH,YAAY,CAACK,UAAU,CAAC,CAAC;AAClE;AACAR,OAAO,CAACE,mBAAmB,GAAGA,mBAAmB;AACjD",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

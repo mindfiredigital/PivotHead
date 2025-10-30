@@ -1,0 +1,28 @@
+{
+  "id": "reference/api-reference/core-webcomponent-api-reference",
+  "title": "Core Web Component API",
+  "description": "The `` web component exposes a rich API through HTML attributes (for initial setup) and JavaScript properties, methods, and events (for dynamic interaction).",
+  "source": "@site/docs/reference/api-reference/core-webcomponent.md",
+  "sourceDirName": "reference/api-reference",
+  "slug": "/reference/api-reference/core-webcomponent-api-reference",
+  "permalink": "/PivotHead/docs/reference/api-reference/core-webcomponent-api-reference",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/reference/api-reference/core-webcomponent.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "core-webcomponent-api-reference",
+    "title": "Core Web Component API",
+    "sidebar_label": "Core Web Component"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Vue",
+    "permalink": "/PivotHead/docs/reference/conceptual-reference/vue-conceptual-reference"
+  },
+  "next": {
+    "title": "React",
+    "permalink": "/PivotHead/docs/reference/api-reference/react-api-reference"
+  }
+}

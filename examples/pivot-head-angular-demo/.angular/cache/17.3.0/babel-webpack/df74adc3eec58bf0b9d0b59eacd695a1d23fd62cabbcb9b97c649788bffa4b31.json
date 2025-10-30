@@ -1,0 +1,42 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\n/* eslint-disable */\n\n/**\n * @param {string[]} pathComponents\n * @returns {string}\n */\nfunction normalizeUrl(pathComponents) {\n  return pathComponents.reduce(function (accumulator, item) {\n    switch (item) {\n      case \"..\":\n        accumulator.pop();\n        break;\n      case \".\":\n        break;\n      default:\n        accumulator.push(item);\n    }\n    return accumulator;\n  }, /** @type {string[]} */[]).join(\"/\");\n}\n\n/**\n * @param {string} urlString\n * @returns {string}\n */\nmodule.exports = function (urlString) {\n  urlString = urlString.trim();\n  if (/^data:/i.test(urlString)) {\n    return urlString;\n  }\n  var protocol = urlString.indexOf(\"//\") !== -1 ? urlString.split(\"//\")[0] + \"//\" : \"\";\n  var components = urlString.replace(new RegExp(protocol, \"i\"), \"\").split(\"/\");\n  var host = components[0].toLowerCase().replace(/\\.$/, \"\");\n  components[0] = \"\";\n  var path = normalizeUrl(components);\n  return protocol + host + path;\n};",
+  "map": {
+    "version": 3,
+    "names": [
+      "normalizeUrl",
+      "pathComponents",
+      "reduce",
+      "accumulator",
+      "item",
+      "pop",
+      "push",
+      "join",
+      "module",
+      "exports",
+      "urlString",
+      "trim",
+      "test",
+      "protocol",
+      "indexOf",
+      "split",
+      "components",
+      "replace",
+      "RegExp",
+      "host",
+      "toLowerCase",
+      "path"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/mini-css-extract-plugin@2.8.1_webpack@5.90.3/node_modules/mini-css-extract-plugin/dist/hmr/normalize-url.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\n\n/* eslint-disable */\n\n/**\n * @param {string[]} pathComponents\n * @returns {string}\n */\nfunction normalizeUrl(pathComponents) {\n  return pathComponents.reduce(function (accumulator, item) {\n    switch (item) {\n      case \"..\":\n        accumulator.pop();\n        break;\n      case \".\":\n        break;\n      default:\n        accumulator.push(item);\n    }\n    return accumulator;\n  }, /** @type {string[]} */[]).join(\"/\");\n}\n\n/**\n * @param {string} urlString\n * @returns {string}\n */\nmodule.exports = function (urlString) {\n  urlString = urlString.trim();\n  if (/^data:/i.test(urlString)) {\n    return urlString;\n  }\n  var protocol = urlString.indexOf(\"//\") !== -1 ? urlString.split(\"//\")[0] + \"//\" : \"\";\n  var components = urlString.replace(new RegExp(protocol, \"i\"), \"\").split(\"/\");\n  var host = components[0].toLowerCase().replace(/\\.$/, \"\");\n  components[0] = \"\";\n  var path = normalizeUrl(components);\n  return protocol + host + path;\n};"
+    ],
+    "mappings": "AAAA,YAAY;;AAEZ;;AAEA;AACA;AACA;AACA;AACA,SAASA,YAAYA,CAACC,cAAc,EAAE;EACpC,OAAOA,cAAc,CAACC,MAAM,CAAC,UAAUC,WAAW,EAAEC,IAAI,EAAE;IACxD,QAAQA,IAAI;MACV,KAAK,IAAI;QACPD,WAAW,CAACE,GAAG,CAAC,CAAC;QACjB;MACF,KAAK,GAAG;QACN;MACF;QACEF,WAAW,CAACG,IAAI,CAACF,IAAI,CAAC;IAC1B;IACA,OAAOD,WAAW;EACpB,CAAC,EAAE,uBAAuB,EAAE,CAAC,CAACI,IAAI,CAAC,GAAG,CAAC;AACzC;;AAEA;AACA;AACA;AACA;AACAC,MAAM,CAACC,OAAO,GAAG,UAAUC,SAAS,EAAE;EACpCA,SAAS,GAAGA,SAAS,CAACC,IAAI,CAAC,CAAC;EAC5B,IAAI,SAAS,CAACC,IAAI,CAACF,SAAS,CAAC,EAAE;IAC7B,OAAOA,SAAS;EAClB;EACA,IAAIG,QAAQ,GAAGH,SAAS,CAACI,OAAO,CAAC,IAAI,CAAC,KAAK,CAAC,CAAC,GAAGJ,SAAS,CAACK,KAAK,CAAC,IAAI,CAAC,CAAC,CAAC,CAAC,GAAG,IAAI,GAAG,EAAE;EACpF,IAAIC,UAAU,GAAGN,SAAS,CAACO,OAAO,CAAC,IAAIC,MAAM,CAACL,QAAQ,EAAE,GAAG,CAAC,EAAE,EAAE,CAAC,CAACE,KAAK,CAAC,GAAG,CAAC;EAC5E,IAAII,IAAI,GAAGH,UAAU,CAAC,CAAC,CAAC,CAACI,WAAW,CAAC,CAAC,CAACH,OAAO,CAAC,KAAK,EAAE,EAAE,CAAC;EACzDD,UAAU,CAAC,CAAC,CAAC,GAAG,EAAE;EAClB,IAAIK,IAAI,GAAGrB,YAAY,CAACgB,UAAU,CAAC;EACnC,OAAOH,QAAQ,GAAGM,IAAI,GAAGE,IAAI;AAC/B,CAAC",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

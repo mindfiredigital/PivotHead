@@ -14,14 +14,5 @@
   "sidebarPosition": 5,
   "frontMatter": {
     "sidebar_position": 5
-  },
-  "sidebar": "tutorialSidebar",
-  "previous": {
-    "title": "Examples & Usage",
-    "permalink": "/PivotHead/docs/tutorial-basics/core/examples"
-  },
-  "next": {
-    "title": "React Wrapper",
-    "permalink": "/PivotHead/docs/tutorial-basics/wrappers/react"
   }
 }

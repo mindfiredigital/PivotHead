@@ -1,0 +1,19 @@
+{
+  "id": "tutorials/angular/angular-sample-project",
+  "title": "Sample Project",
+  "description": "This tutorial will guide you through creating a simple Angular application that uses @pivothead/angular to render a headless pivot table.",
+  "source": "@site/docs/tutorials/angular/sample-project.md",
+  "sourceDirName": "tutorials/angular",
+  "slug": "/tutorials/angular/angular-sample-project",
+  "permalink": "/PivotHead/docs/tutorials/angular/angular-sample-project",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorials/angular/sample-project.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "angular-sample-project",
+    "title": "Sample Project",
+    "sidebar_label": "Sample Project"
+  }
+}

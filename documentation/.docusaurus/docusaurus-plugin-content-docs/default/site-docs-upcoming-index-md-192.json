@@ -1,0 +1,31 @@
+{
+  "id": "upcoming/index",
+  "title": "Upcoming Features",
+  "description": "What's coming next in PivotHead - exciting features in development",
+  "source": "@site/docs/upcoming/index.md",
+  "sourceDirName": "upcoming",
+  "slug": "/upcoming/",
+  "permalink": "/PivotHead/docs/upcoming/",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/upcoming/index.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Upcoming Features",
+    "description": "What's coming next in PivotHead - exciting features in development",
+    "keywords": [
+      "roadmap",
+      "upcoming",
+      "features",
+      "angular",
+      "high-volume",
+      "performance"
+    ]
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Quick Start Guide",
+    "permalink": "/PivotHead/docs/contributors/quick-start"
+  }
+}

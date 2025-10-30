@@ -1,0 +1,37 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.captureError = exports.errorContext = void 0;\nvar config_1 = require(\"../config\");\nvar context = null;\nfunction errorContext(cb) {\n  if (config_1.config.useDeprecatedSynchronousErrorHandling) {\n    var isRoot = !context;\n    if (isRoot) {\n      context = {\n        errorThrown: false,\n        error: null\n      };\n    }\n    cb();\n    if (isRoot) {\n      var _a = context,\n        errorThrown = _a.errorThrown,\n        error = _a.error;\n      context = null;\n      if (errorThrown) {\n        throw error;\n      }\n    }\n  } else {\n    cb();\n  }\n}\nexports.errorContext = errorContext;\nfunction captureError(err) {\n  if (config_1.config.useDeprecatedSynchronousErrorHandling && context) {\n    context.errorThrown = true;\n    context.error = err;\n  }\n}\nexports.captureError = captureError;\n//# sourceMappingURL=errorContext.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "captureError",
+      "errorContext",
+      "config_1",
+      "require",
+      "context",
+      "cb",
+      "config",
+      "useDeprecatedSynchronousErrorHandling",
+      "isRoot",
+      "errorThrown",
+      "error",
+      "_a",
+      "err"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/util/errorContext.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.captureError = exports.errorContext = void 0;\nvar config_1 = require(\"../config\");\nvar context = null;\nfunction errorContext(cb) {\n    if (config_1.config.useDeprecatedSynchronousErrorHandling) {\n        var isRoot = !context;\n        if (isRoot) {\n            context = { errorThrown: false, error: null };\n        }\n        cb();\n        if (isRoot) {\n            var _a = context, errorThrown = _a.errorThrown, error = _a.error;\n            context = null;\n            if (errorThrown) {\n                throw error;\n            }\n        }\n    }\n    else {\n        cb();\n    }\n}\nexports.errorContext = errorContext;\nfunction captureError(err) {\n    if (config_1.config.useDeprecatedSynchronousErrorHandling && context) {\n        context.errorThrown = true;\n        context.error = err;\n    }\n}\nexports.captureError = captureError;\n//# sourceMappingURL=errorContext.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,YAAY,GAAGF,OAAO,CAACG,YAAY,GAAG,KAAK,CAAC;AACpD,IAAIC,QAAQ,GAAGC,OAAO,CAAC,WAAW,CAAC;AACnC,IAAIC,OAAO,GAAG,IAAI;AAClB,SAASH,YAAYA,CAACI,EAAE,EAAE;EACtB,IAAIH,QAAQ,CAACI,MAAM,CAACC,qCAAqC,EAAE;IACvD,IAAIC,MAAM,GAAG,CAACJ,OAAO;IACrB,IAAII,MAAM,EAAE;MACRJ,OAAO,GAAG;QAAEK,WAAW,EAAE,KAAK;QAAEC,KAAK,EAAE;MAAK,CAAC;IACjD;IACAL,EAAE,CAAC,CAAC;IACJ,IAAIG,MAAM,EAAE;MACR,IAAIG,EAAE,GAAGP,OAAO;QAAEK,WAAW,GAAGE,EAAE,CAACF,WAAW;QAAEC,KAAK,GAAGC,EAAE,CAACD,KAAK;MAChEN,OAAO,GAAG,IAAI;MACd,IAAIK,WAAW,EAAE;QACb,MAAMC,KAAK;MACf;IACJ;EACJ,CAAC,MACI;IACDL,EAAE,CAAC,CAAC;EACR;AACJ;AACAP,OAAO,CAACG,YAAY,GAAGA,YAAY;AACnC,SAASD,YAAYA,CAACY,GAAG,EAAE;EACvB,IAAIV,QAAQ,CAACI,MAAM,CAACC,qCAAqC,IAAIH,OAAO,EAAE;IAClEA,OAAO,CAACK,WAAW,GAAG,IAAI;IAC1BL,OAAO,CAACM,KAAK,GAAGE,GAAG;EACvB;AACJ;AACAd,OAAO,CAACE,YAAY,GAAGA,YAAY;AACnC",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

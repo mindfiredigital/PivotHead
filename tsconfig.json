@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "jsx": "react",
+    "baseUrl": ".",
+    "paths": {
+      "@mindfiredigital/pivothead": ["packages/core/dist"],
+      "@mindfiredigital/pivothead/*": ["packages/core/dist/*"],
+      "@mindfiredigital/pivothead-web-component": [
+        "packages/web-component/dist"
+      ],
+      "@mindfiredigital/pivothead-web-component/*": [
+        "packages/web-component/dist/*"
+      ],
+      "@mindfiredigital/pivothead-angular": ["packages/angular/dist"],
+      "@mindfiredigital/pivothead-angular/*": ["packages/angular/dist/*"]
+    },
+    "target": "ES2022",
+    "module": "ESNext",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "declaration": true,
+    "strict": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true
+  }
+}

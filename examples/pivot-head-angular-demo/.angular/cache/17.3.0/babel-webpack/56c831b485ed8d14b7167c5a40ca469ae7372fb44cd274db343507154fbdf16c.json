@@ -1,0 +1,36 @@
+{
+  "ast": null,
+  "code": "import { fn } from 'storybook/test';\nimport { HeaderComponent } from './header.component';\nconst meta = {\n  title: 'Example/Header',\n  component: HeaderComponent,\n  // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs\n  tags: ['autodocs'],\n  parameters: {\n    // More on how to position stories at: https://storybook.js.org/docs/configure/story-layout\n    layout: 'fullscreen'\n  },\n  args: {\n    onLogin: fn(),\n    onLogout: fn(),\n    onCreateAccount: fn()\n  }\n};\nexport default meta;\nexport const LoggedIn = {\n  args: {\n    user: {\n      name: 'Jane Doe'\n    }\n  }\n};\nexport const LoggedOut = {};",
+  "map": {
+    "version": 3,
+    "names": [
+      "fn",
+      "HeaderComponent",
+      "meta",
+      "title",
+      "component",
+      "tags",
+      "parameters",
+      "layout",
+      "args",
+      "onLogin",
+      "onLogout",
+      "onCreateAccount",
+      "LoggedIn",
+      "user",
+      "name",
+      "LoggedOut"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/examples/pivot-head-angular-demo/src/stories/header.stories.ts"
+    ],
+    "sourcesContent": [
+      "import { fn } from 'storybook/test';\nimport { HeaderComponent } from './header.component';\nconst meta = {\n    title: 'Example/Header',\n    component: HeaderComponent,\n    // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs\n    tags: ['autodocs'],\n    parameters: {\n        // More on how to position stories at: https://storybook.js.org/docs/configure/story-layout\n        layout: 'fullscreen',\n    },\n    args: {\n        onLogin: fn(),\n        onLogout: fn(),\n        onCreateAccount: fn(),\n    },\n};\nexport default meta;\nexport const LoggedIn = {\n    args: {\n        user: {\n            name: 'Jane Doe',\n        },\n    },\n};\nexport const LoggedOut = {};\n"
+    ],
+    "mappings": "AAAA,SAASA,EAAE,QAAQ,gBAAgB;AACnC,SAASC,eAAe,QAAQ,oBAAoB;AACpD,MAAMC,IAAI,GAAG;EACTC,KAAK,EAAE,gBAAgB;EACvBC,SAAS,EAAEH,eAAe;EAC1B;EACAI,IAAI,EAAE,CAAC,UAAU,CAAC;EAClBC,UAAU,EAAE;IACR;IACAC,MAAM,EAAE;EACZ,CAAC;EACDC,IAAI,EAAE;IACFC,OAAO,EAAET,EAAE,CAAC,CAAC;IACbU,QAAQ,EAAEV,EAAE,CAAC,CAAC;IACdW,eAAe,EAAEX,EAAE,CAAC;EACxB;AACJ,CAAC;AACD,eAAeE,IAAI;AACnB,OAAO,MAAMU,QAAQ,GAAG;EACpBJ,IAAI,EAAE;IACFK,IAAI,EAAE;MACFC,IAAI,EAAE;IACV;EACJ;AACJ,CAAC;AACD,OAAO,MAAMC,SAAS,GAAG,CAAC,CAAC",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "module",
+  "externalDependencies": []
+}

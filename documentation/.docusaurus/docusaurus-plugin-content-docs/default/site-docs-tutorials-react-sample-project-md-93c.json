@@ -1,0 +1,28 @@
+{
+  "id": "tutorials/react/react-sample-project",
+  "title": "Sample Project",
+  "description": "Let's build a simple React application to demonstrate how to use the @pivothead/react package to create a headless pivot table.",
+  "source": "@site/docs/tutorials/react/sample-project.md",
+  "sourceDirName": "tutorials/react",
+  "slug": "/tutorials/react/react-sample-project",
+  "permalink": "/PivotHead/docs/tutorials/react/react-sample-project",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorials/react/sample-project.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "react-sample-project",
+    "title": "Sample Project",
+    "sidebar_label": "Sample Project"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "setup-for-user-project",
+    "permalink": "/PivotHead/docs/tutorials/core-webcomponent/setup-for-user-project"
+  },
+  "next": {
+    "title": "setup-for-user-project",
+    "permalink": "/PivotHead/docs/tutorials/react/setup-for-user-project"
+  }
+}

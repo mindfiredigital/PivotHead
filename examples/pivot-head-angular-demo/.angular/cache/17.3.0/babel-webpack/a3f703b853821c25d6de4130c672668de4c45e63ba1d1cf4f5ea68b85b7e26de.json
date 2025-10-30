@@ -1,0 +1,35 @@
+{
+  "ast": null,
+  "code": "// import { moduleMetadata, type Meta, type StoryObj } from '@storybook/angular';\n// // import { PivotheadAngularModule } from './pivothead-angular.module';\n// import { PivotHeadWrapperComponent } from './pivothead-wrapper.component';\n// import { sampleData, sampleOptions } from '../../../../examples/pivot-head-angular-demo/src/app/sample-data';\nimport { moduleMetadata } from '@storybook/angular';\n// 1. Import the standalone component\nimport { PivotHeadWrapperComponent } from './pivothead-wrapper.component';\n// You might need to import other modules it uses, like CommonModule\nimport { CommonModule } from '@angular/common';\n// (Optional but recommended) Import your sample data\nimport { sampleData, sampleOptions } from '../../../../examples/pivot-head-angular-demo/src/app/sample-data';\n// This is the core Storybook configuration for your component\nconst meta = {\n  title: 'PivotHead/PivotHeadWrapperComponent',\n  component: PivotHeadWrapperComponent,\n  // This 'decorators' section is THE MOST IMPORTANT PART for Angular\n  decorators: [moduleMetadata({\n    imports: [PivotHeadWrapperComponent,\n    // <-- For standalone, you import the component itself\n    CommonModule // <-- Also import any modules it depends on (e.g., for *ngIf, *ngFor)\n    ]\n  })],\n  tags: ['autodocs']\n};\nexport default meta;\n// This is the \"Default\" story that will be displayed\nexport const Default = {\n  args: {\n    // Pass the data to the component's @Input() properties\n    data: sampleData,\n    options: sampleOptions\n  }\n};",
+  "map": {
+    "version": 3,
+    "names": [
+      "moduleMetadata",
+      "PivotHeadWrapperComponent",
+      "CommonModule",
+      "sampleData",
+      "sampleOptions",
+      "meta",
+      "title",
+      "component",
+      "decorators",
+      "imports",
+      "tags",
+      "Default",
+      "args",
+      "data",
+      "options"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/packages/angular/src/lib/pivothead-wrapper.stories.ts"
+    ],
+    "sourcesContent": [
+      "// import { moduleMetadata, type Meta, type StoryObj } from '@storybook/angular';\n// // import { PivotheadAngularModule } from './pivothead-angular.module';\n// import { PivotHeadWrapperComponent } from './pivothead-wrapper.component';\n// import { sampleData, sampleOptions } from '../../../../examples/pivot-head-angular-demo/src/app/sample-data';\nimport { moduleMetadata } from '@storybook/angular';\n// 1. Import the standalone component\nimport { PivotHeadWrapperComponent } from './pivothead-wrapper.component';\n// You might need to import other modules it uses, like CommonModule\nimport { CommonModule } from '@angular/common';\n// (Optional but recommended) Import your sample data\nimport { sampleData, sampleOptions } from '../../../../examples/pivot-head-angular-demo/src/app/sample-data';\n// This is the core Storybook configuration for your component\nconst meta = {\n    title: 'PivotHead/PivotHeadWrapperComponent',\n    component: PivotHeadWrapperComponent,\n    // This 'decorators' section is THE MOST IMPORTANT PART for Angular\n    decorators: [\n        moduleMetadata({\n            imports: [\n                PivotHeadWrapperComponent, // <-- For standalone, you import the component itself\n                CommonModule // <-- Also import any modules it depends on (e.g., for *ngIf, *ngFor)\n            ],\n        }),\n    ],\n    tags: ['autodocs'],\n};\nexport default meta;\n// This is the \"Default\" story that will be displayed\nexport const Default = {\n    args: {\n        // Pass the data to the component's @Input() properties\n        data: sampleData,\n        options: sampleOptions,\n    },\n};\n"
+    ],
+    "mappings": "AAAA;AACA;AACA;AACA;AACA,SAASA,cAAc,QAAQ,oBAAoB;AACnD;AACA,SAASC,yBAAyB,QAAQ,+BAA+B;AACzE;AACA,SAASC,YAAY,QAAQ,iBAAiB;AAC9C;AACA,SAASC,UAAU,EAAEC,aAAa,QAAQ,kEAAkE;AAC5G;AACA,MAAMC,IAAI,GAAG;EACTC,KAAK,EAAE,qCAAqC;EAC5CC,SAAS,EAAEN,yBAAyB;EACpC;EACAO,UAAU,EAAE,CACRR,cAAc,CAAC;IACXS,OAAO,EAAE,CACLR,yBAAyB;IAAE;IAC3BC,YAAY,CAAC;IAAA;EAErB,CAAC,CAAC,CACL;EACDQ,IAAI,EAAE,CAAC,UAAU;AACrB,CAAC;AACD,eAAeL,IAAI;AACnB;AACA,OAAO,MAAMM,OAAO,GAAG;EACnBC,IAAI,EAAE;IACF;IACAC,IAAI,EAAEV,UAAU;IAChBW,OAAO,EAAEV;EACb;AACJ,CAAC",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "module",
+  "externalDependencies": []
+}

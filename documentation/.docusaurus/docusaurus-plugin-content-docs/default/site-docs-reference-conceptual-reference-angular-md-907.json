@@ -1,0 +1,19 @@
+{
+  "id": "reference/conceptual-reference/angular-conceptual-reference",
+  "title": "Angular concept",
+  "description": "Angular Service Integration",
+  "source": "@site/docs/reference/conceptual-reference/angular.md",
+  "sourceDirName": "reference/conceptual-reference",
+  "slug": "/reference/conceptual-reference/angular-conceptual-reference",
+  "permalink": "/PivotHead/docs/reference/conceptual-reference/angular-conceptual-reference",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/reference/conceptual-reference/angular.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "angular-conceptual-reference",
+    "title": "Angular concept",
+    "sidebar_label": "Angular"
+  }
+}

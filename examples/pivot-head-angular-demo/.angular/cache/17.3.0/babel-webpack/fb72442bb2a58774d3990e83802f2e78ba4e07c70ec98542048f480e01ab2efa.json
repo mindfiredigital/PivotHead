@@ -1,0 +1,35 @@
+{
+  "ast": null,
+  "code": "// import { moduleMetadata, type Meta, type StoryObj } from '@storybook/angular';\n// // import { PivotheadAngularModule } from './pivothead-angular.module';\n// import { PivotHeadWrapperComponent } from './pivothead-wrapper.component';\n// import { sampleData, sampleOptions } from '../../../../examples/pivot-head-angular-demo/src/app/sample-data';\nimport { moduleMetadata } from '@storybook/angular';\n// 1. Import your component AND its NgModule\nimport { PivotHeadWrapperComponent } from './pivothead-wrapper.component'; // Adjust path if necessary\n// Import your sample data\nimport { sampleData, sampleOptions } from '../../../../examples/pivot-head-angular-demo/';\n// The Meta configuration for the story\nconst meta = {\n  title: 'PivotHead/PivotHeadWrapperComponent',\n  component: PivotHeadWrapperComponent,\n  // 2. Ensure the component is correctly referenced here\n  decorators: [\n  // 3. Add the moduleMetadata decorator\n  moduleMetadata({\n    imports: [PivotHeadModule] // <-- IMPORTANT: Add the module to the imports array\n  })],\n  tags: ['autodocs'] // Optional: for automatic documentation generation\n};\nexport default meta;\n// The Default story\nexport const Default = {\n  args: {\n    // 4. Pass the data to the component using args\n    data: sampleData,\n    options: sampleOptions\n  }\n};",
+  "map": {
+    "version": 3,
+    "names": [
+      "moduleMetadata",
+      "PivotHeadWrapperComponent",
+      "sampleData",
+      "sampleOptions",
+      "meta",
+      "title",
+      "component",
+      "decorators",
+      "imports",
+      "PivotHeadModule",
+      "tags",
+      "Default",
+      "args",
+      "data",
+      "options"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/packages/angular/src/lib/pivothead-wrapper.stories.ts"
+    ],
+    "sourcesContent": [
+      "// import { moduleMetadata, type Meta, type StoryObj } from '@storybook/angular';\n// // import { PivotheadAngularModule } from './pivothead-angular.module';\n// import { PivotHeadWrapperComponent } from './pivothead-wrapper.component';\n// import { sampleData, sampleOptions } from '../../../../examples/pivot-head-angular-demo/src/app/sample-data';\nimport { moduleMetadata } from '@storybook/angular';\n// 1. Import your component AND its NgModule\nimport { PivotHeadWrapperComponent } from './pivothead-wrapper.component'; // Adjust path if necessary\n// Import your sample data\nimport { sampleData, sampleOptions } from '../../../../examples/pivot-head-angular-demo/';\n// The Meta configuration for the story\nconst meta = {\n    title: 'PivotHead/PivotHeadWrapperComponent',\n    component: PivotHeadWrapperComponent, // 2. Ensure the component is correctly referenced here\n    decorators: [\n        // 3. Add the moduleMetadata decorator\n        moduleMetadata({\n            imports: [PivotHeadModule], // <-- IMPORTANT: Add the module to the imports array\n        }),\n    ],\n    tags: ['autodocs'], // Optional: for automatic documentation generation\n};\nexport default meta;\n// The Default story\nexport const Default = {\n    args: {\n        // 4. Pass the data to the component using args\n        data: sampleData,\n        options: sampleOptions,\n    },\n};\n"
+    ],
+    "mappings": "AAAA;AACA;AACA;AACA;AACA,SAASA,cAAc,QAAQ,oBAAoB;AACnD;AACA,SAASC,yBAAyB,QAAQ,+BAA+B,CAAC,CAAC;AAC3E;AACA,SAASC,UAAU,EAAEC,aAAa,QAAQ,+CAA+C;AACzF;AACA,MAAMC,IAAI,GAAG;EACTC,KAAK,EAAE,qCAAqC;EAC5CC,SAAS,EAAEL,yBAAyB;EAAE;EACtCM,UAAU,EAAE;EACR;EACAP,cAAc,CAAC;IACXQ,OAAO,EAAE,CAACC,eAAe,CAAC,CAAE;EAChC,CAAC,CAAC,CACL;EACDC,IAAI,EAAE,CAAC,UAAU,CAAC,CAAE;AACxB,CAAC;AACD,eAAeN,IAAI;AACnB;AACA,OAAO,MAAMO,OAAO,GAAG;EACnBC,IAAI,EAAE;IACF;IACAC,IAAI,EAAEX,UAAU;IAChBY,OAAO,EAAEX;EACb;AACJ,CAAC",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "module",
+  "externalDependencies": []
+}

@@ -1,0 +1,39 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.publishReplay = void 0;\nvar ReplaySubject_1 = require(\"../ReplaySubject\");\nvar multicast_1 = require(\"./multicast\");\nvar isFunction_1 = require(\"../util/isFunction\");\nfunction publishReplay(bufferSize, windowTime, selectorOrScheduler, timestampProvider) {\n  if (selectorOrScheduler && !isFunction_1.isFunction(selectorOrScheduler)) {\n    timestampProvider = selectorOrScheduler;\n  }\n  var selector = isFunction_1.isFunction(selectorOrScheduler) ? selectorOrScheduler : undefined;\n  return function (source) {\n    return multicast_1.multicast(new ReplaySubject_1.ReplaySubject(bufferSize, windowTime, timestampProvider), selector)(source);\n  };\n}\nexports.publishReplay = publishReplay;\n//# sourceMappingURL=publishReplay.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "publishReplay",
+      "ReplaySubject_1",
+      "require",
+      "multicast_1",
+      "isFunction_1",
+      "bufferSize",
+      "windowTime",
+      "selectorOrScheduler",
+      "timestampProvider",
+      "isFunction",
+      "selector",
+      "undefined",
+      "source",
+      "multicast",
+      "ReplaySubject"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/operators/publishReplay.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.publishReplay = void 0;\nvar ReplaySubject_1 = require(\"../ReplaySubject\");\nvar multicast_1 = require(\"./multicast\");\nvar isFunction_1 = require(\"../util/isFunction\");\nfunction publishReplay(bufferSize, windowTime, selectorOrScheduler, timestampProvider) {\n    if (selectorOrScheduler && !isFunction_1.isFunction(selectorOrScheduler)) {\n        timestampProvider = selectorOrScheduler;\n    }\n    var selector = isFunction_1.isFunction(selectorOrScheduler) ? selectorOrScheduler : undefined;\n    return function (source) { return multicast_1.multicast(new ReplaySubject_1.ReplaySubject(bufferSize, windowTime, timestampProvider), selector)(source); };\n}\nexports.publishReplay = publishReplay;\n//# sourceMappingURL=publishReplay.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,aAAa,GAAG,KAAK,CAAC;AAC9B,IAAIC,eAAe,GAAGC,OAAO,CAAC,kBAAkB,CAAC;AACjD,IAAIC,WAAW,GAAGD,OAAO,CAAC,aAAa,CAAC;AACxC,IAAIE,YAAY,GAAGF,OAAO,CAAC,oBAAoB,CAAC;AAChD,SAASF,aAAaA,CAACK,UAAU,EAAEC,UAAU,EAAEC,mBAAmB,EAAEC,iBAAiB,EAAE;EACnF,IAAID,mBAAmB,IAAI,CAACH,YAAY,CAACK,UAAU,CAACF,mBAAmB,CAAC,EAAE;IACtEC,iBAAiB,GAAGD,mBAAmB;EAC3C;EACA,IAAIG,QAAQ,GAAGN,YAAY,CAACK,UAAU,CAACF,mBAAmB,CAAC,GAAGA,mBAAmB,GAAGI,SAAS;EAC7F,OAAO,UAAUC,MAAM,EAAE;IAAE,OAAOT,WAAW,CAACU,SAAS,CAAC,IAAIZ,eAAe,CAACa,aAAa,CAACT,UAAU,EAAEC,UAAU,EAAEE,iBAAiB,CAAC,EAAEE,QAAQ,CAAC,CAACE,MAAM,CAAC;EAAE,CAAC;AAC9J;AACAd,OAAO,CAACE,aAAa,GAAGA,aAAa;AACrC",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

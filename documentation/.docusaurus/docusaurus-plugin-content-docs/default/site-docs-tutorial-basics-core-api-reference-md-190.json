@@ -16,14 +16,5 @@
     "sidebar_position": 2,
     "title": "Api Reference",
     "description": "Understanding the Api References of PivotHead"
-  },
-  "sidebar": "tutorialSidebar",
-  "previous": {
-    "title": "Core Concepts",
-    "permalink": "/PivotHead/docs/tutorial-basics/core/core-concepts"
-  },
-  "next": {
-    "title": "Examples & Usage",
-    "permalink": "/PivotHead/docs/tutorial-basics/core/examples"
   }
 }
