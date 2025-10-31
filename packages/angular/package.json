@@ -1,14 +1,14 @@
 {
   "name": "@mindfiredigital/pivothead-angular",
-  "version": "0.1.2",
+  "version": "0.1.0",
+  "private": true,
   "dependencies": {
-    "@mindfiredigital/pivothead": "workspace:*",
     "@mindfiredigital/pivothead-web-component": "workspace:*",
     "tslib": "^2.3.0"
   },
-  "peerDependencies": {
-    "@angular/common": "^17.0.0",
-    "@angular/core": "^17.0.0"
+  "devDependencies": {
+    "ng-packagr": "^17.3.0",
+    "typescript": "~5.3.3"
   },
   "sideEffects": false,
   "scripts": {

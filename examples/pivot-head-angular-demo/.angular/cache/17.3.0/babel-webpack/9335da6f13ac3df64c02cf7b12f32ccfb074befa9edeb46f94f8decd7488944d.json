@@ -1,0 +1,60 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nvar __extends = this && this.__extends || function () {\n  var extendStatics = function (d, b) {\n    extendStatics = Object.setPrototypeOf || {\n      __proto__: []\n    } instanceof Array && function (d, b) {\n      d.__proto__ = b;\n    } || function (d, b) {\n      for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];\n    };\n    return extendStatics(d, b);\n  };\n  return function (d, b) {\n    if (typeof b !== \"function\" && b !== null) throw new TypeError(\"Class extends value \" + String(b) + \" is not a constructor or null\");\n    extendStatics(d, b);\n    function __() {\n      this.constructor = d;\n    }\n    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());\n  };\n}();\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.BehaviorSubject = void 0;\nvar Subject_1 = require(\"./Subject\");\nvar BehaviorSubject = function (_super) {\n  __extends(BehaviorSubject, _super);\n  function BehaviorSubject(_value) {\n    var _this = _super.call(this) || this;\n    _this._value = _value;\n    return _this;\n  }\n  Object.defineProperty(BehaviorSubject.prototype, \"value\", {\n    get: function () {\n      return this.getValue();\n    },\n    enumerable: false,\n    configurable: true\n  });\n  BehaviorSubject.prototype._subscribe = function (subscriber) {\n    var subscription = _super.prototype._subscribe.call(this, subscriber);\n    !subscription.closed && subscriber.next(this._value);\n    return subscription;\n  };\n  BehaviorSubject.prototype.getValue = function () {\n    var _a = this,\n      hasError = _a.hasError,\n      thrownError = _a.thrownError,\n      _value = _a._value;\n    if (hasError) {\n      throw thrownError;\n    }\n    this._throwIfClosed();\n    return _value;\n  };\n  BehaviorSubject.prototype.next = function (value) {\n    _super.prototype.next.call(this, this._value = value);\n  };\n  return BehaviorSubject;\n}(Subject_1.Subject);\nexports.BehaviorSubject = BehaviorSubject;\n//# sourceMappingURL=BehaviorSubject.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "__extends",
+      "extendStatics",
+      "d",
+      "b",
+      "Object",
+      "setPrototypeOf",
+      "__proto__",
+      "Array",
+      "p",
+      "prototype",
+      "hasOwnProperty",
+      "call",
+      "TypeError",
+      "String",
+      "__",
+      "constructor",
+      "create",
+      "defineProperty",
+      "exports",
+      "value",
+      "BehaviorSubject",
+      "Subject_1",
+      "require",
+      "_super",
+      "_value",
+      "_this",
+      "get",
+      "getValue",
+      "enumerable",
+      "configurable",
+      "_subscribe",
+      "subscriber",
+      "subscription",
+      "closed",
+      "next",
+      "_a",
+      "hasError",
+      "thrownError",
+      "_throwIfClosed",
+      "Subject"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/BehaviorSubject.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nvar __extends = (this && this.__extends) || (function () {\n    var extendStatics = function (d, b) {\n        extendStatics = Object.setPrototypeOf ||\n            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||\n            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };\n        return extendStatics(d, b);\n    };\n    return function (d, b) {\n        if (typeof b !== \"function\" && b !== null)\n            throw new TypeError(\"Class extends value \" + String(b) + \" is not a constructor or null\");\n        extendStatics(d, b);\n        function __() { this.constructor = d; }\n        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());\n    };\n})();\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.BehaviorSubject = void 0;\nvar Subject_1 = require(\"./Subject\");\nvar BehaviorSubject = (function (_super) {\n    __extends(BehaviorSubject, _super);\n    function BehaviorSubject(_value) {\n        var _this = _super.call(this) || this;\n        _this._value = _value;\n        return _this;\n    }\n    Object.defineProperty(BehaviorSubject.prototype, \"value\", {\n        get: function () {\n            return this.getValue();\n        },\n        enumerable: false,\n        configurable: true\n    });\n    BehaviorSubject.prototype._subscribe = function (subscriber) {\n        var subscription = _super.prototype._subscribe.call(this, subscriber);\n        !subscription.closed && subscriber.next(this._value);\n        return subscription;\n    };\n    BehaviorSubject.prototype.getValue = function () {\n        var _a = this, hasError = _a.hasError, thrownError = _a.thrownError, _value = _a._value;\n        if (hasError) {\n            throw thrownError;\n        }\n        this._throwIfClosed();\n        return _value;\n    };\n    BehaviorSubject.prototype.next = function (value) {\n        _super.prototype.next.call(this, (this._value = value));\n    };\n    return BehaviorSubject;\n}(Subject_1.Subject));\nexports.BehaviorSubject = BehaviorSubject;\n//# sourceMappingURL=BehaviorSubject.js.map"
+    ],
+    "mappings": "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",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

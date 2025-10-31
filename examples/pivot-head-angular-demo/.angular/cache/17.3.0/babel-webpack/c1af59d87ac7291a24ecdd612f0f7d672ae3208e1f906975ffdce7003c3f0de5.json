@@ -1,0 +1,42 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.catchError = void 0;\nvar innerFrom_1 = require(\"../observable/innerFrom\");\nvar OperatorSubscriber_1 = require(\"./OperatorSubscriber\");\nvar lift_1 = require(\"../util/lift\");\nfunction catchError(selector) {\n  return lift_1.operate(function (source, subscriber) {\n    var innerSub = null;\n    var syncUnsub = false;\n    var handledResult;\n    innerSub = source.subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, undefined, undefined, function (err) {\n      handledResult = innerFrom_1.innerFrom(selector(err, catchError(selector)(source)));\n      if (innerSub) {\n        innerSub.unsubscribe();\n        innerSub = null;\n        handledResult.subscribe(subscriber);\n      } else {\n        syncUnsub = true;\n      }\n    }));\n    if (syncUnsub) {\n      innerSub.unsubscribe();\n      innerSub = null;\n      handledResult.subscribe(subscriber);\n    }\n  });\n}\nexports.catchError = catchError;\n//# sourceMappingURL=catchError.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "catchError",
+      "innerFrom_1",
+      "require",
+      "OperatorSubscriber_1",
+      "lift_1",
+      "selector",
+      "operate",
+      "source",
+      "subscriber",
+      "innerSub",
+      "syncUnsub",
+      "handledResult",
+      "subscribe",
+      "createOperatorSubscriber",
+      "undefined",
+      "err",
+      "innerFrom",
+      "unsubscribe"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/operators/catchError.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.catchError = void 0;\nvar innerFrom_1 = require(\"../observable/innerFrom\");\nvar OperatorSubscriber_1 = require(\"./OperatorSubscriber\");\nvar lift_1 = require(\"../util/lift\");\nfunction catchError(selector) {\n    return lift_1.operate(function (source, subscriber) {\n        var innerSub = null;\n        var syncUnsub = false;\n        var handledResult;\n        innerSub = source.subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, undefined, undefined, function (err) {\n            handledResult = innerFrom_1.innerFrom(selector(err, catchError(selector)(source)));\n            if (innerSub) {\n                innerSub.unsubscribe();\n                innerSub = null;\n                handledResult.subscribe(subscriber);\n            }\n            else {\n                syncUnsub = true;\n            }\n        }));\n        if (syncUnsub) {\n            innerSub.unsubscribe();\n            innerSub = null;\n            handledResult.subscribe(subscriber);\n        }\n    });\n}\nexports.catchError = catchError;\n//# sourceMappingURL=catchError.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,UAAU,GAAG,KAAK,CAAC;AAC3B,IAAIC,WAAW,GAAGC,OAAO,CAAC,yBAAyB,CAAC;AACpD,IAAIC,oBAAoB,GAAGD,OAAO,CAAC,sBAAsB,CAAC;AAC1D,IAAIE,MAAM,GAAGF,OAAO,CAAC,cAAc,CAAC;AACpC,SAASF,UAAUA,CAACK,QAAQ,EAAE;EAC1B,OAAOD,MAAM,CAACE,OAAO,CAAC,UAAUC,MAAM,EAAEC,UAAU,EAAE;IAChD,IAAIC,QAAQ,GAAG,IAAI;IACnB,IAAIC,SAAS,GAAG,KAAK;IACrB,IAAIC,aAAa;IACjBF,QAAQ,GAAGF,MAAM,CAACK,SAAS,CAACT,oBAAoB,CAACU,wBAAwB,CAACL,UAAU,EAAEM,SAAS,EAAEA,SAAS,EAAE,UAAUC,GAAG,EAAE;MACvHJ,aAAa,GAAGV,WAAW,CAACe,SAAS,CAACX,QAAQ,CAACU,GAAG,EAAEf,UAAU,CAACK,QAAQ,CAAC,CAACE,MAAM,CAAC,CAAC,CAAC;MAClF,IAAIE,QAAQ,EAAE;QACVA,QAAQ,CAACQ,WAAW,CAAC,CAAC;QACtBR,QAAQ,GAAG,IAAI;QACfE,aAAa,CAACC,SAAS,CAACJ,UAAU,CAAC;MACvC,CAAC,MACI;QACDE,SAAS,GAAG,IAAI;MACpB;IACJ,CAAC,CAAC,CAAC;IACH,IAAIA,SAAS,EAAE;MACXD,QAAQ,CAACQ,WAAW,CAAC,CAAC;MACtBR,QAAQ,GAAG,IAAI;MACfE,aAAa,CAACC,SAAS,CAACJ,UAAU,CAAC;IACvC;EACJ,CAAC,CAAC;AACN;AACAV,OAAO,CAACE,UAAU,GAAGA,UAAU;AAC/B",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

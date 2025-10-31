@@ -1,0 +1,46 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.connectable = void 0;\nvar Subject_1 = require(\"../Subject\");\nvar Observable_1 = require(\"../Observable\");\nvar defer_1 = require(\"./defer\");\nvar DEFAULT_CONFIG = {\n  connector: function () {\n    return new Subject_1.Subject();\n  },\n  resetOnDisconnect: true\n};\nfunction connectable(source, config) {\n  if (config === void 0) {\n    config = DEFAULT_CONFIG;\n  }\n  var connection = null;\n  var connector = config.connector,\n    _a = config.resetOnDisconnect,\n    resetOnDisconnect = _a === void 0 ? true : _a;\n  var subject = connector();\n  var result = new Observable_1.Observable(function (subscriber) {\n    return subject.subscribe(subscriber);\n  });\n  result.connect = function () {\n    if (!connection || connection.closed) {\n      connection = defer_1.defer(function () {\n        return source;\n      }).subscribe(subject);\n      if (resetOnDisconnect) {\n        connection.add(function () {\n          return subject = connector();\n        });\n      }\n    }\n    return connection;\n  };\n  return result;\n}\nexports.connectable = connectable;\n//# sourceMappingURL=connectable.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "connectable",
+      "Subject_1",
+      "require",
+      "Observable_1",
+      "defer_1",
+      "DEFAULT_CONFIG",
+      "connector",
+      "Subject",
+      "resetOnDisconnect",
+      "source",
+      "config",
+      "connection",
+      "_a",
+      "subject",
+      "result",
+      "Observable",
+      "subscriber",
+      "subscribe",
+      "connect",
+      "closed",
+      "defer",
+      "add"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/observable/connectable.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.connectable = void 0;\nvar Subject_1 = require(\"../Subject\");\nvar Observable_1 = require(\"../Observable\");\nvar defer_1 = require(\"./defer\");\nvar DEFAULT_CONFIG = {\n    connector: function () { return new Subject_1.Subject(); },\n    resetOnDisconnect: true,\n};\nfunction connectable(source, config) {\n    if (config === void 0) { config = DEFAULT_CONFIG; }\n    var connection = null;\n    var connector = config.connector, _a = config.resetOnDisconnect, resetOnDisconnect = _a === void 0 ? true : _a;\n    var subject = connector();\n    var result = new Observable_1.Observable(function (subscriber) {\n        return subject.subscribe(subscriber);\n    });\n    result.connect = function () {\n        if (!connection || connection.closed) {\n            connection = defer_1.defer(function () { return source; }).subscribe(subject);\n            if (resetOnDisconnect) {\n                connection.add(function () { return (subject = connector()); });\n            }\n        }\n        return connection;\n    };\n    return result;\n}\nexports.connectable = connectable;\n//# sourceMappingURL=connectable.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,WAAW,GAAG,KAAK,CAAC;AAC5B,IAAIC,SAAS,GAAGC,OAAO,CAAC,YAAY,CAAC;AACrC,IAAIC,YAAY,GAAGD,OAAO,CAAC,eAAe,CAAC;AAC3C,IAAIE,OAAO,GAAGF,OAAO,CAAC,SAAS,CAAC;AAChC,IAAIG,cAAc,GAAG;EACjBC,SAAS,EAAE,SAAAA,CAAA,EAAY;IAAE,OAAO,IAAIL,SAAS,CAACM,OAAO,CAAC,CAAC;EAAE,CAAC;EAC1DC,iBAAiB,EAAE;AACvB,CAAC;AACD,SAASR,WAAWA,CAACS,MAAM,EAAEC,MAAM,EAAE;EACjC,IAAIA,MAAM,KAAK,KAAK,CAAC,EAAE;IAAEA,MAAM,GAAGL,cAAc;EAAE;EAClD,IAAIM,UAAU,GAAG,IAAI;EACrB,IAAIL,SAAS,GAAGI,MAAM,CAACJ,SAAS;IAAEM,EAAE,GAAGF,MAAM,CAACF,iBAAiB;IAAEA,iBAAiB,GAAGI,EAAE,KAAK,KAAK,CAAC,GAAG,IAAI,GAAGA,EAAE;EAC9G,IAAIC,OAAO,GAAGP,SAAS,CAAC,CAAC;EACzB,IAAIQ,MAAM,GAAG,IAAIX,YAAY,CAACY,UAAU,CAAC,UAAUC,UAAU,EAAE;IAC3D,OAAOH,OAAO,CAACI,SAAS,CAACD,UAAU,CAAC;EACxC,CAAC,CAAC;EACFF,MAAM,CAACI,OAAO,GAAG,YAAY;IACzB,IAAI,CAACP,UAAU,IAAIA,UAAU,CAACQ,MAAM,EAAE;MAClCR,UAAU,GAAGP,OAAO,CAACgB,KAAK,CAAC,YAAY;QAAE,OAAOX,MAAM;MAAE,CAAC,CAAC,CAACQ,SAAS,CAACJ,OAAO,CAAC;MAC7E,IAAIL,iBAAiB,EAAE;QACnBG,UAAU,CAACU,GAAG,CAAC,YAAY;UAAE,OAAQR,OAAO,GAAGP,SAAS,CAAC,CAAC;QAAG,CAAC,CAAC;MACnE;IACJ;IACA,OAAOK,UAAU;EACrB,CAAC;EACD,OAAOG,MAAM;AACjB;AACAhB,OAAO,CAACE,WAAW,GAAGA,WAAW;AACjC",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

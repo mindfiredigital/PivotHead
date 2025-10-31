@@ -1,0 +1,28 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.mapTo = void 0;\nvar map_1 = require(\"./map\");\nfunction mapTo(value) {\n  return map_1.map(function () {\n    return value;\n  });\n}\nexports.mapTo = mapTo;\n//# sourceMappingURL=mapTo.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "mapTo",
+      "map_1",
+      "require",
+      "map"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/operators/mapTo.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.mapTo = void 0;\nvar map_1 = require(\"./map\");\nfunction mapTo(value) {\n    return map_1.map(function () { return value; });\n}\nexports.mapTo = mapTo;\n//# sourceMappingURL=mapTo.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,KAAK,GAAG,KAAK,CAAC;AACtB,IAAIC,KAAK,GAAGC,OAAO,CAAC,OAAO,CAAC;AAC5B,SAASF,KAAKA,CAACD,KAAK,EAAE;EAClB,OAAOE,KAAK,CAACE,GAAG,CAAC,YAAY;IAAE,OAAOJ,KAAK;EAAE,CAAC,CAAC;AACnD;AACAD,OAAO,CAACE,KAAK,GAAGA,KAAK;AACrB",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

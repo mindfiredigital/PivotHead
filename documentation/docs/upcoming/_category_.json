@@ -1,0 +1,11 @@
+{
+  "label": "🚀 Upcoming Features",
+  "position": 10,
+  "link": {
+    "type": "generated-index",
+    "title": "What's Coming Next",
+    "description": "Explore upcoming features and improvements in PivotHead",
+    "slug": "/upcoming"
+  },
+  "collapsed": false
+}

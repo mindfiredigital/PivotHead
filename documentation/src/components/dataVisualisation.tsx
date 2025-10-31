@@ -1,47 +1,12 @@
-"use client"
+// "use client"
 
-import React from "react"
-import { useState, useEffect, useRef } from "react"
-import clsx from "clsx"
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import clsx from 'clsx';
+import { useColorMode } from '@docusaurus/theme-common';
+import FormatDialog from './format-dialogbox'; // Assuming this component exists
 
-function HeadlessDataVisualizationSection() {
-  const [isVisible, setIsVisible] = useState(false)
-  const [colorMode, setColorMode] = useState("light")
-  const sectionRef = useRef(null)
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
-        }
-      },
-      { threshold: 0.1 },
-    )
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current)
-    }
-
-    const checkTheme = () => {
-      const isDark =
-        document.documentElement.getAttribute("data-theme") === "dark" ||
-        document.documentElement.classList.contains("dark") ||
-        window.matchMedia("(prefers-color-scheme: dark)").matches
-      setColorMode(isDark ? "dark" : "light")
-    }
-
-    checkTheme()
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
-    mediaQuery.addEventListener("change", checkTheme)
-
-    return () => {
-      observer.disconnect()
-      mediaQuery.removeEventListener("change", checkTheme)
-    }
-  }, [])
-
-  type Region = "north" | "south" | "east" | "west";
+// --- Types ---
+type Region = 'north' | 'south' | 'east' | 'west';
 
 interface RegionData {
   sales: string;
@@ -50,6 +15,7 @@ interface RegionData {
 }
 
 interface Row {
+  id?: string;
   product: string;
   north: RegionData;
   south: RegionData;
@@ -57,736 +23,536 @@ interface Row {
   west: RegionData;
 }
 
-  const PivotTable: React.FC = () => {
-  const data: Row[] = [
-    {
-      product: "Widget A",
-      north: { sales: "$1,000,000", qty: 50, avg: "$20,000" },
-      south: { sales: "$0", qty: 0, avg: "$0" },
-      east: { sales: "$1,300,000", qty: 104, avg: "$5,562" },
-      west: { sales: "$1,300,000", qty: 65, avg: "$20,000" },
-    },
-    {
-      product: "Widget B",
-      north: { sales: "$1,800,000", qty: 90, avg: "$20,000" },
-      south: { sales: "$1,500,000", qty: 75, avg: "$20,000" },
-      east: { sales: "$1,600,000", qty: 80, avg: "$20,000" },
-      west: { sales: "$0", qty: 0, avg: "$0" },
-    },
-    {
-      product: "Widget C",
-      north: { sales: "$1,300,000", qty: 70, avg: "$18,571" },
-      south: { sales: "$0", qty: 0, avg: "$0" },
-      east: { sales: "$0", qty: 0, avg: "$0" },
-      west: { sales: "$0", qty: 0, avg: "$0" },
-    },
-    {
-      product: "Widget D",
-      north: { sales: "$0", qty: 0, avg: "$0" },
-      south: { sales: "$1,100,000", qty: 55, avg: "$20,000" },
-      east: { sales: "$0", qty: 0, avg: "$0" },
-      west: { sales: "$300,000", qty: 40, avg: "$20,000" },
-    },
-  ];
+interface FormatSettings {
+  chooseValue: string;
+  textAlign: string;
+  thousandSeparator: string;
+  decimalSeparator: string;
+  decimalPlaces: string;
+  currencySymbol: string;
+  currencyAlign: string;
+  nullValue: string;
+  formatAsPercent: string;
+}
 
-  const regions: Region[] = ["north", "south", "east", "west"];
+interface CellFormat {
+  [key: string]: FormatSettings;
+}
+
+// --- Utility Function (Placeholder) ---
+// Minimal formatting stub to keep the example runnable.
+// Replace with the full 'applyCustomFormat' if needed.
+function applyCustomFormat(
+  value: string | number,
+  format?: FormatSettings,
+  isNumeric = true
+) {
+  if (!format) return String(value);
+  if (value === '$0' || value === 0) return String(value);
+  // Add simplified formatting logic or integrate the full function
+  // For demonstration, just returning the string value
+  return String(value);
+}
+
+
+// --- Interactive Pivot Table Component ---
+const InteractivePivotTable = () => {
+  const { colorMode } = useColorMode();
+  const [data, setData] = useState<Row[]>([
+    { id: '1', product: 'Widget A', north: { sales: '$1M', qty: 50, avg: '$20K' }, south: { sales: '$0', qty: 0, avg: '$0' }, east: { sales: '$1.3M', qty: 104, avg: '$5.5K' }, west: { sales: '$1.3M', qty: 65, avg: '$20K' },},
+    { id: '2', product: 'Widget B', north: { sales: '$1.8M', qty: 90, avg: '$20K' }, south: { sales: '$1.5M', qty: 75, avg: '$20K' }, east: { sales: '$1.6M', qty: 80, avg: '$20K' }, west: { sales: '$0', qty: 0, avg: '$0' }, },
+    { id: '3', product: 'Widget C', north: { sales: '$1.3M', qty: 70, avg: '$18.5K' }, south: { sales: '$0', qty: 0, avg: '$0' }, east: { sales: '$0', qty: 0, avg: '$0' }, west: { sales: '$0', qty: 0, avg: '$0' }, },
+    { id: '4', product: 'Widget D', north: { sales: '$0', qty: 0, avg: '$0' }, south: { sales: '$1.1M', qty: 55, avg: '$20K' }, east: { sales: '$0', qty: 0, avg: '$0' }, west: { sales: '$300K', qty: 40, avg: '$20K' }, },
+  ]);
+  const [regions, setRegions] = useState<Region[]>(['north','south','east','west',]);
+  const [showFormatDialog, setShowFormatDialog] = useState(false);
+  const [selectedCell, setSelectedCell] = useState<{ row: string; region: Region; metric: string; } | null>(null);
+  const [cellFormats, setCellFormats] = useState<CellFormat>({});
+  const [draggedRow, setDraggedRow] = useState<string | null>(null);
+  const [draggedRegion, setDraggedRegion] = useState<Region | null>(null);
+  const dragOverRow = useRef<string | null>(null);
+  const dragOverRegion = useRef<Region | null>(null);
+
+  const handleFormatClick = useCallback((rowId: string, region: Region, metric: string) => {
+      const cellKey = `${rowId}-${region}-${metric}`;
+      const initialSettings = cellFormats[cellKey] || { chooseValue: 'None', textAlign: 'Right', thousandSeparator: ',', decimalSeparator: '.', decimalPlaces: '0', currencySymbol: 'Dollar ($)', currencyAlign: 'Left', nullValue: 'None', formatAsPercent: 'No' }; // Use default or existing
+      setSelectedCell({ row: rowId, region, metric });
+      setShowFormatDialog(true);
+      // Pass initialSettings to FormatDialog if it accepts them
+    }, [cellFormats]); // Depend on cellFormats
+
+  const handleApplyFormat = useCallback((settings: FormatSettings) => {
+      if (selectedCell) {
+        const cellKey = `${selectedCell.row}-${selectedCell.region}-${selectedCell.metric}`;
+        setCellFormats(prev => ({ ...prev, [cellKey]: settings }));
+      }
+      setShowFormatDialog(false);
+    }, [selectedCell]);
+
+  const formatCellValue = useCallback((value: string | number, rowId: string, region: Region, metric: string): string => {
+      const cellKey = `${rowId}-${region}-${metric}`;
+      const format = cellFormats[cellKey];
+      // *** Use the actual applyCustomFormat function here ***
+      return applyCustomFormat(value, format, metric !== 'qty');
+    }, [cellFormats]);
+
+  // --- Drag and Drop Handlers ---
+  const handleRowDragStart = (e: React.DragEvent, rowId: string) => {
+    setDraggedRow(rowId);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+  const handleRowDragOver = (e: React.DragEvent, rowId: string) => {
+    e.preventDefault();
+    dragOverRow.current = rowId;
+    e.dataTransfer.dropEffect = 'move';
+  };
+  const handleRowDrop = (e: React.DragEvent, targetRowId: string) => {
+    e.preventDefault();
+    if (!draggedRow || draggedRow === targetRowId) return;
+    const draggedIndex = data.findIndex(r => r.id === draggedRow);
+    const targetIndex = data.findIndex(r => r.id === targetRowId);
+    const newData = [...data];
+    const [draggedItem] = newData.splice(draggedIndex, 1);
+    newData.splice(targetIndex, 0, draggedItem);
+    setData(newData);
+    setDraggedRow(null);
+    dragOverRow.current = null;
+  };
+
+  const handleColumnDragStart = (e: React.DragEvent, region: Region) => {
+    setDraggedRegion(region);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+  const handleColumnDragOver = (e: React.DragEvent, region: Region) => {
+    e.preventDefault();
+    dragOverRegion.current = region;
+    e.dataTransfer.dropEffect = 'move';
+  };
+  const handleColumnDrop = (e: React.DragEvent, targetRegion: Region) => {
+    e.preventDefault();
+    if (!draggedRegion || draggedRegion === targetRegion) return;
+    const draggedIndex = regions.indexOf(draggedRegion);
+    const targetIndex = regions.indexOf(targetRegion);
+    const newRegions = [...regions];
+    const [draggedItem] = newRegions.splice(draggedIndex, 1);
+    newRegions.splice(targetIndex, 0, draggedItem);
+    setRegions(newRegions);
+    setDraggedRegion(null);
+    dragOverRegion.current = null;
+  };
 
   return (
-    <div className="pivot-table-container">
-      <div className="pivot-table-header">
-        <h3 className="pivot-title">Pivothead Core</h3>
-        <div className="pivot-controls">
-          <button className="control-btn format-btn">Format</button>
-          <button className="control-btn fields-btn">Fields</button>
+    <>
+      <div
+        className={clsx(
+          'rounded-lg shadow-lg overflow-hidden border transition-colors',
+          colorMode === 'dark'
+            ? 'bg-slate-900 border-slate-700'
+            : 'bg-white border-slate-200' // Corrected closing bracket
+        )}
+      >
+        {/* Header */}
+        <div
+          className={clsx(
+            'flex justify-between items-center p-3 border-b transition-colors',
+            colorMode === 'dark'
+              ? 'bg-slate-800 border-slate-700'
+              : 'bg-slate-50 border-slate-200'
+          )}
+        >
+          <h2
+            className={clsx(
+              'text-base font-bold',
+              colorMode === 'dark' ? 'text-white' : 'text-slate-900'
+            )}
+          >
+            Pivothead Core
+          </h2>
+          <div className="flex gap-1.5">
+            <button
+              onClick={() => setShowFormatDialog(true)} // Keep simple for now
+              className={clsx(
+                'px-2 py-1 rounded-md text-xs font-medium transition-colors',
+                colorMode === 'dark'
+                  ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                  : 'bg-blue-600 hover:bg-blue-700 text-white'
+              )}
+            >
+              Format
+            </button>
+            <button className="px-2 py-1 bg-gray-600 hover:bg-gray-700 text-white rounded-md text-xs font-medium transition-colors">
+              Fields
+            </button>
+          </div>
         </div>
-      </div>
-      <div className="pivot-table">
-        <table>
-          <thead>
-            <tr>
-              <th rowSpan={2} className="product-header">Product</th>
-              {regions.map((region) => (
-                <th key={region} colSpan={3} className={`region-header ${region}-header`}>
-                  {region.charAt(0).toUpperCase() + region.slice(1)}
+
+        {/* Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse table-fixed">
+            <thead>
+              <tr className={clsx("transition-colors", colorMode === 'dark' ? 'bg-slate-800' : 'bg-slate-100')}>
+                <th className={clsx("px-1 py-1 text-xs text-left font-semibold border-b w-[50px] sticky left-0 z-10 transition-colors", colorMode === 'dark' ? 'text-white border-slate-700 bg-slate-800' : 'text-slate-900 border-slate-200 bg-white')}>
+                  Product
                 </th>
-              ))}
-            </tr>
-            <tr>
-              {regions.map((region) => (
-                <React.Fragment key={region}>
-                  <th className="metric-header">Total Sales</th>
-                  <th className="metric-header">Total Quantity</th>
-                  <th className="metric-header">Average Sale</th>
-                </React.Fragment>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((row, index) => (
-              <tr key={index}>
-                <td className="product-cell">{row.product}</td>
-                {regions.map((region) => (
+                {regions.map(region => (
+                  <th
+                    key={region}
+                    colSpan={3}
+                    draggable
+                    onDragStart={e => handleColumnDragStart(e, region)}
+                    onDragOver={e => handleColumnDragOver(e, region)}
+                    onDrop={e => handleColumnDrop(e, region)}
+                    className={clsx(
+                      'px-1 py-1 text-xs font-semibold border-b cursor-move transition-colors',
+                      colorMode === 'dark' ? 'text-white border-slate-700' : 'text-slate-900 border-slate-200',
+                      region === 'north' ? (colorMode === 'dark' ? 'bg-blue-950' : 'bg-blue-50')
+                      : region === 'south' ? (colorMode === 'dark' ? 'bg-amber-950' : 'bg-amber-50')
+                      : region === 'east' ? (colorMode === 'dark' ? 'bg-green-950' : 'bg-green-50')
+                      : (colorMode === 'dark' ? 'bg-pink-950' : 'bg-pink-50')
+                    )}
+                    style={{ minWidth: '40px', maxWidth: '50px' }}
+                  >
+                    {region.charAt(0).toUpperCase().slice(0, 1)}
+                  </th>
+                ))}
+              </tr>
+              <tr className={clsx("transition-colors", colorMode === 'dark' ? 'bg-slate-800' : 'bg-slate-50')}>
+                {regions.map(region => (
                   <React.Fragment key={region}>
-                    <td className={`data-cell sales-cell ${row[region].sales !== "$0" ? "has-value" : "no-value"}`}>
-                      {row[region].sales}
-                    </td>
-                    <td className={`data-cell qty-cell ${row[region].qty > 0 ? "has-value" : "no-value"}`}>
-                      {row[region].qty}
-                    </td>
-                    <td className={`data-cell avg-cell ${row[region].avg !== "$0" ? "has-value" : "no-value"}`}>
-                      {row[region].avg}
-                    </td>
+                    <th className={clsx("px-1 py-1 text-[10px] font-medium border-b w-[20px] transition-colors", colorMode === 'dark' ? 'text-slate-300 border-slate-700' : 'text-slate-700 border-slate-200')}>Sales</th>
+                    <th className={clsx("px-1 py-1 text-[10px] font-medium border-b w-[15px] transition-colors", colorMode === 'dark' ? 'text-slate-300 border-slate-700' : 'text-slate-700 border-slate-200')}>Qty</th>
+                    <th className={clsx("px-1 py-1 text-[10px] font-medium border-b w-[15px] transition-colors", colorMode === 'dark' ? 'text-slate-300 border-slate-700' : 'text-slate-700 border-slate-200')}>Avg</th>
                   </React.Fragment>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {data.map(row => (
+                <tr
+                  key={row.id}
+                  draggable
+                  onDragStart={e => handleRowDragStart(e, row.id!)}
+                  onDragOver={e => handleRowDragOver(e, row.id!)}
+                  onDrop={e => handleRowDrop(e, row.id!)}
+                  className={clsx('cursor-move transition-colors', colorMode === 'dark' ? 'border-b border-slate-700 hover:bg-slate-800' : 'border-b border-slate-200 hover:bg-slate-50')}
+                >
+                  <td className={clsx('px-1 py-1 text-xs font-medium sticky left-0 z-10 w-[50px] transition-colors', colorMode === 'dark' ? 'text-white bg-slate-800' : 'text-slate-900 bg-slate-50')}>
+                    {row.product.split(' ').pop()}
+                  </td>
+                  {regions.map(region => (
+                    <React.Fragment key={region}>
+                      <td
+                        onClick={() => handleFormatClick(row.id!, region, 'sales')}
+                        style={{ textAlign: (cellFormats[`${row.id}-${region}-sales`]?.textAlign?.toLowerCase() as React.CSSProperties['textAlign']) || 'right' }}
+                        className={clsx(
+                          'px-1 py-1 text-[10px] text-center cursor-pointer hover:opacity-80 transition-opacity',
+                           (row[region].sales.includes('$') || cellFormats[`${row.id}-${region}-sales`]?.currencySymbol !== 'Dollar ($)') && row[region].sales !== '$0'
+                             ? (colorMode === 'dark' ? 'bg-red-500 text-white font-medium' : 'bg-red-600 text-white font-medium')
+                             : (colorMode === 'dark' ? 'bg-slate-700 text-slate-300' : 'bg-slate-100 text-slate-600')
+                        )}
+                      >
+                        {formatCellValue(row[region].sales, row.id!, region, 'sales')}
+                      </td>
+                       <td
+                        onClick={() => handleFormatClick(row.id!, region, 'qty')}
+                        style={{ textAlign: (cellFormats[`${row.id}-${region}-qty`]?.textAlign?.toLowerCase() as React.CSSProperties['textAlign']) || 'right' }}
+                        className={clsx(
+                          'px-1 py-1 text-[10px] text-center cursor-pointer hover:opacity-80 transition-opacity',
+                           row[region].qty > 0
+                             ? (colorMode === 'dark' ? 'bg-blue-500 text-white font-medium' : 'bg-blue-600 text-white font-medium')
+                             : (colorMode === 'dark' ? 'bg-slate-700 text-slate-300' : 'bg-slate-100 text-slate-600')
+                        )}
+                      >
+                        {formatCellValue(row[region].qty, row.id!, region, 'qty')}
+                      </td>
+                       <td
+                        onClick={() => handleFormatClick(row.id!, region, 'avg')}
+                        style={{ textAlign: (cellFormats[`${row.id}-${region}-avg`]?.textAlign?.toLowerCase() as React.CSSProperties['textAlign']) || 'right' }}
+                        className={clsx(
+                          'px-1 py-1 text-[10px] text-center cursor-pointer hover:opacity-80 transition-opacity',
+                           (row[region].avg.includes('$') || cellFormats[`${row.id}-${region}-avg`]?.currencySymbol !== 'Dollar ($)') && row[region].avg !== '$0'
+                             ? (colorMode === 'dark' ? 'bg-red-500 text-white font-medium' : 'bg-red-600 text-white font-medium')
+                             : (colorMode === 'dark' ? 'bg-slate-700 text-slate-300' : 'bg-slate-100 text-slate-600')
+                        )}
+                      >
+                        {formatCellValue(row[region].avg, row.id!, region, 'avg')}
+                      </td>
+                    </React.Fragment>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Format Dialog - Assuming FormatDialog component handles its own theming */}
+      {showFormatDialog && (
+        <FormatDialog
+          isOpen={showFormatDialog}
+          onClose={() => setShowFormatDialog(false)}
+          onApply={handleApplyFormat}
+          selectedCell={selectedCell} // Pass selected cell info
+          // initialSettings={cellFormats[`${selectedCell?.row}-${selectedCell?.region}-${selectedCell?.metric}`]} // Pass initial settings if supported
+        />
+      )}
+    </>
+  );
+};
+
+// --- Architectural Wrapper Components ---
+const DataProcessingEngine: React.FC = () => {
+  const { colorMode } = useColorMode();
+  return (
+    <div className="mt-8">
+      <div className="flex justify-center">
+        <div className={clsx("p-4 rounded-lg shadow-lg text-center transition-all duration-300 hover:shadow-blue-500/20 dark:hover:shadow-blue-400/20", colorMode === 'dark' ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-700')}>
+          <p className="font-semibold text-lg">Data Processing Engine</p>
+          <small className={clsx("text-xs", colorMode === 'dark' ? 'text-slate-400' : 'text-slate-500')}>
+            Aggregation • Filtering • Sorting • SetGroup
+          </small>
+        </div>
       </div>
     </div>
   );
 };
 
-  const DataFlowArrow = ({ delay = 0 }) => (
-    <div className="flow-arrow" style={{ animationDelay: `${delay}s` }}>
-      <div className="arrow-line"></div>
-      <div className="arrow-head"></div>
+const FrontendOptions: React.FC<{ isVisible: boolean }> = ({ isVisible }) => {
+  const { colorMode } = useColorMode();
+  return (
+    // Added relative positioning for potential absolute positioned animations inside
+    <div className={clsx("relative rounded-xl shadow-2xl overflow-hidden border p-6 flex flex-col gap-3 min-w-[200px] min-h-[250px] transition-all duration-300", colorMode === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200')}>
+      <div className="flex justify-center">
+        <div className="px-4 py-1.5 bg-gradient-to-r from-green-500 to-green-400 dark:from-green-400 dark:to-green-300 rounded-full text-white font-semibold text-sm shadow-md transition-all duration-300">
+           Frontend
+        </div>
+      </div>
+      {/* Apply animation and theme classes to each framework div */}
+      <div className={clsx(
+          "text-center p-3 border rounded-lg font-medium transition-all duration-500 hover:scale-[1.02]",
+          colorMode === 'dark' ? 'border-slate-700 text-slate-300' : 'border-slate-200 text-slate-700',
+          isVisible ? 'animate-bounce-slow' : 'opacity-0' // Added entrance animation trigger
+        )}>React Components</div>
+      <div className={clsx(
+          "text-center p-3 border rounded-lg font-medium transition-all duration-500 hover:scale-[1.02]",
+          colorMode === 'dark' ? 'border-slate-700 text-slate-300' : 'border-slate-200 text-slate-700',
+           isVisible ? 'animate-bounce-slow delay-300' : 'opacity-0' // Added entrance animation trigger + delay
+        )}>Vue Components</div>
+      <div className={clsx(
+          "text-center p-3 border rounded-lg font-medium transition-all duration-500 hover:scale-[1.02]",
+          colorMode === 'dark' ? 'border-slate-700 text-slate-300' : 'border-slate-200 text-slate-700',
+          isVisible ? 'animate-bounce-slow delay-500' : 'opacity-0' // Added entrance animation trigger + delay
+        )}>Angular Components</div>
+      <div className={clsx(
+          "text-center p-3 border rounded-lg font-medium transition-all duration-500 hover:scale-[1.02]",
+          colorMode === 'dark' ? 'border-slate-700 text-slate-300' : 'border-slate-200 text-slate-700',
+          isVisible ? 'animate-bounce-slow delay-700' : 'opacity-0' // Added entrance animation trigger + delay
+        )}>JavaScript</div>
+       {/* Ensure animation styles are defined (globally or here) */}
+       <style>{`
+          @keyframes bounce-slow {
+             0%, 20%, 50%, 80%, 100% {
+               transform: translateY(0);
+               box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.2);
+             }
+             40% {
+               transform: translateY(-5px);
+               box-shadow: 0 5px 15px 0 rgba(16, 185, 129, 0.4);
+             }
+             60% { transform: translateY(-2px); }
+           }
+          .animate-bounce-slow { animation: bounce-slow 3s ease-in-out infinite; }
+          .delay-300 { animation-delay: 0.3s; }
+          .delay-500 { animation-delay: 0.5s; }
+          .delay-700 { animation-delay: 0.7s; }
+        `}</style>
     </div>
-  )
+  );
+};
+
+// --- Animated Arrow Component ---
+const AnimatedArrow: React.FC<{ delay: number }> = ({ delay }) => {
+  const { colorMode } = useColorMode();
+  const arrowColor = colorMode === 'dark' ? '#f87171' : '#ef4444';
 
   return (
-    <>
+    <svg
+      className="w-full h-8 absolute top-1/2 left-10 transform -translate-y-1/2"
+      viewBox="0 0 100 10"
+      preserveAspectRatio="none"
+    >
+      <path
+        d="M 0 5 H 90"
+        fill="none"
+        stroke={arrowColor}
+        strokeWidth="1.5"
+        strokeDasharray="100"
+        strokeDashoffset="100"
+        style={{
+          animation: `dash-flow 1.5s ease-out ${delay}s forwards, glow-pulse 3s ease-in-out infinite ${delay + 1.5}s`,
+        }}
+      />
+      <polygon
+        points="90,1 100,5 90,9"
+        fill={arrowColor}
+        opacity="0"
+        style={{
+          animation: `fade-in 0.5s ease-out ${delay + 1}s forwards, arrow-pulse 3s ease-in-out infinite ${delay + 1.5}s`,
+        }}
+      />
+    </svg>
+  );
+};
+
+
+// --- Main Section Component ---
+const HeadlessDataVisualizationSection: React.FC = () => {
+  const sectionRef = useRef<HTMLDivElement | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const { colorMode } = useColorMode();
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const currentRef = sectionRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, []);
+
+  const accentColor = colorMode === 'dark' ? '#f87171' : '#ef4444';
+
+  return (
+     <>
+      {/* Global Animation Styles */}
       <style>{`
-        .headless-section {
-          padding: 5rem 0;
-          background: #ffffff;
-          position: relative;
-          overflow: hidden;
-        }
-
-        .headless-section::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: radial-gradient(circle at 30% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
-                      radial-gradient(circle at 70% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
-          pointer-events: none;
-        }
-
-        [data-theme="dark"] .headless-section {
-          background: #000000;
-        }
-
-        .section-header {
-          text-align: center;
-          margin-bottom: 4rem;
-          position: relative;
-          z-index: 1;
-        }
-
-        .section-title {
-          font-size: 3rem;
-          font-weight: 900;
-          margin-bottom: 1rem;
-          background: linear-gradient(160deg, #dc2626 0%, #000000 0%, #dc2626 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          letter-spacing: -0.02em;
-          
-        }
-
-        [data-theme="dark"] .section-title {
-         background: linear-gradient(135deg, #ef4444 0%, #444444 50%, #ef4444 100%);
-
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          
-        }
-
-        .section-description {
-          font-size: 1.375rem;
-          color: #475569;
-          max-width: 48rem;
-          margin: 0 auto;
-          line-height: 1.7;
-          font-weight: 500;
-        }
-
-        [data-theme="dark"] .section-description {
-          color: #cbd5e1;
-        }
-
-        .architecture-diagram {
-          max-width: 1200px;
-          margin: 0 auto;
-          display: grid;
-          grid-template-columns: 1fr auto 1fr;
-          gap: 6rem;
-          align-items: center;
-          padding: 2rem;
-          opacity: 0;
-          transform: translateY(40px);
-          transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-          position: relative;
-          z-index: 1;
-        }
-
-        .architecture-diagram.visible {
-          opacity: 1;
-          transform: translateY(0);
-        }
-
-        /* Enhanced Engine Section */
-        .engine-section {
-          background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-          border: 2px solid #e2e8f0;
-          border-radius: 2rem;
-          padding: 3rem 2.5rem;
-          position: relative;
-          min-height: 400px;
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 
-                      0 8px 16px rgba(0, 0, 0, 0.04);
-          transition: all 0.4s ease;
-        }
-
-        .engine-section:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12), 
-                      0 12px 24px rgba(0, 0, 0, 0.08);
-        }
-
-        [data-theme="dark"] .engine-section {
-          background: linear-gradient(145deg, #1e293b 0%, #334155 100%);
-          border-color: #475569;
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 
-                      0 8px 16px rgba(0, 0, 0, 0.2);
-        }
-
-        .engine-label {
-          position: absolute;
-          top: -1rem;
-          left: 50%;
-          transform: translateX(-50%);
-          background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-          color: white;
-          padding: 0.75rem 2rem;
-          border-radius: 2rem;
-          font-weight: 700;
-          font-size: 0.875rem;
-          box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
-          letter-spacing: 0.025em;
-        }
-
-        .engine-content {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          height: 100%;
-          gap: 3rem;
-        }
-
-        /* Added pivot table styles */
-        .pivot-table-container {
-          width: 100%;
-          max-width: 600px;
-          background: #f8fafc;
-          border-radius: 1rem;
-          overflow: hidden;
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-          animation: tableFloat 3s ease-in-out infinite;
-        }
-
-        .pivot-table-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 1rem 1.5rem;
-          background: #ffffff;
-          border-bottom: 1px solid #e2e8f0;
-        }
-
-        .pivot-title {
-          font-size: 1.25rem;
-          font-weight: 700;
-          color: #1e293b;
-          margin: 0;
-        }
-
-        .pivot-controls {
-          display: flex;
-          gap: 0.5rem;
-        }
-
-        .control-btn {
-          padding: 0.5rem 1rem;
-          border: 1px solid #d1d5db;
-          border-radius: 0.5rem;
-          background: #ffffff;
-          color: #374151;
-          font-size: 0.875rem;
-          font-weight: 500;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-
-        .format-btn {
-          background: #3b82f6;
-          color: white;
-          border-color: #3b82f6;
-        }
-
-        .fields-btn {
-          background: #6b7280;
-          color: white;
-          border-color: #6b7280;
-        }
-
-        .pivot-table {
-          overflow-x: auto;
-          max-height: 300px;
-          overflow-y: auto;
-        }
-
-        .pivot-table table {
-          width: 100%;
-          border-collapse: collapse;
-          font-size: 0.75rem;
-        }
-
-        .pivot-table th,
-        .pivot-table td {
-          padding: 0.5rem 0.25rem;
-          text-align: center;
-          border: 1px solid #e5e7eb;
-        }
-
-        .product-header,
-        .product-cell {
-          background: #f3f4f6;
-          font-weight: 600;
-          text-align: left;
-          padding-left: 0.75rem;
-        }
-
-        .region-header {
-          background: #e5e7eb;
-          font-weight: 600;
-          font-size: 0.8rem;
-        }
-
-        .north-header { background: #dbeafe; }
-        .south-header { background: #fef3c7; }
-        .east-header { background: #d1fae5; }
-        .west-header { background: #fce7f3; }
-
-        .metric-header {
-          background: #f9fafb;
-          font-weight: 500;
-          font-size: 0.7rem;
-        }
-
-        .data-cell {
-          font-weight: 500;
-        }
-
-        .data-cell.has-value {
-          background: #3b82f6;
-          color: white;
-        }
-
-        .data-cell.no-value {
-          background: #f3f4f6;
-          color: #6b7280;
-        }
-
-        .sales-cell.has-value {
-          background: #3b82f6;
-        }
-
-        .qty-cell.has-value {
-          background: #3b82f6;
-        }
-
-        .avg-cell.has-value {
-          background: #ef4444;
-        }
-
-        @keyframes tableFloat {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-8px); }
-        }
-
-        .core-engine {
-          background: linear-gradient(145deg, #1e293b 0%, #334155 100%);
-          color: white;
-          padding: 2rem 1.5rem;
-          border-radius: 1.5rem;
-          text-align: center;
-          font-weight: 700;
-          box-shadow: 0 12px 32px rgba(30, 41, 59, 0.4),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.1);
-          animation: enginePulse 3s ease-in-out infinite;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          font-size: 1.125rem;
-        }
-
-        .core-engine small {
-          display: block;
-          margin-top: 0.5rem;
-          font-size: 0.875rem;
-          opacity: 0.8;
-          font-weight: 500;
-        }
-
-        @keyframes enginePulse {
-          0%, 100% { transform: scale(1); box-shadow: 0 12px 32px rgba(30, 41, 59, 0.4); }
-          50% { transform: scale(1.02); box-shadow: 0 16px 40px rgba(30, 41, 59, 0.5); }
-        }
-
-        /* Enhanced Flow Section */
-        .flow-section {
-          display: flex;
-          flex-direction: column;
-          gap: 1.5rem;
-          align-items: center;
-        }
-
-        .flow-arrow {
-          position: relative;
-          width: 80px;
-          height: 24px;
-          animation: flowPulse 2.5s ease-in-out infinite;
-        }
-
-        .arrow-line {
-          position: absolute;
-          top: 50%;
-          left: 0;
-          width: 60px;
-          height: 3px;
-          background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 50%, #ef4444 100%);
-          transform: translateY(-50%);
-          border-radius: 2px;
-          box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
-        }
-
-        .arrow-head {
-          position: absolute;
-          top: 50%;
-          right: 0;
-          width: 0;
-          height: 0;
-          border-left: 16px solid #ef4444;
-          border-top: 10px solid transparent;
-          border-bottom: 10px solid transparent;
-          transform: translateY(-50%);
-          filter: drop-shadow(0 2px 4px rgba(239, 68, 68, 0.3));
-        }
-
-        @keyframes flowPulse {
-          0%, 100% { opacity: 0.7; transform: translateX(0px) scale(1); }
-          50% { opacity: 1; transform: translateX(8px) scale(1.05); }
-        }
-
-        /* Enhanced Frontend Section */
-        .frontend-section {
-          background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-          border: 2px solid #e2e8f0;
-          border-radius: 2rem;
-          padding: 4rem 2.5rem 2.5rem;
-          position: relative;
-          min-height: 400px;
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 
-                      0 8px 16px rgba(0, 0, 0, 0.04);
-          transition: all 0.4s ease;
-        }
-
-        .frontend-section:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12), 
-                      0 12px 24px rgba(0, 0, 0, 0.08);
-        }
-
-        [data-theme="dark"] .frontend-section {
-          background: linear-gradient(145deg, #1e293b 0%, #334155 100%);
-          border-color: #475569;
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 
-                      0 8px 16px rgba(0, 0, 0, 0.2);
-        }
-
-        .frontend-label {
-          position: absolute;
-          top: -1rem;
-          left: 50%;
-          
-          transform: translateX(-50%);
-          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-          color: white;
-          padding: 0.75rem 2rem;
-          border-radius: 2rem;
-          font-weight: 700;
-          font-size: 0.875rem;
-          box-shadow: 0 8px 16px rgba(16, 185, 129, 0.3);
-          letter-spacing: 0.025em;
-        }
-
-        .frontend-options {
-          display: flex;
-          flex-direction: column;
-          gap: 1.25rem;
-          height: 100%;
-          justify-content: center;
-        }
-
-        .frontend-option {
-          background: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 100%);
-          border: 2px solid #e2e8f0;
-          border-radius: 1.25rem;
-          padding: 1.25rem 1.5rem;
-          text-align: center;
-          font-weight: 600;
-          color: #1e293b;
-          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-          animation: optionGlow 4s ease-in-out infinite;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-          font-size: 1rem;
-        }
-
-        [data-theme="dark"] .frontend-option {
-          background: linear-gradient(145deg, #374151 0%, #4b5563 100%);
-          border-color: #6b7280;
-          color: #f9fafb;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        .frontend-option:nth-child(1) { animation-delay: 0s; }
-        .frontend-option:nth-child(2) { animation-delay: 0.8s; }
-        .frontend-option:nth-child(3) { animation-delay: 1.6s; }
-        .frontend-option:nth-child(4) { animation-delay: 2.4s; }
-
-        @keyframes optionGlow {
-          0%, 80%, 100% { 
-            border-color: #e2e8f0;
-            background: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 100%);
-            transform: scale(1);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-          }
-          10%, 30% { 
-            border-color: #10b981;
-            background: linear-gradient(145deg, #d1fae5 0%, #a7f3d0 100%);
-            transform: scale(1.03);
-            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.2);
-          }
-        }
-
-        [data-theme="dark"] .frontend-option {
-          animation: optionGlowDark 4s ease-in-out infinite;
-        }
-
-        @keyframes optionGlowDark {
-          0%, 80%, 100% { 
-            border-color: #6b7280;
-            background: linear-gradient(145deg, #374151 0%, #4b5563 100%);
-            transform: scale(1);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-          }
-          10%, 30% { 
-            border-color: #10b981;
-            background: linear-gradient(145deg, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0.1) 100%);
-            transform: scale(1.03);
-            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
-          }
-        }
-
-        /* Enhanced Benefits Section */
-        .benefits-section {
-          margin-top: 5rem;
-          text-align: center;
-          position: relative;
-          z-index: 1;
-        }
-
-        .benefits-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-          gap: 2.5rem;
-          max-width: 1000px;
-          margin: 3rem auto 0;
-        }
-
-        .benefit-card {
-          background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-          padding: 2.5rem 2rem;
-          border-radius: 1.5rem;
-          border: 1px solid #e2e8f0;
-          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-          position: relative;
-          overflow: hidden;
-        }
-
-        .benefit-card::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 4px;
-          background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ef4444);
-          opacity: 0;
-          transition: opacity 0.3s ease;
-        }
-
-        .benefit-card:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
-        }
-
-        .benefit-card:hover::before {
-          opacity: 1;
-        }
-
-        [data-theme="dark"] .benefit-card {
-          background: linear-gradient(145deg, #1e293b 0%, #334155 100%);
-          border-color: #475569;
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-        }
-
-        .benefit-title {
-          font-size: 1.25rem;
-          font-weight: 800;
-          margin-bottom: 1rem;
-          color: #1e293b;
-          letter-spacing: -0.01em;
-        }
-
-        [data-theme="dark"] .benefit-title {
-          color: #f1f5f9;
-        }
-
-        .benefit-description {
-          color: #64748b;
-          line-height: 1.7;
-          font-size: 0.9375rem;
-          font-weight: 500;
-        }
-
-        [data-theme="dark"] .benefit-description {
-          color: #cbd5e1;
-        }
-
-        /* Enhanced Responsive */
-        @media (max-width: 768px) {
-          .architecture-diagram {
-            grid-template-columns: 1fr;
-            gap: 4rem;
-          }
-
-          .flow-section {
-            transform: rotate(90deg);
-            margin: 2rem 0;
-          }
-
-          .section-title {
-            font-size: 2.25rem;
-          }
-
-          .engine-section,
-          .frontend-section {
-            padding: 2.5rem 2rem;
-            min-height: 300px;
-          }
-
-          .pivot-table-container {
-            max-width: 100%;
-          }
-
-          .pivot-table {
-            font-size: 0.7rem;
-          }
-        }
+          @keyframes dash-flow { to { stroke-dashoffset: 0; } }
+          @keyframes fade-in { to { opacity: 1; } }
+          @keyframes glow-pulse {
+             0%, 100% { filter: drop-shadow(0 0 2px ${accentColor}80); opacity: 1; }
+             50% { filter: drop-shadow(0 0 5px ${accentColor}); opacity: 1; }
+           }
+          @keyframes arrow-pulse {
+             0%, 100% { transform: scale(1); }
+             50% { transform: scale(1.1); }
+           }
       `}</style>
-
-      <div className="headless-section" ref={sectionRef}>
+      <section
+        ref={sectionRef}
+        className={clsx(
+          'py-16 overflow-hidden transition-colors duration-300',
+          colorMode === 'dark' ? 'bg-black' : 'bg-white' // Updated dark background
+        )}
+        style={{ ['--ph-accent' as any]: accentColor }}
+      >
         <div className="container">
-          <div className="section-header">
-            <h2
-              className={clsx("text-5xl font-black bg-clip-text text-transparent sm:text-6xl lg:text-7xl mt-4 mb-4", {
-                "bg-gradient-to-r from-red-500 via-white to-slate-400": colorMode === "dark",
-                "bg-gradient-to-r from-red-600 via-slate-700 to-black": colorMode === "light",
-              })}
-            >
+          {/* Section Header with Entrance Animation */}
+          <div
+            className={clsx(
+              'text-center mb-10 transition-all duration-1000 ease-out',
+              isVisible
+                ? 'opacity-100 transform translate-y-0'
+                : 'opacity-0 transform -translate-y-4'
+            )}
+          >
+            <h2 className={clsx('text-3xl sm:text-4xl font-extrabold transition-colors', colorMode === 'dark' ? 'text-white' : 'text-slate-900')}>
               Headless Pivot Tables, Simplified
             </h2>
-            <p className="section-description">Where Data Logic Meets Design Freedom</p>
+            <p className={clsx('text-lg mt-2 transition-colors', colorMode === 'dark' ? 'text-slate-300' : 'text-slate-600')}>
+              Where Data Logic Meets Design Freedom
+            </p>
           </div>
 
-          <div className={`architecture-diagram ${isVisible ? "visible" : ""}`}>
-            {/* Left Side - PivotHead Engine */}
-            <div className="engine-section">
-              <div className="engine-label">PivotHead Core</div>
-              <div className="engine-content">
-                <PivotTable />
-                <div className="core-engine">
-                  Data Processing Engine
-                  <br />
-                  <small>Aggregation • Filtering • Sorting</small>
+          {/* Main Content Layout */}
+          <div className="flex flex-col lg:flex-row justify-center items-start lg:gap-8 gap-12 relative">
+            {/* Left Panel: Core Engine + Table */}
+            <div
+              className={clsx(
+                'flex flex-col items-center w-full lg:w-[450px] transition-all duration-1000 ease-out',
+                isVisible ? 'opacity-100 transform translate-x-0 delay-200' : 'opacity-0 transform -translate-x-10'
+              )}
+            >
+              <div className={clsx("p-4 rounded-xl shadow-2xl border transition-all duration-300 hover:shadow-red-500/30", colorMode === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200')}>
+                 <div className="px-4 py-1.5 bg-gradient-to-r from-blue-600 to-blue-500 dark:from-blue-500 dark:to-blue-400 rounded-full text-white font-semibold text-sm -mt-8 shadow-md transition-all duration-300 mx-auto w-fit">
+                   PivotHead Core
+                 </div>
+                <div className="mt-4 w-full">
+                  <InteractivePivotTable />
                 </div>
+                <DataProcessingEngine />
               </div>
             </div>
 
-            {/* Center - Flow Arrows */}
-            <div className="flow-section">
-              <DataFlowArrow delay={0} />
-              <DataFlowArrow delay={0.5} />
+            {/* Center: Animated Arrows */}
+             <div className="hidden lg:flex flex-col justify-center items-center w-[120px] h-[360px] relative mt-20">
+               <div className="w-full h-full relative">
+                 <div className="absolute top-[25%] left-0 w-full">
+                   <AnimatedArrow delay={0.8} />
+                 </div>
+                 <div className="absolute top-[55%] left-0 w-full">
+                   <AnimatedArrow delay={1.2} />
+                 </div>
+               </div>
             </div>
 
-            {/* Right Side - Frontend Options */}
-            <div className="frontend-section">
-              <div className="frontend-label">Your Frontend</div>
-              <div className="frontend-options">
-                <div className="frontend-option">React Tables</div>
-                <div className="frontend-option">Vue Components</div>
-                <div className="frontend-option">Angular Grids</div>
-                <div className="frontend-option">Custom HTML</div>
+            {/* Right Panel: Frontend Options */}
+            <div className="flex flex-col items-center w-full lg:w-[450px]">
+              <div
+                className={clsx(
+                  'transition-all duration-1000 ease-out',
+                  isVisible ? 'opacity-100 transform translate-x-0 delay-400' : 'opacity-0 transform translate-x-10'
+                )}
+              >
+                {/* Pass isVisible to FrontendOptions */}
+                <FrontendOptions isVisible={isVisible} />
               </div>
             </div>
           </div>
 
-          <div className="benefits-section">
-            <div className="benefits-grid">
-              <div className="benefit-card">
-                <h3 className="benefit-title">Pure Logic</h3>
-                <p className="benefit-description">
-                  Get powerful pivot table calculations without any UI constraints or predetermined styling.
-                </p>
+           {/* Why Go Headless Section */}
+           <div
+            className={clsx(
+              'text-center mt-20 transition-opacity duration-1000 ease-out',
+              isVisible ? 'opacity-100 delay-500' : 'opacity-0'
+            )}
+          >
+            <h2 className={clsx("text-3xl font-extrabold mb-3 transition-colors", colorMode === 'dark' ? 'text-white' : 'text-slate-900')}>
+              Why Go Headless?
+            </h2>
+            <div className="grid md:grid-cols-3 gap-8 mt-10">
+              {/* Cards remain the same */}
+              <div className={clsx("p-6 rounded-xl border shadow-md transition-transform duration-500 hover:scale-[1.03]", colorMode === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200')}>
+                <h3 className={clsx("text-xl font-semibold mb-3 transition-colors", colorMode === 'dark' ? 'text-white' : 'text-slate-900')}>Framework Agnostic</h3>
+                <p className={clsx("transition-colors", colorMode === 'dark' ? 'text-slate-400' : 'text-slate-600')}>Integrate with any JavaScript framework. Your data visualization is reusable and decoupled.</p>
               </div>
-
-              <div className="benefit-card">
-                <h3 className="benefit-title">Any Framework</h3>
-                <p className="benefit-description">
-                  Works with React, Vue, Angular, or vanilla JavaScript. One engine, infinite possibilities.
-                </p>
+              <div className={clsx("p-6 rounded-xl border shadow-md transition-transform duration-500 hover:scale-[1.03]", colorMode === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200')}>
+                <h3 className={clsx("text-xl font-semibold mb-3 transition-colors", colorMode === 'dark' ? 'text-white' : 'text-slate-900')}>Enhanced Performance</h3>
+                <p className={clsx("transition-colors", colorMode === 'dark' ? 'text-slate-400' : 'text-slate-600')}>By separating logic from presentation, we optimize data processing for faster, smoother interactions.</p>
               </div>
-
-              <div className="benefit-card">
-                <h3 className="benefit-title">Your Design</h3>
-                <p className="benefit-description">
-                  Build tables that perfectly match your brand and user experience requirements.
-                </p>
+              <div className={clsx("p-6 rounded-xl border shadow-md transition-transform duration-500 hover:scale-[1.03]", colorMode === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200')}>
+                <h3 className={clsx("text-xl font-semibold mb-3 transition-colors", colorMode === 'dark' ? 'text-white' : 'text-slate-900')}>Future-Proof Your Stack</h3>
+                <p className={clsx("transition-colors", colorMode === 'dark' ? 'text-slate-400' : 'text-slate-600')}>Easily migrate or adopt new frontend technologies without having to rebuild your core data logic.</p>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
     </>
-  )
-}
+  );
+};
 
-export default HeadlessDataVisualizationSection
+export default HeadlessDataVisualizationSection;

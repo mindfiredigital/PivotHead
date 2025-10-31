@@ -1,0 +1,15 @@
+{
+  "id": "installation/react-installation",
+  "title": "react-installation",
+  "description": "abc",
+  "source": "@site/docs/installation/react-installation.md",
+  "sourceDirName": "installation",
+  "slug": "/installation/react-installation",
+  "permalink": "/PivotHead/docs/installation/react-installation",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/installation/react-installation.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {}
+}

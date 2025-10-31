@@ -1,0 +1,39 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.joinAllInternals = void 0;\nvar identity_1 = require(\"../util/identity\");\nvar mapOneOrManyArgs_1 = require(\"../util/mapOneOrManyArgs\");\nvar pipe_1 = require(\"../util/pipe\");\nvar mergeMap_1 = require(\"./mergeMap\");\nvar toArray_1 = require(\"./toArray\");\nfunction joinAllInternals(joinFn, project) {\n  return pipe_1.pipe(toArray_1.toArray(), mergeMap_1.mergeMap(function (sources) {\n    return joinFn(sources);\n  }), project ? mapOneOrManyArgs_1.mapOneOrManyArgs(project) : identity_1.identity);\n}\nexports.joinAllInternals = joinAllInternals;\n//# sourceMappingURL=joinAllInternals.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "joinAllInternals",
+      "identity_1",
+      "require",
+      "mapOneOrManyArgs_1",
+      "pipe_1",
+      "mergeMap_1",
+      "toArray_1",
+      "joinFn",
+      "project",
+      "pipe",
+      "toArray",
+      "mergeMap",
+      "sources",
+      "mapOneOrManyArgs",
+      "identity"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/operators/joinAllInternals.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.joinAllInternals = void 0;\nvar identity_1 = require(\"../util/identity\");\nvar mapOneOrManyArgs_1 = require(\"../util/mapOneOrManyArgs\");\nvar pipe_1 = require(\"../util/pipe\");\nvar mergeMap_1 = require(\"./mergeMap\");\nvar toArray_1 = require(\"./toArray\");\nfunction joinAllInternals(joinFn, project) {\n    return pipe_1.pipe(toArray_1.toArray(), mergeMap_1.mergeMap(function (sources) { return joinFn(sources); }), project ? mapOneOrManyArgs_1.mapOneOrManyArgs(project) : identity_1.identity);\n}\nexports.joinAllInternals = joinAllInternals;\n//# sourceMappingURL=joinAllInternals.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,gBAAgB,GAAG,KAAK,CAAC;AACjC,IAAIC,UAAU,GAAGC,OAAO,CAAC,kBAAkB,CAAC;AAC5C,IAAIC,kBAAkB,GAAGD,OAAO,CAAC,0BAA0B,CAAC;AAC5D,IAAIE,MAAM,GAAGF,OAAO,CAAC,cAAc,CAAC;AACpC,IAAIG,UAAU,GAAGH,OAAO,CAAC,YAAY,CAAC;AACtC,IAAII,SAAS,GAAGJ,OAAO,CAAC,WAAW,CAAC;AACpC,SAASF,gBAAgBA,CAACO,MAAM,EAAEC,OAAO,EAAE;EACvC,OAAOJ,MAAM,CAACK,IAAI,CAACH,SAAS,CAACI,OAAO,CAAC,CAAC,EAAEL,UAAU,CAACM,QAAQ,CAAC,UAAUC,OAAO,EAAE;IAAE,OAAOL,MAAM,CAACK,OAAO,CAAC;EAAE,CAAC,CAAC,EAAEJ,OAAO,GAAGL,kBAAkB,CAACU,gBAAgB,CAACL,OAAO,CAAC,GAAGP,UAAU,CAACa,QAAQ,CAAC;AAC9L;AACAhB,OAAO,CAACE,gBAAgB,GAAGA,gBAAgB;AAC3C",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

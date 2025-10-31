@@ -1,15 +1,30 @@
+// {
+//   "extends": "../../tsconfig.json",
+//   "compilerOptions": {
+//     "outDir": "../../dist/out-tsc",
+//     "declaration": true,
+//     "declarationMap": true,
+//     "inlineSources": true,
+//     "types": [],
+//     "paths": {
+//       "@mindfiredigital/pivothead-web-component": ["../web-component/dist"],
+//       "@mindfiredigital/pivothead": ["../core/dist"]
+//     }
+//   },
+//   "exclude": [
+//     "**/*.spec.ts"
+//   ]
+// }
+
+// packages/angular/tsconfig.lib.json
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.json", // <-- This inherits the paths from the root
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
     "declaration": true,
     "declarationMap": true,
     "inlineSources": true,
-    "types": [],
-    "paths": {
-      "@mindfiredigital/pivothead-web-component": ["../web-component/dist"],
-      "@mindfiredigital/pivothead": ["../core/dist"]
-    }
+    "types": []
   },
   "exclude": ["**/*.spec.ts"]
 }

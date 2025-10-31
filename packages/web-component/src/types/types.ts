@@ -15,6 +15,13 @@ import type {
 // Define a type for pivot data records
 export type PivotDataRecord = Record<string, unknown>;
 
+// Interface for fields used in field service
+export interface IField {
+  uniqueName: string;
+  caption?: string;
+  dataType: string;
+}
+
 // FormatOptions interface for field formatting
 export interface FormatOptions {
   type?: 'currency' | 'number' | 'percentage' | 'date';
@@ -31,11 +38,17 @@ export interface FormatOptions {
 
 // Enhanced interface extending PivotEngine with additional methods (superset)
 // Supports both legacy and current method signatures used across the web-component
-export interface EnhancedPivotEngine<T extends Record<string, unknown>>
-  extends PivotEngine<T> {
-  // state helpers
-  state: PivotTableState<T>;
+export interface EnhancedPivotEngine<T extends Record<string, unknown>> {
+  // // state helpers
+  // state: PivotTableState<T>;
+  getState(): PivotTableState<T>;
   subscribe(fn: (state: PivotTableState<T>) => void): () => void;
+
+  setLayout(
+    rows: AxisConfig[],
+    columns: AxisConfig[],
+    measures: MeasureConfig[]
+  ): void;
 
   // filtering
   applyFilters(filters: FilterConfig[]): void;
@@ -104,7 +117,7 @@ export interface PivotOptions {
   columns?: AxisConfig[];
   measures?: MeasureConfig[];
   groupConfig?: GroupConfig;
-  [key: string]: unknown;
+  // [key: string]: unknown;
 }
 
 // The following legacy types are kept for compatibility with prior codegen (commented)

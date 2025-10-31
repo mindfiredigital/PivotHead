@@ -13,15 +13,7 @@ export interface FieldInfo {
   type: FieldType;
 }
 
-export interface LayoutSelection {
-  rows: string[]; // field names
-  columns: string[]; // field names
-  values: Array<{
-    field: string;
-    aggregation?: AggregationType;
-    caption?: string;
-  }>;
-}
+import type { LayoutSelection } from '../types/interfaces';
 
 /**
  * FieldService: Helper utilities to drive field selection and aggregations from UI.

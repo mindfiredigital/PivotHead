@@ -7,6 +7,8 @@ import type {
   AggregationType,
   Group,
   PaginationConfig,
+  FieldInfo,
+  LayoutSelection,
 } from '@mindfiredigital/pivothead';
 import type {
   EnhancedPivotEngine,
@@ -57,6 +59,10 @@ import {
   getProcessedData as getProcessedDataHelper,
   updateFieldFormatting as updateFieldFormattingHelper,
   getFieldAlignment as getFieldAlignmentHelper,
+  getAvailableFields as getAvailableFieldsHelper,
+  getSupportedAggregations as getSupportedAggregationsHelper,
+  setMeasureAggregation as setMeasureAggregationHelper,
+  buildLayout as buildLayoutHelper,
 } from './internal/api-engine';
 import {
   setFilters as setFiltersHelper,
@@ -378,6 +384,46 @@ export class PivotHeadElement extends HTMLElement {
   }
   public showFormatPopup(): void {
     showFormatPopupHelper(this as unknown as PivotHeadHost);
+  }
+
+  /**
+   * Returns all fields inferred from the engine's raw data.
+   * Useful for building a UI for field selection.
+   */
+  public getAvailableFields(): FieldInfo[] {
+    return getAvailableFieldsHelper(this as unknown as PivotHeadHost);
+  }
+
+  /**
+   * Returns the list of supported aggregation types (e.g., 'sum', 'avg').
+   */
+  public getSupportedAggregations(): AggregationType[] {
+    return getSupportedAggregationsHelper();
+  }
+
+  /**
+   * Changes the aggregation for a specific measure and refreshes the engine.
+   * @param field The unique name of the measure field.
+   * @param aggregation The new aggregation type.
+   */
+  public setMeasureAggregation(
+    field: string,
+    aggregation: AggregationType
+  ): void {
+    setMeasureAggregationHelper(
+      this as unknown as PivotHeadHost,
+      field,
+      aggregation
+    );
+  }
+
+  /**
+   * Builds and applies a complete layout (rows, columns, measures) from a selection object.
+   * This is the primary method for updating the pivot table structure from a UI.
+   * @param selection The layout selection object.
+   */
+  public buildLayout(selection: LayoutSelection): void {
+    buildLayoutHelper(this as unknown as PivotHeadHost, selection);
   }
 }
 

@@ -1,0 +1,40 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.TestTools = exports.Immediate = void 0;\nvar nextHandle = 1;\nvar resolved;\nvar activeHandles = {};\nfunction findAndClearHandle(handle) {\n  if (handle in activeHandles) {\n    delete activeHandles[handle];\n    return true;\n  }\n  return false;\n}\nexports.Immediate = {\n  setImmediate: function (cb) {\n    var handle = nextHandle++;\n    activeHandles[handle] = true;\n    if (!resolved) {\n      resolved = Promise.resolve();\n    }\n    resolved.then(function () {\n      return findAndClearHandle(handle) && cb();\n    });\n    return handle;\n  },\n  clearImmediate: function (handle) {\n    findAndClearHandle(handle);\n  }\n};\nexports.TestTools = {\n  pending: function () {\n    return Object.keys(activeHandles).length;\n  }\n};\n//# sourceMappingURL=Immediate.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "TestTools",
+      "Immediate",
+      "nextHandle",
+      "resolved",
+      "activeHandles",
+      "findAndClearHandle",
+      "handle",
+      "setImmediate",
+      "cb",
+      "Promise",
+      "resolve",
+      "then",
+      "clearImmediate",
+      "pending",
+      "keys",
+      "length"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/util/Immediate.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.TestTools = exports.Immediate = void 0;\nvar nextHandle = 1;\nvar resolved;\nvar activeHandles = {};\nfunction findAndClearHandle(handle) {\n    if (handle in activeHandles) {\n        delete activeHandles[handle];\n        return true;\n    }\n    return false;\n}\nexports.Immediate = {\n    setImmediate: function (cb) {\n        var handle = nextHandle++;\n        activeHandles[handle] = true;\n        if (!resolved) {\n            resolved = Promise.resolve();\n        }\n        resolved.then(function () { return findAndClearHandle(handle) && cb(); });\n        return handle;\n    },\n    clearImmediate: function (handle) {\n        findAndClearHandle(handle);\n    },\n};\nexports.TestTools = {\n    pending: function () {\n        return Object.keys(activeHandles).length;\n    }\n};\n//# sourceMappingURL=Immediate.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,SAAS,GAAGF,OAAO,CAACG,SAAS,GAAG,KAAK,CAAC;AAC9C,IAAIC,UAAU,GAAG,CAAC;AAClB,IAAIC,QAAQ;AACZ,IAAIC,aAAa,GAAG,CAAC,CAAC;AACtB,SAASC,kBAAkBA,CAACC,MAAM,EAAE;EAChC,IAAIA,MAAM,IAAIF,aAAa,EAAE;IACzB,OAAOA,aAAa,CAACE,MAAM,CAAC;IAC5B,OAAO,IAAI;EACf;EACA,OAAO,KAAK;AAChB;AACAR,OAAO,CAACG,SAAS,GAAG;EAChBM,YAAY,EAAE,SAAAA,CAAUC,EAAE,EAAE;IACxB,IAAIF,MAAM,GAAGJ,UAAU,EAAE;IACzBE,aAAa,CAACE,MAAM,CAAC,GAAG,IAAI;IAC5B,IAAI,CAACH,QAAQ,EAAE;MACXA,QAAQ,GAAGM,OAAO,CAACC,OAAO,CAAC,CAAC;IAChC;IACAP,QAAQ,CAACQ,IAAI,CAAC,YAAY;MAAE,OAAON,kBAAkB,CAACC,MAAM,CAAC,IAAIE,EAAE,CAAC,CAAC;IAAE,CAAC,CAAC;IACzE,OAAOF,MAAM;EACjB,CAAC;EACDM,cAAc,EAAE,SAAAA,CAAUN,MAAM,EAAE;IAC9BD,kBAAkB,CAACC,MAAM,CAAC;EAC9B;AACJ,CAAC;AACDR,OAAO,CAACE,SAAS,GAAG;EAChBa,OAAO,EAAE,SAAAA,CAAA,EAAY;IACjB,OAAOjB,MAAM,CAACkB,IAAI,CAACV,aAAa,CAAC,CAACW,MAAM;EAC5C;AACJ,CAAC;AACD",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

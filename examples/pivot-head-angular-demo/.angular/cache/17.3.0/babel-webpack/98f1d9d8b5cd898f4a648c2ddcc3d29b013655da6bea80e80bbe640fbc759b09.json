@@ -1,0 +1,31 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.config = void 0;\nexports.config = {\n  onUnhandledError: null,\n  onStoppedNotification: null,\n  Promise: undefined,\n  useDeprecatedSynchronousErrorHandling: false,\n  useDeprecatedNextContext: false\n};\n//# sourceMappingURL=config.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "config",
+      "onUnhandledError",
+      "onStoppedNotification",
+      "Promise",
+      "undefined",
+      "useDeprecatedSynchronousErrorHandling",
+      "useDeprecatedNextContext"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/config.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.config = void 0;\nexports.config = {\n    onUnhandledError: null,\n    onStoppedNotification: null,\n    Promise: undefined,\n    useDeprecatedSynchronousErrorHandling: false,\n    useDeprecatedNextContext: false,\n};\n//# sourceMappingURL=config.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,MAAM,GAAG,KAAK,CAAC;AACvBF,OAAO,CAACE,MAAM,GAAG;EACbC,gBAAgB,EAAE,IAAI;EACtBC,qBAAqB,EAAE,IAAI;EAC3BC,OAAO,EAAEC,SAAS;EAClBC,qCAAqC,EAAE,KAAK;EAC5CC,wBAAwB,EAAE;AAC9B,CAAC;AACD",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

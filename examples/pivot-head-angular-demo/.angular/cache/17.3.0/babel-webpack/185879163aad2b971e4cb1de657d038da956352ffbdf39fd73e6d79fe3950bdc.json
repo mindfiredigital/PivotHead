@@ -1,0 +1,36 @@
+{
+  "ast": null,
+  "code": "import { moduleMetadata } from '@storybook/angular';\nimport { PivotHeadWrapperComponent } from './pivothead-wrapper.component';\nimport { sampleData, sampleOptions } from '../../../../examples/pivot-head-angular-demo/src/app/sample-data';\nconst meta = {\n  title: 'PivotHead/PivotHeadWrapperComponent',\n  component: PivotHeadWrapperComponent,\n  tags: ['autodocs'],\n  decorators: [moduleMetadata({\n    imports: [PivotheadAngularModule]\n  })],\n  argTypes: {}\n};\nexport default meta;\nexport const Default = {\n  args: {\n    data: sampleData,\n    options: sampleOptions\n  }\n};",
+  "map": {
+    "version": 3,
+    "names": [
+      "moduleMetadata",
+      "PivotHeadWrapperComponent",
+      "sampleData",
+      "sampleOptions",
+      "meta",
+      "title",
+      "component",
+      "tags",
+      "decorators",
+      "imports",
+      "PivotheadAngularModule",
+      "argTypes",
+      "Default",
+      "args",
+      "data",
+      "options"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/packages/angular/src/lib/pivothead-wrapper.stories.ts"
+    ],
+    "sourcesContent": [
+      "import { moduleMetadata } from '@storybook/angular';\nimport { PivotHeadWrapperComponent } from './pivothead-wrapper.component';\nimport { sampleData, sampleOptions } from '../../../../examples/pivot-head-angular-demo/src/app/sample-data';\nconst meta = {\n    title: 'PivotHead/PivotHeadWrapperComponent',\n    component: PivotHeadWrapperComponent,\n    tags: ['autodocs'],\n    decorators: [\n        moduleMetadata({\n            imports: [PivotheadAngularModule],\n        }),\n    ],\n    argTypes: {},\n};\nexport default meta;\nexport const Default = {\n    args: {\n        data: sampleData,\n        options: sampleOptions,\n    },\n};\n"
+    ],
+    "mappings": "AAAA,SAASA,cAAc,QAAQ,oBAAoB;AACnD,SAASC,yBAAyB,QAAQ,+BAA+B;AACzE,SAASC,UAAU,EAAEC,aAAa,QAAQ,kEAAkE;AAC5G,MAAMC,IAAI,GAAG;EACTC,KAAK,EAAE,qCAAqC;EAC5CC,SAAS,EAAEL,yBAAyB;EACpCM,IAAI,EAAE,CAAC,UAAU,CAAC;EAClBC,UAAU,EAAE,CACRR,cAAc,CAAC;IACXS,OAAO,EAAE,CAACC,sBAAsB;EACpC,CAAC,CAAC,CACL;EACDC,QAAQ,EAAE,CAAC;AACf,CAAC;AACD,eAAeP,IAAI;AACnB,OAAO,MAAMQ,OAAO,GAAG;EACnBC,IAAI,EAAE;IACFC,IAAI,EAAEZ,UAAU;IAChBa,OAAO,EAAEZ;EACb;AACJ,CAAC",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "module",
+  "externalDependencies": []
+}

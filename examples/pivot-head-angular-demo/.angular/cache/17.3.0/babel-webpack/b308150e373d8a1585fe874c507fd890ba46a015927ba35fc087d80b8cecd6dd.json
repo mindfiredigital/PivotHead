@@ -1,0 +1,31 @@
+{
+  "ast": null,
+  "code": "var PARAM_KEY = \"viewport\";\nvar modern = {\n    [PARAM_KEY]: {\n      value: void 0,\n      isRotated: !1\n    }\n  },\n  legacy = {\n    viewport: \"reset\",\n    viewportRotated: !1\n  },\n  initialGlobals = globalThis.FEATURES?.viewportStoryGlobals ? modern : legacy;\nexport { initialGlobals };",
+  "map": {
+    "version": 3,
+    "names": [
+      "PARAM_KEY",
+      "modern",
+      "value",
+      "isRotated",
+      "legacy",
+      "viewport",
+      "viewportRotated",
+      "initialGlobals",
+      "globalThis",
+      "FEATURES",
+      "viewportStoryGlobals"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/@storybook+addon-viewport@8.6.14_storybook@8.6.14/node_modules/@storybook/addon-viewport/dist/preview.mjs"
+    ],
+    "sourcesContent": [
+      "var PARAM_KEY=\"viewport\";var modern={[PARAM_KEY]:{value:void 0,isRotated:!1}},legacy={viewport:\"reset\",viewportRotated:!1},initialGlobals=globalThis.FEATURES?.viewportStoryGlobals?modern:legacy;\n\nexport { initialGlobals };\n"
+    ],
+    "mappings": "AAAA,IAAIA,SAAS,GAAC,UAAU;AAAC,IAAIC,MAAM,GAAC;IAAC,CAACD,SAAS,GAAE;MAACE,KAAK,EAAC,KAAK,CAAC;MAACC,SAAS,EAAC,CAAC;IAAC;EAAC,CAAC;EAACC,MAAM,GAAC;IAACC,QAAQ,EAAC,OAAO;IAACC,eAAe,EAAC,CAAC;EAAC,CAAC;EAACC,cAAc,GAACC,UAAU,CAACC,QAAQ,EAAEC,oBAAoB,GAACT,MAAM,GAACG,MAAM;AAEjM,SAASG,cAAc",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "module",
+  "externalDependencies": []
+}

@@ -1,0 +1,60 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nvar __values = this && this.__values || function (o) {\n  var s = typeof Symbol === \"function\" && Symbol.iterator,\n    m = s && o[s],\n    i = 0;\n  if (m) return m.call(o);\n  if (o && typeof o.length === \"number\") return {\n    next: function () {\n      if (o && i >= o.length) o = void 0;\n      return {\n        value: o && o[i++],\n        done: !o\n      };\n    }\n  };\n  throw new TypeError(s ? \"Object is not iterable.\" : \"Symbol.iterator is not defined.\");\n};\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.takeLast = void 0;\nvar empty_1 = require(\"../observable/empty\");\nvar lift_1 = require(\"../util/lift\");\nvar OperatorSubscriber_1 = require(\"./OperatorSubscriber\");\nfunction takeLast(count) {\n  return count <= 0 ? function () {\n    return empty_1.EMPTY;\n  } : lift_1.operate(function (source, subscriber) {\n    var buffer = [];\n    source.subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, function (value) {\n      buffer.push(value);\n      count < buffer.length && buffer.shift();\n    }, function () {\n      var e_1, _a;\n      try {\n        for (var buffer_1 = __values(buffer), buffer_1_1 = buffer_1.next(); !buffer_1_1.done; buffer_1_1 = buffer_1.next()) {\n          var value = buffer_1_1.value;\n          subscriber.next(value);\n        }\n      } catch (e_1_1) {\n        e_1 = {\n          error: e_1_1\n        };\n      } finally {\n        try {\n          if (buffer_1_1 && !buffer_1_1.done && (_a = buffer_1.return)) _a.call(buffer_1);\n        } finally {\n          if (e_1) throw e_1.error;\n        }\n      }\n      subscriber.complete();\n    }, undefined, function () {\n      buffer = null;\n    }));\n  });\n}\nexports.takeLast = takeLast;\n//# sourceMappingURL=takeLast.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "__values",
+      "o",
+      "s",
+      "Symbol",
+      "iterator",
+      "m",
+      "i",
+      "call",
+      "length",
+      "next",
+      "value",
+      "done",
+      "TypeError",
+      "Object",
+      "defineProperty",
+      "exports",
+      "takeLast",
+      "empty_1",
+      "require",
+      "lift_1",
+      "OperatorSubscriber_1",
+      "count",
+      "EMPTY",
+      "operate",
+      "source",
+      "subscriber",
+      "buffer",
+      "subscribe",
+      "createOperatorSubscriber",
+      "push",
+      "shift",
+      "e_1",
+      "_a",
+      "buffer_1",
+      "buffer_1_1",
+      "e_1_1",
+      "error",
+      "return",
+      "complete",
+      "undefined"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/operators/takeLast.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nvar __values = (this && this.__values) || function(o) {\n    var s = typeof Symbol === \"function\" && Symbol.iterator, m = s && o[s], i = 0;\n    if (m) return m.call(o);\n    if (o && typeof o.length === \"number\") return {\n        next: function () {\n            if (o && i >= o.length) o = void 0;\n            return { value: o && o[i++], done: !o };\n        }\n    };\n    throw new TypeError(s ? \"Object is not iterable.\" : \"Symbol.iterator is not defined.\");\n};\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.takeLast = void 0;\nvar empty_1 = require(\"../observable/empty\");\nvar lift_1 = require(\"../util/lift\");\nvar OperatorSubscriber_1 = require(\"./OperatorSubscriber\");\nfunction takeLast(count) {\n    return count <= 0\n        ? function () { return empty_1.EMPTY; }\n        : lift_1.operate(function (source, subscriber) {\n            var buffer = [];\n            source.subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, function (value) {\n                buffer.push(value);\n                count < buffer.length && buffer.shift();\n            }, function () {\n                var e_1, _a;\n                try {\n                    for (var buffer_1 = __values(buffer), buffer_1_1 = buffer_1.next(); !buffer_1_1.done; buffer_1_1 = buffer_1.next()) {\n                        var value = buffer_1_1.value;\n                        subscriber.next(value);\n                    }\n                }\n                catch (e_1_1) { e_1 = { error: e_1_1 }; }\n                finally {\n                    try {\n                        if (buffer_1_1 && !buffer_1_1.done && (_a = buffer_1.return)) _a.call(buffer_1);\n                    }\n                    finally { if (e_1) throw e_1.error; }\n                }\n                subscriber.complete();\n            }, undefined, function () {\n                buffer = null;\n            }));\n        });\n}\nexports.takeLast = takeLast;\n//# sourceMappingURL=takeLast.js.map"
+    ],
+    "mappings": "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",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

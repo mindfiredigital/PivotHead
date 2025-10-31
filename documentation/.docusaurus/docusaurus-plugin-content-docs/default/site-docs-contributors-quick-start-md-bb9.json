@@ -19,5 +19,9 @@
   "previous": {
     "title": "Monorepo Setup Guide",
     "permalink": "/PivotHead/docs/contributors/monorepo-setup"
+  },
+  "next": {
+    "title": "Upcoming Features",
+    "permalink": "/PivotHead/docs/upcoming/"
   }
 }

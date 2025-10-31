@@ -1,0 +1,34 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.auditTime = void 0;\nvar async_1 = require(\"../scheduler/async\");\nvar audit_1 = require(\"./audit\");\nvar timer_1 = require(\"../observable/timer\");\nfunction auditTime(duration, scheduler) {\n  if (scheduler === void 0) {\n    scheduler = async_1.asyncScheduler;\n  }\n  return audit_1.audit(function () {\n    return timer_1.timer(duration, scheduler);\n  });\n}\nexports.auditTime = auditTime;\n//# sourceMappingURL=auditTime.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "auditTime",
+      "async_1",
+      "require",
+      "audit_1",
+      "timer_1",
+      "duration",
+      "scheduler",
+      "asyncScheduler",
+      "audit",
+      "timer"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/operators/auditTime.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.auditTime = void 0;\nvar async_1 = require(\"../scheduler/async\");\nvar audit_1 = require(\"./audit\");\nvar timer_1 = require(\"../observable/timer\");\nfunction auditTime(duration, scheduler) {\n    if (scheduler === void 0) { scheduler = async_1.asyncScheduler; }\n    return audit_1.audit(function () { return timer_1.timer(duration, scheduler); });\n}\nexports.auditTime = auditTime;\n//# sourceMappingURL=auditTime.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,SAAS,GAAG,KAAK,CAAC;AAC1B,IAAIC,OAAO,GAAGC,OAAO,CAAC,oBAAoB,CAAC;AAC3C,IAAIC,OAAO,GAAGD,OAAO,CAAC,SAAS,CAAC;AAChC,IAAIE,OAAO,GAAGF,OAAO,CAAC,qBAAqB,CAAC;AAC5C,SAASF,SAASA,CAACK,QAAQ,EAAEC,SAAS,EAAE;EACpC,IAAIA,SAAS,KAAK,KAAK,CAAC,EAAE;IAAEA,SAAS,GAAGL,OAAO,CAACM,cAAc;EAAE;EAChE,OAAOJ,OAAO,CAACK,KAAK,CAAC,YAAY;IAAE,OAAOJ,OAAO,CAACK,KAAK,CAACJ,QAAQ,EAAEC,SAAS,CAAC;EAAE,CAAC,CAAC;AACpF;AACAR,OAAO,CAACE,SAAS,GAAGA,SAAS;AAC7B",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

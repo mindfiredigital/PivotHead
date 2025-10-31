@@ -1,0 +1,46 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.retryWhen = void 0;\nvar innerFrom_1 = require(\"../observable/innerFrom\");\nvar Subject_1 = require(\"../Subject\");\nvar lift_1 = require(\"../util/lift\");\nvar OperatorSubscriber_1 = require(\"./OperatorSubscriber\");\nfunction retryWhen(notifier) {\n  return lift_1.operate(function (source, subscriber) {\n    var innerSub;\n    var syncResub = false;\n    var errors$;\n    var subscribeForRetryWhen = function () {\n      innerSub = source.subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, undefined, undefined, function (err) {\n        if (!errors$) {\n          errors$ = new Subject_1.Subject();\n          innerFrom_1.innerFrom(notifier(errors$)).subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, function () {\n            return innerSub ? subscribeForRetryWhen() : syncResub = true;\n          }));\n        }\n        if (errors$) {\n          errors$.next(err);\n        }\n      }));\n      if (syncResub) {\n        innerSub.unsubscribe();\n        innerSub = null;\n        syncResub = false;\n        subscribeForRetryWhen();\n      }\n    };\n    subscribeForRetryWhen();\n  });\n}\nexports.retryWhen = retryWhen;\n//# sourceMappingURL=retryWhen.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "retryWhen",
+      "innerFrom_1",
+      "require",
+      "Subject_1",
+      "lift_1",
+      "OperatorSubscriber_1",
+      "notifier",
+      "operate",
+      "source",
+      "subscriber",
+      "innerSub",
+      "syncResub",
+      "errors$",
+      "subscribeForRetryWhen",
+      "subscribe",
+      "createOperatorSubscriber",
+      "undefined",
+      "err",
+      "Subject",
+      "innerFrom",
+      "next",
+      "unsubscribe"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/operators/retryWhen.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.retryWhen = void 0;\nvar innerFrom_1 = require(\"../observable/innerFrom\");\nvar Subject_1 = require(\"../Subject\");\nvar lift_1 = require(\"../util/lift\");\nvar OperatorSubscriber_1 = require(\"./OperatorSubscriber\");\nfunction retryWhen(notifier) {\n    return lift_1.operate(function (source, subscriber) {\n        var innerSub;\n        var syncResub = false;\n        var errors$;\n        var subscribeForRetryWhen = function () {\n            innerSub = source.subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, undefined, undefined, function (err) {\n                if (!errors$) {\n                    errors$ = new Subject_1.Subject();\n                    innerFrom_1.innerFrom(notifier(errors$)).subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, function () {\n                        return innerSub ? subscribeForRetryWhen() : (syncResub = true);\n                    }));\n                }\n                if (errors$) {\n                    errors$.next(err);\n                }\n            }));\n            if (syncResub) {\n                innerSub.unsubscribe();\n                innerSub = null;\n                syncResub = false;\n                subscribeForRetryWhen();\n            }\n        };\n        subscribeForRetryWhen();\n    });\n}\nexports.retryWhen = retryWhen;\n//# sourceMappingURL=retryWhen.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,SAAS,GAAG,KAAK,CAAC;AAC1B,IAAIC,WAAW,GAAGC,OAAO,CAAC,yBAAyB,CAAC;AACpD,IAAIC,SAAS,GAAGD,OAAO,CAAC,YAAY,CAAC;AACrC,IAAIE,MAAM,GAAGF,OAAO,CAAC,cAAc,CAAC;AACpC,IAAIG,oBAAoB,GAAGH,OAAO,CAAC,sBAAsB,CAAC;AAC1D,SAASF,SAASA,CAACM,QAAQ,EAAE;EACzB,OAAOF,MAAM,CAACG,OAAO,CAAC,UAAUC,MAAM,EAAEC,UAAU,EAAE;IAChD,IAAIC,QAAQ;IACZ,IAAIC,SAAS,GAAG,KAAK;IACrB,IAAIC,OAAO;IACX,IAAIC,qBAAqB,GAAG,SAAAA,CAAA,EAAY;MACpCH,QAAQ,GAAGF,MAAM,CAACM,SAAS,CAACT,oBAAoB,CAACU,wBAAwB,CAACN,UAAU,EAAEO,SAAS,EAAEA,SAAS,EAAE,UAAUC,GAAG,EAAE;QACvH,IAAI,CAACL,OAAO,EAAE;UACVA,OAAO,GAAG,IAAIT,SAAS,CAACe,OAAO,CAAC,CAAC;UACjCjB,WAAW,CAACkB,SAAS,CAACb,QAAQ,CAACM,OAAO,CAAC,CAAC,CAACE,SAAS,CAACT,oBAAoB,CAACU,wBAAwB,CAACN,UAAU,EAAE,YAAY;YACrH,OAAOC,QAAQ,GAAGG,qBAAqB,CAAC,CAAC,GAAIF,SAAS,GAAG,IAAK;UAClE,CAAC,CAAC,CAAC;QACP;QACA,IAAIC,OAAO,EAAE;UACTA,OAAO,CAACQ,IAAI,CAACH,GAAG,CAAC;QACrB;MACJ,CAAC,CAAC,CAAC;MACH,IAAIN,SAAS,EAAE;QACXD,QAAQ,CAACW,WAAW,CAAC,CAAC;QACtBX,QAAQ,GAAG,IAAI;QACfC,SAAS,GAAG,KAAK;QACjBE,qBAAqB,CAAC,CAAC;MAC3B;IACJ,CAAC;IACDA,qBAAqB,CAAC,CAAC;EAC3B,CAAC,CAAC;AACN;AACAf,OAAO,CAACE,SAAS,GAAGA,SAAS;AAC7B",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

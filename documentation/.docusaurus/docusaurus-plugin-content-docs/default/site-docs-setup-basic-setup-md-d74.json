@@ -1,0 +1,24 @@
+{
+  "id": "setup/Basic-setup",
+  "title": "Basic-setup",
+  "description": "abc",
+  "source": "@site/docs/setup/Basic-setup.md",
+  "sourceDirName": "setup",
+  "slug": "/setup/Basic-setup",
+  "permalink": "/PivotHead/docs/setup/Basic-setup",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/setup/Basic-setup.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Getting Started",
+    "permalink": "/PivotHead/docs/Installation"
+  },
+  "next": {
+    "title": "sample-project",
+    "permalink": "/PivotHead/docs/tutorials/core-webcomponent/sample-project"
+  }
+}

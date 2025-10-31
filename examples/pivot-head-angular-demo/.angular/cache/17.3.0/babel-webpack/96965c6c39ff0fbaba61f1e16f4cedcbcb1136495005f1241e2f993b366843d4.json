@@ -1,0 +1,46 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.mergeMap = void 0;\nvar map_1 = require(\"./map\");\nvar innerFrom_1 = require(\"../observable/innerFrom\");\nvar lift_1 = require(\"../util/lift\");\nvar mergeInternals_1 = require(\"./mergeInternals\");\nvar isFunction_1 = require(\"../util/isFunction\");\nfunction mergeMap(project, resultSelector, concurrent) {\n  if (concurrent === void 0) {\n    concurrent = Infinity;\n  }\n  if (isFunction_1.isFunction(resultSelector)) {\n    return mergeMap(function (a, i) {\n      return map_1.map(function (b, ii) {\n        return resultSelector(a, b, i, ii);\n      })(innerFrom_1.innerFrom(project(a, i)));\n    }, concurrent);\n  } else if (typeof resultSelector === 'number') {\n    concurrent = resultSelector;\n  }\n  return lift_1.operate(function (source, subscriber) {\n    return mergeInternals_1.mergeInternals(source, subscriber, project, concurrent);\n  });\n}\nexports.mergeMap = mergeMap;\n//# sourceMappingURL=mergeMap.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "mergeMap",
+      "map_1",
+      "require",
+      "innerFrom_1",
+      "lift_1",
+      "mergeInternals_1",
+      "isFunction_1",
+      "project",
+      "resultSelector",
+      "concurrent",
+      "Infinity",
+      "isFunction",
+      "a",
+      "i",
+      "map",
+      "b",
+      "ii",
+      "innerFrom",
+      "operate",
+      "source",
+      "subscriber",
+      "mergeInternals"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/operators/mergeMap.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.mergeMap = void 0;\nvar map_1 = require(\"./map\");\nvar innerFrom_1 = require(\"../observable/innerFrom\");\nvar lift_1 = require(\"../util/lift\");\nvar mergeInternals_1 = require(\"./mergeInternals\");\nvar isFunction_1 = require(\"../util/isFunction\");\nfunction mergeMap(project, resultSelector, concurrent) {\n    if (concurrent === void 0) { concurrent = Infinity; }\n    if (isFunction_1.isFunction(resultSelector)) {\n        return mergeMap(function (a, i) { return map_1.map(function (b, ii) { return resultSelector(a, b, i, ii); })(innerFrom_1.innerFrom(project(a, i))); }, concurrent);\n    }\n    else if (typeof resultSelector === 'number') {\n        concurrent = resultSelector;\n    }\n    return lift_1.operate(function (source, subscriber) { return mergeInternals_1.mergeInternals(source, subscriber, project, concurrent); });\n}\nexports.mergeMap = mergeMap;\n//# sourceMappingURL=mergeMap.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,QAAQ,GAAG,KAAK,CAAC;AACzB,IAAIC,KAAK,GAAGC,OAAO,CAAC,OAAO,CAAC;AAC5B,IAAIC,WAAW,GAAGD,OAAO,CAAC,yBAAyB,CAAC;AACpD,IAAIE,MAAM,GAAGF,OAAO,CAAC,cAAc,CAAC;AACpC,IAAIG,gBAAgB,GAAGH,OAAO,CAAC,kBAAkB,CAAC;AAClD,IAAII,YAAY,GAAGJ,OAAO,CAAC,oBAAoB,CAAC;AAChD,SAASF,QAAQA,CAACO,OAAO,EAAEC,cAAc,EAAEC,UAAU,EAAE;EACnD,IAAIA,UAAU,KAAK,KAAK,CAAC,EAAE;IAAEA,UAAU,GAAGC,QAAQ;EAAE;EACpD,IAAIJ,YAAY,CAACK,UAAU,CAACH,cAAc,CAAC,EAAE;IACzC,OAAOR,QAAQ,CAAC,UAAUY,CAAC,EAAEC,CAAC,EAAE;MAAE,OAAOZ,KAAK,CAACa,GAAG,CAAC,UAAUC,CAAC,EAAEC,EAAE,EAAE;QAAE,OAAOR,cAAc,CAACI,CAAC,EAAEG,CAAC,EAAEF,CAAC,EAAEG,EAAE,CAAC;MAAE,CAAC,CAAC,CAACb,WAAW,CAACc,SAAS,CAACV,OAAO,CAACK,CAAC,EAAEC,CAAC,CAAC,CAAC,CAAC;IAAE,CAAC,EAAEJ,UAAU,CAAC;EACtK,CAAC,MACI,IAAI,OAAOD,cAAc,KAAK,QAAQ,EAAE;IACzCC,UAAU,GAAGD,cAAc;EAC/B;EACA,OAAOJ,MAAM,CAACc,OAAO,CAAC,UAAUC,MAAM,EAAEC,UAAU,EAAE;IAAE,OAAOf,gBAAgB,CAACgB,cAAc,CAACF,MAAM,EAAEC,UAAU,EAAEb,OAAO,EAAEE,UAAU,CAAC;EAAE,CAAC,CAAC;AAC7I;AACAX,OAAO,CAACE,QAAQ,GAAGA,QAAQ;AAC3B",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

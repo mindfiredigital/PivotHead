@@ -1,0 +1,43 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.refCount = void 0;\nvar lift_1 = require(\"../util/lift\");\nvar OperatorSubscriber_1 = require(\"./OperatorSubscriber\");\nfunction refCount() {\n  return lift_1.operate(function (source, subscriber) {\n    var connection = null;\n    source._refCount++;\n    var refCounter = OperatorSubscriber_1.createOperatorSubscriber(subscriber, undefined, undefined, undefined, function () {\n      if (!source || source._refCount <= 0 || 0 < --source._refCount) {\n        connection = null;\n        return;\n      }\n      var sharedConnection = source._connection;\n      var conn = connection;\n      connection = null;\n      if (sharedConnection && (!conn || sharedConnection === conn)) {\n        sharedConnection.unsubscribe();\n      }\n      subscriber.unsubscribe();\n    });\n    source.subscribe(refCounter);\n    if (!refCounter.closed) {\n      connection = source.connect();\n    }\n  });\n}\nexports.refCount = refCount;\n//# sourceMappingURL=refCount.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "refCount",
+      "lift_1",
+      "require",
+      "OperatorSubscriber_1",
+      "operate",
+      "source",
+      "subscriber",
+      "connection",
+      "_refCount",
+      "refCounter",
+      "createOperatorSubscriber",
+      "undefined",
+      "sharedConnection",
+      "_connection",
+      "conn",
+      "unsubscribe",
+      "subscribe",
+      "closed",
+      "connect"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/operators/refCount.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.refCount = void 0;\nvar lift_1 = require(\"../util/lift\");\nvar OperatorSubscriber_1 = require(\"./OperatorSubscriber\");\nfunction refCount() {\n    return lift_1.operate(function (source, subscriber) {\n        var connection = null;\n        source._refCount++;\n        var refCounter = OperatorSubscriber_1.createOperatorSubscriber(subscriber, undefined, undefined, undefined, function () {\n            if (!source || source._refCount <= 0 || 0 < --source._refCount) {\n                connection = null;\n                return;\n            }\n            var sharedConnection = source._connection;\n            var conn = connection;\n            connection = null;\n            if (sharedConnection && (!conn || sharedConnection === conn)) {\n                sharedConnection.unsubscribe();\n            }\n            subscriber.unsubscribe();\n        });\n        source.subscribe(refCounter);\n        if (!refCounter.closed) {\n            connection = source.connect();\n        }\n    });\n}\nexports.refCount = refCount;\n//# sourceMappingURL=refCount.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,QAAQ,GAAG,KAAK,CAAC;AACzB,IAAIC,MAAM,GAAGC,OAAO,CAAC,cAAc,CAAC;AACpC,IAAIC,oBAAoB,GAAGD,OAAO,CAAC,sBAAsB,CAAC;AAC1D,SAASF,QAAQA,CAAA,EAAG;EAChB,OAAOC,MAAM,CAACG,OAAO,CAAC,UAAUC,MAAM,EAAEC,UAAU,EAAE;IAChD,IAAIC,UAAU,GAAG,IAAI;IACrBF,MAAM,CAACG,SAAS,EAAE;IAClB,IAAIC,UAAU,GAAGN,oBAAoB,CAACO,wBAAwB,CAACJ,UAAU,EAAEK,SAAS,EAAEA,SAAS,EAAEA,SAAS,EAAE,YAAY;MACpH,IAAI,CAACN,MAAM,IAAIA,MAAM,CAACG,SAAS,IAAI,CAAC,IAAI,CAAC,GAAG,EAAEH,MAAM,CAACG,SAAS,EAAE;QAC5DD,UAAU,GAAG,IAAI;QACjB;MACJ;MACA,IAAIK,gBAAgB,GAAGP,MAAM,CAACQ,WAAW;MACzC,IAAIC,IAAI,GAAGP,UAAU;MACrBA,UAAU,GAAG,IAAI;MACjB,IAAIK,gBAAgB,KAAK,CAACE,IAAI,IAAIF,gBAAgB,KAAKE,IAAI,CAAC,EAAE;QAC1DF,gBAAgB,CAACG,WAAW,CAAC,CAAC;MAClC;MACAT,UAAU,CAACS,WAAW,CAAC,CAAC;IAC5B,CAAC,CAAC;IACFV,MAAM,CAACW,SAAS,CAACP,UAAU,CAAC;IAC5B,IAAI,CAACA,UAAU,CAACQ,MAAM,EAAE;MACpBV,UAAU,GAAGF,MAAM,CAACa,OAAO,CAAC,CAAC;IACjC;EACJ,CAAC,CAAC;AACN;AACApB,OAAO,CAACE,QAAQ,GAAGA,QAAQ;AAC3B",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

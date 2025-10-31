@@ -1,0 +1,62 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.forkJoin = void 0;\nvar Observable_1 = require(\"../Observable\");\nvar argsArgArrayOrObject_1 = require(\"../util/argsArgArrayOrObject\");\nvar innerFrom_1 = require(\"./innerFrom\");\nvar args_1 = require(\"../util/args\");\nvar OperatorSubscriber_1 = require(\"../operators/OperatorSubscriber\");\nvar mapOneOrManyArgs_1 = require(\"../util/mapOneOrManyArgs\");\nvar createObject_1 = require(\"../util/createObject\");\nfunction forkJoin() {\n  var args = [];\n  for (var _i = 0; _i < arguments.length; _i++) {\n    args[_i] = arguments[_i];\n  }\n  var resultSelector = args_1.popResultSelector(args);\n  var _a = argsArgArrayOrObject_1.argsArgArrayOrObject(args),\n    sources = _a.args,\n    keys = _a.keys;\n  var result = new Observable_1.Observable(function (subscriber) {\n    var length = sources.length;\n    if (!length) {\n      subscriber.complete();\n      return;\n    }\n    var values = new Array(length);\n    var remainingCompletions = length;\n    var remainingEmissions = length;\n    var _loop_1 = function (sourceIndex) {\n      var hasValue = false;\n      innerFrom_1.innerFrom(sources[sourceIndex]).subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, function (value) {\n        if (!hasValue) {\n          hasValue = true;\n          remainingEmissions--;\n        }\n        values[sourceIndex] = value;\n      }, function () {\n        return remainingCompletions--;\n      }, undefined, function () {\n        if (!remainingCompletions || !hasValue) {\n          if (!remainingEmissions) {\n            subscriber.next(keys ? createObject_1.createObject(keys, values) : values);\n          }\n          subscriber.complete();\n        }\n      }));\n    };\n    for (var sourceIndex = 0; sourceIndex < length; sourceIndex++) {\n      _loop_1(sourceIndex);\n    }\n  });\n  return resultSelector ? result.pipe(mapOneOrManyArgs_1.mapOneOrManyArgs(resultSelector)) : result;\n}\nexports.forkJoin = forkJoin;\n//# sourceMappingURL=forkJoin.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "forkJoin",
+      "Observable_1",
+      "require",
+      "argsArgArrayOrObject_1",
+      "innerFrom_1",
+      "args_1",
+      "OperatorSubscriber_1",
+      "mapOneOrManyArgs_1",
+      "createObject_1",
+      "args",
+      "_i",
+      "arguments",
+      "length",
+      "resultSelector",
+      "popResultSelector",
+      "_a",
+      "argsArgArrayOrObject",
+      "sources",
+      "keys",
+      "result",
+      "Observable",
+      "subscriber",
+      "complete",
+      "values",
+      "Array",
+      "remainingCompletions",
+      "remainingEmissions",
+      "_loop_1",
+      "sourceIndex",
+      "hasValue",
+      "innerFrom",
+      "subscribe",
+      "createOperatorSubscriber",
+      "undefined",
+      "next",
+      "createObject",
+      "pipe",
+      "mapOneOrManyArgs"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/observable/forkJoin.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.forkJoin = void 0;\nvar Observable_1 = require(\"../Observable\");\nvar argsArgArrayOrObject_1 = require(\"../util/argsArgArrayOrObject\");\nvar innerFrom_1 = require(\"./innerFrom\");\nvar args_1 = require(\"../util/args\");\nvar OperatorSubscriber_1 = require(\"../operators/OperatorSubscriber\");\nvar mapOneOrManyArgs_1 = require(\"../util/mapOneOrManyArgs\");\nvar createObject_1 = require(\"../util/createObject\");\nfunction forkJoin() {\n    var args = [];\n    for (var _i = 0; _i < arguments.length; _i++) {\n        args[_i] = arguments[_i];\n    }\n    var resultSelector = args_1.popResultSelector(args);\n    var _a = argsArgArrayOrObject_1.argsArgArrayOrObject(args), sources = _a.args, keys = _a.keys;\n    var result = new Observable_1.Observable(function (subscriber) {\n        var length = sources.length;\n        if (!length) {\n            subscriber.complete();\n            return;\n        }\n        var values = new Array(length);\n        var remainingCompletions = length;\n        var remainingEmissions = length;\n        var _loop_1 = function (sourceIndex) {\n            var hasValue = false;\n            innerFrom_1.innerFrom(sources[sourceIndex]).subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, function (value) {\n                if (!hasValue) {\n                    hasValue = true;\n                    remainingEmissions--;\n                }\n                values[sourceIndex] = value;\n            }, function () { return remainingCompletions--; }, undefined, function () {\n                if (!remainingCompletions || !hasValue) {\n                    if (!remainingEmissions) {\n                        subscriber.next(keys ? createObject_1.createObject(keys, values) : values);\n                    }\n                    subscriber.complete();\n                }\n            }));\n        };\n        for (var sourceIndex = 0; sourceIndex < length; sourceIndex++) {\n            _loop_1(sourceIndex);\n        }\n    });\n    return resultSelector ? result.pipe(mapOneOrManyArgs_1.mapOneOrManyArgs(resultSelector)) : result;\n}\nexports.forkJoin = forkJoin;\n//# sourceMappingURL=forkJoin.js.map"
+    ],
+    "mappings": "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",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

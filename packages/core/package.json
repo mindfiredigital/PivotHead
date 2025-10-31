@@ -5,6 +5,18 @@
   "main": "./dist/pivothead-core.umd.js",
   "module": "./dist/pivothead-core.mjs",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/pivothead-core.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/pivothead-core.umd.js"
+      }
+    }
+  },
   "files": [
     "dist"
   ],

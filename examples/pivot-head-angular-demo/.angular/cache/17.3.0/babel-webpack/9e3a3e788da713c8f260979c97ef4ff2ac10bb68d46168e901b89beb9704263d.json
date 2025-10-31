@@ -1,0 +1,32 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.interval = void 0;\nvar async_1 = require(\"../scheduler/async\");\nvar timer_1 = require(\"./timer\");\nfunction interval(period, scheduler) {\n  if (period === void 0) {\n    period = 0;\n  }\n  if (scheduler === void 0) {\n    scheduler = async_1.asyncScheduler;\n  }\n  if (period < 0) {\n    period = 0;\n  }\n  return timer_1.timer(period, period, scheduler);\n}\nexports.interval = interval;\n//# sourceMappingURL=interval.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "interval",
+      "async_1",
+      "require",
+      "timer_1",
+      "period",
+      "scheduler",
+      "asyncScheduler",
+      "timer"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/observable/interval.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.interval = void 0;\nvar async_1 = require(\"../scheduler/async\");\nvar timer_1 = require(\"./timer\");\nfunction interval(period, scheduler) {\n    if (period === void 0) { period = 0; }\n    if (scheduler === void 0) { scheduler = async_1.asyncScheduler; }\n    if (period < 0) {\n        period = 0;\n    }\n    return timer_1.timer(period, period, scheduler);\n}\nexports.interval = interval;\n//# sourceMappingURL=interval.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,QAAQ,GAAG,KAAK,CAAC;AACzB,IAAIC,OAAO,GAAGC,OAAO,CAAC,oBAAoB,CAAC;AAC3C,IAAIC,OAAO,GAAGD,OAAO,CAAC,SAAS,CAAC;AAChC,SAASF,QAAQA,CAACI,MAAM,EAAEC,SAAS,EAAE;EACjC,IAAID,MAAM,KAAK,KAAK,CAAC,EAAE;IAAEA,MAAM,GAAG,CAAC;EAAE;EACrC,IAAIC,SAAS,KAAK,KAAK,CAAC,EAAE;IAAEA,SAAS,GAAGJ,OAAO,CAACK,cAAc;EAAE;EAChE,IAAIF,MAAM,GAAG,CAAC,EAAE;IACZA,MAAM,GAAG,CAAC;EACd;EACA,OAAOD,OAAO,CAACI,KAAK,CAACH,MAAM,EAAEA,MAAM,EAAEC,SAAS,CAAC;AACnD;AACAP,OAAO,CAACE,QAAQ,GAAGA,QAAQ;AAC3B",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

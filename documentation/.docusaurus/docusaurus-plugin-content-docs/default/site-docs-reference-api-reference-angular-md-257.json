@@ -1,0 +1,19 @@
+{
+  "id": "reference/api-reference/angular-api-reference",
+  "title": "Angular API",
+  "description": "The @pivothead/angular package provides a service for creating your headless pivot table.",
+  "source": "@site/docs/reference/api-reference/angular.md",
+  "sourceDirName": "reference/api-reference",
+  "slug": "/reference/api-reference/angular-api-reference",
+  "permalink": "/PivotHead/docs/reference/api-reference/angular-api-reference",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/reference/api-reference/angular.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "angular-api-reference",
+    "title": "Angular API",
+    "sidebar_label": "Angular"
+  }
+}

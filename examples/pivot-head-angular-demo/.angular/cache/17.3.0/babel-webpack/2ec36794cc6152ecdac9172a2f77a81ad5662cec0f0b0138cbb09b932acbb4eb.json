@@ -1,0 +1,19 @@
+{
+  "ast": null,
+  "code": "export * from './client/index';\nexport * from './types';\n/*\n * ATTENTION:\n * - moduleMetadata\n * - NgModuleMetadata\n * - ICollection\n *\n * These typings are coped out of decorators.d.ts and types.d.ts in order to fix a bug with tsc\n * It was imported out of dist before which was not the proper way of exporting public API\n *\n * This can be fixed by migrating app/angular to typescript\n */",
+  "map": {
+    "version": 3,
+    "names": [],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/@storybook+angular@8.6.14_@angular-devkit+architect@0.1703.0_@angular-devkit+build-angular@17_a7aajamgs7bgz2yqzrp63bsev4/node_modules/@storybook/angular/dist/index.mjs"
+    ],
+    "sourcesContent": [
+      "export * from './client/index';\nexport * from './types';\n/*\n * ATTENTION:\n * - moduleMetadata\n * - NgModuleMetadata\n * - ICollection\n *\n * These typings are coped out of decorators.d.ts and types.d.ts in order to fix a bug with tsc\n * It was imported out of dist before which was not the proper way of exporting public API\n *\n * This can be fixed by migrating app/angular to typescript\n */\n"
+    ],
+    "mappings": "AAAA,cAAc,gBAAgB;AAC9B,cAAc,SAAS;AACvB;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "module",
+  "externalDependencies": []
+}

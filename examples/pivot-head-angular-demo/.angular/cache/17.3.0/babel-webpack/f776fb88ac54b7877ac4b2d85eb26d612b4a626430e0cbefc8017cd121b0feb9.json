@@ -1,0 +1,47 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.bufferWhen = void 0;\nvar lift_1 = require(\"../util/lift\");\nvar noop_1 = require(\"../util/noop\");\nvar OperatorSubscriber_1 = require(\"./OperatorSubscriber\");\nvar innerFrom_1 = require(\"../observable/innerFrom\");\nfunction bufferWhen(closingSelector) {\n  return lift_1.operate(function (source, subscriber) {\n    var buffer = null;\n    var closingSubscriber = null;\n    var openBuffer = function () {\n      closingSubscriber === null || closingSubscriber === void 0 ? void 0 : closingSubscriber.unsubscribe();\n      var b = buffer;\n      buffer = [];\n      b && subscriber.next(b);\n      innerFrom_1.innerFrom(closingSelector()).subscribe(closingSubscriber = OperatorSubscriber_1.createOperatorSubscriber(subscriber, openBuffer, noop_1.noop));\n    };\n    openBuffer();\n    source.subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, function (value) {\n      return buffer === null || buffer === void 0 ? void 0 : buffer.push(value);\n    }, function () {\n      buffer && subscriber.next(buffer);\n      subscriber.complete();\n    }, undefined, function () {\n      return buffer = closingSubscriber = null;\n    }));\n  });\n}\nexports.bufferWhen = bufferWhen;\n//# sourceMappingURL=bufferWhen.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "bufferWhen",
+      "lift_1",
+      "require",
+      "noop_1",
+      "OperatorSubscriber_1",
+      "innerFrom_1",
+      "closingSelector",
+      "operate",
+      "source",
+      "subscriber",
+      "buffer",
+      "closingSubscriber",
+      "openBuffer",
+      "unsubscribe",
+      "b",
+      "next",
+      "innerFrom",
+      "subscribe",
+      "createOperatorSubscriber",
+      "noop",
+      "push",
+      "complete",
+      "undefined"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/operators/bufferWhen.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.bufferWhen = void 0;\nvar lift_1 = require(\"../util/lift\");\nvar noop_1 = require(\"../util/noop\");\nvar OperatorSubscriber_1 = require(\"./OperatorSubscriber\");\nvar innerFrom_1 = require(\"../observable/innerFrom\");\nfunction bufferWhen(closingSelector) {\n    return lift_1.operate(function (source, subscriber) {\n        var buffer = null;\n        var closingSubscriber = null;\n        var openBuffer = function () {\n            closingSubscriber === null || closingSubscriber === void 0 ? void 0 : closingSubscriber.unsubscribe();\n            var b = buffer;\n            buffer = [];\n            b && subscriber.next(b);\n            innerFrom_1.innerFrom(closingSelector()).subscribe((closingSubscriber = OperatorSubscriber_1.createOperatorSubscriber(subscriber, openBuffer, noop_1.noop)));\n        };\n        openBuffer();\n        source.subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, function (value) { return buffer === null || buffer === void 0 ? void 0 : buffer.push(value); }, function () {\n            buffer && subscriber.next(buffer);\n            subscriber.complete();\n        }, undefined, function () { return (buffer = closingSubscriber = null); }));\n    });\n}\nexports.bufferWhen = bufferWhen;\n//# sourceMappingURL=bufferWhen.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,UAAU,GAAG,KAAK,CAAC;AAC3B,IAAIC,MAAM,GAAGC,OAAO,CAAC,cAAc,CAAC;AACpC,IAAIC,MAAM,GAAGD,OAAO,CAAC,cAAc,CAAC;AACpC,IAAIE,oBAAoB,GAAGF,OAAO,CAAC,sBAAsB,CAAC;AAC1D,IAAIG,WAAW,GAAGH,OAAO,CAAC,yBAAyB,CAAC;AACpD,SAASF,UAAUA,CAACM,eAAe,EAAE;EACjC,OAAOL,MAAM,CAACM,OAAO,CAAC,UAAUC,MAAM,EAAEC,UAAU,EAAE;IAChD,IAAIC,MAAM,GAAG,IAAI;IACjB,IAAIC,iBAAiB,GAAG,IAAI;IAC5B,IAAIC,UAAU,GAAG,SAAAA,CAAA,EAAY;MACzBD,iBAAiB,KAAK,IAAI,IAAIA,iBAAiB,KAAK,KAAK,CAAC,GAAG,KAAK,CAAC,GAAGA,iBAAiB,CAACE,WAAW,CAAC,CAAC;MACrG,IAAIC,CAAC,GAAGJ,MAAM;MACdA,MAAM,GAAG,EAAE;MACXI,CAAC,IAAIL,UAAU,CAACM,IAAI,CAACD,CAAC,CAAC;MACvBT,WAAW,CAACW,SAAS,CAACV,eAAe,CAAC,CAAC,CAAC,CAACW,SAAS,CAAEN,iBAAiB,GAAGP,oBAAoB,CAACc,wBAAwB,CAACT,UAAU,EAAEG,UAAU,EAAET,MAAM,CAACgB,IAAI,CAAE,CAAC;IAChK,CAAC;IACDP,UAAU,CAAC,CAAC;IACZJ,MAAM,CAACS,SAAS,CAACb,oBAAoB,CAACc,wBAAwB,CAACT,UAAU,EAAE,UAAUV,KAAK,EAAE;MAAE,OAAOW,MAAM,KAAK,IAAI,IAAIA,MAAM,KAAK,KAAK,CAAC,GAAG,KAAK,CAAC,GAAGA,MAAM,CAACU,IAAI,CAACrB,KAAK,CAAC;IAAE,CAAC,EAAE,YAAY;MACpLW,MAAM,IAAID,UAAU,CAACM,IAAI,CAACL,MAAM,CAAC;MACjCD,UAAU,CAACY,QAAQ,CAAC,CAAC;IACzB,CAAC,EAAEC,SAAS,EAAE,YAAY;MAAE,OAAQZ,MAAM,GAAGC,iBAAiB,GAAG,IAAI;IAAG,CAAC,CAAC,CAAC;EAC/E,CAAC,CAAC;AACN;AACAb,OAAO,CAACE,UAAU,GAAGA,UAAU;AAC/B",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

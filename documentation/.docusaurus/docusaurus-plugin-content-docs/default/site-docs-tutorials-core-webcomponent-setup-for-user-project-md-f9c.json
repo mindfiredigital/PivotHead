@@ -1,0 +1,24 @@
+{
+  "id": "tutorials/core-webcomponent/setup-for-user-project",
+  "title": "setup-for-user-project",
+  "description": "Overview",
+  "source": "@site/docs/tutorials/core-webcomponent/setup-for-user-project.md",
+  "sourceDirName": "tutorials/core-webcomponent",
+  "slug": "/tutorials/core-webcomponent/setup-for-user-project",
+  "permalink": "/PivotHead/docs/tutorials/core-webcomponent/setup-for-user-project",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorials/core-webcomponent/setup-for-user-project.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Sample Project",
+    "permalink": "/PivotHead/docs/tutorials/core-webcomponent/core-webcomponent-sample-project"
+  },
+  "next": {
+    "title": "Sample Project",
+    "permalink": "/PivotHead/docs/tutorials/react/react-sample-project"
+  }
+}

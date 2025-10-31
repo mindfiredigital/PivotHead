@@ -9,6 +9,12 @@ import type {
 import type { PivotHeadHost } from './host';
 import type { PivotDataRecord, FormatOptions } from '../../types/types';
 
+import {
+  FieldService,
+  FieldInfo,
+  LayoutSelection,
+} from '@mindfiredigital/pivothead';
+
 export function getState(
   host: PivotHeadHost
 ): PivotTableState<PivotDataRecord> {
@@ -120,6 +126,32 @@ export function updateFieldFormatting(
     return;
   }
   host.engine.updateFieldFormatting(field, format);
+}
+
+export function getAvailableFields(host: PivotHeadHost): FieldInfo[] {
+  return FieldService.getAvailableFields(host.engine as any);
+}
+
+export function getSupportedAggregations(): AggregationType[] {
+  return FieldService.getSupportedAggregations();
+}
+
+export function setMeasureAggregation(
+  host: PivotHeadHost,
+  field: string,
+  aggregation: AggregationType
+): void {
+  FieldService.setMeasureAggregation(host.engine as any, field, aggregation);
+}
+
+export function buildLayout(
+  host: PivotHeadHost,
+  selection: LayoutSelection
+): void {
+  const layout = FieldService.buildLayout(selection);
+  host._options.rows = layout.rows;
+  host._options.columns = layout.columns;
+  host._options.measures = layout.measures;
 }
 
 export function getFieldAlignment(host: PivotHeadHost, field: string): string {

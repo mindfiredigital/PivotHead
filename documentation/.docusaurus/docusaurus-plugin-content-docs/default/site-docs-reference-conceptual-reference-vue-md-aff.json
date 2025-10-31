@@ -1,0 +1,28 @@
+{
+  "id": "reference/conceptual-reference/vue-conceptual-reference",
+  "title": "Vue Concepts",
+  "description": "For Vue developers, the @pivothead/vue package offers a reactive and intuitive way to build a headless pivot table.",
+  "source": "@site/docs/reference/conceptual-reference/vue.md",
+  "sourceDirName": "reference/conceptual-reference",
+  "slug": "/reference/conceptual-reference/vue-conceptual-reference",
+  "permalink": "/PivotHead/docs/reference/conceptual-reference/vue-conceptual-reference",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/reference/conceptual-reference/vue.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "vue-conceptual-reference",
+    "title": "Vue Concepts",
+    "sidebar_label": "Vue"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "React",
+    "permalink": "/PivotHead/docs/reference/conceptual-reference/react-conceptual-reference"
+  },
+  "next": {
+    "title": "Core Web Component",
+    "permalink": "/PivotHead/docs/reference/api-reference/core-webcomponent-api-reference"
+  }
+}

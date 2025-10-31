@@ -1,0 +1,31 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.createNotification = exports.nextNotification = exports.errorNotification = exports.COMPLETE_NOTIFICATION = void 0;\nexports.COMPLETE_NOTIFICATION = function () {\n  return createNotification('C', undefined, undefined);\n}();\nfunction errorNotification(error) {\n  return createNotification('E', undefined, error);\n}\nexports.errorNotification = errorNotification;\nfunction nextNotification(value) {\n  return createNotification('N', value, undefined);\n}\nexports.nextNotification = nextNotification;\nfunction createNotification(kind, value, error) {\n  return {\n    kind: kind,\n    value: value,\n    error: error\n  };\n}\nexports.createNotification = createNotification;\n//# sourceMappingURL=NotificationFactories.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "createNotification",
+      "nextNotification",
+      "errorNotification",
+      "COMPLETE_NOTIFICATION",
+      "undefined",
+      "error",
+      "kind"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/NotificationFactories.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.createNotification = exports.nextNotification = exports.errorNotification = exports.COMPLETE_NOTIFICATION = void 0;\nexports.COMPLETE_NOTIFICATION = (function () { return createNotification('C', undefined, undefined); })();\nfunction errorNotification(error) {\n    return createNotification('E', undefined, error);\n}\nexports.errorNotification = errorNotification;\nfunction nextNotification(value) {\n    return createNotification('N', value, undefined);\n}\nexports.nextNotification = nextNotification;\nfunction createNotification(kind, value, error) {\n    return {\n        kind: kind,\n        value: value,\n        error: error,\n    };\n}\nexports.createNotification = createNotification;\n//# sourceMappingURL=NotificationFactories.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,kBAAkB,GAAGF,OAAO,CAACG,gBAAgB,GAAGH,OAAO,CAACI,iBAAiB,GAAGJ,OAAO,CAACK,qBAAqB,GAAG,KAAK,CAAC;AAC1HL,OAAO,CAACK,qBAAqB,GAAI,YAAY;EAAE,OAAOH,kBAAkB,CAAC,GAAG,EAAEI,SAAS,EAAEA,SAAS,CAAC;AAAE,CAAC,CAAE,CAAC;AACzG,SAASF,iBAAiBA,CAACG,KAAK,EAAE;EAC9B,OAAOL,kBAAkB,CAAC,GAAG,EAAEI,SAAS,EAAEC,KAAK,CAAC;AACpD;AACAP,OAAO,CAACI,iBAAiB,GAAGA,iBAAiB;AAC7C,SAASD,gBAAgBA,CAACF,KAAK,EAAE;EAC7B,OAAOC,kBAAkB,CAAC,GAAG,EAAED,KAAK,EAAEK,SAAS,CAAC;AACpD;AACAN,OAAO,CAACG,gBAAgB,GAAGA,gBAAgB;AAC3C,SAASD,kBAAkBA,CAACM,IAAI,EAAEP,KAAK,EAAEM,KAAK,EAAE;EAC5C,OAAO;IACHC,IAAI,EAAEA,IAAI;IACVP,KAAK,EAAEA,KAAK;IACZM,KAAK,EAAEA;EACX,CAAC;AACL;AACAP,OAAO,CAACE,kBAAkB,GAAGA,kBAAkB;AAC/C",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

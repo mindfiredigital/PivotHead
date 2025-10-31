@@ -1,0 +1,24 @@
+{
+  "id": "getting-started/installation/angular-installation",
+  "title": "angular-installation",
+  "description": "abc",
+  "source": "@site/docs/getting-started/installation/angular-installation.md",
+  "sourceDirName": "getting-started/installation",
+  "slug": "/getting-started/installation/angular-installation",
+  "permalink": "/PivotHead/docs/getting-started/installation/angular-installation",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/getting-started/installation/angular-installation.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "react-installation",
+    "permalink": "/PivotHead/docs/getting-started/installation/react-installation"
+  },
+  "next": {
+    "title": "vue-installation",
+    "permalink": "/PivotHead/docs/getting-started/installation/vue-installation"
+  }
+}

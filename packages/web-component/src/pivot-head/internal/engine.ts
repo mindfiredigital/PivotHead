@@ -89,7 +89,7 @@ export function tryInitializeEngine(host: PivotHeadHost): void {
 
     host.engine = new PivotEngine(
       config
-    ) as EnhancedPivotEngine<PivotDataRecord>;
+    ) as unknown as EnhancedPivotEngine<PivotDataRecord>;
 
     // Disable core engine pagination; the web component manages pagination itself
     // Use a very large page size so engine never slices the data internally

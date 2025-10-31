@@ -1,0 +1,50 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.debounceTime = void 0;\nvar async_1 = require(\"../scheduler/async\");\nvar lift_1 = require(\"../util/lift\");\nvar OperatorSubscriber_1 = require(\"./OperatorSubscriber\");\nfunction debounceTime(dueTime, scheduler) {\n  if (scheduler === void 0) {\n    scheduler = async_1.asyncScheduler;\n  }\n  return lift_1.operate(function (source, subscriber) {\n    var activeTask = null;\n    var lastValue = null;\n    var lastTime = null;\n    var emit = function () {\n      if (activeTask) {\n        activeTask.unsubscribe();\n        activeTask = null;\n        var value = lastValue;\n        lastValue = null;\n        subscriber.next(value);\n      }\n    };\n    function emitWhenIdle() {\n      var targetTime = lastTime + dueTime;\n      var now = scheduler.now();\n      if (now < targetTime) {\n        activeTask = this.schedule(undefined, targetTime - now);\n        subscriber.add(activeTask);\n        return;\n      }\n      emit();\n    }\n    source.subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, function (value) {\n      lastValue = value;\n      lastTime = scheduler.now();\n      if (!activeTask) {\n        activeTask = scheduler.schedule(emitWhenIdle, dueTime);\n        subscriber.add(activeTask);\n      }\n    }, function () {\n      emit();\n      subscriber.complete();\n    }, undefined, function () {\n      lastValue = activeTask = null;\n    }));\n  });\n}\nexports.debounceTime = debounceTime;\n//# sourceMappingURL=debounceTime.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "debounceTime",
+      "async_1",
+      "require",
+      "lift_1",
+      "OperatorSubscriber_1",
+      "dueTime",
+      "scheduler",
+      "asyncScheduler",
+      "operate",
+      "source",
+      "subscriber",
+      "activeTask",
+      "lastValue",
+      "lastTime",
+      "emit",
+      "unsubscribe",
+      "next",
+      "emitWhenIdle",
+      "targetTime",
+      "now",
+      "schedule",
+      "undefined",
+      "add",
+      "subscribe",
+      "createOperatorSubscriber",
+      "complete"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/operators/debounceTime.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.debounceTime = void 0;\nvar async_1 = require(\"../scheduler/async\");\nvar lift_1 = require(\"../util/lift\");\nvar OperatorSubscriber_1 = require(\"./OperatorSubscriber\");\nfunction debounceTime(dueTime, scheduler) {\n    if (scheduler === void 0) { scheduler = async_1.asyncScheduler; }\n    return lift_1.operate(function (source, subscriber) {\n        var activeTask = null;\n        var lastValue = null;\n        var lastTime = null;\n        var emit = function () {\n            if (activeTask) {\n                activeTask.unsubscribe();\n                activeTask = null;\n                var value = lastValue;\n                lastValue = null;\n                subscriber.next(value);\n            }\n        };\n        function emitWhenIdle() {\n            var targetTime = lastTime + dueTime;\n            var now = scheduler.now();\n            if (now < targetTime) {\n                activeTask = this.schedule(undefined, targetTime - now);\n                subscriber.add(activeTask);\n                return;\n            }\n            emit();\n        }\n        source.subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, function (value) {\n            lastValue = value;\n            lastTime = scheduler.now();\n            if (!activeTask) {\n                activeTask = scheduler.schedule(emitWhenIdle, dueTime);\n                subscriber.add(activeTask);\n            }\n        }, function () {\n            emit();\n            subscriber.complete();\n        }, undefined, function () {\n            lastValue = activeTask = null;\n        }));\n    });\n}\nexports.debounceTime = debounceTime;\n//# sourceMappingURL=debounceTime.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,YAAY,GAAG,KAAK,CAAC;AAC7B,IAAIC,OAAO,GAAGC,OAAO,CAAC,oBAAoB,CAAC;AAC3C,IAAIC,MAAM,GAAGD,OAAO,CAAC,cAAc,CAAC;AACpC,IAAIE,oBAAoB,GAAGF,OAAO,CAAC,sBAAsB,CAAC;AAC1D,SAASF,YAAYA,CAACK,OAAO,EAAEC,SAAS,EAAE;EACtC,IAAIA,SAAS,KAAK,KAAK,CAAC,EAAE;IAAEA,SAAS,GAAGL,OAAO,CAACM,cAAc;EAAE;EAChE,OAAOJ,MAAM,CAACK,OAAO,CAAC,UAAUC,MAAM,EAAEC,UAAU,EAAE;IAChD,IAAIC,UAAU,GAAG,IAAI;IACrB,IAAIC,SAAS,GAAG,IAAI;IACpB,IAAIC,QAAQ,GAAG,IAAI;IACnB,IAAIC,IAAI,GAAG,SAAAA,CAAA,EAAY;MACnB,IAAIH,UAAU,EAAE;QACZA,UAAU,CAACI,WAAW,CAAC,CAAC;QACxBJ,UAAU,GAAG,IAAI;QACjB,IAAIZ,KAAK,GAAGa,SAAS;QACrBA,SAAS,GAAG,IAAI;QAChBF,UAAU,CAACM,IAAI,CAACjB,KAAK,CAAC;MAC1B;IACJ,CAAC;IACD,SAASkB,YAAYA,CAAA,EAAG;MACpB,IAAIC,UAAU,GAAGL,QAAQ,GAAGR,OAAO;MACnC,IAAIc,GAAG,GAAGb,SAAS,CAACa,GAAG,CAAC,CAAC;MACzB,IAAIA,GAAG,GAAGD,UAAU,EAAE;QAClBP,UAAU,GAAG,IAAI,CAACS,QAAQ,CAACC,SAAS,EAAEH,UAAU,GAAGC,GAAG,CAAC;QACvDT,UAAU,CAACY,GAAG,CAACX,UAAU,CAAC;QAC1B;MACJ;MACAG,IAAI,CAAC,CAAC;IACV;IACAL,MAAM,CAACc,SAAS,CAACnB,oBAAoB,CAACoB,wBAAwB,CAACd,UAAU,EAAE,UAAUX,KAAK,EAAE;MACxFa,SAAS,GAAGb,KAAK;MACjBc,QAAQ,GAAGP,SAAS,CAACa,GAAG,CAAC,CAAC;MAC1B,IAAI,CAACR,UAAU,EAAE;QACbA,UAAU,GAAGL,SAAS,CAACc,QAAQ,CAACH,YAAY,EAAEZ,OAAO,CAAC;QACtDK,UAAU,CAACY,GAAG,CAACX,UAAU,CAAC;MAC9B;IACJ,CAAC,EAAE,YAAY;MACXG,IAAI,CAAC,CAAC;MACNJ,UAAU,CAACe,QAAQ,CAAC,CAAC;IACzB,CAAC,EAAEJ,SAAS,EAAE,YAAY;MACtBT,SAAS,GAAGD,UAAU,GAAG,IAAI;IACjC,CAAC,CAAC,CAAC;EACP,CAAC,CAAC;AACN;AACAb,OAAO,CAACE,YAAY,GAAGA,YAAY;AACnC",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

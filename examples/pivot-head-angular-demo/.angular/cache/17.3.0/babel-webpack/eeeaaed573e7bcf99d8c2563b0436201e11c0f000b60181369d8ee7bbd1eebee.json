@@ -1,0 +1,31 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.isIterable = void 0;\nvar iterator_1 = require(\"../symbol/iterator\");\nvar isFunction_1 = require(\"./isFunction\");\nfunction isIterable(input) {\n  return isFunction_1.isFunction(input === null || input === void 0 ? void 0 : input[iterator_1.iterator]);\n}\nexports.isIterable = isIterable;\n//# sourceMappingURL=isIterable.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "isIterable",
+      "iterator_1",
+      "require",
+      "isFunction_1",
+      "input",
+      "isFunction",
+      "iterator"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/util/isIterable.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.isIterable = void 0;\nvar iterator_1 = require(\"../symbol/iterator\");\nvar isFunction_1 = require(\"./isFunction\");\nfunction isIterable(input) {\n    return isFunction_1.isFunction(input === null || input === void 0 ? void 0 : input[iterator_1.iterator]);\n}\nexports.isIterable = isIterable;\n//# sourceMappingURL=isIterable.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,UAAU,GAAG,KAAK,CAAC;AAC3B,IAAIC,UAAU,GAAGC,OAAO,CAAC,oBAAoB,CAAC;AAC9C,IAAIC,YAAY,GAAGD,OAAO,CAAC,cAAc,CAAC;AAC1C,SAASF,UAAUA,CAACI,KAAK,EAAE;EACvB,OAAOD,YAAY,CAACE,UAAU,CAACD,KAAK,KAAK,IAAI,IAAIA,KAAK,KAAK,KAAK,CAAC,GAAG,KAAK,CAAC,GAAGA,KAAK,CAACH,UAAU,CAACK,QAAQ,CAAC,CAAC;AAC5G;AACAR,OAAO,CAACE,UAAU,GAAGA,UAAU;AAC/B",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

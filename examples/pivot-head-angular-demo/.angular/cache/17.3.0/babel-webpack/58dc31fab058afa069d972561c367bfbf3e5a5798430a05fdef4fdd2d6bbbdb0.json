@@ -1,0 +1,61 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.sourceDecorator = exports.skipSourceRender = void 0;\nconst docs_tools_1 = require(\"storybook/internal/docs-tools\");\nconst preview_api_1 = require(\"storybook/internal/preview-api\");\nconst renderer_1 = require(\"../../renderer\");\nconst skipSourceRender = context => {\n  const sourceParams = context?.parameters.docs?.source;\n  // always render if the user forces it\n  if (sourceParams?.type === docs_tools_1.SourceType.DYNAMIC) {\n    return false;\n  }\n  // never render if the user is forcing the block to render code, or\n  // if the user provides code\n  return sourceParams?.code || sourceParams?.type === docs_tools_1.SourceType.CODE;\n};\nexports.skipSourceRender = skipSourceRender;\n/**\n * Angular source decorator.\n *\n * @param storyFn Fn\n * @param context StoryContext\n */\nconst sourceDecorator = (storyFn, context) => {\n  const story = storyFn();\n  if ((0, exports.skipSourceRender)(context)) {\n    return story;\n  }\n  const channel = preview_api_1.addons.getChannel();\n  const {\n    props,\n    userDefinedTemplate\n  } = story;\n  const {\n    component,\n    argTypes,\n    parameters\n  } = context;\n  const template = parameters.docs?.source?.excludeDecorators ? context.originalStoryFn(context.args, context).template : story.template;\n  let toEmit;\n  (0, preview_api_1.useEffect)(() => {\n    if (toEmit) {\n      const {\n        id,\n        unmappedArgs\n      } = context;\n      const format = parameters?.docs?.source?.format ?? true;\n      channel.emit(docs_tools_1.SNIPPET_RENDERED, {\n        id,\n        args: unmappedArgs,\n        source: toEmit,\n        format: format === true ? 'angular' : format\n      });\n    }\n  });\n  if (component && !userDefinedTemplate) {\n    const source = (0, renderer_1.computesTemplateSourceFromComponent)(component, props, argTypes);\n    // We might have a story with a Directive or Service defined as the component\n    // In these cases there might exist a template, even if we aren't able to create source from component\n    if (source || template) {\n      toEmit = source || template;\n    }\n  } else if (template) {\n    toEmit = template;\n  }\n  return story;\n};\nexports.sourceDecorator = sourceDecorator;",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "sourceDecorator",
+      "skipSourceRender",
+      "docs_tools_1",
+      "require",
+      "preview_api_1",
+      "renderer_1",
+      "context",
+      "sourceParams",
+      "parameters",
+      "docs",
+      "source",
+      "type",
+      "SourceType",
+      "DYNAMIC",
+      "code",
+      "CODE",
+      "storyFn",
+      "story",
+      "channel",
+      "addons",
+      "getChannel",
+      "props",
+      "userDefinedTemplate",
+      "component",
+      "argTypes",
+      "template",
+      "excludeDecorators",
+      "originalStoryFn",
+      "args",
+      "toEmit",
+      "useEffect",
+      "id",
+      "unmappedArgs",
+      "format",
+      "emit",
+      "SNIPPET_RENDERED",
+      "computesTemplateSourceFromComponent"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/@storybook+angular@8.6.14_@angular-devkit+architect@0.1703.0_@angular-devkit+build-angular@17_a7aajamgs7bgz2yqzrp63bsev4/node_modules/@storybook/angular/dist/client/docs/sourceDecorator.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.sourceDecorator = exports.skipSourceRender = void 0;\nconst docs_tools_1 = require(\"storybook/internal/docs-tools\");\nconst preview_api_1 = require(\"storybook/internal/preview-api\");\nconst renderer_1 = require(\"../../renderer\");\nconst skipSourceRender = (context) => {\n    const sourceParams = context?.parameters.docs?.source;\n    // always render if the user forces it\n    if (sourceParams?.type === docs_tools_1.SourceType.DYNAMIC) {\n        return false;\n    }\n    // never render if the user is forcing the block to render code, or\n    // if the user provides code\n    return sourceParams?.code || sourceParams?.type === docs_tools_1.SourceType.CODE;\n};\nexports.skipSourceRender = skipSourceRender;\n/**\n * Angular source decorator.\n *\n * @param storyFn Fn\n * @param context StoryContext\n */\nconst sourceDecorator = (storyFn, context) => {\n    const story = storyFn();\n    if ((0, exports.skipSourceRender)(context)) {\n        return story;\n    }\n    const channel = preview_api_1.addons.getChannel();\n    const { props, userDefinedTemplate } = story;\n    const { component, argTypes, parameters } = context;\n    const template = parameters.docs?.source?.excludeDecorators\n        ? context.originalStoryFn(context.args, context).template\n        : story.template;\n    let toEmit;\n    (0, preview_api_1.useEffect)(() => {\n        if (toEmit) {\n            const { id, unmappedArgs } = context;\n            const format = parameters?.docs?.source?.format ?? true;\n            channel.emit(docs_tools_1.SNIPPET_RENDERED, {\n                id,\n                args: unmappedArgs,\n                source: toEmit,\n                format: format === true ? 'angular' : format,\n            });\n        }\n    });\n    if (component && !userDefinedTemplate) {\n        const source = (0, renderer_1.computesTemplateSourceFromComponent)(component, props, argTypes);\n        // We might have a story with a Directive or Service defined as the component\n        // In these cases there might exist a template, even if we aren't able to create source from component\n        if (source || template) {\n            toEmit = source || template;\n        }\n    }\n    else if (template) {\n        toEmit = template;\n    }\n    return story;\n};\nexports.sourceDecorator = sourceDecorator;\n"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,eAAe,GAAGF,OAAO,CAACG,gBAAgB,GAAG,KAAK,CAAC;AAC3D,MAAMC,YAAY,GAAGC,OAAO,CAAC,+BAA+B,CAAC;AAC7D,MAAMC,aAAa,GAAGD,OAAO,CAAC,gCAAgC,CAAC;AAC/D,MAAME,UAAU,GAAGF,OAAO,CAAC,gBAAgB,CAAC;AAC5C,MAAMF,gBAAgB,GAAIK,OAAO,IAAK;EAClC,MAAMC,YAAY,GAAGD,OAAO,EAAEE,UAAU,CAACC,IAAI,EAAEC,MAAM;EACrD;EACA,IAAIH,YAAY,EAAEI,IAAI,KAAKT,YAAY,CAACU,UAAU,CAACC,OAAO,EAAE;IACxD,OAAO,KAAK;EAChB;EACA;EACA;EACA,OAAON,YAAY,EAAEO,IAAI,IAAIP,YAAY,EAAEI,IAAI,KAAKT,YAAY,CAACU,UAAU,CAACG,IAAI;AACpF,CAAC;AACDjB,OAAO,CAACG,gBAAgB,GAAGA,gBAAgB;AAC3C;AACA;AACA;AACA;AACA;AACA;AACA,MAAMD,eAAe,GAAGA,CAACgB,OAAO,EAAEV,OAAO,KAAK;EAC1C,MAAMW,KAAK,GAAGD,OAAO,CAAC,CAAC;EACvB,IAAI,CAAC,CAAC,EAAElB,OAAO,CAACG,gBAAgB,EAAEK,OAAO,CAAC,EAAE;IACxC,OAAOW,KAAK;EAChB;EACA,MAAMC,OAAO,GAAGd,aAAa,CAACe,MAAM,CAACC,UAAU,CAAC,CAAC;EACjD,MAAM;IAAEC,KAAK;IAAEC;EAAoB,CAAC,GAAGL,KAAK;EAC5C,MAAM;IAAEM,SAAS;IAAEC,QAAQ;IAAEhB;EAAW,CAAC,GAAGF,OAAO;EACnD,MAAMmB,QAAQ,GAAGjB,UAAU,CAACC,IAAI,EAAEC,MAAM,EAAEgB,iBAAiB,GACrDpB,OAAO,CAACqB,eAAe,CAACrB,OAAO,CAACsB,IAAI,EAAEtB,OAAO,CAAC,CAACmB,QAAQ,GACvDR,KAAK,CAACQ,QAAQ;EACpB,IAAII,MAAM;EACV,CAAC,CAAC,EAAEzB,aAAa,CAAC0B,SAAS,EAAE,MAAM;IAC/B,IAAID,MAAM,EAAE;MACR,MAAM;QAAEE,EAAE;QAAEC;MAAa,CAAC,GAAG1B,OAAO;MACpC,MAAM2B,MAAM,GAAGzB,UAAU,EAAEC,IAAI,EAAEC,MAAM,EAAEuB,MAAM,IAAI,IAAI;MACvDf,OAAO,CAACgB,IAAI,CAAChC,YAAY,CAACiC,gBAAgB,EAAE;QACxCJ,EAAE;QACFH,IAAI,EAAEI,YAAY;QAClBtB,MAAM,EAAEmB,MAAM;QACdI,MAAM,EAAEA,MAAM,KAAK,IAAI,GAAG,SAAS,GAAGA;MAC1C,CAAC,CAAC;IACN;EACJ,CAAC,CAAC;EACF,IAAIV,SAAS,IAAI,CAACD,mBAAmB,EAAE;IACnC,MAAMZ,MAAM,GAAG,CAAC,CAAC,EAAEL,UAAU,CAAC+B,mCAAmC,EAAEb,SAAS,EAAEF,KAAK,EAAEG,QAAQ,CAAC;IAC9F;IACA;IACA,IAAId,MAAM,IAAIe,QAAQ,EAAE;MACpBI,MAAM,GAAGnB,MAAM,IAAIe,QAAQ;IAC/B;EACJ,CAAC,MACI,IAAIA,QAAQ,EAAE;IACfI,MAAM,GAAGJ,QAAQ;EACrB;EACA,OAAOR,KAAK;AAChB,CAAC;AACDnB,OAAO,CAACE,eAAe,GAAGA,eAAe",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

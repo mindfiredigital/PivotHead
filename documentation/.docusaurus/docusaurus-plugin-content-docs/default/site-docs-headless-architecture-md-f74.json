@@ -1,0 +1,24 @@
+{
+  "id": "headless-architecture",
+  "title": "Headless Architecture",
+  "description": "What Makes PivotHead Special?",
+  "source": "@site/docs/headless-architecture.md",
+  "sourceDirName": ".",
+  "slug": "/headless-architecture",
+  "permalink": "/PivotHead/docs/headless-architecture",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/headless-architecture.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Introduction",
+    "permalink": "/PivotHead/docs/introduction"
+  },
+  "next": {
+    "title": "Why Use PivotHead",
+    "permalink": "/PivotHead/docs/getting-started/Why-we-use-pivothead"
+  }
+}

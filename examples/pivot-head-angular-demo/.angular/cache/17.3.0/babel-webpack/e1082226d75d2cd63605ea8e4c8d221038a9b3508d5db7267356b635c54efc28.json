@@ -1,0 +1,51 @@
+{
+  "ast": null,
+  "code": "import { computesTemplateSourceFromComponent } from '../../chunk-LXSTVAFF.mjs';\nimport { SourceType } from 'storybook/internal/docs-tools';\nimport { useRef, useEffect, emitTransformCode } from 'storybook/preview-api';\nvar skipSourceRender = context => {\n    let sourceParams = context?.parameters.docs?.source;\n    return sourceParams?.type === SourceType.DYNAMIC ? !1 : sourceParams?.code || sourceParams?.type === SourceType.CODE;\n  },\n  sourceDecorator = (storyFn, context) => {\n    let story = storyFn(),\n      source = useRef(void 0);\n    return useEffect(() => {\n      if (skipSourceRender(context)) return;\n      let {\n          props,\n          userDefinedTemplate\n        } = story,\n        {\n          component,\n          argTypes,\n          parameters: parameters2\n        } = context,\n        template = parameters2.docs?.source?.excludeDecorators ? context.originalStoryFn(context.args, context).template : story.template;\n      if (component && !userDefinedTemplate) {\n        let newSource = computesTemplateSourceFromComponent(component, props, argTypes) || template;\n        newSource && newSource !== source.current && (emitTransformCode(newSource, context), source.current = newSource);\n      } else template && template !== source.current && (emitTransformCode(template, context), source.current = template);\n    }), story;\n  };\nvar parameters = {\n    docs: {\n      source: {\n        type: SourceType.DYNAMIC,\n        language: \"html\"\n      }\n    }\n  },\n  decorators = [sourceDecorator];\nexport { decorators, parameters };",
+  "map": {
+    "version": 3,
+    "names": [
+      "computesTemplateSourceFromComponent",
+      "SourceType",
+      "useRef",
+      "useEffect",
+      "emitTransformCode",
+      "skipSourceRender",
+      "context",
+      "sourceParams",
+      "parameters",
+      "docs",
+      "source",
+      "type",
+      "DYNAMIC",
+      "code",
+      "CODE",
+      "sourceDecorator",
+      "storyFn",
+      "story",
+      "props",
+      "userDefinedTemplate",
+      "component",
+      "argTypes",
+      "parameters2",
+      "template",
+      "excludeDecorators",
+      "originalStoryFn",
+      "args",
+      "newSource",
+      "current",
+      "language",
+      "decorators"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/@storybook+angular@9.1.8_@angular-devkit+architect@0.2003.3_@angular-devkit+build-angular@17._gwu2xyhw6nxedxlnbv6s7dhmju/node_modules/@storybook/angular/dist/client/docs/config.mjs"
+    ],
+    "sourcesContent": [
+      "import { computesTemplateSourceFromComponent } from '../../chunk-LXSTVAFF.mjs';\nimport { SourceType } from 'storybook/internal/docs-tools';\nimport { useRef, useEffect, emitTransformCode } from 'storybook/preview-api';\n\nvar skipSourceRender=context=>{let sourceParams=context?.parameters.docs?.source;return sourceParams?.type===SourceType.DYNAMIC?!1:sourceParams?.code||sourceParams?.type===SourceType.CODE},sourceDecorator=(storyFn,context)=>{let story=storyFn(),source=useRef(void 0);return useEffect(()=>{if(skipSourceRender(context))return;let{props,userDefinedTemplate}=story,{component,argTypes,parameters:parameters2}=context,template=parameters2.docs?.source?.excludeDecorators?context.originalStoryFn(context.args,context).template:story.template;if(component&&!userDefinedTemplate){let newSource=computesTemplateSourceFromComponent(component,props,argTypes)||template;newSource&&newSource!==source.current&&(emitTransformCode(newSource,context),source.current=newSource);}else template&&template!==source.current&&(emitTransformCode(template,context),source.current=template);}),story};var parameters={docs:{source:{type:SourceType.DYNAMIC,language:\"html\"}}},decorators=[sourceDecorator];\n\nexport { decorators, parameters };\n"
+    ],
+    "mappings": "AAAA,SAASA,mCAAmC,QAAQ,0BAA0B;AAC9E,SAASC,UAAU,QAAQ,+BAA+B;AAC1D,SAASC,MAAM,EAAEC,SAAS,EAAEC,iBAAiB,QAAQ,uBAAuB;AAE5E,IAAIC,gBAAgB,GAACC,OAAO,IAAE;IAAC,IAAIC,YAAY,GAACD,OAAO,EAAEE,UAAU,CAACC,IAAI,EAAEC,MAAM;IAAC,OAAOH,YAAY,EAAEI,IAAI,KAAGV,UAAU,CAACW,OAAO,GAAC,CAAC,CAAC,GAACL,YAAY,EAAEM,IAAI,IAAEN,YAAY,EAAEI,IAAI,KAAGV,UAAU,CAACa,IAAI;EAAA,CAAC;EAACC,eAAe,GAACA,CAACC,OAAO,EAACV,OAAO,KAAG;IAAC,IAAIW,KAAK,GAACD,OAAO,CAAC,CAAC;MAACN,MAAM,GAACR,MAAM,CAAC,KAAK,CAAC,CAAC;IAAC,OAAOC,SAAS,CAAC,MAAI;MAAC,IAAGE,gBAAgB,CAACC,OAAO,CAAC,EAAC;MAAO,IAAG;UAACY,KAAK;UAACC;QAAmB,CAAC,GAACF,KAAK;QAAC;UAACG,SAAS;UAACC,QAAQ;UAACb,UAAU,EAACc;QAAW,CAAC,GAAChB,OAAO;QAACiB,QAAQ,GAACD,WAAW,CAACb,IAAI,EAAEC,MAAM,EAAEc,iBAAiB,GAAClB,OAAO,CAACmB,eAAe,CAACnB,OAAO,CAACoB,IAAI,EAACpB,OAAO,CAAC,CAACiB,QAAQ,GAACN,KAAK,CAACM,QAAQ;MAAC,IAAGH,SAAS,IAAE,CAACD,mBAAmB,EAAC;QAAC,IAAIQ,SAAS,GAAC3B,mCAAmC,CAACoB,SAAS,EAACF,KAAK,EAACG,QAAQ,CAAC,IAAEE,QAAQ;QAACI,SAAS,IAAEA,SAAS,KAAGjB,MAAM,CAACkB,OAAO,KAAGxB,iBAAiB,CAACuB,SAAS,EAACrB,OAAO,CAAC,EAACI,MAAM,CAACkB,OAAO,GAACD,SAAS,CAAC;MAAC,CAAC,MAAKJ,QAAQ,IAAEA,QAAQ,KAAGb,MAAM,CAACkB,OAAO,KAAGxB,iBAAiB,CAACmB,QAAQ,EAACjB,OAAO,CAAC,EAACI,MAAM,CAACkB,OAAO,GAACL,QAAQ,CAAC;IAAC,CAAC,CAAC,EAACN,KAAK;EAAA,CAAC;AAAC,IAAIT,UAAU,GAAC;IAACC,IAAI,EAAC;MAACC,MAAM,EAAC;QAACC,IAAI,EAACV,UAAU,CAACW,OAAO;QAACiB,QAAQ,EAAC;MAAM;IAAC;EAAC,CAAC;EAACC,UAAU,GAAC,CAACf,eAAe,CAAC;AAEl9B,SAASe,UAAU,EAAEtB,UAAU",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "module",
+  "externalDependencies": []
+}

@@ -1,0 +1,47 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.first = void 0;\nvar EmptyError_1 = require(\"../util/EmptyError\");\nvar filter_1 = require(\"./filter\");\nvar take_1 = require(\"./take\");\nvar defaultIfEmpty_1 = require(\"./defaultIfEmpty\");\nvar throwIfEmpty_1 = require(\"./throwIfEmpty\");\nvar identity_1 = require(\"../util/identity\");\nfunction first(predicate, defaultValue) {\n  var hasDefaultValue = arguments.length >= 2;\n  return function (source) {\n    return source.pipe(predicate ? filter_1.filter(function (v, i) {\n      return predicate(v, i, source);\n    }) : identity_1.identity, take_1.take(1), hasDefaultValue ? defaultIfEmpty_1.defaultIfEmpty(defaultValue) : throwIfEmpty_1.throwIfEmpty(function () {\n      return new EmptyError_1.EmptyError();\n    }));\n  };\n}\nexports.first = first;\n//# sourceMappingURL=first.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "first",
+      "EmptyError_1",
+      "require",
+      "filter_1",
+      "take_1",
+      "defaultIfEmpty_1",
+      "throwIfEmpty_1",
+      "identity_1",
+      "predicate",
+      "defaultValue",
+      "hasDefaultValue",
+      "arguments",
+      "length",
+      "source",
+      "pipe",
+      "filter",
+      "v",
+      "i",
+      "identity",
+      "take",
+      "defaultIfEmpty",
+      "throwIfEmpty",
+      "EmptyError"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/operators/first.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.first = void 0;\nvar EmptyError_1 = require(\"../util/EmptyError\");\nvar filter_1 = require(\"./filter\");\nvar take_1 = require(\"./take\");\nvar defaultIfEmpty_1 = require(\"./defaultIfEmpty\");\nvar throwIfEmpty_1 = require(\"./throwIfEmpty\");\nvar identity_1 = require(\"../util/identity\");\nfunction first(predicate, defaultValue) {\n    var hasDefaultValue = arguments.length >= 2;\n    return function (source) {\n        return source.pipe(predicate ? filter_1.filter(function (v, i) { return predicate(v, i, source); }) : identity_1.identity, take_1.take(1), hasDefaultValue ? defaultIfEmpty_1.defaultIfEmpty(defaultValue) : throwIfEmpty_1.throwIfEmpty(function () { return new EmptyError_1.EmptyError(); }));\n    };\n}\nexports.first = first;\n//# sourceMappingURL=first.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,KAAK,GAAG,KAAK,CAAC;AACtB,IAAIC,YAAY,GAAGC,OAAO,CAAC,oBAAoB,CAAC;AAChD,IAAIC,QAAQ,GAAGD,OAAO,CAAC,UAAU,CAAC;AAClC,IAAIE,MAAM,GAAGF,OAAO,CAAC,QAAQ,CAAC;AAC9B,IAAIG,gBAAgB,GAAGH,OAAO,CAAC,kBAAkB,CAAC;AAClD,IAAII,cAAc,GAAGJ,OAAO,CAAC,gBAAgB,CAAC;AAC9C,IAAIK,UAAU,GAAGL,OAAO,CAAC,kBAAkB,CAAC;AAC5C,SAASF,KAAKA,CAACQ,SAAS,EAAEC,YAAY,EAAE;EACpC,IAAIC,eAAe,GAAGC,SAAS,CAACC,MAAM,IAAI,CAAC;EAC3C,OAAO,UAAUC,MAAM,EAAE;IACrB,OAAOA,MAAM,CAACC,IAAI,CAACN,SAAS,GAAGL,QAAQ,CAACY,MAAM,CAAC,UAAUC,CAAC,EAAEC,CAAC,EAAE;MAAE,OAAOT,SAAS,CAACQ,CAAC,EAAEC,CAAC,EAAEJ,MAAM,CAAC;IAAE,CAAC,CAAC,GAAGN,UAAU,CAACW,QAAQ,EAAEd,MAAM,CAACe,IAAI,CAAC,CAAC,CAAC,EAAET,eAAe,GAAGL,gBAAgB,CAACe,cAAc,CAACX,YAAY,CAAC,GAAGH,cAAc,CAACe,YAAY,CAAC,YAAY;MAAE,OAAO,IAAIpB,YAAY,CAACqB,UAAU,CAAC,CAAC;IAAE,CAAC,CAAC,CAAC;EACpS,CAAC;AACL;AACAxB,OAAO,CAACE,KAAK,GAAGA,KAAK;AACrB",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}
