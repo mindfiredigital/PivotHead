@@ -252,7 +252,7 @@
         },
         {
           "type": "link",
-          "label": "🚀 Upcoming Features",
+          "label": "Upcoming Features",
           "href": "/PivotHead/docs/upcoming/",
           "docId": "upcoming/index",
           "unlisted": false

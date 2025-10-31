@@ -202,7 +202,7 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: '🚀 Upcoming Features',
+      label: 'Upcoming Features',
       link: {
         type: 'doc',
         id: 'upcoming/index',

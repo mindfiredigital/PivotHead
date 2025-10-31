@@ -4,7 +4,7 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HeadlessArchitectureVisual from '@site/src/components/HeadlessArchitectureVisual';
 
-## What Makes PivotHead Special?
+## **What Makes PivotHead Special?**
 
 **PivotHead is the first truly headless pivot table engine.** But what does "headless" really mean, and why does it matter for you?
 
@@ -110,7 +110,7 @@ Pre-built integrations for popular frameworks.
 </YourCustomTable>
 ```
 
-### Testability
+### **Testability**
 
 ```typescript
 // Test the engine logic independently
@@ -128,7 +128,7 @@ test('renders table correctly', () => {
 });
 ```
 
-## Real-World Example: Custom Dashboard
+## **Real-World Example: Custom Dashboard**
 
 Here's how you might use PivotHead's headless architecture to build a custom analytics dashboard:
 
@@ -167,9 +167,9 @@ function AnalyticsDashboard({ salesData }) {
 
 **Notice:** You're using the same powerful pivot engine, but the UI is 100% yours!
 
-## Getting Started with Headless
+## **Getting Started with Headless**
 
-### Quick Start
+### \*Quick Start\*\*
 
 1. **Install the core engine:**
 
@@ -206,47 +206,18 @@ function AnalyticsDashboard({ salesData }) {
    }
    ```
 
-## Sample Projects
-
-We've created ready-to-run sample projects for each framework to help you get started:
-
-### React Example
-
-A modern dashboard with Material-UI components.
-
-[**View React Sample →**](/docs/tutorials/react/sample-project)
-
-### Vue Example
-
-An elegant interface using Vuetify.
-
-[**View Vue Sample →**](/docs/tutorials/vue/sample-project)
-
-### Angular Example
-
-An enterprise-ready app with Angular Material.
-
-[**View Angular Sample →**](/docs/tutorials/angular/sample-project)
-
-### Vanilla JavaScript Example
-
-A lightweight implementation with no framework.
-
-[**View Web Component Sample →**](/docs/tutorials/core-webcomponent/sample-project)
-
-## When to Use Headless
+## **When to Use Headless**
 
 ## Architecture Benefits Summary
 
-| Feature               | Traditional Libraries | PivotHead Headless   |
-| --------------------- | --------------------- | -------------------- |
-| **UI Flexibility**    | Limited               | Complete             |
-| **Framework Support** | Usually 1-2           | Any framework        |
-| **Bundle Size**       | 500KB+                | ~50KB core + your UI |
-| **Customization**     | CSS overrides         | Full control         |
-| **Testing**           | Coupled               | Independent layers   |
-| **Updates**           | Breaking UI changes   | Core logic stable    |
-| **Learning Curve**    | Library-specific      | Standard web dev     |
+| Feature               | Traditional Libraries | PivotHead Headless |
+| --------------------- | --------------------- | ------------------ |
+| **UI Flexibility**    | Limited               | Complete           |
+| **Framework Support** | Usually 1-2           | Any framework      |
+| **Customization**     | CSS overrides         | Full control       |
+| **Testing**           | Coupled               | Independent layers |
+| **Updates**           | Breaking UI changes   | Core logic stable  |
+| **Learning Curve**    | Library-specific      | Standard web dev   |
 
 ---
 

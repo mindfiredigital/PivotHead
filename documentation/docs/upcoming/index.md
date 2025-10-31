@@ -4,495 +4,658 @@ description: What's coming next in PivotHead - exciting features in development
 keywords: [roadmap, upcoming, features, angular, high-volume, performance]
 ---
 
-# 🚀 Upcoming Features
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-We're constantly working to make PivotHead even better! Here's what's coming in our next releases.
+# **What's New & Coming Soon**
 
-:::info Active Development
-The features listed here are currently in development or planning stages. Release dates and specifications may change based on community feedback and priorities.
-:::
-
----
-
-## In Active Development
-
-### Angular Support (Coming in next release)
-
-**Status:** In Development
-
-We're bringing full Angular support to PivotHead's headless architecture!
-
-**What's Included:**
-
-- Angular service integration
-- Reactive directives
-- TypeScript-first design
-- Zone.js compatibility
-- Angular CLI integration
-- Standalone component support
-
-**Quick Preview:**
-
-```typescript
-import { Component } from '@angular/core';
-import { PivotHeadService } from '@pivothead/angular';
-
-@Component({
-  selector: 'app-sales-pivot',
-  template: `
-    <div *ngFor="let row of pivot.rows$ | async">
-      {{ row.label }}: {{ row.total }}
-    </div>
-  `,
-})
-export class SalesPivotComponent {
-  constructor(public pivot: PivotHeadService) {
-    this.pivot.setData(salesData, {
-      rows: ['product'],
-      columns: ['region'],
-      values: ['sales'],
-    });
-  }
-}
-```
-
-[Learn more about Angular integration →](#angular-deep-dive)
+<div style={{
+  background: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
+  padding: '2rem',
+  borderRadius: '1rem',
+  color: 'white',
+  textAlign: 'center',
+  marginBottom: '2rem',
+  animation: 'fadeIn 0.6s ease-in'
+}}>
+  <h2 style={{ color: 'white', marginBottom: '0.5rem', fontSize: '2rem' }}> Current Version: v2.0</h2>
+  <p style={{ fontSize: '1.2rem', margin: 0, opacity: 0.95 }}>Major feature release with powerful new capabilities!</p>
+</div>
 
 ---
 
-### ⚡ High-Volume Data Processing (Coming in next release)
+<div style={{ 
+  display: 'grid', 
+  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
+  gap: '1.5rem',
+  marginTop: '2rem' 
+}}>
 
-**Status:** Design Phase Complete
+{/_ Feature Card 1 _/}
 
-Handle millions of rows directly in the browser with our revolutionary client-side processing engine.
+<div style={{
+  background: 'linear-gradient(135deg, #fecaca 0%, #f87171 100%)',
+  padding: '2rem',
+  borderRadius: '1rem',
+  color: '#991b1b',
+  boxShadow: '0 10px 30px rgba(248, 113, 113, 0.3)',
+  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+  cursor: 'pointer',
+  position: 'relative',
+  overflow: 'hidden'
+}} 
+onMouseEnter={(e) => {
+  e.currentTarget.style.transform = 'translateY(-8px)';
+  e.currentTarget.style.boxShadow = '0 20px 40px rgba(248, 113, 113, 0.4)';
+}}
+onMouseLeave={(e) => {
+  e.currentTarget.style.transform = 'translateY(0)';
+  e.currentTarget.style.boxShadow = '0 10px 30px rgba(248, 113, 113, 0.3)';
+}}>
+  <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔍</div>
+  <h3 style={{ color: '#991b1b', marginBottom: '0.75rem', fontSize: '1.5rem' }}>Advanced Filtering</h3>
+  <p style={{ fontSize: '1rem', lineHeight: '1.6', margin: 0, opacity: 0.95 }}>
+    Apply custom filters to your data with an intuitive UI. Filter by any field, combine conditions, and see instant results!
+  </p>
+  <div style={{
+    marginTop: '1rem',
+    padding: '0.5rem 1rem',
+    background: 'rgba(255, 255, 255, 0.4)',
+    borderRadius: '0.5rem',
+    fontSize: '0.9rem',
+    fontWeight: '600'
+  }}>
+    ✓ Core • WebComponent • React • Vue
+  </div>
+</div>
 
-**Key Capabilities:**
+{/_ Feature Card 2 _/}
 
-- Process datasets **> 100MB** entirely in the browser
-- WebAssembly-powered aggregations
-- Streaming data ingestion with progressive rendering
-- Columnar in-memory storage for blazing-fast operations
-- Virtual scrolling for massive datasets
+<div style={{
+  background: 'linear-gradient(135deg, #fecaca 0%, #f87171 100%)',
+  padding: '2rem',
+  borderRadius: '1rem',
+  color: '#991b1b',
+  boxShadow: '0 10px 30px rgba(248, 113, 113, 0.3)',
+  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+  cursor: 'pointer',
+  position: 'relative',
+  overflow: 'hidden'
+}} 
+onMouseEnter={(e) => {
+  e.currentTarget.style.transform = 'translateY(-8px)';
+  e.currentTarget.style.boxShadow = '0 20px 40px rgba(248, 113, 113, 0.4)';
+}}
+onMouseLeave={(e) => {
+  e.currentTarget.style.transform = 'translateY(0)';
+  e.currentTarget.style.boxShadow = '0 10px 30px rgba(248, 113, 113, 0.3)';
+}}>
+  <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📤</div>
+  <h3 style={{ color: '#991b1b', marginBottom: '0.75rem', fontSize: '1.5rem' }}>File Upload & Import</h3>
+  <p style={{ fontSize: '1rem', lineHeight: '1.6', margin: 0, opacity: 0.95 }}>
+    Upload CSV or JSON files and watch your data instantly populate the pivot table. Drag & drop or browse!
+  </p>
+  <div style={{
+    marginTop: '1rem',
+    padding: '0.5rem 1rem',
+    background: 'rgba(255, 255, 255, 0.4)',
+    borderRadius: '0.5rem',
+    fontSize: '0.9rem',
+    fontWeight: '600'
+  }}>
+    ✓ CSV & JSON Support
+  </div>
+</div>
 
-**Performance Targets:**
+{/_ Feature Card 3 _/}
 
-| Dataset Size      | Processing Time | Memory Usage |
-| ----------------- | --------------- | ------------ |
-| 1 MB (50K rows)   | < 100ms         | ~5 MB        |
-| 10 MB (500K rows) | < 1s            | ~30 MB       |
-| 100 MB (5M rows)  | < 5s            | ~200 MB      |
-| 500 MB (25M rows) | < 30s           | ~800 MB      |
+<div style={{
+  background: 'linear-gradient(135deg, #fecaca 0%, #f87171 100%)',
+  padding: '2rem',
+  borderRadius: '1rem',
+  color: '#991b1b',
+  boxShadow: '0 10px 30px rgba(248, 113, 113, 0.3)',
+  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+  cursor: 'pointer',
+  position: 'relative',
+  overflow: 'hidden'
+}} 
+onMouseEnter={(e) => {
+  e.currentTarget.style.transform = 'translateY(-8px)';
+  e.currentTarget.style.boxShadow = '0 20px 40px rgba(248, 113, 113, 0.4)';
+}}
+onMouseLeave={(e) => {
+  e.currentTarget.style.transform = 'translateY(0)';
+  e.currentTarget.style.boxShadow = '0 10px 30px rgba(248, 113, 113, 0.3)';
+}}>
+  <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📥</div>
+  <h3 style={{ color: '#991b1b', marginBottom: '0.75rem', fontSize: '1.5rem' }}>Export Anywhere</h3>
+  <p style={{ fontSize: '1rem', lineHeight: '1.6', margin: 0, opacity: 0.95 }}>
+    Export your pivot tables to PDF, Excel, or HTML with one click. Perfect formatting, ready to share!
+  </p>
+  <div style={{
+    marginTop: '1rem',
+    padding: '0.5rem 1rem',
+    background: 'rgba(255, 255, 255, 0.4)',
+    borderRadius: '0.5rem',
+    fontSize: '0.9rem',
+    fontWeight: '600'
+  }}>
+    ✓ PDF • Excel • HTML
+  </div>
+</div>
 
-[View detailed specification →](#high-volume-specification)
-
----
-
-## Planned Features
-
-### Advanced Customization
-
-- **Conditional Formatting API**: Color cells based on values, thresholds, or formulas
-- **Custom Cell Renderers**: Inject your own components for any cell
-- **Theme System**: Pre-built themes with easy customization
-- **Export Templates**: Customizable PDF and Excel export layouts
-
-### Enhanced Filtering
-
-- **Date Range Picker**: Built-in date filtering UI
-- **Search Across Fields**: Full-text search in pivot data
-- **Filter History**: Undo/redo filter changes
-- **Saved Filter Sets**: Save and restore filter combinations
-
-### Advanced Calculations
-
-- **Running Totals**: Cumulative calculations
-- **Moving Averages**: Time-window aggregations
-- **Percentage of Total**: Row/column/grand total percentages
-- **Custom Formulas**: Excel-like formula language
-- **Year-over-Year**: Automatic period comparisons
-
----
-
-## Angular Deep Dive {#angular-deep-dive}
-
-### Architecture
-
-```mermaid
-flowchart TB
-    Component["Angular Component"]
-    Service["PivotHeadService"]
-    Store["In-Memory Store"]
-    Core["@pivothead/core"]
-
-    Component -->|"Injects"| Service
-    Service -->|"Uses"| Core
-    Service -->|"Manages"| Store
-    Store -->|"Observables"| Component
-
-    classDef angular fill:#dd0031,stroke:#c3002f,color:#fff
-    classDef service fill:#0284c7,stroke:#0369a1,color:#fff
-    classDef core fill:#f59e0b,stroke:#d97706,color:#fff
-
-    class Component angular
-    class Service,Store service
-    class Core core
-```
-
-### Features
-
-#### 1. Reactive Service
-
-```typescript
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-
-@Injectable({
-  providedIn: 'root',
-})
-export class PivotHeadService {
-  private data$ = new BehaviorSubject<any[]>([]);
-  private config$ = new BehaviorSubject<PivotConfig>({});
-
-  // Reactive data streams
-  readonly rows$: Observable<Row[]>;
-  readonly columns$: Observable<Column[]>;
-  readonly totals$: Observable<Totals>;
-
-  // Methods
-  setData(data: any[], config: PivotConfig): void;
-  updateConfig(config: Partial<PivotConfig>): void;
-  applyFilter(field: string, values: any[]): void;
-  export(format: 'csv' | 'excel'): Promise<Blob>;
-}
-```
-
-#### 2. Directives
-
-```typescript
-// Pivot Table Directive
-<table pivotHead [data]="salesData" [config]="pivotConfig">
-  <thead>
-    <tr *pivotColumns="let col">
-      <th>{{ col.label }}</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *pivotRows="let row">
-      <td>{{ row.label }}</td>
-      <td *pivotCells="let cell">{{ cell.value | number }}</td>
-    </tr>
-  </tbody>
-</table>
-```
-
-#### 3. Standalone Components
-
-```typescript
-import { PivotTableComponent } from '@pivothead/angular';
-
-@Component({
-  standalone: true,
-  imports: [PivotTableComponent],
-  template: `
-    <pivot-table
-      [data]="data"
-      [rows]="['product']"
-      [columns]="['region']"
-      [values]="['sales']"
-      (cellClick)="onCellClick($event)"
-    />
-  `,
-})
-export class DashboardComponent {}
-```
+</div>
 
 ---
 
-## **High-Volume Data Processing Specification {#high-volume-specification}**
+## **Feature Highlights**
 
-### Architecture Components
+<Tabs>
+<TabItem value="filtering" label="🔍 Advanced Filtering" default>
 
-#### 1. Main Thread
+<div style={{
+  background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
+  padding: '2rem',
+  borderRadius: '1rem',
+  marginTop: '1rem'
+}}>
 
-**Responsibilities:**
+### Filter Your Way
 
-- UI rendering and virtual scrolling
-- User interaction handling
-- Worker coordination
-- Progressive result merging
+**What's New:**
 
-```typescript
-class MainThreadController {
-  private workerPool: WorkerPool;
-  private resultMerger: IncrementalMerger;
+- **Multiple Filter Types** - Text, number, date, and custom filters
+- **Instant Results** - See filtered data in real-time
+- **Save Filter Sets** - Save and reuse your favorite filters
 
-  async loadLargeDataset(file: File): Promise<void> {
-    const chunks = this.createChunks(file, CHUNK_SIZE);
+**How It Works:**
 
-    for await (const chunk of chunks) {
-      const worker = await this.workerPool.getAvailableWorker();
-      worker.postMessage({ type: 'PARSE_CHUNK', data: chunk });
+<div style={{
+  background: 'white',
+  padding: '1.5rem',
+  borderRadius: '0.75rem',
+  marginTop: '1rem',
+  boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+}}>
 
-      // Progressive update
-      this.updateProgress(chunk.processedBytes / file.size);
-    }
-  }
-}
-```
+**1.** Select your field → **2.** Choose condition → **3.** Enter value → **4.** Click Apply
 
-#### 2. Web Worker Pool
+</div>
 
-**Responsibilities:**
+**Available in:**
 
-- Parallel data parsing
-- Incremental aggregation
-- Delta calculation
-- WebAssembly execution
+- **@pivothead/core** - Core filtering engine
+- **@pivothead/webcomponent** - Native web component
+- **@pivothead/react** - React hooks
+- **@pivothead/vue** - Vue composables
 
-**Configuration:**
+</div>
 
-```typescript
-interface WorkerConfig {
-  workerCount: number;
-  chunkSizeBytes: number;
-  useWasm: boolean;
-  maxRawRowRetention: number;
-}
-```
+</TabItem>
 
-#### 3. WebAssembly Modules
+<TabItem value="import" label="📤 File Import">
 
-**When to Use:**
+<div style={{
+  background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
+  padding: '2rem',
+  borderRadius: '1rem',
+  marginTop: '1rem'
+}}>
 
-- Dataset size > 5 MB
-- Row count > 100,000
-- Complex aggregations
+### Upload & Visualize
 
-**Performance Gains:**
+**What's New:**
 
-- **3-5x faster** parsing
-- **5-10x faster** aggregations
-- **50% less** memory usage
+- **Drag & Drop** - Simple file upload interface
+- **Auto-Detection** - Automatically parse CSV/JSON structure
+- **Data Preview** - See your data before loading
+- **Smart Mapping** - Intelligent column detection
 
-### Data Ingestion Pipeline
+**Supported Formats:**
 
-```typescript
-// 1. Chunked Streaming
-async function* streamFile(file: File, chunkSize: number) {
-  const reader = file.stream().getReader();
-  let buffer = new Uint8Array();
+<div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', flexWrap: 'wrap' }}>
+  <div style={{
+    background: 'white',
+    padding: '1rem 1.5rem',
+    borderRadius: '0.5rem',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    fontWeight: '600',
+    fontSize: '1.1rem'
+  }}>
+    📄 CSV Files
+  </div>
+  <div style={{
+    background: 'white',
+    padding: '1rem 1.5rem',
+    borderRadius: '0.5rem',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    fontWeight: '600',
+    fontSize: '1.1rem'
+  }}>
+    📋 JSON Files
+  </div>
+</div>
 
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
+**Maximum file size:** Up to 100MB with progressive loading!
 
-    buffer = concatenate(buffer, value);
+</div>
 
-    while (buffer.length >= chunkSize) {
-      yield buffer.slice(0, chunkSize);
-      buffer = buffer.slice(chunkSize);
-    }
-  }
+</TabItem>
 
-  if (buffer.length > 0) yield buffer;
-}
+<TabItem value="export" label="📥 Export Options">
 
-// 2. Worker Dispatch
-for await (const chunk of streamFile(file, CHUNK_SIZE)) {
-  const worker = await workerPool.acquire();
-  worker.postMessage({
-    type: 'PARSE_AND_AGGREGATE',
-    chunk,
-    schema,
-    pivotConfig,
-  });
-}
+<div style={{
+  background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
+  padding: '2rem',
+  borderRadius: '1rem',
+  marginTop: '1rem'
+}}>
 
-// 3. Incremental Merge
-worker.onmessage = event => {
-  const { delta, progress } = event.data;
-  resultMerger.mergeDelta(delta);
-  ui.updateProgress(progress);
-  ui.refreshViewport();
-};
-```
+### Export Anywhere
 
-### Virtualized Rendering
+**What's New:**
 
-```typescript
-class VirtualScrollRenderer {
-  private viewportHeight: number;
-  private rowHeight: number;
-  private totalRows: number;
+- **PDF Export** - Publication-ready documents
+- **Excel Export** - Fully formatted spreadsheets
+- **HTML Export** - Web-ready tables
+- **Styled Output** - Preserve your custom styling
 
-  getVisibleRange(): [number, number] {
-    const scrollTop = this.container.scrollTop;
-    const startIndex = Math.floor(scrollTop / this.rowHeight);
-    const endIndex = Math.ceil(
-      (scrollTop + this.viewportHeight) / this.rowHeight
-    );
+**Export Features:**
 
-    return [startIndex, endIndex];
-  }
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
+  <div style={{
+    background: 'white',
+    padding: '1.5rem',
+    borderRadius: '0.75rem',
+    textAlign: 'center',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+  }}>
+    <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>📄</div>
+    <strong>PDF</strong>
+    <div style={{ fontSize: '0.9rem', color: '#666', marginTop: '0.25rem' }}>Print-ready format</div>
+  </div>
+  <div style={{
+    background: 'white',
+    padding: '1.5rem',
+    borderRadius: '0.75rem',
+    textAlign: 'center',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+  }}>
+    <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>📊</div>
+    <strong>Excel</strong>
+    <div style={{ fontSize: '0.9rem', color: '#666', marginTop: '0.25rem' }}>With formulas</div>
+  </div>
+  <div style={{
+    background: 'white',
+    padding: '1.5rem',
+    borderRadius: '0.75rem',
+    textAlign: 'center',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+  }}>
+    <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🌐</div>
+    <strong>HTML</strong>
+    <div style={{ fontSize: '0.9rem', color: '#666', marginTop: '0.25rem' }}>Interactive web</div>
+  </div>
+</div>
 
-  render() {
-    const [start, end] = this.getVisibleRange();
-    const visibleData = this.store.slice(start, end);
+**One-click export with all your filters and formatting intact!**
 
-    // Render only visible rows
-    this.renderRows(visibleData, start);
+</div>
 
-    // Update scroll spacers
-    this.updateSpacers(start, end, this.totalRows);
-  }
-}
-```
-
-### Memory Management
-
-```typescript
-class MemoryManager {
-  private rawBuffers: Map<string, ArrayBuffer>;
-  private aggregatedCache: Map<string, AggResult>;
-
-  processChunk(chunk: Chunk): void {
-    // Parse and aggregate immediately
-    const result = this.parseAndAggregate(chunk);
-
-    // Release raw buffer if not needed for drill-down
-    if (!this.needsDrillDown(chunk.id)) {
-      this.rawBuffers.delete(chunk.id);
-    }
-
-    // Cache aggregated result
-    this.aggregatedCache.set(chunk.id, result);
-  }
-
-  cleanupMemory(): void {
-    // Remove buffers for collapsed nodes
-    for (const [id, buffer] of this.rawBuffers) {
-      if (!this.isExpanded(id)) {
-        this.rawBuffers.delete(id);
-      }
-    }
-  }
-}
-```
-
-### Configuration Options
-
-```typescript
-const config: HighVolumeConfig = {
-  // Data Processing
-  chunkSizeBytes: 1024 * 1024, // 1MB chunks
-  workerCount: navigator.hardwareConcurrency - 1,
-  useWasm: true, // Auto-enable
-
-  // Memory Management
-  maxRawRowRetention: 10_000,
-  enableCompression: true,
-  compressionThreshold: 5 * 1024 * 1024, // 5MB
-
-  // Virtual Scrolling
-  rowHeight: 32,
-  overscanCount: 5,
-
-  // Performance Tuning
-  batchSize: 1000,
-  debounceMs: 16,
-
-  // Monitoring
-  enableMetrics: true,
-  logLevel: 'info',
-};
-```
-
-### Performance Monitoring
-
-```typescript
-interface PerformanceMetrics {
-  // Parsing
-  chunkParseTime: number[];
-  totalParseTime: number;
-
-  // Aggregation
-  aggregationTime: number[];
-
-  // WebAssembly
-  wasmLoadTime: number;
-  wasmExecutionTime: number;
-
-  // Memory
-  peakMemoryUsage: number;
-  currentMemoryUsage: number;
-
-  // Rendering
-  fps: number;
-  frameDrops: number;
-}
-
-// Usage
-pivotHead.on('metrics', (metrics: PerformanceMetrics) => {
-  console.log('Parse time:', metrics.totalParseTime);
-  console.log('Memory:', metrics.currentMemoryUsage);
-  dashboard.updateMetrics(metrics);
-});
-```
-
-### Usage Example
-
-```typescript
-import { PivotHead, HighVolumeConfig } from '@pivothead/core';
-
-// Initialize with high-volume config
-const pivot = new PivotHead({
-  ...HighVolumeConfig,
-  workerCount: 4,
-  useWasm: true,
-});
-
-// Load large file
-const file = document.querySelector('input[type="file"]').files[0];
-
-pivot
-  .loadFile(file, {
-    rows: ['category', 'product'],
-    columns: ['year', 'quarter'],
-    values: ['sales', 'profit'],
-    aggregation: 'sum',
-  })
-  .on('progress', percent => {
-    console.log(`Loading: ${percent}%`);
-  })
-  .on('chunk-processed', stats => {
-    console.log('Processed chunk:', stats);
-  })
-  .on('complete', result => {
-    console.log('Dataset loaded:', result);
-    // Data is ready, UI is already updated progressively
-  });
-```
+</TabItem>
+</Tabs>
 
 ---
 
-## Community Input
+## **Coming Soon {#upcoming-features}**
 
-We value your feedback! Help shape PivotHead's future:
+<div style={{
+  background: 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
+  padding: '2rem',
+  borderRadius: '1rem',
+  border: '3px dashed #dc2626',
+  marginBottom: '2rem',
+  textAlign: 'center'
+}}>
+  <h2 style={{ marginBottom: '0.5rem', color: '#991b1b' }}>Next Release: v2.1</h2>
+  <p style={{ fontSize: '1.1rem', color: '#7f1d1d', margin: 0 }}>Exciting new features in development!</p>
+</div>
 
-Which feature would help you most?
+<div style={{ 
+  display: 'grid', 
+  gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+  gap: '1.5rem',
+  marginTop: '2rem' 
+}}>
 
-1. **Angular Support** - Full Angular integration
-2. **High-Volume Processing** - Handle 100MB+ datasets
-3. **Advanced Calculations** - Complex formulas and computations
-4. **Real-Time Updates** - Live data streaming
-5. **Enhanced Export** - Better PDF/Excel exports
+{/_ Angular Support _/}
+
+<div style={{
+  background: 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
+  padding: '2rem',
+  borderRadius: '1rem',
+  border: '2px solid #dc2626',
+  position: 'relative',
+  boxShadow: '0 10px 30px rgba(220, 38, 38, 0.2)',
+  transition: 'transform 0.3s ease',
+  cursor: 'pointer'
+}}
+onMouseEnter={(e) => {
+  e.currentTarget.style.transform = 'scale(1.05)';
+}}
+onMouseLeave={(e) => {
+  e.currentTarget.style.transform = 'scale(1)';
+}}>
+  <div style={{
+    position: 'absolute',
+    top: '1rem',
+    right: '1rem',
+    background: '#dc2626',
+    color: 'white',
+    padding: '0.25rem 0.75rem',
+    borderRadius: '1rem',
+    fontSize: '0.75rem',
+    fontWeight: '700',
+    textTransform: 'uppercase'
+  }}>
+    In Development
+  </div>
+  <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>🅰️</div>
+  <h3 style={{ color: '#7f1d1d', marginBottom: '1rem', fontSize: '1.5rem' }}>Angular Support</h3>
+  <p style={{ color: '#991b1b', fontSize: '1rem', lineHeight: '1.6', marginBottom: '1rem' }}>
+    Full Angular integration with reactive services, directives, and standalone components!
+  </p>
+  <div style={{
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '0.5rem'
+  }}>
+    <span style={{
+      background: 'white',
+      padding: '0.25rem 0.75rem',
+      borderRadius: '1rem',
+      fontSize: '0.85rem',
+      color: '#991b1b',
+      fontWeight: '600'
+    }}>@pivothead/angular</span>
+    <span style={{
+      background: 'white',
+      padding: '0.25rem 0.75rem',
+      borderRadius: '1rem',
+      fontSize: '0.85rem',
+      color: '#991b1b',
+      fontWeight: '600'
+    }}>TypeScript-first</span>
+    <span style={{
+      background: 'white',
+      padding: '0.25rem 0.75rem',
+      borderRadius: '1rem',
+      fontSize: '0.85rem',
+      color: '#991b1b',
+      fontWeight: '600'
+    }}>Zone.js ready</span>
+  </div>
+</div>
+
+{/_ High-Volume Processing _/}
+
+<div style={{
+  background: 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
+  padding: '2rem',
+  borderRadius: '1rem',
+  border: '2px solid #dc2626',
+  position: 'relative',
+  boxShadow: '0 10px 30px rgba(220, 38, 38, 0.2)',
+  transition: 'transform 0.3s ease',
+  cursor: 'pointer'
+}}
+onMouseEnter={(e) => {
+  e.currentTarget.style.transform = 'scale(1.05)';
+}}
+onMouseLeave={(e) => {
+  e.currentTarget.style.transform = 'scale(1)';
+}}>
+  <div style={{
+    position: 'absolute',
+    top: '1rem',
+    right: '1rem',
+    background: '#dc2626',
+    color: 'white',
+    padding: '0.25rem 0.75rem',
+    borderRadius: '1rem',
+    fontSize: '0.75rem',
+    fontWeight: '700',
+    textTransform: 'uppercase'
+  }}>
+    Coming Soon
+  </div>
+  <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>⚡</div>
+  <h3 style={{ color: '#7f1d1d', marginBottom: '1rem', fontSize: '1.5rem' }}>High-Volume Data</h3>
+  <p style={{ color: '#991b1b', fontSize: '1rem', lineHeight: '1.6', marginBottom: '1rem' }}>
+    Handle massive CSV and JSON files without freezing or crashing. Process millions of rows smoothly!
+  </p>
+  <div style={{
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '0.5rem'
+  }}>
+    <span style={{
+      background: 'white',
+      padding: '0.25rem 0.75rem',
+      borderRadius: '1rem',
+      fontSize: '0.85rem',
+      color: '#991b1b',
+      fontWeight: '600'
+    }}>100MB+ files</span>
+    <span style={{
+      background: 'white',
+      padding: '0.25rem 0.75rem',
+      borderRadius: '1rem',
+      fontSize: '0.85rem',
+      color: '#991b1b',
+      fontWeight: '600'
+    }}>No freezing</span>
+    <span style={{
+      background: 'white',
+      padding: '0.25rem 0.75rem',
+      borderRadius: '1rem',
+      fontSize: '0.85rem',
+      color: '#991b1b',
+      fontWeight: '600'
+    }}>WebAssembly</span>
+  </div>
+</div>
+
+</div>
+
+---
+
+## **Feature Comparison**
+
+<div style={{
+  background: 'white',
+  padding: '2rem',
+  borderRadius: '1rem',
+  boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+  marginTop: '2rem',
+  overflow: 'auto'
+}}>
+
+| Feature                      |                                                                                                                    Current (v2.0)                                                                                                                     |                                                                                    Next (v2.1)                                                                                     |
+| ---------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| **Advanced Filtering**       |                                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg>                                   | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg> |
+| **File Upload (CSV/JSON)**   |                                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg>                                   | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg> |
+| **Export (PDF/Excel/HTML)**  |                                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg>                                   | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg> |
+| **React Support**            |                                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg>                                   | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg> |
+| **Vue Support**              |                                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg>                                   | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg> |
+| **Angular Support**          | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="3" style={{display: 'inline-block'}}><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="12" r="8"></circle><path d="M12 3v18M3 12h18"></path></svg> | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg> |
+| **High-Volume Processing**   | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="3" style={{display: 'inline-block'}}><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="12" r="8"></circle><path d="M12 3v18M3 12h18"></path></svg> | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg> |
+| **WebAssembly Acceleration** | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="3" style={{display: 'inline-block'}}><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="12" r="8"></circle><path d="M12 3v18M3 12h18"></path></svg> | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg> |
+| **Progressive Loading**      | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="3" style={{display: 'inline-block'}}><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="12" r="8"></circle><path d="M12 3v18M3 12h18"></path></svg> | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg> |
+
+<div style={{ marginTop: '1rem', fontSize: '0.9rem', color: '#666', display: 'flex', gap: '2rem', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
+  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+    <span>Available</span>
+  </div>
+  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="3"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="12" r="8"></circle><path d="M12 3v18M3 12h18"></path></svg>
+    <span>Coming Soon</span>
+  </div>
+</div>
+
+</div>
 
 ---
 
 ## **Stay Updated**
 
-### **Get Notified**
+<div style={{
+  background: 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
+  padding: '2rem',
+  borderRadius: '1rem',
+  marginTop: '2rem',
+  textAlign: 'center'
+}}>
 
-- **Star** our [GitHub repo](https://github.com/mindfiredigital/PivotHead)
+### Never Miss an Update!
+
+<div style={{
+  display: 'flex',
+  justifyContent: 'center',
+  gap: '1rem',
+  flexWrap: 'wrap',
+  marginTop: '1.5rem'
+}}>
+  <a 
+    href="https://github.com/mindfiredigital/PivotHead" 
+    target="_blank"
+    style={{
+      background: 'white',
+      color: '#991b1b',
+      padding: '0.75rem 1.5rem',
+      borderRadius: '0.5rem',
+      textDecoration: 'none',
+      fontWeight: '600',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '0.5rem'
+    }}
+  >
+    ⭐ Star on GitHub
+  </a>
+  
+</div>
+
+<p style={{ marginTop: '1.5rem', color: '#7f1d1d', fontSize: '0.95rem' }}>
+  Get notified about new releases, beta programs, and exclusive features!
+</p>
+
+</div>
 
 ---
+
+<div style={{
+  textAlign: 'center',
+  padding: '3rem 1rem',
+  background: 'linear-gradient(135deg, #fafafa 0%, #f4f4f5 100%)',
+  borderRadius: '1rem',
+  marginTop: '3rem'
+}}>
+  <svg
+    viewBox="0 0 120 180"
+    style={{
+      width: '5rem',
+      height: '7.5rem',
+      marginBottom: '1rem',
+      display: 'inline-block',
+      filter: 'drop-shadow(0 4px 12px rgba(220, 38, 38, 0.25))',
+      animation: 'rocketLift 3s ease-in-out infinite'
+    }}
+  >
+    {/* Rocket body - main tube */}
+    <rect x="45" y="40" width="30" height="90" rx="4" fill="#dc2626" />
+    
+    {/* Rocket body - upper section with gradient appearance */}
+    <rect x="48" y="45" width="24" height="25" rx="3" fill="#991b1b" />
+    
+    {/* Nose cone - pointed tip */}
+    <polygon points="60,15 48,40 72,40" fill="#fbbf24" />
+    
+    {/* Window - circular viewport */}
+    <circle cx="60" cy="50" r="5" fill="#60a5fa" />
+    <circle cx="60" cy="50" r="3" fill="#bfdbfe" opacity="0.6" />
+    
+    {/* Left fin */}
+    <polygon points="45,110 20,145 45,125" fill="#7f1d1d" />
+    
+    {/* Right fin */}
+    <polygon points="75,110 100,145 75,125" fill="#7f1d1d" />
+    
+    {/* Bottom thruster section */}
+    <rect x="50" y="125" width="20" height="15" rx="2" fill="#ea580c" />
+    
+    {/* Flame - outer (large) */}
+    <polygon points="48,140 60,170 72,140" fill="#f97316" opacity="0.9" />
+    
+    {/* Flame - middle */}
+    <polygon points="52,148 60,162 68,148" fill="#fbbf24" opacity="0.8" />
+    
+    {/* Flame - inner (bright core) */}
+    <polygon points="55,152 60,160 65,152" fill="#fef3c7" />
+  </svg>
+  
+  <h2 style={{ marginBottom: '1rem' }}>Excited About What's Coming?</h2>
+  <p style={{ fontSize: '1.2rem', color: '#6b7280', maxWidth: '600px', margin: '0 auto 2rem' }}>
+    Try the current version today and experience the power of PivotHead!
+  </p>
+  <a 
+    href="/PivotHead/docs/getting-started/Why-we-use-pivothead"
+    style={{
+      background: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
+      color: 'white',
+      padding: '1rem 2.5rem',
+      borderRadius: '0.5rem',
+      textDecoration: 'none',
+      fontWeight: '700',
+      fontSize: '1.2rem',
+      display: 'inline-block',
+      boxShadow: '0 6px 20px rgba(220, 38, 38, 0.4)',
+      transition: 'all 0.3s ease'
+    }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.transform = 'translateY(-2px)';
+      e.currentTarget.style.boxShadow = '0 8px 25px rgba(220, 38, 38, 0.5)';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.transform = 'translateY(0)';
+      e.currentTarget.style.boxShadow = '0 6px 20px rgba(220, 38, 38, 0.4)';
+    }}
+  >
+    Get Started Now →
+  </a>
+</div>
+
+<style>{`
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes rocketLift {
+    0%, 100% {
+      transform: translateY(0px) scaleY(1);
+    }
+    50% {
+      transform: translateY(-20px) scaleY(1.02);
+    }
+  }
+`}</style>

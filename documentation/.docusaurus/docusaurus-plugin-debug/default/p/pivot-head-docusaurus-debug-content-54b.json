@@ -141,7 +141,7 @@
                   "permalink": "/PivotHead/docs/contributors/monorepo-setup"
                 },
                 "next": {
-                  "title": "🚀 Upcoming Features",
+                  "title": "Upcoming Features",
                   "permalink": "/PivotHead/docs/upcoming/"
                 }
               },
@@ -1037,7 +1037,7 @@
                 },
                 {
                   "type": "doc",
-                  "label": "🚀 Upcoming Features",
+                  "label": "Upcoming Features",
                   "id": "upcoming/index"
                 }
               ]
