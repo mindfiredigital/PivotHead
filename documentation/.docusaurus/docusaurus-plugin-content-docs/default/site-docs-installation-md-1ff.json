@@ -16,14 +16,5 @@
     "sidebar_position": 3,
     "title": "Getting Started",
     "description": "Learn how to install and set up PivotHead in your project"
-  },
-  "sidebar": "tutorialSidebar",
-  "previous": {
-    "title": "Why Use PivotHead",
-    "permalink": "/PivotHead/docs/Why-we-use-pivothead"
-  },
-  "next": {
-    "title": "Tutorials",
-    "permalink": "/PivotHead/docs/category/tutorials"
   }
 }

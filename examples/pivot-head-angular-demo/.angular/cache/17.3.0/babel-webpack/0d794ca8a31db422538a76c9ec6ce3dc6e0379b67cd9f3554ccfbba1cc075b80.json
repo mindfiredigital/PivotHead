@@ -1,0 +1,39 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.UnsubscriptionError = void 0;\nvar createErrorClass_1 = require(\"./createErrorClass\");\nexports.UnsubscriptionError = createErrorClass_1.createErrorClass(function (_super) {\n  return function UnsubscriptionErrorImpl(errors) {\n    _super(this);\n    this.message = errors ? errors.length + \" errors occurred during unsubscription:\\n\" + errors.map(function (err, i) {\n      return i + 1 + \") \" + err.toString();\n    }).join('\\n  ') : '';\n    this.name = 'UnsubscriptionError';\n    this.errors = errors;\n  };\n});\n//# sourceMappingURL=UnsubscriptionError.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "UnsubscriptionError",
+      "createErrorClass_1",
+      "require",
+      "createErrorClass",
+      "_super",
+      "UnsubscriptionErrorImpl",
+      "errors",
+      "message",
+      "length",
+      "map",
+      "err",
+      "i",
+      "toString",
+      "join",
+      "name"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/util/UnsubscriptionError.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.UnsubscriptionError = void 0;\nvar createErrorClass_1 = require(\"./createErrorClass\");\nexports.UnsubscriptionError = createErrorClass_1.createErrorClass(function (_super) {\n    return function UnsubscriptionErrorImpl(errors) {\n        _super(this);\n        this.message = errors\n            ? errors.length + \" errors occurred during unsubscription:\\n\" + errors.map(function (err, i) { return i + 1 + \") \" + err.toString(); }).join('\\n  ')\n            : '';\n        this.name = 'UnsubscriptionError';\n        this.errors = errors;\n    };\n});\n//# sourceMappingURL=UnsubscriptionError.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,mBAAmB,GAAG,KAAK,CAAC;AACpC,IAAIC,kBAAkB,GAAGC,OAAO,CAAC,oBAAoB,CAAC;AACtDJ,OAAO,CAACE,mBAAmB,GAAGC,kBAAkB,CAACE,gBAAgB,CAAC,UAAUC,MAAM,EAAE;EAChF,OAAO,SAASC,uBAAuBA,CAACC,MAAM,EAAE;IAC5CF,MAAM,CAAC,IAAI,CAAC;IACZ,IAAI,CAACG,OAAO,GAAGD,MAAM,GACfA,MAAM,CAACE,MAAM,GAAG,2CAA2C,GAAGF,MAAM,CAACG,GAAG,CAAC,UAAUC,GAAG,EAAEC,CAAC,EAAE;MAAE,OAAOA,CAAC,GAAG,CAAC,GAAG,IAAI,GAAGD,GAAG,CAACE,QAAQ,CAAC,CAAC;IAAE,CAAC,CAAC,CAACC,IAAI,CAAC,MAAM,CAAC,GAClJ,EAAE;IACR,IAAI,CAACC,IAAI,GAAG,qBAAqB;IACjC,IAAI,CAACR,MAAM,GAAGA,MAAM;EACxB,CAAC;AACL,CAAC,CAAC;AACF",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

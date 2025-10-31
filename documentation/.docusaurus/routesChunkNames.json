@@ -49,26 +49,18 @@
     },
     "content": "content---pivot-head-markdown-page-393-f56"
   },
-  "/PivotHead/docs-901": {
+  "/PivotHead/docs-929": {
     "__comp": "__comp---theme-docs-root-5-e-9-0b6",
     "__context": {
       "plugin": "plugin---pivot-head-docsaba-41e"
     }
   },
-  "/PivotHead/docs-3c0": {
+  "/PivotHead/docs-46d": {
     "__comp": "__comp---theme-doc-version-roota-7-b-5de",
     "__props": "__props---pivot-head-docs-162-87b"
   },
-  "/PivotHead/docs-4f9": {
+  "/PivotHead/docs-c56": {
     "__comp": "__comp---theme-doc-roota-94-67a"
-  },
-  "/PivotHead/docs/category/contribution-guide-2e1": {
-    "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
-    "__props": "__props---pivot-head-docs-category-contribution-guidea-3-d-5d9"
-  },
-  "/PivotHead/docs/category/tutorials-ceb": {
-    "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
-    "__props": "__props---pivot-head-docs-category-tutorials-9-b-3-017"
   },
   "/PivotHead/docs/contributors/-f21": {
     "__comp": "__comp---theme-doc-item-178-a40",
@@ -90,7 +82,27 @@
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---pivot-head-docs-contributors-quick-startbb-9-9e6"
   },
-  "/PivotHead/docs/Installation-15e": {
+  "/PivotHead/docs/getting-started/basic-setup-2b9": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-getting-started-basic-setupc-9-d-e6d"
+  },
+  "/PivotHead/docs/getting-started/headless-quick-start-271": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-getting-started-headless-quick-start-92-d-446"
+  },
+  "/PivotHead/docs/getting-started/installation-30f": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-getting-started-installation-54-f-dbe"
+  },
+  "/PivotHead/docs/getting-started/Why-we-use-pivothead-e9b": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-getting-started-why-we-use-pivotheada-47-6c0"
+  },
+  "/PivotHead/docs/headless-architecture-0ca": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-headless-architecturef-74-9ed"
+  },
+  "/PivotHead/docs/Installation-e1c": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---pivot-head-docs-installation-1-ff-9e1"
   },
@@ -98,15 +110,47 @@
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---pivot-head-docs-introductiona-09-d41"
   },
-  "/PivotHead/docs/tutorial-basics/core/api-reference-23f": {
+  "/PivotHead/docs/reference/api-reference/angular-api-reference-1e0": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-reference-api-reference-angular-api-reference-257-544"
+  },
+  "/PivotHead/docs/reference/api-reference/core-webcomponent-api-reference-312": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-reference-api-reference-core-webcomponent-api-referenceae-3-7c2"
+  },
+  "/PivotHead/docs/reference/api-reference/react-api-reference-46a": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-reference-api-reference-react-api-referencece-6-0e8"
+  },
+  "/PivotHead/docs/reference/api-reference/vue-api-reference-cc0": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-reference-api-reference-vue-api-referencebc-2-021"
+  },
+  "/PivotHead/docs/reference/conceptual-reference/angular-conceptual-reference-28e": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-reference-conceptual-reference-angular-conceptual-reference-907-07b"
+  },
+  "/PivotHead/docs/reference/conceptual-reference/core-webcomponent-conceptual-reference-c2b": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-reference-conceptual-reference-core-webcomponent-conceptual-reference-079-8c3"
+  },
+  "/PivotHead/docs/reference/conceptual-reference/react-conceptual-reference-9ee": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-reference-conceptual-reference-react-conceptual-reference-09-b-cd1"
+  },
+  "/PivotHead/docs/reference/conceptual-reference/vue-conceptual-reference-08d": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-reference-conceptual-reference-vue-conceptual-referenceaff-136"
+  },
+  "/PivotHead/docs/tutorial-basics/core/api-reference-0be": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---pivot-head-docs-tutorial-basics-core-api-reference-190-54c"
   },
-  "/PivotHead/docs/tutorial-basics/core/core-concepts-52f": {
+  "/PivotHead/docs/tutorial-basics/core/core-concepts-496": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---pivot-head-docs-tutorial-basics-core-core-conceptsb-6-f-842"
   },
-  "/PivotHead/docs/tutorial-basics/core/examples-906": {
+  "/PivotHead/docs/tutorial-basics/core/examples-85b": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---pivot-head-docs-tutorial-basics-core-examples-8-fa-07f"
   },
@@ -114,21 +158,53 @@
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---pivot-head-docs-tutorial-basics-troubleshooting-18-f-fd8"
   },
-  "/PivotHead/docs/tutorial-basics/web-component-9dc": {
+  "/PivotHead/docs/tutorial-basics/web-component-f28": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---pivot-head-docs-tutorial-basics-web-component-841-478"
   },
-  "/PivotHead/docs/tutorial-basics/wrappers/react-af3": {
+  "/PivotHead/docs/tutorial-basics/wrappers/react-2a0": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---pivot-head-docs-tutorial-basics-wrappers-reactc-03-958"
   },
-  "/PivotHead/docs/tutorial-basics/wrappers/vue-877": {
+  "/PivotHead/docs/tutorial-basics/wrappers/vue-69f": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---pivot-head-docs-tutorial-basics-wrappers-vue-9-c-1-c95"
   },
-  "/PivotHead/docs/Why-we-use-pivothead-71b": {
+  "/PivotHead/docs/tutorials/angular/angular-sample-project-7a0": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-why-we-use-pivotheada-8-b-7a9"
+    "content": "content---pivot-head-docs-tutorials-angular-angular-sample-projecta-6-d-bd2"
+  },
+  "/PivotHead/docs/tutorials/angular/angular-setup-for-user-project-87f": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-tutorials-angular-angular-setup-for-user-projectcec-4c5"
+  },
+  "/PivotHead/docs/tutorials/core-webcomponent/core-webcomponent-sample-project-c32": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-tutorials-core-webcomponent-core-webcomponent-sample-project-4-ee-0ac"
+  },
+  "/PivotHead/docs/tutorials/core-webcomponent/setup-for-user-project-83d": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-tutorials-core-webcomponent-setup-for-user-projectf-9-c-bc6"
+  },
+  "/PivotHead/docs/tutorials/react/react-sample-project-1f6": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-tutorials-react-react-sample-project-93-c-8a2"
+  },
+  "/PivotHead/docs/tutorials/react/setup-for-user-project-953": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-tutorials-react-setup-for-user-project-030-56c"
+  },
+  "/PivotHead/docs/tutorials/vue/setup-for-user-project-d76": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-tutorials-vue-setup-for-user-project-860-9a2"
+  },
+  "/PivotHead/docs/tutorials/vue/vue-sample-project-041": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-tutorials-vue-vue-sample-project-00-f-082"
+  },
+  "/PivotHead/docs/upcoming/-249": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-upcoming-192-7de"
   },
   "/PivotHead/-409": {
     "__comp": "__comp---site-src-pages-index-jsc-4-f-f99",

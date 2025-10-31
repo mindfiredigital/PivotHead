@@ -1,0 +1,27 @@
+{
+  "id": "getting-started/headless-quick-start",
+  "title": "Headless Quick Start",
+  "description": "Get started with PivotHead's headless architecture in 5 minutes",
+  "source": "@site/docs/getting-started/headless-quick-start.md",
+  "sourceDirName": "getting-started",
+  "slug": "/getting-started/headless-quick-start",
+  "permalink": "/PivotHead/docs/getting-started/headless-quick-start",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/getting-started/headless-quick-start.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Headless Quick Start",
+    "description": "Get started with PivotHead's headless architecture in 5 minutes"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Why Use PivotHead",
+    "permalink": "/PivotHead/docs/getting-started/Why-we-use-pivothead"
+  },
+  "next": {
+    "title": "Installation",
+    "permalink": "/PivotHead/docs/getting-started/installation"
+  }
+}

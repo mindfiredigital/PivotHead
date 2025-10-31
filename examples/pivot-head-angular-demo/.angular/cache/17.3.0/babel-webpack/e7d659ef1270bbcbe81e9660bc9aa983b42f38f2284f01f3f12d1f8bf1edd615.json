@@ -1,0 +1,40 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.timeoutWith = void 0;\nvar async_1 = require(\"../scheduler/async\");\nvar isDate_1 = require(\"../util/isDate\");\nvar timeout_1 = require(\"./timeout\");\nfunction timeoutWith(due, withObservable, scheduler) {\n  var first;\n  var each;\n  var _with;\n  scheduler = scheduler !== null && scheduler !== void 0 ? scheduler : async_1.async;\n  if (isDate_1.isValidDate(due)) {\n    first = due;\n  } else if (typeof due === 'number') {\n    each = due;\n  }\n  if (withObservable) {\n    _with = function () {\n      return withObservable;\n    };\n  } else {\n    throw new TypeError('No observable provided to switch to');\n  }\n  if (first == null && each == null) {\n    throw new TypeError('No timeout provided.');\n  }\n  return timeout_1.timeout({\n    first: first,\n    each: each,\n    scheduler: scheduler,\n    with: _with\n  });\n}\nexports.timeoutWith = timeoutWith;\n//# sourceMappingURL=timeoutWith.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "timeoutWith",
+      "async_1",
+      "require",
+      "isDate_1",
+      "timeout_1",
+      "due",
+      "withObservable",
+      "scheduler",
+      "first",
+      "each",
+      "_with",
+      "async",
+      "isValidDate",
+      "TypeError",
+      "timeout",
+      "with"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/operators/timeoutWith.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.timeoutWith = void 0;\nvar async_1 = require(\"../scheduler/async\");\nvar isDate_1 = require(\"../util/isDate\");\nvar timeout_1 = require(\"./timeout\");\nfunction timeoutWith(due, withObservable, scheduler) {\n    var first;\n    var each;\n    var _with;\n    scheduler = scheduler !== null && scheduler !== void 0 ? scheduler : async_1.async;\n    if (isDate_1.isValidDate(due)) {\n        first = due;\n    }\n    else if (typeof due === 'number') {\n        each = due;\n    }\n    if (withObservable) {\n        _with = function () { return withObservable; };\n    }\n    else {\n        throw new TypeError('No observable provided to switch to');\n    }\n    if (first == null && each == null) {\n        throw new TypeError('No timeout provided.');\n    }\n    return timeout_1.timeout({\n        first: first,\n        each: each,\n        scheduler: scheduler,\n        with: _with,\n    });\n}\nexports.timeoutWith = timeoutWith;\n//# sourceMappingURL=timeoutWith.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,WAAW,GAAG,KAAK,CAAC;AAC5B,IAAIC,OAAO,GAAGC,OAAO,CAAC,oBAAoB,CAAC;AAC3C,IAAIC,QAAQ,GAAGD,OAAO,CAAC,gBAAgB,CAAC;AACxC,IAAIE,SAAS,GAAGF,OAAO,CAAC,WAAW,CAAC;AACpC,SAASF,WAAWA,CAACK,GAAG,EAAEC,cAAc,EAAEC,SAAS,EAAE;EACjD,IAAIC,KAAK;EACT,IAAIC,IAAI;EACR,IAAIC,KAAK;EACTH,SAAS,GAAGA,SAAS,KAAK,IAAI,IAAIA,SAAS,KAAK,KAAK,CAAC,GAAGA,SAAS,GAAGN,OAAO,CAACU,KAAK;EAClF,IAAIR,QAAQ,CAACS,WAAW,CAACP,GAAG,CAAC,EAAE;IAC3BG,KAAK,GAAGH,GAAG;EACf,CAAC,MACI,IAAI,OAAOA,GAAG,KAAK,QAAQ,EAAE;IAC9BI,IAAI,GAAGJ,GAAG;EACd;EACA,IAAIC,cAAc,EAAE;IAChBI,KAAK,GAAG,SAAAA,CAAA,EAAY;MAAE,OAAOJ,cAAc;IAAE,CAAC;EAClD,CAAC,MACI;IACD,MAAM,IAAIO,SAAS,CAAC,qCAAqC,CAAC;EAC9D;EACA,IAAIL,KAAK,IAAI,IAAI,IAAIC,IAAI,IAAI,IAAI,EAAE;IAC/B,MAAM,IAAII,SAAS,CAAC,sBAAsB,CAAC;EAC/C;EACA,OAAOT,SAAS,CAACU,OAAO,CAAC;IACrBN,KAAK,EAAEA,KAAK;IACZC,IAAI,EAAEA,IAAI;IACVF,SAAS,EAAEA,SAAS;IACpBQ,IAAI,EAAEL;EACV,CAAC,CAAC;AACN;AACAZ,OAAO,CAACE,WAAW,GAAGA,WAAW;AACjC",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

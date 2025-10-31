@@ -1,0 +1,28 @@
+{
+  "id": "tutorials/vue/vue-sample-project",
+  "title": "Sample Project",
+  "description": "This guide will show you how to create a basic Vue application using @pivothead/vue to build a headless pivot table.",
+  "source": "@site/docs/tutorials/vue/sample-project.md",
+  "sourceDirName": "tutorials/vue",
+  "slug": "/tutorials/vue/vue-sample-project",
+  "permalink": "/PivotHead/docs/tutorials/vue/vue-sample-project",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorials/vue/sample-project.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "vue-sample-project",
+    "title": "Sample Project",
+    "sidebar_label": "Sample Project"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "setup-for-user-project",
+    "permalink": "/PivotHead/docs/tutorials/react/setup-for-user-project"
+  },
+  "next": {
+    "title": "setup-for-user-project",
+    "permalink": "/PivotHead/docs/tutorials/vue/setup-for-user-project"
+  }
+}

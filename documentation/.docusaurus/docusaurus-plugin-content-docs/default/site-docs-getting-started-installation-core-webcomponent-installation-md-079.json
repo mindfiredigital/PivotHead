@@ -1,0 +1,28 @@
+{
+  "id": "getting-started/installation/core-webcomponent-installation",
+  "title": "Core Web Component Installation",
+  "description": "To get started with PivotHead's core web component, you can install it via npm. This package provides the core headless pivot table logic, allowing you to build your pivot table with maximum flexibility.",
+  "source": "@site/docs/getting-started/installation/core-webcomponent-installation.md",
+  "sourceDirName": "getting-started/installation",
+  "slug": "/getting-started/installation/core-webcomponent-installation",
+  "permalink": "/PivotHead/docs/getting-started/installation/core-webcomponent-installation",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/getting-started/installation/core-webcomponent-installation.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "core-webcomponent-installation",
+    "title": "Core Web Component Installation",
+    "sidebar_label": "Core Web Component"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Why Use PivotHead",
+    "permalink": "/PivotHead/docs/getting-started/Why-we-use-pivothead"
+  },
+  "next": {
+    "title": "react-installation",
+    "permalink": "/PivotHead/docs/getting-started/installation/react-installation"
+  }
+}

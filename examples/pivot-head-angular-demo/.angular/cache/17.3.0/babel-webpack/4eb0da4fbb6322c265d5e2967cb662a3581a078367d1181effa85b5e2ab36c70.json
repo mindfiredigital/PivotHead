@@ -1,0 +1,49 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nvar _asyncToGenerator = require(\"/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/@babel+runtime@7.24.0/node_modules/@babel/runtime/helpers/asyncToGenerator.js\").default;\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.render = exports.rendererFactory = void 0;\nexports.renderToCanvas = renderToCanvas;\nrequire(\"@angular/compiler\");\nconst RendererFactory_1 = require(\"./angular-beta/RendererFactory\");\nexports.rendererFactory = new RendererFactory_1.RendererFactory();\nconst render = props => ({\n  props\n});\nexports.render = render;\nfunction renderToCanvas(_x, _x2) {\n  return _renderToCanvas.apply(this, arguments);\n}\nfunction _renderToCanvas() {\n  _renderToCanvas = _asyncToGenerator(function* ({\n    storyFn,\n    showMain,\n    forceRemount,\n    storyContext: {\n      component\n    }\n  }, element) {\n    showMain();\n    const renderer = yield exports.rendererFactory.getRendererInstance(element);\n    yield renderer.render({\n      storyFnAngular: storyFn(),\n      component,\n      forced: !forceRemount,\n      targetDOMNode: element\n    });\n  });\n  return _renderToCanvas.apply(this, arguments);\n}",
+  "map": {
+    "version": 3,
+    "names": [
+      "_asyncToGenerator",
+      "require",
+      "default",
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "render",
+      "rendererFactory",
+      "renderToCanvas",
+      "RendererFactory_1",
+      "RendererFactory",
+      "props",
+      "_x",
+      "_x2",
+      "_renderToCanvas",
+      "apply",
+      "arguments",
+      "storyFn",
+      "showMain",
+      "forceRemount",
+      "storyContext",
+      "component",
+      "element",
+      "renderer",
+      "getRendererInstance",
+      "storyFnAngular",
+      "forced",
+      "targetDOMNode"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/@storybook+angular@8.6.14_@angular-devkit+architect@0.1703.0_@angular-devkit+build-angular@17_a7aajamgs7bgz2yqzrp63bsev4/node_modules/@storybook/angular/dist/client/render.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.render = exports.rendererFactory = void 0;\nexports.renderToCanvas = renderToCanvas;\nrequire(\"@angular/compiler\");\nconst RendererFactory_1 = require(\"./angular-beta/RendererFactory\");\nexports.rendererFactory = new RendererFactory_1.RendererFactory();\nconst render = (props) => ({ props });\nexports.render = render;\nasync function renderToCanvas({ storyFn, showMain, forceRemount, storyContext: { component } }, element) {\n    showMain();\n    const renderer = await exports.rendererFactory.getRendererInstance(element);\n    await renderer.render({\n        storyFnAngular: storyFn(),\n        component,\n        forced: !forceRemount,\n        targetDOMNode: element,\n    });\n}\n"
+    ],
+    "mappings": "AAAA,YAAY;;AAAC,IAAAA,iBAAA,GAAAC,OAAA,uKAAAC,OAAA;AACbC,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,MAAM,GAAGF,OAAO,CAACG,eAAe,GAAG,KAAK,CAAC;AACjDH,OAAO,CAACI,cAAc,GAAGA,cAAc;AACvCR,OAAO,CAAC,mBAAmB,CAAC;AAC5B,MAAMS,iBAAiB,GAAGT,OAAO,CAAC,gCAAgC,CAAC;AACnEI,OAAO,CAACG,eAAe,GAAG,IAAIE,iBAAiB,CAACC,eAAe,CAAC,CAAC;AACjE,MAAMJ,MAAM,GAAIK,KAAK,KAAM;EAAEA;AAAM,CAAC,CAAC;AACrCP,OAAO,CAACE,MAAM,GAAGA,MAAM;AAAC,SACTE,cAAcA,CAAAI,EAAA,EAAAC,GAAA;EAAA,OAAAC,eAAA,CAAAC,KAAA,OAAAC,SAAA;AAAA;AAAA,SAAAF,gBAAA;EAAAA,eAAA,GAAAf,iBAAA,CAA7B,WAA8B;IAAEkB,OAAO;IAAEC,QAAQ;IAAEC,YAAY;IAAEC,YAAY,EAAE;MAAEC;IAAU;EAAE,CAAC,EAAEC,OAAO,EAAE;IACrGJ,QAAQ,CAAC,CAAC;IACV,MAAMK,QAAQ,SAASnB,OAAO,CAACG,eAAe,CAACiB,mBAAmB,CAACF,OAAO,CAAC;IAC3E,MAAMC,QAAQ,CAACjB,MAAM,CAAC;MAClBmB,cAAc,EAAER,OAAO,CAAC,CAAC;MACzBI,SAAS;MACTK,MAAM,EAAE,CAACP,YAAY;MACrBQ,aAAa,EAAEL;IACnB,CAAC,CAAC;EACN,CAAC;EAAA,OAAAR,eAAA,CAAAC,KAAA,OAAAC,SAAA;AAAA",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

@@ -1,0 +1,51 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.onErrorResumeNext = void 0;\nvar Observable_1 = require(\"../Observable\");\nvar argsOrArgArray_1 = require(\"../util/argsOrArgArray\");\nvar OperatorSubscriber_1 = require(\"../operators/OperatorSubscriber\");\nvar noop_1 = require(\"../util/noop\");\nvar innerFrom_1 = require(\"./innerFrom\");\nfunction onErrorResumeNext() {\n  var sources = [];\n  for (var _i = 0; _i < arguments.length; _i++) {\n    sources[_i] = arguments[_i];\n  }\n  var nextSources = argsOrArgArray_1.argsOrArgArray(sources);\n  return new Observable_1.Observable(function (subscriber) {\n    var sourceIndex = 0;\n    var subscribeNext = function () {\n      if (sourceIndex < nextSources.length) {\n        var nextSource = void 0;\n        try {\n          nextSource = innerFrom_1.innerFrom(nextSources[sourceIndex++]);\n        } catch (err) {\n          subscribeNext();\n          return;\n        }\n        var innerSubscriber = new OperatorSubscriber_1.OperatorSubscriber(subscriber, undefined, noop_1.noop, noop_1.noop);\n        nextSource.subscribe(innerSubscriber);\n        innerSubscriber.add(subscribeNext);\n      } else {\n        subscriber.complete();\n      }\n    };\n    subscribeNext();\n  });\n}\nexports.onErrorResumeNext = onErrorResumeNext;\n//# sourceMappingURL=onErrorResumeNext.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "onErrorResumeNext",
+      "Observable_1",
+      "require",
+      "argsOrArgArray_1",
+      "OperatorSubscriber_1",
+      "noop_1",
+      "innerFrom_1",
+      "sources",
+      "_i",
+      "arguments",
+      "length",
+      "nextSources",
+      "argsOrArgArray",
+      "Observable",
+      "subscriber",
+      "sourceIndex",
+      "subscribeNext",
+      "nextSource",
+      "innerFrom",
+      "err",
+      "innerSubscriber",
+      "OperatorSubscriber",
+      "undefined",
+      "noop",
+      "subscribe",
+      "add",
+      "complete"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/observable/onErrorResumeNext.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.onErrorResumeNext = void 0;\nvar Observable_1 = require(\"../Observable\");\nvar argsOrArgArray_1 = require(\"../util/argsOrArgArray\");\nvar OperatorSubscriber_1 = require(\"../operators/OperatorSubscriber\");\nvar noop_1 = require(\"../util/noop\");\nvar innerFrom_1 = require(\"./innerFrom\");\nfunction onErrorResumeNext() {\n    var sources = [];\n    for (var _i = 0; _i < arguments.length; _i++) {\n        sources[_i] = arguments[_i];\n    }\n    var nextSources = argsOrArgArray_1.argsOrArgArray(sources);\n    return new Observable_1.Observable(function (subscriber) {\n        var sourceIndex = 0;\n        var subscribeNext = function () {\n            if (sourceIndex < nextSources.length) {\n                var nextSource = void 0;\n                try {\n                    nextSource = innerFrom_1.innerFrom(nextSources[sourceIndex++]);\n                }\n                catch (err) {\n                    subscribeNext();\n                    return;\n                }\n                var innerSubscriber = new OperatorSubscriber_1.OperatorSubscriber(subscriber, undefined, noop_1.noop, noop_1.noop);\n                nextSource.subscribe(innerSubscriber);\n                innerSubscriber.add(subscribeNext);\n            }\n            else {\n                subscriber.complete();\n            }\n        };\n        subscribeNext();\n    });\n}\nexports.onErrorResumeNext = onErrorResumeNext;\n//# sourceMappingURL=onErrorResumeNext.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,iBAAiB,GAAG,KAAK,CAAC;AAClC,IAAIC,YAAY,GAAGC,OAAO,CAAC,eAAe,CAAC;AAC3C,IAAIC,gBAAgB,GAAGD,OAAO,CAAC,wBAAwB,CAAC;AACxD,IAAIE,oBAAoB,GAAGF,OAAO,CAAC,iCAAiC,CAAC;AACrE,IAAIG,MAAM,GAAGH,OAAO,CAAC,cAAc,CAAC;AACpC,IAAII,WAAW,GAAGJ,OAAO,CAAC,aAAa,CAAC;AACxC,SAASF,iBAAiBA,CAAA,EAAG;EACzB,IAAIO,OAAO,GAAG,EAAE;EAChB,KAAK,IAAIC,EAAE,GAAG,CAAC,EAAEA,EAAE,GAAGC,SAAS,CAACC,MAAM,EAAEF,EAAE,EAAE,EAAE;IAC1CD,OAAO,CAACC,EAAE,CAAC,GAAGC,SAAS,CAACD,EAAE,CAAC;EAC/B;EACA,IAAIG,WAAW,GAAGR,gBAAgB,CAACS,cAAc,CAACL,OAAO,CAAC;EAC1D,OAAO,IAAIN,YAAY,CAACY,UAAU,CAAC,UAAUC,UAAU,EAAE;IACrD,IAAIC,WAAW,GAAG,CAAC;IACnB,IAAIC,aAAa,GAAG,SAAAA,CAAA,EAAY;MAC5B,IAAID,WAAW,GAAGJ,WAAW,CAACD,MAAM,EAAE;QAClC,IAAIO,UAAU,GAAG,KAAK,CAAC;QACvB,IAAI;UACAA,UAAU,GAAGX,WAAW,CAACY,SAAS,CAACP,WAAW,CAACI,WAAW,EAAE,CAAC,CAAC;QAClE,CAAC,CACD,OAAOI,GAAG,EAAE;UACRH,aAAa,CAAC,CAAC;UACf;QACJ;QACA,IAAII,eAAe,GAAG,IAAIhB,oBAAoB,CAACiB,kBAAkB,CAACP,UAAU,EAAEQ,SAAS,EAAEjB,MAAM,CAACkB,IAAI,EAAElB,MAAM,CAACkB,IAAI,CAAC;QAClHN,UAAU,CAACO,SAAS,CAACJ,eAAe,CAAC;QACrCA,eAAe,CAACK,GAAG,CAACT,aAAa,CAAC;MACtC,CAAC,MACI;QACDF,UAAU,CAACY,QAAQ,CAAC,CAAC;MACzB;IACJ,CAAC;IACDV,aAAa,CAAC,CAAC;EACnB,CAAC,CAAC;AACN;AACAlB,OAAO,CAACE,iBAAiB,GAAGA,iBAAiB;AAC7C",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

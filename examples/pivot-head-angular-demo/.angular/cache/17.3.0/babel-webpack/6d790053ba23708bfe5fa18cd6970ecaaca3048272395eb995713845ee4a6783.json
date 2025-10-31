@@ -1,0 +1,43 @@
+{
+  "ast": null,
+  "code": "var __decorate = this && this.__decorate || function (decorators, target, key, desc) {\n  var c = arguments.length,\n    r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc,\n    d;\n  if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\n  return c > 3 && r && Object.defineProperty(target, key, r), r;\n};\nimport { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';\nimport { PivotHeadWrapperComponent } from './pivothead-wrapper.component';\nlet StandaloneComponentModule = class StandaloneComponentModule {};\nStandaloneComponentModule = __decorate([NgModule({\n  imports: [PivotHeadWrapperComponent],\n  exports: [PivotHeadWrapperComponent],\n  schemas: [CUSTOM_ELEMENTS_SCHEMA]\n})], StandaloneComponentModule);\nexport { StandaloneComponentModule };",
+  "map": {
+    "version": 3,
+    "names": [
+      "__decorate",
+      "decorators",
+      "target",
+      "key",
+      "desc",
+      "c",
+      "arguments",
+      "length",
+      "r",
+      "Object",
+      "getOwnPropertyDescriptor",
+      "d",
+      "Reflect",
+      "decorate",
+      "i",
+      "defineProperty",
+      "NgModule",
+      "CUSTOM_ELEMENTS_SCHEMA",
+      "PivotHeadWrapperComponent",
+      "StandaloneComponentModule",
+      "imports",
+      "exports",
+      "schemas"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/packages/angular/src/lib/standalone-component.module.ts"
+    ],
+    "sourcesContent": [
+      "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\n};\nimport { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';\nimport { PivotHeadWrapperComponent } from './pivothead-wrapper.component';\nlet StandaloneComponentModule = class StandaloneComponentModule {\n};\nStandaloneComponentModule = __decorate([\n    NgModule({\n        imports: [PivotHeadWrapperComponent],\n        exports: [PivotHeadWrapperComponent],\n        schemas: [CUSTOM_ELEMENTS_SCHEMA],\n    })\n], StandaloneComponentModule);\nexport { StandaloneComponentModule };\n"
+    ],
+    "mappings": "AAAA,IAAIA,UAAU,GAAI,IAAI,IAAI,IAAI,CAACA,UAAU,IAAK,UAAUC,UAAU,EAAEC,MAAM,EAAEC,GAAG,EAAEC,IAAI,EAAE;EACnF,IAAIC,CAAC,GAAGC,SAAS,CAACC,MAAM;IAAEC,CAAC,GAAGH,CAAC,GAAG,CAAC,GAAGH,MAAM,GAAGE,IAAI,KAAK,IAAI,GAAGA,IAAI,GAAGK,MAAM,CAACC,wBAAwB,CAACR,MAAM,EAAEC,GAAG,CAAC,GAAGC,IAAI;IAAEO,CAAC;EAC5H,IAAI,OAAOC,OAAO,KAAK,QAAQ,IAAI,OAAOA,OAAO,CAACC,QAAQ,KAAK,UAAU,EAAEL,CAAC,GAAGI,OAAO,CAACC,QAAQ,CAACZ,UAAU,EAAEC,MAAM,EAAEC,GAAG,EAAEC,IAAI,CAAC,CAAC,KAC1H,KAAK,IAAIU,CAAC,GAAGb,UAAU,CAACM,MAAM,GAAG,CAAC,EAAEO,CAAC,IAAI,CAAC,EAAEA,CAAC,EAAE,EAAE,IAAIH,CAAC,GAAGV,UAAU,CAACa,CAAC,CAAC,EAAEN,CAAC,GAAG,CAACH,CAAC,GAAG,CAAC,GAAGM,CAAC,CAACH,CAAC,CAAC,GAAGH,CAAC,GAAG,CAAC,GAAGM,CAAC,CAACT,MAAM,EAAEC,GAAG,EAAEK,CAAC,CAAC,GAAGG,CAAC,CAACT,MAAM,EAAEC,GAAG,CAAC,KAAKK,CAAC;EACjJ,OAAOH,CAAC,GAAG,CAAC,IAAIG,CAAC,IAAIC,MAAM,CAACM,cAAc,CAACb,MAAM,EAAEC,GAAG,EAAEK,CAAC,CAAC,EAAEA,CAAC;AACjE,CAAC;AACD,SAASQ,QAAQ,EAAEC,sBAAsB,QAAQ,eAAe;AAChE,SAASC,yBAAyB,QAAQ,+BAA+B;AACzE,IAAIC,yBAAyB,GAAG,MAAMA,yBAAyB,CAAC,EAC/D;AACDA,yBAAyB,GAAGnB,UAAU,CAAC,CACnCgB,QAAQ,CAAC;EACLI,OAAO,EAAE,CAACF,yBAAyB,CAAC;EACpCG,OAAO,EAAE,CAACH,yBAAyB,CAAC;EACpCI,OAAO,EAAE,CAACL,sBAAsB;AACpC,CAAC,CAAC,CACL,EAAEE,yBAAyB,CAAC;AAC7B,SAASA,yBAAyB",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "module",
+  "externalDependencies": []
+}

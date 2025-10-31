@@ -1,0 +1,24 @@
+{
+  "id": "getting-started/setup/Basic-setup",
+  "title": "Basic-setup",
+  "description": "abc",
+  "source": "@site/docs/getting-started/setup/Basic-setup.md",
+  "sourceDirName": "getting-started/setup",
+  "slug": "/getting-started/setup/Basic-setup",
+  "permalink": "/PivotHead/docs/getting-started/setup/Basic-setup",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/getting-started/setup/Basic-setup.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "vue-installation",
+    "permalink": "/PivotHead/docs/getting-started/installation/vue-installation"
+  },
+  "next": {
+    "title": "sample-project",
+    "permalink": "/PivotHead/docs/tutorials/core-webcomponent/sample-project"
+  }
+}

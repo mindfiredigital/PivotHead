@@ -1,0 +1,29 @@
+{
+  "id": "getting-started/Why-we-use-pivothead",
+  "title": "Why Use PivotHead",
+  "description": "Discover the advantages of using PivotHead for your data visualization needs",
+  "source": "@site/docs/getting-started/Why-we-use-pivothead.md",
+  "sourceDirName": "getting-started",
+  "slug": "/getting-started/Why-we-use-pivothead",
+  "permalink": "/PivotHead/docs/getting-started/Why-we-use-pivothead",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/getting-started/Why-we-use-pivothead.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 2,
+  "frontMatter": {
+    "sidebar_position": 2,
+    "title": "Why Use PivotHead",
+    "description": "Discover the advantages of using PivotHead for your data visualization needs"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Headless Architecture",
+    "permalink": "/PivotHead/docs/headless-architecture"
+  },
+  "next": {
+    "title": "Headless Quick Start",
+    "permalink": "/PivotHead/docs/getting-started/headless-quick-start"
+  }
+}

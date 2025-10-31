@@ -1,0 +1,19 @@
+{
+  "ast": null,
+  "code": "export function isValidDate(value) {\n  return value instanceof Date && !isNaN(value);\n}\n//# sourceMappingURL=isDate.js.map",
+  "map": {
+    "version": 3,
+    "names": ["isValidDate", "value", "Date", "isNaN"],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/esm5/internal/util/isDate.js"
+    ],
+    "sourcesContent": [
+      "export function isValidDate(value) {\n    return value instanceof Date && !isNaN(value);\n}\n//# sourceMappingURL=isDate.js.map"
+    ],
+    "mappings": "AAAA,OAAO,SAASA,WAAWA,CAACC,KAAK,EAAE;EAC/B,OAAOA,KAAK,YAAYC,IAAI,IAAI,CAACC,KAAK,CAACF,KAAK,CAAC;AACjD;AACA",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "module",
+  "externalDependencies": []
+}

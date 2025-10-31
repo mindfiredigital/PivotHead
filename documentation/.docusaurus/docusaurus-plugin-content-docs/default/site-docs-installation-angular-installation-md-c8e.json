@@ -1,0 +1,15 @@
+{
+  "id": "installation/angular-installation",
+  "title": "angular-installation",
+  "description": "abc",
+  "source": "@site/docs/installation/angular-installation.md",
+  "sourceDirName": "installation",
+  "slug": "/installation/angular-installation",
+  "permalink": "/PivotHead/docs/installation/angular-installation",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/installation/angular-installation.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {}
+}

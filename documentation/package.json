@@ -16,9 +16,11 @@
   "dependencies": {
     "@docusaurus/core": "^3.7.0",
     "@docusaurus/preset-classic": "^3.7.0",
+    "@docusaurus/theme-mermaid": "^3.8.1",
     "@mdx-js/react": "^3.1.0",
     "clsx": "^2.0.0",
     "gsap": "^3.13.0",
+    "lucide-react": "^0.548.0",
     "motion": "^12.23.12",
     "ogl": "^1.0.11",
     "prism-react-renderer": "^2.3.0",

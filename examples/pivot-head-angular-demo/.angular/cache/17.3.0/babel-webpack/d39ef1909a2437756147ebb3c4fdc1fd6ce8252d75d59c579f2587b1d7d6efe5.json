@@ -1,0 +1,55 @@
+{
+  "ast": null,
+  "code": "import { STORY_CHANGED } from 'storybook/internal/core-events';\nimport { addons } from 'storybook/internal/preview-api';\nimport { global } from '@storybook/global';\nvar ADDON_ID = \"storybook/highlight\",\n  HIGHLIGHT_STYLE_ID = \"storybookHighlight\",\n  HIGHLIGHT = `${ADDON_ID}/add`,\n  RESET_HIGHLIGHT = `${ADDON_ID}/reset`;\nvar {\n    document\n  } = global,\n  highlightStyle = (color = \"#FF4785\", style = \"dashed\") => `\n  outline: 2px ${style} ${color};\n  outline-offset: 2px;\n  box-shadow: 0 0 0 6px rgba(255,255,255,0.6);\n`,\n  channel = addons.getChannel(),\n  highlight = infos => {\n    let id = HIGHLIGHT_STYLE_ID;\n    resetHighlight();\n    let elements = Array.from(new Set(infos.elements)),\n      sheet = document.createElement(\"style\");\n    sheet.setAttribute(\"id\", id), sheet.innerHTML = elements.map(target => `${target}{\n          ${highlightStyle(infos.color, infos.style)}\n         }`).join(\" \"), document.head.appendChild(sheet);\n  },\n  resetHighlight = () => {\n    let id = HIGHLIGHT_STYLE_ID,\n      sheetToBeRemoved = document.getElementById(id);\n    sheetToBeRemoved && sheetToBeRemoved.parentNode?.removeChild(sheetToBeRemoved);\n  };\nchannel.on(STORY_CHANGED, resetHighlight);\nchannel.on(RESET_HIGHLIGHT, resetHighlight);\nchannel.on(HIGHLIGHT, highlight);",
+  "map": {
+    "version": 3,
+    "names": [
+      "STORY_CHANGED",
+      "addons",
+      "global",
+      "ADDON_ID",
+      "HIGHLIGHT_STYLE_ID",
+      "HIGHLIGHT",
+      "RESET_HIGHLIGHT",
+      "document",
+      "highlightStyle",
+      "color",
+      "style",
+      "channel",
+      "getChannel",
+      "highlight",
+      "infos",
+      "id",
+      "resetHighlight",
+      "elements",
+      "Array",
+      "from",
+      "Set",
+      "sheet",
+      "createElement",
+      "setAttribute",
+      "innerHTML",
+      "map",
+      "target",
+      "join",
+      "head",
+      "appendChild",
+      "sheetToBeRemoved",
+      "getElementById",
+      "parentNode",
+      "removeChild",
+      "on"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/@storybook+addon-highlight@8.6.14_storybook@8.6.14/node_modules/@storybook/addon-highlight/dist/preview.mjs"
+    ],
+    "sourcesContent": [
+      "import { STORY_CHANGED } from 'storybook/internal/core-events';\nimport { addons } from 'storybook/internal/preview-api';\nimport { global } from '@storybook/global';\n\nvar ADDON_ID=\"storybook/highlight\",HIGHLIGHT_STYLE_ID=\"storybookHighlight\",HIGHLIGHT=`${ADDON_ID}/add`,RESET_HIGHLIGHT=`${ADDON_ID}/reset`;var{document}=global,highlightStyle=(color=\"#FF4785\",style=\"dashed\")=>`\n  outline: 2px ${style} ${color};\n  outline-offset: 2px;\n  box-shadow: 0 0 0 6px rgba(255,255,255,0.6);\n`,channel=addons.getChannel(),highlight=infos=>{let id=HIGHLIGHT_STYLE_ID;resetHighlight();let elements=Array.from(new Set(infos.elements)),sheet=document.createElement(\"style\");sheet.setAttribute(\"id\",id),sheet.innerHTML=elements.map(target=>`${target}{\n          ${highlightStyle(infos.color,infos.style)}\n         }`).join(\" \"),document.head.appendChild(sheet);},resetHighlight=()=>{let id=HIGHLIGHT_STYLE_ID,sheetToBeRemoved=document.getElementById(id);sheetToBeRemoved&&sheetToBeRemoved.parentNode?.removeChild(sheetToBeRemoved);};channel.on(STORY_CHANGED,resetHighlight);channel.on(RESET_HIGHLIGHT,resetHighlight);channel.on(HIGHLIGHT,highlight);\n"
+    ],
+    "mappings": "AAAA,SAASA,aAAa,QAAQ,gCAAgC;AAC9D,SAASC,MAAM,QAAQ,gCAAgC;AACvD,SAASC,MAAM,QAAQ,mBAAmB;AAE1C,IAAIC,QAAQ,GAAC,qBAAqB;EAACC,kBAAkB,GAAC,oBAAoB;EAACC,SAAS,GAAE,GAAEF,QAAS,MAAK;EAACG,eAAe,GAAE,GAAEH,QAAS,QAAO;AAAC,IAAG;IAACI;EAAQ,CAAC,GAACL,MAAM;EAACM,cAAc,GAACA,CAACC,KAAK,GAAC,SAAS,EAACC,KAAK,GAAC,QAAQ,KAAI;AAClN,iBAAiBA,KAAM,IAAGD,KAAM;AAChC;AACA;AACA,CAAC;EAACE,OAAO,GAACV,MAAM,CAACW,UAAU,CAAC,CAAC;EAACC,SAAS,GAACC,KAAK,IAAE;IAAC,IAAIC,EAAE,GAACX,kBAAkB;IAACY,cAAc,CAAC,CAAC;IAAC,IAAIC,QAAQ,GAACC,KAAK,CAACC,IAAI,CAAC,IAAIC,GAAG,CAACN,KAAK,CAACG,QAAQ,CAAC,CAAC;MAACI,KAAK,GAACd,QAAQ,CAACe,aAAa,CAAC,OAAO,CAAC;IAACD,KAAK,CAACE,YAAY,CAAC,IAAI,EAACR,EAAE,CAAC,EAACM,KAAK,CAACG,SAAS,GAACP,QAAQ,CAACQ,GAAG,CAACC,MAAM,IAAG,GAAEA,MAAO;AAC7P,YAAYlB,cAAc,CAACM,KAAK,CAACL,KAAK,EAACK,KAAK,CAACJ,KAAK,CAAE;AACpD,WAAW,CAAC,CAACiB,IAAI,CAAC,GAAG,CAAC,EAACpB,QAAQ,CAACqB,IAAI,CAACC,WAAW,CAACR,KAAK,CAAC;EAAC,CAAC;EAACL,cAAc,GAACA,CAAA,KAAI;IAAC,IAAID,EAAE,GAACX,kBAAkB;MAAC0B,gBAAgB,GAACvB,QAAQ,CAACwB,cAAc,CAAChB,EAAE,CAAC;IAACe,gBAAgB,IAAEA,gBAAgB,CAACE,UAAU,EAAEC,WAAW,CAACH,gBAAgB,CAAC;EAAC,CAAC;AAACnB,OAAO,CAACuB,EAAE,CAAClC,aAAa,EAACgB,cAAc,CAAC;AAACL,OAAO,CAACuB,EAAE,CAAC5B,eAAe,EAACU,cAAc,CAAC;AAACL,OAAO,CAACuB,EAAE,CAAC7B,SAAS,EAACQ,SAAS,CAAC",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "module",
+  "externalDependencies": []
+}

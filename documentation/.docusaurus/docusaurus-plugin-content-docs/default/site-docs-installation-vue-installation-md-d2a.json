@@ -1,0 +1,15 @@
+{
+  "id": "installation/vue-installation",
+  "title": "vue-installation",
+  "description": "abc",
+  "source": "@site/docs/installation/vue-installation.md",
+  "sourceDirName": "installation",
+  "slug": "/installation/vue-installation",
+  "permalink": "/PivotHead/docs/installation/vue-installation",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/installation/vue-installation.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {}
+}

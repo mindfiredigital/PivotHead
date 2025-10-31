@@ -16,14 +16,5 @@
     "sidebar_position": 3,
     "title": "Examples & Usage",
     "description": "Examples & Usage of PivotHead"
-  },
-  "sidebar": "tutorialSidebar",
-  "previous": {
-    "title": "Api Reference",
-    "permalink": "/PivotHead/docs/tutorial-basics/core/api-reference"
-  },
-  "next": {
-    "title": "PivotHead Web Component",
-    "permalink": "/PivotHead/docs/tutorial-basics/web-component"
   }
 }

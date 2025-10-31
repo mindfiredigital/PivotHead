@@ -1,0 +1,47 @@
+{
+  "ast": null,
+  "code": "import { moduleMetadata } from '@storybook/angular';\nimport { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';\nimport { PivotHeadWrapperComponent } from '@mindfiredigital/pivothead-angular';\nconst meta = {\n  title: 'PivotHead',\n  // The component property is not needed if you use a custom render function\n  decorators: [moduleMetadata({\n    // Import the module that makes your component available\n    imports: [PivotHeadWrapperComponent],\n    // Allow the use of the custom <pivot-head> tag in the template\n    schemas: [CUSTOM_ELEMENTS_SCHEMA]\n  })],\n  argTypes: {\n    data: {\n      control: 'object',\n      description: 'The raw dataset to be processed.'\n    },\n    options: {\n      control: 'object',\n      description: 'Configuration options for the pivot table.'\n    }\n  }\n};\nexport default meta;\nexport const Default = {\n  // Use the render function to provide a template with the component's selector\n  render: args => ({\n    props: args,\n    template: `<pivot-head [data]=\"data\" [options]=\"options\"></pivot-head>`\n  }),\n  args: {\n    data: [{\n      product: 'Product A',\n      category: 'Category 1',\n      value: 100\n    }, {\n      product: 'Product B',\n      category: 'Category 2',\n      value: 150\n    }, {\n      product: 'Product A',\n      category: 'Category 2',\n      value: 200\n    }],\n    options: {\n      rows: [{\n        uniqueName: 'product',\n        caption: 'Product'\n      }],\n      columns: [{\n        uniqueName: 'category',\n        caption: 'Category'\n      }],\n      measures: [{\n        uniqueName: 'value',\n        caption: 'Total Value',\n        aggregation: 'sum'\n      }]\n    }\n  }\n};",
+  "map": {
+    "version": 3,
+    "names": [
+      "moduleMetadata",
+      "CUSTOM_ELEMENTS_SCHEMA",
+      "PivotHeadWrapperComponent",
+      "meta",
+      "title",
+      "decorators",
+      "imports",
+      "schemas",
+      "argTypes",
+      "data",
+      "control",
+      "description",
+      "options",
+      "Default",
+      "render",
+      "args",
+      "props",
+      "template",
+      "product",
+      "category",
+      "value",
+      "rows",
+      "uniqueName",
+      "caption",
+      "columns",
+      "measures",
+      "aggregation"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/examples/pivot-head-angular-demo/src/stories/PivotHead.stories.ts"
+    ],
+    "sourcesContent": [
+      "import { moduleMetadata } from '@storybook/angular';\nimport { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';\nimport { PivotHeadWrapperComponent } from '@mindfiredigital/pivothead-angular';\nconst meta = {\n    title: 'PivotHead',\n    // The component property is not needed if you use a custom render function\n    decorators: [\n        moduleMetadata({\n            // Import the module that makes your component available\n            imports: [PivotHeadWrapperComponent],\n            // Allow the use of the custom <pivot-head> tag in the template\n            schemas: [CUSTOM_ELEMENTS_SCHEMA],\n        }),\n    ],\n    argTypes: {\n        data: {\n            control: 'object',\n            description: 'The raw dataset to be processed.',\n        },\n        options: {\n            control: 'object',\n            description: 'Configuration options for the pivot table.',\n        },\n    },\n};\nexport default meta;\nexport const Default = {\n    // Use the render function to provide a template with the component's selector\n    render: (args) => ({\n        props: args,\n        template: `<pivot-head [data]=\"data\" [options]=\"options\"></pivot-head>`,\n    }),\n    args: {\n        data: [\n            {\n                product: 'Product A',\n                category: 'Category 1',\n                value: 100,\n            },\n            {\n                product: 'Product B',\n                category: 'Category 2',\n                value: 150,\n            },\n            {\n                product: 'Product A',\n                category: 'Category 2',\n                value: 200,\n            },\n        ],\n        options: {\n            rows: [{ uniqueName: 'product', caption: 'Product' }],\n            columns: [{ uniqueName: 'category', caption: 'Category' }],\n            measures: [\n                { uniqueName: 'value', caption: 'Total Value', aggregation: 'sum' },\n            ],\n        },\n    },\n};\n"
+    ],
+    "mappings": "AAAA,SAASA,cAAc,QAAQ,oBAAoB;AACnD,SAASC,sBAAsB,QAAQ,eAAe;AACtD,SAASC,yBAAyB,QAAQ,oCAAoC;AAC9E,MAAMC,IAAI,GAAG;EACTC,KAAK,EAAE,WAAW;EAClB;EACAC,UAAU,EAAE,CACRL,cAAc,CAAC;IACX;IACAM,OAAO,EAAE,CAACJ,yBAAyB,CAAC;IACpC;IACAK,OAAO,EAAE,CAACN,sBAAsB;EACpC,CAAC,CAAC,CACL;EACDO,QAAQ,EAAE;IACNC,IAAI,EAAE;MACFC,OAAO,EAAE,QAAQ;MACjBC,WAAW,EAAE;IACjB,CAAC;IACDC,OAAO,EAAE;MACLF,OAAO,EAAE,QAAQ;MACjBC,WAAW,EAAE;IACjB;EACJ;AACJ,CAAC;AACD,eAAeR,IAAI;AACnB,OAAO,MAAMU,OAAO,GAAG;EACnB;EACAC,MAAM,EAAGC,IAAI,KAAM;IACfC,KAAK,EAAED,IAAI;IACXE,QAAQ,EAAG;EACf,CAAC,CAAC;EACFF,IAAI,EAAE;IACFN,IAAI,EAAE,CACF;MACIS,OAAO,EAAE,WAAW;MACpBC,QAAQ,EAAE,YAAY;MACtBC,KAAK,EAAE;IACX,CAAC,EACD;MACIF,OAAO,EAAE,WAAW;MACpBC,QAAQ,EAAE,YAAY;MACtBC,KAAK,EAAE;IACX,CAAC,EACD;MACIF,OAAO,EAAE,WAAW;MACpBC,QAAQ,EAAE,YAAY;MACtBC,KAAK,EAAE;IACX,CAAC,CACJ;IACDR,OAAO,EAAE;MACLS,IAAI,EAAE,CAAC;QAAEC,UAAU,EAAE,SAAS;QAAEC,OAAO,EAAE;MAAU,CAAC,CAAC;MACrDC,OAAO,EAAE,CAAC;QAAEF,UAAU,EAAE,UAAU;QAAEC,OAAO,EAAE;MAAW,CAAC,CAAC;MAC1DE,QAAQ,EAAE,CACN;QAAEH,UAAU,EAAE,OAAO;QAAEC,OAAO,EAAE,aAAa;QAAEG,WAAW,EAAE;MAAM,CAAC;IAE3E;EACJ;AACJ,CAAC",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "module",
+  "externalDependencies": []
+}

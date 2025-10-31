@@ -32,69 +32,166 @@
 
 // module.exports = sidebars;
 
-/**
- * Creating a sidebar enables you to:
- - create an ordered group of docs
- - render a sidebar for each doc of that group
- - provide next/previous navigation
+// /**
+//  * Creating a sidebar enables you to:
+//  - create an ordered group of docs
+//  - render a sidebar for each doc of that group
+//  - provide next/previous navigation
 
- The sidebars can be generated from the filesystem, or explicitly defined here.
+//  The sidebars can be generated from the filesystem, or explicitly defined here.
 
- Create as many sidebars as you want.
- */
+//  Create as many sidebars as you want.
+//  */
 
-// @ts-check
+// // @ts-check
+
+// /** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
+// const sidebars = {
+//   // By default, Docusaurus generates a sidebar from the docs folder structure
+//   tutorialSidebar: [
+//     'introduction',
+//     'Why-we-use-pivothead',
+//     'Installation',
+
+//     {
+//       type: 'category',
+//       label: 'Tutorials',
+//       link: {
+//         type: 'generated-index',
+//         title: 'PivotHead Tutorials',
+//         description:
+//           'Learn the core concepts and see practical examples of how to use PivotHead.',
+//       },
+//       items: [
+//         {
+//           type: 'category',
+//           label: 'Core',
+//           items: [
+//             'tutorial-basics/core/core-concepts',
+//             'tutorial-basics/core/api-reference',
+//             'tutorial-basics/core/examples',
+//           ],
+//         },
+
+//         'tutorial-basics/web-component',
+
+//         {
+//           type: 'category',
+//           label: 'Framework Wrappers',
+//           items: [
+//             'tutorial-basics/wrappers/react',
+//             'tutorial-basics/wrappers/vue',
+//           ],
+//         },
+//         'tutorial-basics/troubleshooting',
+//       ],
+//     },
+//     {
+//       type: 'category',
+//       label: 'Contribution Guide',
+//       link: {
+//         type: 'generated-index',
+//         title: 'Contribution Guide',
+//         description:
+//           'Guides for setting up your development environment and contributing to the PivotHead project.',
+//       },
+//       items: [
+//         'contributors/contributors',
+//         'contributors/how-to-contribute',
+//         'contributors/code-of-conduct',
+//         'contributors/monorepo-setup',
+//         'contributors/quick-start',
+//       ],
+//     },
+//   ],
+// };
+
+// module.exports = sidebars;
 
 /** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
 const sidebars = {
-  // By default, Docusaurus generates a sidebar from the docs folder structure
   tutorialSidebar: [
     'introduction',
-    'Why-we-use-pivothead',
-    'Installation',
-
+    'headless-architecture',
     {
       type: 'category',
-      label: 'Tutorials',
-      link: {
-        type: 'generated-index',
-        title: 'PivotHead Tutorials',
-        description:
-          'Learn the core concepts and see practical examples of how to use PivotHead.',
-      },
+      label: 'Getting Started',
+      // Corrected paths to match the flattened structure
       items: [
-        {
-          type: 'category',
-          label: 'Core',
-          items: [
-            'tutorial-basics/core/core-concepts',
-            'tutorial-basics/core/api-reference',
-            'tutorial-basics/core/examples',
-          ],
-        },
-
-        'tutorial-basics/web-component',
-
-        {
-          type: 'category',
-          label: 'Framework Wrappers',
-          items: [
-            'tutorial-basics/wrappers/react',
-            'tutorial-basics/wrappers/vue',
-          ],
-        },
-        'tutorial-basics/troubleshooting',
+        'getting-started/Why-we-use-pivothead',
+        'getting-started/headless-quick-start',
+        'getting-started/installation',
+        'getting-started/basic-setup',
       ],
     },
     {
       type: 'category',
+      label: 'Tutorial',
+      items: [
+        {
+          type: 'category',
+          label: 'Core Webcomponent',
+          items: [
+            'tutorials/core-webcomponent/core-webcomponent-sample-project',
+            'tutorials/core-webcomponent/setup-for-user-project',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'React',
+          items: [
+            'tutorials/react/react-sample-project',
+            'tutorials/react/setup-for-user-project',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Vue',
+          items: [
+            'tutorials/vue/vue-sample-project',
+            'tutorials/vue/setup-for-user-project',
+          ],
+        },
+        // {
+        //   type: 'category',
+        //   label: 'Angular',
+        //   items: [
+        //     'tutorials/angular/angular-sample-project',
+        //     'tutorials/angular/angular-setup-for-user-project',
+        //   ],
+        // },
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Reference',
+      items: [
+        {
+          type: 'category',
+          label: 'Conceptual Reference',
+          items: [
+            'reference/conceptual-reference/core-webcomponent-conceptual-reference',
+            'reference/conceptual-reference/react-conceptual-reference',
+            // 'reference/conceptual-reference/angular-conceptual-reference',
+            'reference/conceptual-reference/vue-conceptual-reference',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'API Reference',
+          items: [
+            'reference/api-reference/core-webcomponent-api-reference',
+            'reference/api-reference/react-api-reference',
+            // 'reference/api-reference/angular-api-reference',
+            'reference/api-reference/vue-api-reference',
+          ],
+        },
+      ],
+    },
+    'tutorial-basics/troubleshooting',
+    {
+      type: 'category',
       label: 'Contribution Guide',
-      link: {
-        type: 'generated-index',
-        title: 'Contribution Guide',
-        description:
-          'Guides for setting up your development environment and contributing to the PivotHead project.',
-      },
       items: [
         'contributors/contributors',
         'contributors/how-to-contribute',
@@ -102,6 +199,16 @@ const sidebars = {
         'contributors/monorepo-setup',
         'contributors/quick-start',
       ],
+    },
+    {
+      type: 'category',
+      label: 'Upcoming Features',
+      link: {
+        type: 'doc',
+        id: 'upcoming/index',
+      },
+      collapsed: false,
+      items: [],
     },
   ],
 };

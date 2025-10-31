@@ -16,15 +16,10 @@ A "headless" library provides all the backend logic without shipping a pre-built
 
 ### Pros of the Headless Approach
 
-- **✨ Ultimate UI Flexibility**: You are not locked into a specific table design. Build custom tables, grids, charts, or any other visualization that fits your application's design system perfectly.
-- **🌐 Framework Agnostic**: The core engine is pure TypeScript, making it compatible with any JavaScript framework (React, Vue, Svelte, Angular) or even vanilla JavaScript.
-- **⚡️ Better Performance**: By separating data logic from rendering, your application can perform complex calculations without being slowed down by UI updates. You control the rendering strategy.
-- **🧩 Seamless Integration**: Easily integrate PivotHead into your existing component libraries and design systems without fighting against pre-defined styles.
-
-### Cons of the Headless Approach
-
-- **More Initial Setup**: Since there is no pre-built UI, you are responsible for writing the code that renders the pivot table's state.
-- **Not a Drop-in UI Component**: If you need a fully-styled pivot table out of the box with minimal effort, a headless library requires more work than a traditional UI-component library.
+- **Ultimate UI Flexibility**: You are not locked into a specific table design. Build custom tables, grids, charts, or any other visualization that fits your application's design system perfectly.
+- **Framework Agnostic**: The core engine is pure TypeScript, making it compatible with any JavaScript framework (React, Vue, Svelte, Angular) or even vanilla JavaScript.
+- **Better Performance**: By separating data logic from rendering, your application can perform complex calculations without being slowed down by UI updates. You control the rendering strategy.
+- **Seamless Integration**: Easily integrate PivotHead into your existing component libraries and design systems without fighting against pre-defined styles.
 
 ## Key Features
 

@@ -1,0 +1,39 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.argsArgArrayOrObject = void 0;\nvar isArray = Array.isArray;\nvar getPrototypeOf = Object.getPrototypeOf,\n  objectProto = Object.prototype,\n  getKeys = Object.keys;\nfunction argsArgArrayOrObject(args) {\n  if (args.length === 1) {\n    var first_1 = args[0];\n    if (isArray(first_1)) {\n      return {\n        args: first_1,\n        keys: null\n      };\n    }\n    if (isPOJO(first_1)) {\n      var keys = getKeys(first_1);\n      return {\n        args: keys.map(function (key) {\n          return first_1[key];\n        }),\n        keys: keys\n      };\n    }\n  }\n  return {\n    args: args,\n    keys: null\n  };\n}\nexports.argsArgArrayOrObject = argsArgArrayOrObject;\nfunction isPOJO(obj) {\n  return obj && typeof obj === 'object' && getPrototypeOf(obj) === objectProto;\n}\n//# sourceMappingURL=argsArgArrayOrObject.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "argsArgArrayOrObject",
+      "isArray",
+      "Array",
+      "getPrototypeOf",
+      "objectProto",
+      "prototype",
+      "getKeys",
+      "keys",
+      "args",
+      "length",
+      "first_1",
+      "isPOJO",
+      "map",
+      "key",
+      "obj"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/util/argsArgArrayOrObject.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.argsArgArrayOrObject = void 0;\nvar isArray = Array.isArray;\nvar getPrototypeOf = Object.getPrototypeOf, objectProto = Object.prototype, getKeys = Object.keys;\nfunction argsArgArrayOrObject(args) {\n    if (args.length === 1) {\n        var first_1 = args[0];\n        if (isArray(first_1)) {\n            return { args: first_1, keys: null };\n        }\n        if (isPOJO(first_1)) {\n            var keys = getKeys(first_1);\n            return {\n                args: keys.map(function (key) { return first_1[key]; }),\n                keys: keys,\n            };\n        }\n    }\n    return { args: args, keys: null };\n}\nexports.argsArgArrayOrObject = argsArgArrayOrObject;\nfunction isPOJO(obj) {\n    return obj && typeof obj === 'object' && getPrototypeOf(obj) === objectProto;\n}\n//# sourceMappingURL=argsArgArrayOrObject.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,oBAAoB,GAAG,KAAK,CAAC;AACrC,IAAIC,OAAO,GAAGC,KAAK,CAACD,OAAO;AAC3B,IAAIE,cAAc,GAAGP,MAAM,CAACO,cAAc;EAAEC,WAAW,GAAGR,MAAM,CAACS,SAAS;EAAEC,OAAO,GAAGV,MAAM,CAACW,IAAI;AACjG,SAASP,oBAAoBA,CAACQ,IAAI,EAAE;EAChC,IAAIA,IAAI,CAACC,MAAM,KAAK,CAAC,EAAE;IACnB,IAAIC,OAAO,GAAGF,IAAI,CAAC,CAAC,CAAC;IACrB,IAAIP,OAAO,CAACS,OAAO,CAAC,EAAE;MAClB,OAAO;QAAEF,IAAI,EAAEE,OAAO;QAAEH,IAAI,EAAE;MAAK,CAAC;IACxC;IACA,IAAII,MAAM,CAACD,OAAO,CAAC,EAAE;MACjB,IAAIH,IAAI,GAAGD,OAAO,CAACI,OAAO,CAAC;MAC3B,OAAO;QACHF,IAAI,EAAED,IAAI,CAACK,GAAG,CAAC,UAAUC,GAAG,EAAE;UAAE,OAAOH,OAAO,CAACG,GAAG,CAAC;QAAE,CAAC,CAAC;QACvDN,IAAI,EAAEA;MACV,CAAC;IACL;EACJ;EACA,OAAO;IAAEC,IAAI,EAAEA,IAAI;IAAED,IAAI,EAAE;EAAK,CAAC;AACrC;AACAT,OAAO,CAACE,oBAAoB,GAAGA,oBAAoB;AACnD,SAASW,MAAMA,CAACG,GAAG,EAAE;EACjB,OAAOA,GAAG,IAAI,OAAOA,GAAG,KAAK,QAAQ,IAAIX,cAAc,CAACW,GAAG,CAAC,KAAKV,WAAW;AAChF;AACA",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

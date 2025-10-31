@@ -1,0 +1,32 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.EmptyError = void 0;\nvar createErrorClass_1 = require(\"./createErrorClass\");\nexports.EmptyError = createErrorClass_1.createErrorClass(function (_super) {\n  return function EmptyErrorImpl() {\n    _super(this);\n    this.name = 'EmptyError';\n    this.message = 'no elements in sequence';\n  };\n});\n//# sourceMappingURL=EmptyError.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "EmptyError",
+      "createErrorClass_1",
+      "require",
+      "createErrorClass",
+      "_super",
+      "EmptyErrorImpl",
+      "name",
+      "message"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/util/EmptyError.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.EmptyError = void 0;\nvar createErrorClass_1 = require(\"./createErrorClass\");\nexports.EmptyError = createErrorClass_1.createErrorClass(function (_super) { return function EmptyErrorImpl() {\n    _super(this);\n    this.name = 'EmptyError';\n    this.message = 'no elements in sequence';\n}; });\n//# sourceMappingURL=EmptyError.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,UAAU,GAAG,KAAK,CAAC;AAC3B,IAAIC,kBAAkB,GAAGC,OAAO,CAAC,oBAAoB,CAAC;AACtDJ,OAAO,CAACE,UAAU,GAAGC,kBAAkB,CAACE,gBAAgB,CAAC,UAAUC,MAAM,EAAE;EAAE,OAAO,SAASC,cAAcA,CAAA,EAAG;IAC1GD,MAAM,CAAC,IAAI,CAAC;IACZ,IAAI,CAACE,IAAI,GAAG,YAAY;IACxB,IAAI,CAACC,OAAO,GAAG,yBAAyB;EAC5C,CAAC;AAAE,CAAC,CAAC;AACL",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

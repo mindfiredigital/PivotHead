@@ -1,0 +1,24 @@
+{
+  "id": "tutorials/vue/setup-for-user-project",
+  "title": "setup-for-user-project",
+  "description": "A powerful Vue 3 wrapper for PivotHead that provides seamless integration with reactive data binding, TypeScript support, and Vue-specific optimizations. The wrapper bridges Vue applications with the PivotHead web component while maintaining full Vue ecosystem compatibility.",
+  "source": "@site/docs/tutorials/vue/setup-for-user-project.md",
+  "sourceDirName": "tutorials/vue",
+  "slug": "/tutorials/vue/setup-for-user-project",
+  "permalink": "/PivotHead/docs/tutorials/vue/setup-for-user-project",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorials/vue/setup-for-user-project.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Sample Project",
+    "permalink": "/PivotHead/docs/tutorials/vue/vue-sample-project"
+  },
+  "next": {
+    "title": "Core Web Component",
+    "permalink": "/PivotHead/docs/reference/conceptual-reference/core-webcomponent-conceptual-reference"
+  }
+}

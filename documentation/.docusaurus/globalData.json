@@ -36,9 +36,33 @@
               "sidebar": "tutorialSidebar"
             },
             {
-              "id": "Installation",
-              "path": "/PivotHead/docs/Installation",
+              "id": "getting-started/basic-setup",
+              "path": "/PivotHead/docs/getting-started/basic-setup",
               "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "getting-started/headless-quick-start",
+              "path": "/PivotHead/docs/getting-started/headless-quick-start",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "getting-started/installation",
+              "path": "/PivotHead/docs/getting-started/installation",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "getting-started/Why-we-use-pivothead",
+              "path": "/PivotHead/docs/getting-started/Why-we-use-pivothead",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "headless-architecture",
+              "path": "/PivotHead/docs/headless-architecture",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "Installation",
+              "path": "/PivotHead/docs/Installation"
             },
             {
               "id": "introduction",
@@ -46,19 +70,54 @@
               "sidebar": "tutorialSidebar"
             },
             {
-              "id": "tutorial-basics/core/api-reference",
-              "path": "/PivotHead/docs/tutorial-basics/core/api-reference",
+              "id": "reference/api-reference/angular-api-reference",
+              "path": "/PivotHead/docs/reference/api-reference/angular-api-reference"
+            },
+            {
+              "id": "reference/api-reference/core-webcomponent-api-reference",
+              "path": "/PivotHead/docs/reference/api-reference/core-webcomponent-api-reference",
               "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "reference/api-reference/react-api-reference",
+              "path": "/PivotHead/docs/reference/api-reference/react-api-reference",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "reference/api-reference/vue-api-reference",
+              "path": "/PivotHead/docs/reference/api-reference/vue-api-reference",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "reference/conceptual-reference/angular-conceptual-reference",
+              "path": "/PivotHead/docs/reference/conceptual-reference/angular-conceptual-reference"
+            },
+            {
+              "id": "reference/conceptual-reference/core-webcomponent-conceptual-reference",
+              "path": "/PivotHead/docs/reference/conceptual-reference/core-webcomponent-conceptual-reference",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "reference/conceptual-reference/react-conceptual-reference",
+              "path": "/PivotHead/docs/reference/conceptual-reference/react-conceptual-reference",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "reference/conceptual-reference/vue-conceptual-reference",
+              "path": "/PivotHead/docs/reference/conceptual-reference/vue-conceptual-reference",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "tutorial-basics/core/api-reference",
+              "path": "/PivotHead/docs/tutorial-basics/core/api-reference"
             },
             {
               "id": "tutorial-basics/core/core-concepts",
-              "path": "/PivotHead/docs/tutorial-basics/core/core-concepts",
-              "sidebar": "tutorialSidebar"
+              "path": "/PivotHead/docs/tutorial-basics/core/core-concepts"
             },
             {
               "id": "tutorial-basics/core/examples",
-              "path": "/PivotHead/docs/tutorial-basics/core/examples",
-              "sidebar": "tutorialSidebar"
+              "path": "/PivotHead/docs/tutorial-basics/core/examples"
             },
             {
               "id": "tutorial-basics/troubleshooting",
@@ -67,32 +126,57 @@
             },
             {
               "id": "tutorial-basics/web-component",
-              "path": "/PivotHead/docs/tutorial-basics/web-component",
-              "sidebar": "tutorialSidebar"
+              "path": "/PivotHead/docs/tutorial-basics/web-component"
             },
             {
               "id": "tutorial-basics/wrappers/react",
-              "path": "/PivotHead/docs/tutorial-basics/wrappers/react",
-              "sidebar": "tutorialSidebar"
+              "path": "/PivotHead/docs/tutorial-basics/wrappers/react"
             },
             {
               "id": "tutorial-basics/wrappers/vue",
-              "path": "/PivotHead/docs/tutorial-basics/wrappers/vue",
+              "path": "/PivotHead/docs/tutorial-basics/wrappers/vue"
+            },
+            {
+              "id": "tutorials/angular/angular-sample-project",
+              "path": "/PivotHead/docs/tutorials/angular/angular-sample-project"
+            },
+            {
+              "id": "tutorials/angular/angular-setup-for-user-project",
+              "path": "/PivotHead/docs/tutorials/angular/angular-setup-for-user-project"
+            },
+            {
+              "id": "tutorials/core-webcomponent/core-webcomponent-sample-project",
+              "path": "/PivotHead/docs/tutorials/core-webcomponent/core-webcomponent-sample-project",
               "sidebar": "tutorialSidebar"
             },
             {
-              "id": "Why-we-use-pivothead",
-              "path": "/PivotHead/docs/Why-we-use-pivothead",
+              "id": "tutorials/core-webcomponent/setup-for-user-project",
+              "path": "/PivotHead/docs/tutorials/core-webcomponent/setup-for-user-project",
               "sidebar": "tutorialSidebar"
             },
             {
-              "id": "/category/tutorials",
-              "path": "/PivotHead/docs/category/tutorials",
+              "id": "tutorials/react/react-sample-project",
+              "path": "/PivotHead/docs/tutorials/react/react-sample-project",
               "sidebar": "tutorialSidebar"
             },
             {
-              "id": "/category/contribution-guide",
-              "path": "/PivotHead/docs/category/contribution-guide",
+              "id": "tutorials/react/setup-for-user-project",
+              "path": "/PivotHead/docs/tutorials/react/setup-for-user-project",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "tutorials/vue/setup-for-user-project",
+              "path": "/PivotHead/docs/tutorials/vue/setup-for-user-project",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "tutorials/vue/vue-sample-project",
+              "path": "/PivotHead/docs/tutorials/vue/vue-sample-project",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "upcoming/index",
+              "path": "/PivotHead/docs/upcoming/",
               "sidebar": "tutorialSidebar"
             }
           ],

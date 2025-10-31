@@ -1,0 +1,8 @@
+{
+  "ast": null,
+  "code": "export const sampleData = [{\n  country: 'USA',\n  product: 'Laptop',\n  sales: 1500\n}, {\n  country: 'USA',\n  product: 'Mouse',\n  sales: 120\n}, {\n  country: 'Canada',\n  product: 'Laptop',\n  sales: 900\n}, {\n  country: 'Canada',\n  product: 'Mouse',\n  sales: 75\n}, {\n  country: 'USA',\n  product: 'Keyboard',\n  sales: 250\n}, {\n  country: 'Canada',\n  product: 'Keyboard',\n  sales: 150\n}];\nexport const sampleOptions = {\n  rows: [{\n    uniqueName: 'product',\n    caption: 'Product'\n  }],\n  columns: [{\n    uniqueName: 'country',\n    caption: 'Country'\n  }],\n  measures: [{\n    uniqueName: 'sales',\n    caption: 'Total Sales',\n    aggregation: 'sum'\n  }]\n};",
+  "map": null,
+  "metadata": {},
+  "sourceType": "module",
+  "externalDependencies": []
+}

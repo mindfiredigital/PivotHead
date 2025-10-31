@@ -1,0 +1,45 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.merge = void 0;\nvar mergeAll_1 = require(\"../operators/mergeAll\");\nvar innerFrom_1 = require(\"./innerFrom\");\nvar empty_1 = require(\"./empty\");\nvar args_1 = require(\"../util/args\");\nvar from_1 = require(\"./from\");\nfunction merge() {\n  var args = [];\n  for (var _i = 0; _i < arguments.length; _i++) {\n    args[_i] = arguments[_i];\n  }\n  var scheduler = args_1.popScheduler(args);\n  var concurrent = args_1.popNumber(args, Infinity);\n  var sources = args;\n  return !sources.length ? empty_1.EMPTY : sources.length === 1 ? innerFrom_1.innerFrom(sources[0]) : mergeAll_1.mergeAll(concurrent)(from_1.from(sources, scheduler));\n}\nexports.merge = merge;\n//# sourceMappingURL=merge.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "merge",
+      "mergeAll_1",
+      "require",
+      "innerFrom_1",
+      "empty_1",
+      "args_1",
+      "from_1",
+      "args",
+      "_i",
+      "arguments",
+      "length",
+      "scheduler",
+      "popScheduler",
+      "concurrent",
+      "popNumber",
+      "Infinity",
+      "sources",
+      "EMPTY",
+      "innerFrom",
+      "mergeAll",
+      "from"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/observable/merge.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.merge = void 0;\nvar mergeAll_1 = require(\"../operators/mergeAll\");\nvar innerFrom_1 = require(\"./innerFrom\");\nvar empty_1 = require(\"./empty\");\nvar args_1 = require(\"../util/args\");\nvar from_1 = require(\"./from\");\nfunction merge() {\n    var args = [];\n    for (var _i = 0; _i < arguments.length; _i++) {\n        args[_i] = arguments[_i];\n    }\n    var scheduler = args_1.popScheduler(args);\n    var concurrent = args_1.popNumber(args, Infinity);\n    var sources = args;\n    return !sources.length\n        ?\n            empty_1.EMPTY\n        : sources.length === 1\n            ?\n                innerFrom_1.innerFrom(sources[0])\n            :\n                mergeAll_1.mergeAll(concurrent)(from_1.from(sources, scheduler));\n}\nexports.merge = merge;\n//# sourceMappingURL=merge.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,KAAK,GAAG,KAAK,CAAC;AACtB,IAAIC,UAAU,GAAGC,OAAO,CAAC,uBAAuB,CAAC;AACjD,IAAIC,WAAW,GAAGD,OAAO,CAAC,aAAa,CAAC;AACxC,IAAIE,OAAO,GAAGF,OAAO,CAAC,SAAS,CAAC;AAChC,IAAIG,MAAM,GAAGH,OAAO,CAAC,cAAc,CAAC;AACpC,IAAII,MAAM,GAAGJ,OAAO,CAAC,QAAQ,CAAC;AAC9B,SAASF,KAAKA,CAAA,EAAG;EACb,IAAIO,IAAI,GAAG,EAAE;EACb,KAAK,IAAIC,EAAE,GAAG,CAAC,EAAEA,EAAE,GAAGC,SAAS,CAACC,MAAM,EAAEF,EAAE,EAAE,EAAE;IAC1CD,IAAI,CAACC,EAAE,CAAC,GAAGC,SAAS,CAACD,EAAE,CAAC;EAC5B;EACA,IAAIG,SAAS,GAAGN,MAAM,CAACO,YAAY,CAACL,IAAI,CAAC;EACzC,IAAIM,UAAU,GAAGR,MAAM,CAACS,SAAS,CAACP,IAAI,EAAEQ,QAAQ,CAAC;EACjD,IAAIC,OAAO,GAAGT,IAAI;EAClB,OAAO,CAACS,OAAO,CAACN,MAAM,GAEdN,OAAO,CAACa,KAAK,GACfD,OAAO,CAACN,MAAM,KAAK,CAAC,GAEdP,WAAW,CAACe,SAAS,CAACF,OAAO,CAAC,CAAC,CAAC,CAAC,GAEjCf,UAAU,CAACkB,QAAQ,CAACN,UAAU,CAAC,CAACP,MAAM,CAACc,IAAI,CAACJ,OAAO,EAAEL,SAAS,CAAC,CAAC;AAChF;AACAb,OAAO,CAACE,KAAK,GAAGA,KAAK;AACrB",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

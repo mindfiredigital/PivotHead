@@ -1,0 +1,41 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.sample = void 0;\nvar innerFrom_1 = require(\"../observable/innerFrom\");\nvar lift_1 = require(\"../util/lift\");\nvar noop_1 = require(\"../util/noop\");\nvar OperatorSubscriber_1 = require(\"./OperatorSubscriber\");\nfunction sample(notifier) {\n  return lift_1.operate(function (source, subscriber) {\n    var hasValue = false;\n    var lastValue = null;\n    source.subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, function (value) {\n      hasValue = true;\n      lastValue = value;\n    }));\n    innerFrom_1.innerFrom(notifier).subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, function () {\n      if (hasValue) {\n        hasValue = false;\n        var value = lastValue;\n        lastValue = null;\n        subscriber.next(value);\n      }\n    }, noop_1.noop));\n  });\n}\nexports.sample = sample;\n//# sourceMappingURL=sample.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "sample",
+      "innerFrom_1",
+      "require",
+      "lift_1",
+      "noop_1",
+      "OperatorSubscriber_1",
+      "notifier",
+      "operate",
+      "source",
+      "subscriber",
+      "hasValue",
+      "lastValue",
+      "subscribe",
+      "createOperatorSubscriber",
+      "innerFrom",
+      "next",
+      "noop"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/operators/sample.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.sample = void 0;\nvar innerFrom_1 = require(\"../observable/innerFrom\");\nvar lift_1 = require(\"../util/lift\");\nvar noop_1 = require(\"../util/noop\");\nvar OperatorSubscriber_1 = require(\"./OperatorSubscriber\");\nfunction sample(notifier) {\n    return lift_1.operate(function (source, subscriber) {\n        var hasValue = false;\n        var lastValue = null;\n        source.subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, function (value) {\n            hasValue = true;\n            lastValue = value;\n        }));\n        innerFrom_1.innerFrom(notifier).subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, function () {\n            if (hasValue) {\n                hasValue = false;\n                var value = lastValue;\n                lastValue = null;\n                subscriber.next(value);\n            }\n        }, noop_1.noop));\n    });\n}\nexports.sample = sample;\n//# sourceMappingURL=sample.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,MAAM,GAAG,KAAK,CAAC;AACvB,IAAIC,WAAW,GAAGC,OAAO,CAAC,yBAAyB,CAAC;AACpD,IAAIC,MAAM,GAAGD,OAAO,CAAC,cAAc,CAAC;AACpC,IAAIE,MAAM,GAAGF,OAAO,CAAC,cAAc,CAAC;AACpC,IAAIG,oBAAoB,GAAGH,OAAO,CAAC,sBAAsB,CAAC;AAC1D,SAASF,MAAMA,CAACM,QAAQ,EAAE;EACtB,OAAOH,MAAM,CAACI,OAAO,CAAC,UAAUC,MAAM,EAAEC,UAAU,EAAE;IAChD,IAAIC,QAAQ,GAAG,KAAK;IACpB,IAAIC,SAAS,GAAG,IAAI;IACpBH,MAAM,CAACI,SAAS,CAACP,oBAAoB,CAACQ,wBAAwB,CAACJ,UAAU,EAAE,UAAUV,KAAK,EAAE;MACxFW,QAAQ,GAAG,IAAI;MACfC,SAAS,GAAGZ,KAAK;IACrB,CAAC,CAAC,CAAC;IACHE,WAAW,CAACa,SAAS,CAACR,QAAQ,CAAC,CAACM,SAAS,CAACP,oBAAoB,CAACQ,wBAAwB,CAACJ,UAAU,EAAE,YAAY;MAC5G,IAAIC,QAAQ,EAAE;QACVA,QAAQ,GAAG,KAAK;QAChB,IAAIX,KAAK,GAAGY,SAAS;QACrBA,SAAS,GAAG,IAAI;QAChBF,UAAU,CAACM,IAAI,CAAChB,KAAK,CAAC;MAC1B;IACJ,CAAC,EAAEK,MAAM,CAACY,IAAI,CAAC,CAAC;EACpB,CAAC,CAAC;AACN;AACAlB,OAAO,CAACE,MAAM,GAAGA,MAAM;AACvB",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

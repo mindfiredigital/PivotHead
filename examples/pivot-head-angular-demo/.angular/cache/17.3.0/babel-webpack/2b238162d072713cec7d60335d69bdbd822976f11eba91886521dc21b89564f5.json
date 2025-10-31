@@ -1,0 +1,41 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.throwIfEmpty = void 0;\nvar EmptyError_1 = require(\"../util/EmptyError\");\nvar lift_1 = require(\"../util/lift\");\nvar OperatorSubscriber_1 = require(\"./OperatorSubscriber\");\nfunction throwIfEmpty(errorFactory) {\n  if (errorFactory === void 0) {\n    errorFactory = defaultErrorFactory;\n  }\n  return lift_1.operate(function (source, subscriber) {\n    var hasValue = false;\n    source.subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, function (value) {\n      hasValue = true;\n      subscriber.next(value);\n    }, function () {\n      return hasValue ? subscriber.complete() : subscriber.error(errorFactory());\n    }));\n  });\n}\nexports.throwIfEmpty = throwIfEmpty;\nfunction defaultErrorFactory() {\n  return new EmptyError_1.EmptyError();\n}\n//# sourceMappingURL=throwIfEmpty.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "throwIfEmpty",
+      "EmptyError_1",
+      "require",
+      "lift_1",
+      "OperatorSubscriber_1",
+      "errorFactory",
+      "defaultErrorFactory",
+      "operate",
+      "source",
+      "subscriber",
+      "hasValue",
+      "subscribe",
+      "createOperatorSubscriber",
+      "next",
+      "complete",
+      "error",
+      "EmptyError"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/operators/throwIfEmpty.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.throwIfEmpty = void 0;\nvar EmptyError_1 = require(\"../util/EmptyError\");\nvar lift_1 = require(\"../util/lift\");\nvar OperatorSubscriber_1 = require(\"./OperatorSubscriber\");\nfunction throwIfEmpty(errorFactory) {\n    if (errorFactory === void 0) { errorFactory = defaultErrorFactory; }\n    return lift_1.operate(function (source, subscriber) {\n        var hasValue = false;\n        source.subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, function (value) {\n            hasValue = true;\n            subscriber.next(value);\n        }, function () { return (hasValue ? subscriber.complete() : subscriber.error(errorFactory())); }));\n    });\n}\nexports.throwIfEmpty = throwIfEmpty;\nfunction defaultErrorFactory() {\n    return new EmptyError_1.EmptyError();\n}\n//# sourceMappingURL=throwIfEmpty.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,YAAY,GAAG,KAAK,CAAC;AAC7B,IAAIC,YAAY,GAAGC,OAAO,CAAC,oBAAoB,CAAC;AAChD,IAAIC,MAAM,GAAGD,OAAO,CAAC,cAAc,CAAC;AACpC,IAAIE,oBAAoB,GAAGF,OAAO,CAAC,sBAAsB,CAAC;AAC1D,SAASF,YAAYA,CAACK,YAAY,EAAE;EAChC,IAAIA,YAAY,KAAK,KAAK,CAAC,EAAE;IAAEA,YAAY,GAAGC,mBAAmB;EAAE;EACnE,OAAOH,MAAM,CAACI,OAAO,CAAC,UAAUC,MAAM,EAAEC,UAAU,EAAE;IAChD,IAAIC,QAAQ,GAAG,KAAK;IACpBF,MAAM,CAACG,SAAS,CAACP,oBAAoB,CAACQ,wBAAwB,CAACH,UAAU,EAAE,UAAUV,KAAK,EAAE;MACxFW,QAAQ,GAAG,IAAI;MACfD,UAAU,CAACI,IAAI,CAACd,KAAK,CAAC;IAC1B,CAAC,EAAE,YAAY;MAAE,OAAQW,QAAQ,GAAGD,UAAU,CAACK,QAAQ,CAAC,CAAC,GAAGL,UAAU,CAACM,KAAK,CAACV,YAAY,CAAC,CAAC,CAAC;IAAG,CAAC,CAAC,CAAC;EACtG,CAAC,CAAC;AACN;AACAP,OAAO,CAACE,YAAY,GAAGA,YAAY;AACnC,SAASM,mBAAmBA,CAAA,EAAG;EAC3B,OAAO,IAAIL,YAAY,CAACe,UAAU,CAAC,CAAC;AACxC;AACA",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

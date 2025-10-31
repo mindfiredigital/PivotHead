@@ -16,14 +16,5 @@
     "sidebar_position": 1,
     "title": "Core Concepts",
     "description": "Understanding the fundamental building blocks of the PivotHead engine."
-  },
-  "sidebar": "tutorialSidebar",
-  "previous": {
-    "title": "Tutorials",
-    "permalink": "/PivotHead/docs/category/tutorials"
-  },
-  "next": {
-    "title": "Api Reference",
-    "permalink": "/PivotHead/docs/tutorial-basics/core/api-reference"
   }
 }

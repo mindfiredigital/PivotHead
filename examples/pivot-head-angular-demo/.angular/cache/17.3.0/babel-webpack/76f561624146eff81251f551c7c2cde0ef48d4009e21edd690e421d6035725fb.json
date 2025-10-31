@@ -1,0 +1,49 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.raceInit = exports.race = void 0;\nvar Observable_1 = require(\"../Observable\");\nvar innerFrom_1 = require(\"./innerFrom\");\nvar argsOrArgArray_1 = require(\"../util/argsOrArgArray\");\nvar OperatorSubscriber_1 = require(\"../operators/OperatorSubscriber\");\nfunction race() {\n  var sources = [];\n  for (var _i = 0; _i < arguments.length; _i++) {\n    sources[_i] = arguments[_i];\n  }\n  sources = argsOrArgArray_1.argsOrArgArray(sources);\n  return sources.length === 1 ? innerFrom_1.innerFrom(sources[0]) : new Observable_1.Observable(raceInit(sources));\n}\nexports.race = race;\nfunction raceInit(sources) {\n  return function (subscriber) {\n    var subscriptions = [];\n    var _loop_1 = function (i) {\n      subscriptions.push(innerFrom_1.innerFrom(sources[i]).subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, function (value) {\n        if (subscriptions) {\n          for (var s = 0; s < subscriptions.length; s++) {\n            s !== i && subscriptions[s].unsubscribe();\n          }\n          subscriptions = null;\n        }\n        subscriber.next(value);\n      })));\n    };\n    for (var i = 0; subscriptions && !subscriber.closed && i < sources.length; i++) {\n      _loop_1(i);\n    }\n  };\n}\nexports.raceInit = raceInit;\n//# sourceMappingURL=race.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "raceInit",
+      "race",
+      "Observable_1",
+      "require",
+      "innerFrom_1",
+      "argsOrArgArray_1",
+      "OperatorSubscriber_1",
+      "sources",
+      "_i",
+      "arguments",
+      "length",
+      "argsOrArgArray",
+      "innerFrom",
+      "Observable",
+      "subscriber",
+      "subscriptions",
+      "_loop_1",
+      "i",
+      "push",
+      "subscribe",
+      "createOperatorSubscriber",
+      "s",
+      "unsubscribe",
+      "next",
+      "closed"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/observable/race.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.raceInit = exports.race = void 0;\nvar Observable_1 = require(\"../Observable\");\nvar innerFrom_1 = require(\"./innerFrom\");\nvar argsOrArgArray_1 = require(\"../util/argsOrArgArray\");\nvar OperatorSubscriber_1 = require(\"../operators/OperatorSubscriber\");\nfunction race() {\n    var sources = [];\n    for (var _i = 0; _i < arguments.length; _i++) {\n        sources[_i] = arguments[_i];\n    }\n    sources = argsOrArgArray_1.argsOrArgArray(sources);\n    return sources.length === 1 ? innerFrom_1.innerFrom(sources[0]) : new Observable_1.Observable(raceInit(sources));\n}\nexports.race = race;\nfunction raceInit(sources) {\n    return function (subscriber) {\n        var subscriptions = [];\n        var _loop_1 = function (i) {\n            subscriptions.push(innerFrom_1.innerFrom(sources[i]).subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, function (value) {\n                if (subscriptions) {\n                    for (var s = 0; s < subscriptions.length; s++) {\n                        s !== i && subscriptions[s].unsubscribe();\n                    }\n                    subscriptions = null;\n                }\n                subscriber.next(value);\n            })));\n        };\n        for (var i = 0; subscriptions && !subscriber.closed && i < sources.length; i++) {\n            _loop_1(i);\n        }\n    };\n}\nexports.raceInit = raceInit;\n//# sourceMappingURL=race.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,QAAQ,GAAGF,OAAO,CAACG,IAAI,GAAG,KAAK,CAAC;AACxC,IAAIC,YAAY,GAAGC,OAAO,CAAC,eAAe,CAAC;AAC3C,IAAIC,WAAW,GAAGD,OAAO,CAAC,aAAa,CAAC;AACxC,IAAIE,gBAAgB,GAAGF,OAAO,CAAC,wBAAwB,CAAC;AACxD,IAAIG,oBAAoB,GAAGH,OAAO,CAAC,iCAAiC,CAAC;AACrE,SAASF,IAAIA,CAAA,EAAG;EACZ,IAAIM,OAAO,GAAG,EAAE;EAChB,KAAK,IAAIC,EAAE,GAAG,CAAC,EAAEA,EAAE,GAAGC,SAAS,CAACC,MAAM,EAAEF,EAAE,EAAE,EAAE;IAC1CD,OAAO,CAACC,EAAE,CAAC,GAAGC,SAAS,CAACD,EAAE,CAAC;EAC/B;EACAD,OAAO,GAAGF,gBAAgB,CAACM,cAAc,CAACJ,OAAO,CAAC;EAClD,OAAOA,OAAO,CAACG,MAAM,KAAK,CAAC,GAAGN,WAAW,CAACQ,SAAS,CAACL,OAAO,CAAC,CAAC,CAAC,CAAC,GAAG,IAAIL,YAAY,CAACW,UAAU,CAACb,QAAQ,CAACO,OAAO,CAAC,CAAC;AACpH;AACAT,OAAO,CAACG,IAAI,GAAGA,IAAI;AACnB,SAASD,QAAQA,CAACO,OAAO,EAAE;EACvB,OAAO,UAAUO,UAAU,EAAE;IACzB,IAAIC,aAAa,GAAG,EAAE;IACtB,IAAIC,OAAO,GAAG,SAAAA,CAAUC,CAAC,EAAE;MACvBF,aAAa,CAACG,IAAI,CAACd,WAAW,CAACQ,SAAS,CAACL,OAAO,CAACU,CAAC,CAAC,CAAC,CAACE,SAAS,CAACb,oBAAoB,CAACc,wBAAwB,CAACN,UAAU,EAAE,UAAUf,KAAK,EAAE;QACtI,IAAIgB,aAAa,EAAE;UACf,KAAK,IAAIM,CAAC,GAAG,CAAC,EAAEA,CAAC,GAAGN,aAAa,CAACL,MAAM,EAAEW,CAAC,EAAE,EAAE;YAC3CA,CAAC,KAAKJ,CAAC,IAAIF,aAAa,CAACM,CAAC,CAAC,CAACC,WAAW,CAAC,CAAC;UAC7C;UACAP,aAAa,GAAG,IAAI;QACxB;QACAD,UAAU,CAACS,IAAI,CAACxB,KAAK,CAAC;MAC1B,CAAC,CAAC,CAAC,CAAC;IACR,CAAC;IACD,KAAK,IAAIkB,CAAC,GAAG,CAAC,EAAEF,aAAa,IAAI,CAACD,UAAU,CAACU,MAAM,IAAIP,CAAC,GAAGV,OAAO,CAACG,MAAM,EAAEO,CAAC,EAAE,EAAE;MAC5ED,OAAO,CAACC,CAAC,CAAC;IACd;EACJ,CAAC;AACL;AACAnB,OAAO,CAACE,QAAQ,GAAGA,QAAQ;AAC3B",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

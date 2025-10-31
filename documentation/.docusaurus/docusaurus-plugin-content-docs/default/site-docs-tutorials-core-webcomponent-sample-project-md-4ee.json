@@ -1,0 +1,28 @@
+{
+  "id": "tutorials/core-webcomponent/core-webcomponent-sample-project",
+  "title": "sample-project",
+  "description": "Sample Project:",
+  "source": "@site/docs/tutorials/core-webcomponent/sample-project.md",
+  "sourceDirName": "tutorials/core-webcomponent",
+  "slug": "/tutorials/core-webcomponent/core-webcomponent-sample-project",
+  "permalink": "/PivotHead/docs/tutorials/core-webcomponent/core-webcomponent-sample-project",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorials/core-webcomponent/sample-project.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "core-webcomponent-sample-project",
+    "title": "sample-project",
+    "sidebar_label": "Sample Project"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Basic Setup",
+    "permalink": "/PivotHead/docs/getting-started/basic-setup"
+  },
+  "next": {
+    "title": "setup-for-user-project",
+    "permalink": "/PivotHead/docs/tutorials/core-webcomponent/setup-for-user-project"
+  }
+}

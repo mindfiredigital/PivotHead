@@ -1,0 +1,34 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.publish = void 0;\nvar Subject_1 = require(\"../Subject\");\nvar multicast_1 = require(\"./multicast\");\nvar connect_1 = require(\"./connect\");\nfunction publish(selector) {\n  return selector ? function (source) {\n    return connect_1.connect(selector)(source);\n  } : function (source) {\n    return multicast_1.multicast(new Subject_1.Subject())(source);\n  };\n}\nexports.publish = publish;\n//# sourceMappingURL=publish.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "publish",
+      "Subject_1",
+      "require",
+      "multicast_1",
+      "connect_1",
+      "selector",
+      "source",
+      "connect",
+      "multicast",
+      "Subject"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/operators/publish.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.publish = void 0;\nvar Subject_1 = require(\"../Subject\");\nvar multicast_1 = require(\"./multicast\");\nvar connect_1 = require(\"./connect\");\nfunction publish(selector) {\n    return selector ? function (source) { return connect_1.connect(selector)(source); } : function (source) { return multicast_1.multicast(new Subject_1.Subject())(source); };\n}\nexports.publish = publish;\n//# sourceMappingURL=publish.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,OAAO,GAAG,KAAK,CAAC;AACxB,IAAIC,SAAS,GAAGC,OAAO,CAAC,YAAY,CAAC;AACrC,IAAIC,WAAW,GAAGD,OAAO,CAAC,aAAa,CAAC;AACxC,IAAIE,SAAS,GAAGF,OAAO,CAAC,WAAW,CAAC;AACpC,SAASF,OAAOA,CAACK,QAAQ,EAAE;EACvB,OAAOA,QAAQ,GAAG,UAAUC,MAAM,EAAE;IAAE,OAAOF,SAAS,CAACG,OAAO,CAACF,QAAQ,CAAC,CAACC,MAAM,CAAC;EAAE,CAAC,GAAG,UAAUA,MAAM,EAAE;IAAE,OAAOH,WAAW,CAACK,SAAS,CAAC,IAAIP,SAAS,CAACQ,OAAO,CAAC,CAAC,CAAC,CAACH,MAAM,CAAC;EAAE,CAAC;AAC9K;AACAR,OAAO,CAACE,OAAO,GAAGA,OAAO;AACzB",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

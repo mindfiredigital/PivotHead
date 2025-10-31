@@ -1,0 +1,45 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.fromEventPattern = void 0;\nvar Observable_1 = require(\"../Observable\");\nvar isFunction_1 = require(\"../util/isFunction\");\nvar mapOneOrManyArgs_1 = require(\"../util/mapOneOrManyArgs\");\nfunction fromEventPattern(addHandler, removeHandler, resultSelector) {\n  if (resultSelector) {\n    return fromEventPattern(addHandler, removeHandler).pipe(mapOneOrManyArgs_1.mapOneOrManyArgs(resultSelector));\n  }\n  return new Observable_1.Observable(function (subscriber) {\n    var handler = function () {\n      var e = [];\n      for (var _i = 0; _i < arguments.length; _i++) {\n        e[_i] = arguments[_i];\n      }\n      return subscriber.next(e.length === 1 ? e[0] : e);\n    };\n    var retValue = addHandler(handler);\n    return isFunction_1.isFunction(removeHandler) ? function () {\n      return removeHandler(handler, retValue);\n    } : undefined;\n  });\n}\nexports.fromEventPattern = fromEventPattern;\n//# sourceMappingURL=fromEventPattern.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "fromEventPattern",
+      "Observable_1",
+      "require",
+      "isFunction_1",
+      "mapOneOrManyArgs_1",
+      "addHandler",
+      "removeHandler",
+      "resultSelector",
+      "pipe",
+      "mapOneOrManyArgs",
+      "Observable",
+      "subscriber",
+      "handler",
+      "e",
+      "_i",
+      "arguments",
+      "length",
+      "next",
+      "retValue",
+      "isFunction",
+      "undefined"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/observable/fromEventPattern.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.fromEventPattern = void 0;\nvar Observable_1 = require(\"../Observable\");\nvar isFunction_1 = require(\"../util/isFunction\");\nvar mapOneOrManyArgs_1 = require(\"../util/mapOneOrManyArgs\");\nfunction fromEventPattern(addHandler, removeHandler, resultSelector) {\n    if (resultSelector) {\n        return fromEventPattern(addHandler, removeHandler).pipe(mapOneOrManyArgs_1.mapOneOrManyArgs(resultSelector));\n    }\n    return new Observable_1.Observable(function (subscriber) {\n        var handler = function () {\n            var e = [];\n            for (var _i = 0; _i < arguments.length; _i++) {\n                e[_i] = arguments[_i];\n            }\n            return subscriber.next(e.length === 1 ? e[0] : e);\n        };\n        var retValue = addHandler(handler);\n        return isFunction_1.isFunction(removeHandler) ? function () { return removeHandler(handler, retValue); } : undefined;\n    });\n}\nexports.fromEventPattern = fromEventPattern;\n//# sourceMappingURL=fromEventPattern.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,gBAAgB,GAAG,KAAK,CAAC;AACjC,IAAIC,YAAY,GAAGC,OAAO,CAAC,eAAe,CAAC;AAC3C,IAAIC,YAAY,GAAGD,OAAO,CAAC,oBAAoB,CAAC;AAChD,IAAIE,kBAAkB,GAAGF,OAAO,CAAC,0BAA0B,CAAC;AAC5D,SAASF,gBAAgBA,CAACK,UAAU,EAAEC,aAAa,EAAEC,cAAc,EAAE;EACjE,IAAIA,cAAc,EAAE;IAChB,OAAOP,gBAAgB,CAACK,UAAU,EAAEC,aAAa,CAAC,CAACE,IAAI,CAACJ,kBAAkB,CAACK,gBAAgB,CAACF,cAAc,CAAC,CAAC;EAChH;EACA,OAAO,IAAIN,YAAY,CAACS,UAAU,CAAC,UAAUC,UAAU,EAAE;IACrD,IAAIC,OAAO,GAAG,SAAAA,CAAA,EAAY;MACtB,IAAIC,CAAC,GAAG,EAAE;MACV,KAAK,IAAIC,EAAE,GAAG,CAAC,EAAEA,EAAE,GAAGC,SAAS,CAACC,MAAM,EAAEF,EAAE,EAAE,EAAE;QAC1CD,CAAC,CAACC,EAAE,CAAC,GAAGC,SAAS,CAACD,EAAE,CAAC;MACzB;MACA,OAAOH,UAAU,CAACM,IAAI,CAACJ,CAAC,CAACG,MAAM,KAAK,CAAC,GAAGH,CAAC,CAAC,CAAC,CAAC,GAAGA,CAAC,CAAC;IACrD,CAAC;IACD,IAAIK,QAAQ,GAAGb,UAAU,CAACO,OAAO,CAAC;IAClC,OAAOT,YAAY,CAACgB,UAAU,CAACb,aAAa,CAAC,GAAG,YAAY;MAAE,OAAOA,aAAa,CAACM,OAAO,EAAEM,QAAQ,CAAC;IAAE,CAAC,GAAGE,SAAS;EACxH,CAAC,CAAC;AACN;AACAtB,OAAO,CAACE,gBAAgB,GAAGA,gBAAgB;AAC3C",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

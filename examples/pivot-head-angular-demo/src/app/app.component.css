@@ -1,0 +1,26 @@
+/* ... existing styles ... */
+
+hr {
+  border: none;
+  border-top: 2px solid #e2e7ed;
+  margin: 2.5em 0;
+}
+
+.custom-header,
+.custom-body {
+  padding: 1em;
+}
+
+.custom-header {
+  background-color: #e3f2fd;
+  border-bottom: 1px solid #90caf9;
+}
+
+.custom-header h3 {
+  margin: 0 0 0.5em 0;
+  color: #1565c0;
+}
+
+.custom-body {
+  background-color: #f5f5f5;
+}

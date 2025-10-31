@@ -62,8 +62,8 @@
                 "frontMatter": { "sidebar_position": 1 },
                 "sidebar": "tutorialSidebar",
                 "previous": {
-                  "title": "Contribution Guide",
-                  "permalink": "/PivotHead/docs/category/contribution-guide"
+                  "title": "Troubleshooting",
+                  "permalink": "/PivotHead/docs/tutorial-basics/troubleshooting"
                 },
                 "next": {
                   "title": "How to Contribute",
@@ -139,6 +139,146 @@
                 "previous": {
                   "title": "Monorepo Setup Guide",
                   "permalink": "/PivotHead/docs/contributors/monorepo-setup"
+                },
+                "next": {
+                  "title": "Upcoming Features",
+                  "permalink": "/PivotHead/docs/upcoming/"
+                }
+              },
+              {
+                "id": "getting-started/basic-setup",
+                "title": "Basic Setup",
+                "description": "Once you've installed the appropriate PivotHead package for your framework, the basic setup is straightforward. You'll need to:",
+                "source": "@site/docs/getting-started/basic-setup.md",
+                "sourceDirName": "getting-started",
+                "slug": "/getting-started/basic-setup",
+                "permalink": "/PivotHead/docs/getting-started/basic-setup",
+                "draft": false,
+                "unlisted": false,
+                "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/getting-started/basic-setup.md",
+                "tags": [],
+                "version": "current",
+                "frontMatter": {
+                  "id": "basic-setup",
+                  "title": "Basic Setup",
+                  "sidebar_label": "Basic Setup"
+                },
+                "sidebar": "tutorialSidebar",
+                "previous": {
+                  "title": "Installation",
+                  "permalink": "/PivotHead/docs/getting-started/installation"
+                },
+                "next": {
+                  "title": "Sample Project",
+                  "permalink": "/PivotHead/docs/tutorials/core-webcomponent/core-webcomponent-sample-project"
+                }
+              },
+              {
+                "id": "getting-started/headless-quick-start",
+                "title": "Headless Quick Start",
+                "description": "Get started with PivotHead's headless architecture in 5 minutes",
+                "source": "@site/docs/getting-started/headless-quick-start.md",
+                "sourceDirName": "getting-started",
+                "slug": "/getting-started/headless-quick-start",
+                "permalink": "/PivotHead/docs/getting-started/headless-quick-start",
+                "draft": false,
+                "unlisted": false,
+                "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/getting-started/headless-quick-start.md",
+                "tags": [],
+                "version": "current",
+                "frontMatter": {
+                  "title": "Headless Quick Start",
+                  "description": "Get started with PivotHead's headless architecture in 5 minutes"
+                },
+                "sidebar": "tutorialSidebar",
+                "previous": {
+                  "title": "Why Use PivotHead",
+                  "permalink": "/PivotHead/docs/getting-started/Why-we-use-pivothead"
+                },
+                "next": {
+                  "title": "Installation",
+                  "permalink": "/PivotHead/docs/getting-started/installation"
+                }
+              },
+              {
+                "id": "getting-started/installation",
+                "title": "Installation Guide",
+                "description": "Easily integrate PivotHead, the next-generation headless pivot table solution, into your web projects. Whether you're using React, Angular, or Vue, PivotHead provides flexible and high-performance tools for building dynamic pivot tables that adapt to your data needs.",
+                "source": "@site/docs/getting-started/installation.md",
+                "sourceDirName": "getting-started",
+                "slug": "/getting-started/installation",
+                "permalink": "/PivotHead/docs/getting-started/installation",
+                "draft": false,
+                "unlisted": false,
+                "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/getting-started/installation.md",
+                "tags": [],
+                "version": "current",
+                "frontMatter": {
+                  "id": "installation",
+                  "title": "Installation Guide",
+                  "sidebar_label": "Installation"
+                },
+                "sidebar": "tutorialSidebar",
+                "previous": {
+                  "title": "Headless Quick Start",
+                  "permalink": "/PivotHead/docs/getting-started/headless-quick-start"
+                },
+                "next": {
+                  "title": "Basic Setup",
+                  "permalink": "/PivotHead/docs/getting-started/basic-setup"
+                }
+              },
+              {
+                "id": "getting-started/Why-we-use-pivothead",
+                "title": "Why Use PivotHead",
+                "description": "Discover the advantages of using PivotHead for your data visualization needs",
+                "source": "@site/docs/getting-started/Why-we-use-pivothead.md",
+                "sourceDirName": "getting-started",
+                "slug": "/getting-started/Why-we-use-pivothead",
+                "permalink": "/PivotHead/docs/getting-started/Why-we-use-pivothead",
+                "draft": false,
+                "unlisted": false,
+                "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/getting-started/Why-we-use-pivothead.md",
+                "tags": [],
+                "version": "current",
+                "sidebarPosition": 2,
+                "frontMatter": {
+                  "sidebar_position": 2,
+                  "title": "Why Use PivotHead",
+                  "description": "Discover the advantages of using PivotHead for your data visualization needs"
+                },
+                "sidebar": "tutorialSidebar",
+                "previous": {
+                  "title": "Headless Architecture",
+                  "permalink": "/PivotHead/docs/headless-architecture"
+                },
+                "next": {
+                  "title": "Headless Quick Start",
+                  "permalink": "/PivotHead/docs/getting-started/headless-quick-start"
+                }
+              },
+              {
+                "id": "headless-architecture",
+                "title": "Headless Architecture",
+                "description": "What Makes PivotHead Special?",
+                "source": "@site/docs/headless-architecture.md",
+                "sourceDirName": ".",
+                "slug": "/headless-architecture",
+                "permalink": "/PivotHead/docs/headless-architecture",
+                "draft": false,
+                "unlisted": false,
+                "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/headless-architecture.md",
+                "tags": [],
+                "version": "current",
+                "frontMatter": {},
+                "sidebar": "tutorialSidebar",
+                "previous": {
+                  "title": "Introduction",
+                  "permalink": "/PivotHead/docs/introduction"
+                },
+                "next": {
+                  "title": "Why Use PivotHead",
+                  "permalink": "/PivotHead/docs/getting-started/Why-we-use-pivothead"
                 }
               },
               {
@@ -159,15 +299,6 @@
                   "sidebar_position": 3,
                   "title": "Getting Started",
                   "description": "Learn how to install and set up PivotHead in your project"
-                },
-                "sidebar": "tutorialSidebar",
-                "previous": {
-                  "title": "Why Use PivotHead",
-                  "permalink": "/PivotHead/docs/Why-we-use-pivothead"
-                },
-                "next": {
-                  "title": "Tutorials",
-                  "permalink": "/PivotHead/docs/category/tutorials"
                 }
               },
               {
@@ -191,8 +322,214 @@
                 },
                 "sidebar": "tutorialSidebar",
                 "next": {
-                  "title": "Why Use PivotHead",
-                  "permalink": "/PivotHead/docs/Why-we-use-pivothead"
+                  "title": "Headless Architecture",
+                  "permalink": "/PivotHead/docs/headless-architecture"
+                }
+              },
+              {
+                "id": "reference/api-reference/angular-api-reference",
+                "title": "Angular API",
+                "description": "The @pivothead/angular package provides a service for creating your headless pivot table.",
+                "source": "@site/docs/reference/api-reference/angular.md",
+                "sourceDirName": "reference/api-reference",
+                "slug": "/reference/api-reference/angular-api-reference",
+                "permalink": "/PivotHead/docs/reference/api-reference/angular-api-reference",
+                "draft": false,
+                "unlisted": false,
+                "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/reference/api-reference/angular.md",
+                "tags": [],
+                "version": "current",
+                "frontMatter": {
+                  "id": "angular-api-reference",
+                  "title": "Angular API",
+                  "sidebar_label": "Angular"
+                }
+              },
+              {
+                "id": "reference/api-reference/core-webcomponent-api-reference",
+                "title": "Core Web Component API",
+                "description": "The `` web component exposes a rich API through HTML attributes (for initial setup) and JavaScript properties, methods, and events (for dynamic interaction).",
+                "source": "@site/docs/reference/api-reference/core-webcomponent.md",
+                "sourceDirName": "reference/api-reference",
+                "slug": "/reference/api-reference/core-webcomponent-api-reference",
+                "permalink": "/PivotHead/docs/reference/api-reference/core-webcomponent-api-reference",
+                "draft": false,
+                "unlisted": false,
+                "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/reference/api-reference/core-webcomponent.md",
+                "tags": [],
+                "version": "current",
+                "frontMatter": {
+                  "id": "core-webcomponent-api-reference",
+                  "title": "Core Web Component API",
+                  "sidebar_label": "Core Web Component"
+                },
+                "sidebar": "tutorialSidebar",
+                "previous": {
+                  "title": "Vue",
+                  "permalink": "/PivotHead/docs/reference/conceptual-reference/vue-conceptual-reference"
+                },
+                "next": {
+                  "title": "React",
+                  "permalink": "/PivotHead/docs/reference/api-reference/react-api-reference"
+                }
+              },
+              {
+                "id": "reference/api-reference/react-api-reference",
+                "title": "React API",
+                "description": "Component API Reference",
+                "source": "@site/docs/reference/api-reference/react.md",
+                "sourceDirName": "reference/api-reference",
+                "slug": "/reference/api-reference/react-api-reference",
+                "permalink": "/PivotHead/docs/reference/api-reference/react-api-reference",
+                "draft": false,
+                "unlisted": false,
+                "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/reference/api-reference/react.md",
+                "tags": [],
+                "version": "current",
+                "frontMatter": {
+                  "id": "react-api-reference",
+                  "title": "React API",
+                  "sidebar_label": "React"
+                },
+                "sidebar": "tutorialSidebar",
+                "previous": {
+                  "title": "Core Web Component",
+                  "permalink": "/PivotHead/docs/reference/api-reference/core-webcomponent-api-reference"
+                },
+                "next": {
+                  "title": "Vue",
+                  "permalink": "/PivotHead/docs/reference/api-reference/vue-api-reference"
+                }
+              },
+              {
+                "id": "reference/api-reference/vue-api-reference",
+                "title": "Vue API",
+                "description": "API Reference",
+                "source": "@site/docs/reference/api-reference/vue.md",
+                "sourceDirName": "reference/api-reference",
+                "slug": "/reference/api-reference/vue-api-reference",
+                "permalink": "/PivotHead/docs/reference/api-reference/vue-api-reference",
+                "draft": false,
+                "unlisted": false,
+                "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/reference/api-reference/vue.md",
+                "tags": [],
+                "version": "current",
+                "frontMatter": {
+                  "id": "vue-api-reference",
+                  "title": "Vue API",
+                  "sidebar_label": "Vue"
+                },
+                "sidebar": "tutorialSidebar",
+                "previous": {
+                  "title": "React",
+                  "permalink": "/PivotHead/docs/reference/api-reference/react-api-reference"
+                },
+                "next": {
+                  "title": "Troubleshooting",
+                  "permalink": "/PivotHead/docs/tutorial-basics/troubleshooting"
+                }
+              },
+              {
+                "id": "reference/conceptual-reference/angular-conceptual-reference",
+                "title": "Angular concept",
+                "description": "Angular Service Integration",
+                "source": "@site/docs/reference/conceptual-reference/angular.md",
+                "sourceDirName": "reference/conceptual-reference",
+                "slug": "/reference/conceptual-reference/angular-conceptual-reference",
+                "permalink": "/PivotHead/docs/reference/conceptual-reference/angular-conceptual-reference",
+                "draft": false,
+                "unlisted": false,
+                "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/reference/conceptual-reference/angular.md",
+                "tags": [],
+                "version": "current",
+                "frontMatter": {
+                  "id": "angular-conceptual-reference",
+                  "title": "Angular concept",
+                  "sidebar_label": "Angular"
+                }
+              },
+              {
+                "id": "reference/conceptual-reference/core-webcomponent-conceptual-reference",
+                "title": "Core Web Component Concepts",
+                "description": "The PivotHead Web Component (@mindfiredigital/pivothead-web-component) provides a flexible, framework-agnostic solution for integrating pivot table functionality into any web application. Built as a native Web Component, it offers three distinct rendering modes to accommodate different use cases and UI requirements.",
+                "source": "@site/docs/reference/conceptual-reference/core-webcomponent.md",
+                "sourceDirName": "reference/conceptual-reference",
+                "slug": "/reference/conceptual-reference/core-webcomponent-conceptual-reference",
+                "permalink": "/PivotHead/docs/reference/conceptual-reference/core-webcomponent-conceptual-reference",
+                "draft": false,
+                "unlisted": false,
+                "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/reference/conceptual-reference/core-webcomponent.md",
+                "tags": [],
+                "version": "current",
+                "frontMatter": {
+                  "id": "core-webcomponent-conceptual-reference",
+                  "title": "Core Web Component Concepts",
+                  "sidebar_label": "Core Web Component"
+                },
+                "sidebar": "tutorialSidebar",
+                "previous": {
+                  "title": "setup-for-user-project",
+                  "permalink": "/PivotHead/docs/tutorials/vue/setup-for-user-project"
+                },
+                "next": {
+                  "title": "React",
+                  "permalink": "/PivotHead/docs/reference/conceptual-reference/react-conceptual-reference"
+                }
+              },
+              {
+                "id": "reference/conceptual-reference/react-conceptual-reference",
+                "title": "React Concepts",
+                "description": "The PivotHead React Wrapper (@mindfiredigital/pivothead-react) is a thin, type-safe React component that bridges React applications with the PivotHead Web Component. It provides a seamless React developer experience while preserving all the functionality and modes of the underlying web component.",
+                "source": "@site/docs/reference/conceptual-reference/react.md",
+                "sourceDirName": "reference/conceptual-reference",
+                "slug": "/reference/conceptual-reference/react-conceptual-reference",
+                "permalink": "/PivotHead/docs/reference/conceptual-reference/react-conceptual-reference",
+                "draft": false,
+                "unlisted": false,
+                "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/reference/conceptual-reference/react.md",
+                "tags": [],
+                "version": "current",
+                "frontMatter": {
+                  "id": "react-conceptual-reference",
+                  "title": "React Concepts",
+                  "sidebar_label": "React"
+                },
+                "sidebar": "tutorialSidebar",
+                "previous": {
+                  "title": "Core Web Component",
+                  "permalink": "/PivotHead/docs/reference/conceptual-reference/core-webcomponent-conceptual-reference"
+                },
+                "next": {
+                  "title": "Vue",
+                  "permalink": "/PivotHead/docs/reference/conceptual-reference/vue-conceptual-reference"
+                }
+              },
+              {
+                "id": "reference/conceptual-reference/vue-conceptual-reference",
+                "title": "Vue Concepts",
+                "description": "For Vue developers, the @pivothead/vue package offers a reactive and intuitive way to build a headless pivot table.",
+                "source": "@site/docs/reference/conceptual-reference/vue.md",
+                "sourceDirName": "reference/conceptual-reference",
+                "slug": "/reference/conceptual-reference/vue-conceptual-reference",
+                "permalink": "/PivotHead/docs/reference/conceptual-reference/vue-conceptual-reference",
+                "draft": false,
+                "unlisted": false,
+                "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/reference/conceptual-reference/vue.md",
+                "tags": [],
+                "version": "current",
+                "frontMatter": {
+                  "id": "vue-conceptual-reference",
+                  "title": "Vue Concepts",
+                  "sidebar_label": "Vue"
+                },
+                "sidebar": "tutorialSidebar",
+                "previous": {
+                  "title": "React",
+                  "permalink": "/PivotHead/docs/reference/conceptual-reference/react-conceptual-reference"
+                },
+                "next": {
+                  "title": "Core Web Component",
+                  "permalink": "/PivotHead/docs/reference/api-reference/core-webcomponent-api-reference"
                 }
               },
               {
@@ -213,15 +550,6 @@
                   "sidebar_position": 2,
                   "title": "Api Reference",
                   "description": "Understanding the Api References of PivotHead"
-                },
-                "sidebar": "tutorialSidebar",
-                "previous": {
-                  "title": "Core Concepts",
-                  "permalink": "/PivotHead/docs/tutorial-basics/core/core-concepts"
-                },
-                "next": {
-                  "title": "Examples & Usage",
-                  "permalink": "/PivotHead/docs/tutorial-basics/core/examples"
                 }
               },
               {
@@ -242,15 +570,6 @@
                   "sidebar_position": 1,
                   "title": "Core Concepts",
                   "description": "Understanding the fundamental building blocks of the PivotHead engine."
-                },
-                "sidebar": "tutorialSidebar",
-                "previous": {
-                  "title": "Tutorials",
-                  "permalink": "/PivotHead/docs/category/tutorials"
-                },
-                "next": {
-                  "title": "Api Reference",
-                  "permalink": "/PivotHead/docs/tutorial-basics/core/api-reference"
                 }
               },
               {
@@ -271,15 +590,6 @@
                   "sidebar_position": 3,
                   "title": "Examples & Usage",
                   "description": "Examples & Usage of PivotHead"
-                },
-                "sidebar": "tutorialSidebar",
-                "previous": {
-                  "title": "Api Reference",
-                  "permalink": "/PivotHead/docs/tutorial-basics/core/api-reference"
-                },
-                "next": {
-                  "title": "PivotHead Web Component",
-                  "permalink": "/PivotHead/docs/tutorial-basics/web-component"
                 }
               },
               {
@@ -303,12 +613,12 @@
                 },
                 "sidebar": "tutorialSidebar",
                 "previous": {
-                  "title": "Vue Wrapper",
-                  "permalink": "/PivotHead/docs/tutorial-basics/wrappers/vue"
+                  "title": "Vue",
+                  "permalink": "/PivotHead/docs/reference/api-reference/vue-api-reference"
                 },
                 "next": {
-                  "title": "Contribution Guide",
-                  "permalink": "/PivotHead/docs/category/contribution-guide"
+                  "title": "Contributors",
+                  "permalink": "/PivotHead/docs/contributors/"
                 }
               },
               {
@@ -325,16 +635,7 @@
                 "tags": [],
                 "version": "current",
                 "sidebarPosition": 5,
-                "frontMatter": { "sidebar_position": 5 },
-                "sidebar": "tutorialSidebar",
-                "previous": {
-                  "title": "Examples & Usage",
-                  "permalink": "/PivotHead/docs/tutorial-basics/core/examples"
-                },
-                "next": {
-                  "title": "React Wrapper",
-                  "permalink": "/PivotHead/docs/tutorial-basics/wrappers/react"
-                }
+                "frontMatter": { "sidebar_position": 5 }
               },
               {
                 "id": "tutorial-basics/wrappers/react",
@@ -350,16 +651,7 @@
                 "tags": [],
                 "version": "current",
                 "sidebarPosition": 1,
-                "frontMatter": { "sidebar_position": 1 },
-                "sidebar": "tutorialSidebar",
-                "previous": {
-                  "title": "PivotHead Web Component",
-                  "permalink": "/PivotHead/docs/tutorial-basics/web-component"
-                },
-                "next": {
-                  "title": "Vue Wrapper",
-                  "permalink": "/PivotHead/docs/tutorial-basics/wrappers/vue"
-                }
+                "frontMatter": { "sidebar_position": 1 }
               },
               {
                 "id": "tutorial-basics/wrappers/vue",
@@ -374,44 +666,231 @@
                 "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorial-basics/wrappers/vue.md",
                 "tags": [],
                 "version": "current",
-                "frontMatter": {},
-                "sidebar": "tutorialSidebar",
-                "previous": {
-                  "title": "React Wrapper",
-                  "permalink": "/PivotHead/docs/tutorial-basics/wrappers/react"
-                },
-                "next": {
-                  "title": "Troubleshooting",
-                  "permalink": "/PivotHead/docs/tutorial-basics/troubleshooting"
+                "frontMatter": {}
+              },
+              {
+                "id": "tutorials/angular/angular-sample-project",
+                "title": "Sample Project",
+                "description": "This tutorial will guide you through creating a simple Angular application that uses @pivothead/angular to render a headless pivot table.",
+                "source": "@site/docs/tutorials/angular/sample-project.md",
+                "sourceDirName": "tutorials/angular",
+                "slug": "/tutorials/angular/angular-sample-project",
+                "permalink": "/PivotHead/docs/tutorials/angular/angular-sample-project",
+                "draft": false,
+                "unlisted": false,
+                "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorials/angular/sample-project.md",
+                "tags": [],
+                "version": "current",
+                "frontMatter": {
+                  "id": "angular-sample-project",
+                  "title": "Sample Project",
+                  "sidebar_label": "Sample Project"
                 }
               },
               {
-                "id": "Why-we-use-pivothead",
-                "title": "Why Use PivotHead",
-                "description": "Discover the advantages of using PivotHead for your data visualization needs",
-                "source": "@site/docs/Why-we-use-pivothead.md",
-                "sourceDirName": ".",
-                "slug": "/Why-we-use-pivothead",
-                "permalink": "/PivotHead/docs/Why-we-use-pivothead",
+                "id": "tutorials/angular/angular-setup-for-user-project",
+                "title": "Setup for Your Project",
+                "description": "To use PivotHead's headless pivot table in your Angular project, you'll need to use the @pivothead/angular package. Here's how to set it up.",
+                "source": "@site/docs/tutorials/angular/setup-for-user-project.md",
+                "sourceDirName": "tutorials/angular",
+                "slug": "/tutorials/angular/angular-setup-for-user-project",
+                "permalink": "/PivotHead/docs/tutorials/angular/angular-setup-for-user-project",
                 "draft": false,
                 "unlisted": false,
-                "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/Why-we-use-pivothead.md",
+                "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorials/angular/setup-for-user-project.md",
                 "tags": [],
                 "version": "current",
-                "sidebarPosition": 2,
                 "frontMatter": {
-                  "sidebar_position": 2,
-                  "title": "Why Use PivotHead",
-                  "description": "Discover the advantages of using PivotHead for your data visualization needs"
+                  "id": "angular-setup-for-user-project",
+                  "title": "Setup for Your Project",
+                  "sidebar_label": "Setup for Your Project"
+                }
+              },
+              {
+                "id": "tutorials/core-webcomponent/core-webcomponent-sample-project",
+                "title": "sample-project",
+                "description": "Sample Project:",
+                "source": "@site/docs/tutorials/core-webcomponent/sample-project.md",
+                "sourceDirName": "tutorials/core-webcomponent",
+                "slug": "/tutorials/core-webcomponent/core-webcomponent-sample-project",
+                "permalink": "/PivotHead/docs/tutorials/core-webcomponent/core-webcomponent-sample-project",
+                "draft": false,
+                "unlisted": false,
+                "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorials/core-webcomponent/sample-project.md",
+                "tags": [],
+                "version": "current",
+                "frontMatter": {
+                  "id": "core-webcomponent-sample-project",
+                  "title": "sample-project",
+                  "sidebar_label": "Sample Project"
                 },
                 "sidebar": "tutorialSidebar",
                 "previous": {
-                  "title": "Introduction",
-                  "permalink": "/PivotHead/docs/introduction"
+                  "title": "Basic Setup",
+                  "permalink": "/PivotHead/docs/getting-started/basic-setup"
                 },
                 "next": {
-                  "title": "Getting Started",
-                  "permalink": "/PivotHead/docs/Installation"
+                  "title": "setup-for-user-project",
+                  "permalink": "/PivotHead/docs/tutorials/core-webcomponent/setup-for-user-project"
+                }
+              },
+              {
+                "id": "tutorials/core-webcomponent/setup-for-user-project",
+                "title": "setup-for-user-project",
+                "description": "Overview",
+                "source": "@site/docs/tutorials/core-webcomponent/setup-for-user-project.md",
+                "sourceDirName": "tutorials/core-webcomponent",
+                "slug": "/tutorials/core-webcomponent/setup-for-user-project",
+                "permalink": "/PivotHead/docs/tutorials/core-webcomponent/setup-for-user-project",
+                "draft": false,
+                "unlisted": false,
+                "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorials/core-webcomponent/setup-for-user-project.md",
+                "tags": [],
+                "version": "current",
+                "frontMatter": {},
+                "sidebar": "tutorialSidebar",
+                "previous": {
+                  "title": "Sample Project",
+                  "permalink": "/PivotHead/docs/tutorials/core-webcomponent/core-webcomponent-sample-project"
+                },
+                "next": {
+                  "title": "Sample Project",
+                  "permalink": "/PivotHead/docs/tutorials/react/react-sample-project"
+                }
+              },
+              {
+                "id": "tutorials/react/react-sample-project",
+                "title": "Sample Project",
+                "description": "Let's build a simple React application to demonstrate how to use the @pivothead/react package to create a headless pivot table.",
+                "source": "@site/docs/tutorials/react/sample-project.md",
+                "sourceDirName": "tutorials/react",
+                "slug": "/tutorials/react/react-sample-project",
+                "permalink": "/PivotHead/docs/tutorials/react/react-sample-project",
+                "draft": false,
+                "unlisted": false,
+                "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorials/react/sample-project.md",
+                "tags": [],
+                "version": "current",
+                "frontMatter": {
+                  "id": "react-sample-project",
+                  "title": "Sample Project",
+                  "sidebar_label": "Sample Project"
+                },
+                "sidebar": "tutorialSidebar",
+                "previous": {
+                  "title": "setup-for-user-project",
+                  "permalink": "/PivotHead/docs/tutorials/core-webcomponent/setup-for-user-project"
+                },
+                "next": {
+                  "title": "setup-for-user-project",
+                  "permalink": "/PivotHead/docs/tutorials/react/setup-for-user-project"
+                }
+              },
+              {
+                "id": "tutorials/react/setup-for-user-project",
+                "title": "setup-for-user-project",
+                "description": "Overview",
+                "source": "@site/docs/tutorials/react/setup-for-user-project.md",
+                "sourceDirName": "tutorials/react",
+                "slug": "/tutorials/react/setup-for-user-project",
+                "permalink": "/PivotHead/docs/tutorials/react/setup-for-user-project",
+                "draft": false,
+                "unlisted": false,
+                "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorials/react/setup-for-user-project.md",
+                "tags": [],
+                "version": "current",
+                "frontMatter": {},
+                "sidebar": "tutorialSidebar",
+                "previous": {
+                  "title": "Sample Project",
+                  "permalink": "/PivotHead/docs/tutorials/react/react-sample-project"
+                },
+                "next": {
+                  "title": "Sample Project",
+                  "permalink": "/PivotHead/docs/tutorials/vue/vue-sample-project"
+                }
+              },
+              {
+                "id": "tutorials/vue/setup-for-user-project",
+                "title": "setup-for-user-project",
+                "description": "A powerful Vue 3 wrapper for PivotHead that provides seamless integration with reactive data binding, TypeScript support, and Vue-specific optimizations. The wrapper bridges Vue applications with the PivotHead web component while maintaining full Vue ecosystem compatibility.",
+                "source": "@site/docs/tutorials/vue/setup-for-user-project.md",
+                "sourceDirName": "tutorials/vue",
+                "slug": "/tutorials/vue/setup-for-user-project",
+                "permalink": "/PivotHead/docs/tutorials/vue/setup-for-user-project",
+                "draft": false,
+                "unlisted": false,
+                "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorials/vue/setup-for-user-project.md",
+                "tags": [],
+                "version": "current",
+                "frontMatter": {},
+                "sidebar": "tutorialSidebar",
+                "previous": {
+                  "title": "Sample Project",
+                  "permalink": "/PivotHead/docs/tutorials/vue/vue-sample-project"
+                },
+                "next": {
+                  "title": "Core Web Component",
+                  "permalink": "/PivotHead/docs/reference/conceptual-reference/core-webcomponent-conceptual-reference"
+                }
+              },
+              {
+                "id": "tutorials/vue/vue-sample-project",
+                "title": "Sample Project",
+                "description": "This guide will show you how to create a basic Vue application using @pivothead/vue to build a headless pivot table.",
+                "source": "@site/docs/tutorials/vue/sample-project.md",
+                "sourceDirName": "tutorials/vue",
+                "slug": "/tutorials/vue/vue-sample-project",
+                "permalink": "/PivotHead/docs/tutorials/vue/vue-sample-project",
+                "draft": false,
+                "unlisted": false,
+                "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorials/vue/sample-project.md",
+                "tags": [],
+                "version": "current",
+                "frontMatter": {
+                  "id": "vue-sample-project",
+                  "title": "Sample Project",
+                  "sidebar_label": "Sample Project"
+                },
+                "sidebar": "tutorialSidebar",
+                "previous": {
+                  "title": "setup-for-user-project",
+                  "permalink": "/PivotHead/docs/tutorials/react/setup-for-user-project"
+                },
+                "next": {
+                  "title": "setup-for-user-project",
+                  "permalink": "/PivotHead/docs/tutorials/vue/setup-for-user-project"
+                }
+              },
+              {
+                "id": "upcoming/index",
+                "title": "Upcoming Features",
+                "description": "What's coming next in PivotHead - exciting features in development",
+                "source": "@site/docs/upcoming/index.md",
+                "sourceDirName": "upcoming",
+                "slug": "/upcoming/",
+                "permalink": "/PivotHead/docs/upcoming/",
+                "draft": false,
+                "unlisted": false,
+                "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/upcoming/index.md",
+                "tags": [],
+                "version": "current",
+                "frontMatter": {
+                  "title": "Upcoming Features",
+                  "description": "What's coming next in PivotHead - exciting features in development",
+                  "keywords": [
+                    "roadmap",
+                    "upcoming",
+                    "features",
+                    "angular",
+                    "high-volume",
+                    "performance"
+                  ]
+                },
+                "sidebar": "tutorialSidebar",
+                "previous": {
+                  "title": "Quick Start Guide",
+                  "permalink": "/PivotHead/docs/contributors/quick-start"
                 }
               }
             ],
@@ -419,65 +898,133 @@
             "sidebars": {
               "tutorialSidebar": [
                 { "type": "doc", "id": "introduction" },
-                { "type": "doc", "id": "Why-we-use-pivothead" },
-                { "type": "doc", "id": "Installation" },
+                { "type": "doc", "id": "headless-architecture" },
                 {
                   "type": "category",
-                  "label": "Tutorials",
-                  "link": {
-                    "type": "generated-index",
-                    "title": "PivotHead Tutorials",
-                    "description": "Learn the core concepts and see practical examples of how to use PivotHead.",
-                    "slug": "/category/tutorials",
-                    "permalink": "/PivotHead/docs/category/tutorials"
-                  },
+                  "label": "Getting Started",
                   "items": [
                     {
-                      "type": "category",
-                      "label": "Core",
-                      "items": [
-                        {
-                          "type": "doc",
-                          "id": "tutorial-basics/core/core-concepts"
-                        },
-                        {
-                          "type": "doc",
-                          "id": "tutorial-basics/core/api-reference"
-                        },
-                        { "type": "doc", "id": "tutorial-basics/core/examples" }
-                      ],
-                      "collapsed": true,
-                      "collapsible": true
+                      "type": "doc",
+                      "id": "getting-started/Why-we-use-pivothead"
                     },
-                    { "type": "doc", "id": "tutorial-basics/web-component" },
                     {
-                      "type": "category",
-                      "label": "Framework Wrappers",
-                      "items": [
-                        {
-                          "type": "doc",
-                          "id": "tutorial-basics/wrappers/react"
-                        },
-                        { "type": "doc", "id": "tutorial-basics/wrappers/vue" }
-                      ],
-                      "collapsed": true,
-                      "collapsible": true
+                      "type": "doc",
+                      "id": "getting-started/headless-quick-start"
                     },
-                    { "type": "doc", "id": "tutorial-basics/troubleshooting" }
+                    { "type": "doc", "id": "getting-started/installation" },
+                    { "type": "doc", "id": "getting-started/basic-setup" }
                   ],
                   "collapsed": true,
                   "collapsible": true
                 },
                 {
                   "type": "category",
+                  "label": "Tutorial",
+                  "items": [
+                    {
+                      "type": "category",
+                      "label": "Core Webcomponent",
+                      "items": [
+                        {
+                          "type": "doc",
+                          "id": "tutorials/core-webcomponent/core-webcomponent-sample-project"
+                        },
+                        {
+                          "type": "doc",
+                          "id": "tutorials/core-webcomponent/setup-for-user-project"
+                        }
+                      ],
+                      "collapsed": true,
+                      "collapsible": true
+                    },
+                    {
+                      "type": "category",
+                      "label": "React",
+                      "items": [
+                        {
+                          "type": "doc",
+                          "id": "tutorials/react/react-sample-project"
+                        },
+                        {
+                          "type": "doc",
+                          "id": "tutorials/react/setup-for-user-project"
+                        }
+                      ],
+                      "collapsed": true,
+                      "collapsible": true
+                    },
+                    {
+                      "type": "category",
+                      "label": "Vue",
+                      "items": [
+                        {
+                          "type": "doc",
+                          "id": "tutorials/vue/vue-sample-project"
+                        },
+                        {
+                          "type": "doc",
+                          "id": "tutorials/vue/setup-for-user-project"
+                        }
+                      ],
+                      "collapsed": true,
+                      "collapsible": true
+                    }
+                  ],
+                  "collapsed": true,
+                  "collapsible": true
+                },
+                {
+                  "type": "category",
+                  "label": "Reference",
+                  "items": [
+                    {
+                      "type": "category",
+                      "label": "Conceptual Reference",
+                      "items": [
+                        {
+                          "type": "doc",
+                          "id": "reference/conceptual-reference/core-webcomponent-conceptual-reference"
+                        },
+                        {
+                          "type": "doc",
+                          "id": "reference/conceptual-reference/react-conceptual-reference"
+                        },
+                        {
+                          "type": "doc",
+                          "id": "reference/conceptual-reference/vue-conceptual-reference"
+                        }
+                      ],
+                      "collapsed": true,
+                      "collapsible": true
+                    },
+                    {
+                      "type": "category",
+                      "label": "API Reference",
+                      "items": [
+                        {
+                          "type": "doc",
+                          "id": "reference/api-reference/core-webcomponent-api-reference"
+                        },
+                        {
+                          "type": "doc",
+                          "id": "reference/api-reference/react-api-reference"
+                        },
+                        {
+                          "type": "doc",
+                          "id": "reference/api-reference/vue-api-reference"
+                        }
+                      ],
+                      "collapsed": true,
+                      "collapsible": true
+                    }
+                  ],
+                  "collapsed": true,
+                  "collapsible": true
+                },
+                { "type": "doc", "id": "tutorial-basics/troubleshooting" },
+                {
+                  "type": "category",
                   "label": "Contribution Guide",
-                  "link": {
-                    "type": "generated-index",
-                    "title": "Contribution Guide",
-                    "description": "Guides for setting up your development environment and contributing to the PivotHead project.",
-                    "slug": "/category/contribution-guide",
-                    "permalink": "/PivotHead/docs/category/contribution-guide"
-                  },
                   "items": [
                     { "type": "doc", "id": "contributors/contributors" },
                     { "type": "doc", "id": "contributors/how-to-contribute" },
@@ -487,6 +1034,11 @@
                   ],
                   "collapsed": true,
                   "collapsible": true
+                },
+                {
+                  "type": "doc",
+                  "label": "Upcoming Features",
+                  "id": "upcoming/index"
                 }
               ]
             }
@@ -525,6 +1077,7 @@
     "docusaurus-plugin-svgr": {},
     "docusaurus-theme-classic": {},
     "docusaurus-tailwindcss": {},
+    "docusaurus-theme-mermaid": {},
     "docusaurus-bootstrap-plugin": {},
     "docusaurus-mdx-fallback-plugin": {}
   }

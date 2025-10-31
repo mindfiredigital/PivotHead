@@ -1,0 +1,60 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.default = decorateStory;\nexports.decorateStory = decorateStory;\nconst preview_api_1 = require(\"storybook/internal/preview-api\");\nconst ComputesTemplateFromComponent_1 = require(\"./angular-beta/ComputesTemplateFromComponent\");\nfunction decorateStory(mainStoryFn, decorators) {\n  const returnDecorators = [cleanArgsDecorator, ...decorators].reduce((previousStoryFn, decorator) => context => {\n    const decoratedStory = decorator(update => {\n      return previousStoryFn({\n        ...context,\n        ...(0, preview_api_1.sanitizeStoryContextUpdate)(update)\n      });\n    }, context);\n    return decoratedStory;\n  }, context => prepareMain(mainStoryFn(context), context));\n  return returnDecorators;\n}\nconst prepareMain = (story, context) => {\n  let {\n    template\n  } = story;\n  const {\n    component\n  } = context;\n  const userDefinedTemplate = !hasNoTemplate(template);\n  if (!userDefinedTemplate && component) {\n    template = (0, ComputesTemplateFromComponent_1.computesTemplateFromComponent)(component, story.props, '');\n  }\n  return {\n    ...story,\n    ...(template ? {\n      template,\n      userDefinedTemplate\n    } : {})\n  };\n};\nfunction hasNoTemplate(template) {\n  return template === null || template === undefined;\n}\nconst cleanArgsDecorator = (storyFn, context) => {\n  if (!context.argTypes || !context.args) {\n    return storyFn();\n  }\n  const argsToClean = context.args;\n  context.args = Object.entries(argsToClean).reduce((obj, [key, arg]) => {\n    const argType = context.argTypes[key];\n    // Only keeps args with a control or an action in argTypes\n    if (argType?.action || argType?.control) {\n      return {\n        ...obj,\n        [key]: arg\n      };\n    }\n    return obj;\n  }, {});\n  return storyFn();\n};",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "default",
+      "decorateStory",
+      "preview_api_1",
+      "require",
+      "ComputesTemplateFromComponent_1",
+      "mainStoryFn",
+      "decorators",
+      "returnDecorators",
+      "cleanArgsDecorator",
+      "reduce",
+      "previousStoryFn",
+      "decorator",
+      "context",
+      "decoratedStory",
+      "update",
+      "sanitizeStoryContextUpdate",
+      "prepareMain",
+      "story",
+      "template",
+      "component",
+      "userDefinedTemplate",
+      "hasNoTemplate",
+      "computesTemplateFromComponent",
+      "props",
+      "undefined",
+      "storyFn",
+      "argTypes",
+      "args",
+      "argsToClean",
+      "entries",
+      "obj",
+      "key",
+      "arg",
+      "argType",
+      "action",
+      "control"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/@storybook+angular@8.6.14_@angular-devkit+architect@0.1703.0_@angular-devkit+build-angular@17_a7aajamgs7bgz2yqzrp63bsev4/node_modules/@storybook/angular/dist/client/decorateStory.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.default = decorateStory;\nexports.decorateStory = decorateStory;\nconst preview_api_1 = require(\"storybook/internal/preview-api\");\nconst ComputesTemplateFromComponent_1 = require(\"./angular-beta/ComputesTemplateFromComponent\");\nfunction decorateStory(mainStoryFn, decorators) {\n    const returnDecorators = [cleanArgsDecorator, ...decorators].reduce((previousStoryFn, decorator) => (context) => {\n        const decoratedStory = decorator((update) => {\n            return previousStoryFn({\n                ...context,\n                ...(0, preview_api_1.sanitizeStoryContextUpdate)(update),\n            });\n        }, context);\n        return decoratedStory;\n    }, (context) => prepareMain(mainStoryFn(context), context));\n    return returnDecorators;\n}\nconst prepareMain = (story, context) => {\n    let { template } = story;\n    const { component } = context;\n    const userDefinedTemplate = !hasNoTemplate(template);\n    if (!userDefinedTemplate && component) {\n        template = (0, ComputesTemplateFromComponent_1.computesTemplateFromComponent)(component, story.props, '');\n    }\n    return {\n        ...story,\n        ...(template ? { template, userDefinedTemplate } : {}),\n    };\n};\nfunction hasNoTemplate(template) {\n    return template === null || template === undefined;\n}\nconst cleanArgsDecorator = (storyFn, context) => {\n    if (!context.argTypes || !context.args) {\n        return storyFn();\n    }\n    const argsToClean = context.args;\n    context.args = Object.entries(argsToClean).reduce((obj, [key, arg]) => {\n        const argType = context.argTypes[key];\n        // Only keeps args with a control or an action in argTypes\n        if (argType?.action || argType?.control) {\n            return { ...obj, [key]: arg };\n        }\n        return obj;\n    }, {});\n    return storyFn();\n};\n"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,OAAO,GAAGC,aAAa;AAC/BH,OAAO,CAACG,aAAa,GAAGA,aAAa;AACrC,MAAMC,aAAa,GAAGC,OAAO,CAAC,gCAAgC,CAAC;AAC/D,MAAMC,+BAA+B,GAAGD,OAAO,CAAC,8CAA8C,CAAC;AAC/F,SAASF,aAAaA,CAACI,WAAW,EAAEC,UAAU,EAAE;EAC5C,MAAMC,gBAAgB,GAAG,CAACC,kBAAkB,EAAE,GAAGF,UAAU,CAAC,CAACG,MAAM,CAAC,CAACC,eAAe,EAAEC,SAAS,KAAMC,OAAO,IAAK;IAC7G,MAAMC,cAAc,GAAGF,SAAS,CAAEG,MAAM,IAAK;MACzC,OAAOJ,eAAe,CAAC;QACnB,GAAGE,OAAO;QACV,GAAG,CAAC,CAAC,EAAEV,aAAa,CAACa,0BAA0B,EAAED,MAAM;MAC3D,CAAC,CAAC;IACN,CAAC,EAAEF,OAAO,CAAC;IACX,OAAOC,cAAc;EACzB,CAAC,EAAGD,OAAO,IAAKI,WAAW,CAACX,WAAW,CAACO,OAAO,CAAC,EAAEA,OAAO,CAAC,CAAC;EAC3D,OAAOL,gBAAgB;AAC3B;AACA,MAAMS,WAAW,GAAGA,CAACC,KAAK,EAAEL,OAAO,KAAK;EACpC,IAAI;IAAEM;EAAS,CAAC,GAAGD,KAAK;EACxB,MAAM;IAAEE;EAAU,CAAC,GAAGP,OAAO;EAC7B,MAAMQ,mBAAmB,GAAG,CAACC,aAAa,CAACH,QAAQ,CAAC;EACpD,IAAI,CAACE,mBAAmB,IAAID,SAAS,EAAE;IACnCD,QAAQ,GAAG,CAAC,CAAC,EAAEd,+BAA+B,CAACkB,6BAA6B,EAAEH,SAAS,EAAEF,KAAK,CAACM,KAAK,EAAE,EAAE,CAAC;EAC7G;EACA,OAAO;IACH,GAAGN,KAAK;IACR,IAAIC,QAAQ,GAAG;MAAEA,QAAQ;MAAEE;IAAoB,CAAC,GAAG,CAAC,CAAC;EACzD,CAAC;AACL,CAAC;AACD,SAASC,aAAaA,CAACH,QAAQ,EAAE;EAC7B,OAAOA,QAAQ,KAAK,IAAI,IAAIA,QAAQ,KAAKM,SAAS;AACtD;AACA,MAAMhB,kBAAkB,GAAGA,CAACiB,OAAO,EAAEb,OAAO,KAAK;EAC7C,IAAI,CAACA,OAAO,CAACc,QAAQ,IAAI,CAACd,OAAO,CAACe,IAAI,EAAE;IACpC,OAAOF,OAAO,CAAC,CAAC;EACpB;EACA,MAAMG,WAAW,GAAGhB,OAAO,CAACe,IAAI;EAChCf,OAAO,CAACe,IAAI,GAAG/B,MAAM,CAACiC,OAAO,CAACD,WAAW,CAAC,CAACnB,MAAM,CAAC,CAACqB,GAAG,EAAE,CAACC,GAAG,EAAEC,GAAG,CAAC,KAAK;IACnE,MAAMC,OAAO,GAAGrB,OAAO,CAACc,QAAQ,CAACK,GAAG,CAAC;IACrC;IACA,IAAIE,OAAO,EAAEC,MAAM,IAAID,OAAO,EAAEE,OAAO,EAAE;MACrC,OAAO;QAAE,GAAGL,GAAG;QAAE,CAACC,GAAG,GAAGC;MAAI,CAAC;IACjC;IACA,OAAOF,GAAG;EACd,CAAC,EAAE,CAAC,CAAC,CAAC;EACN,OAAOL,OAAO,CAAC,CAAC;AACpB,CAAC",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

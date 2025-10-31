@@ -1,0 +1,19 @@
+{
+  "ast": null,
+  "code": "// /*\n//  * Public API Surface of pivothead-angular\n//  */\n// export * from './lib/pivothead-wrapper.component';\n// // Re-export types for a better developer experience, mirroring the web component's API\n// export type {\n//   PivotHeadElement,\n//   PivotOptions,\n//   PivotDataRecord,\n//   FormatOptions,\n// } from '@mindfiredigital/pivothead-web-component';\n// export type {\n//   PivotTableState,\n//   FilterConfig,\n//   PaginationConfig,\n//   MeasureConfig,\n//   Dimension,\n//   GroupConfig,\n//   AggregationType,\n//   Group,\n// } from '@mindfiredigital/pivothead';\n// packages/angular/src/public-api.ts\n/*\n * Public API Surface of pivothead-angular\n */\nexport * from './lib/pivothead-wrapper.component';",
+  "map": {
+    "version": 3,
+    "names": [],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/packages/angular/src/public-api.ts"
+    ],
+    "sourcesContent": [
+      "// /*\n//  * Public API Surface of pivothead-angular\n//  */\n// export * from './lib/pivothead-wrapper.component';\n// // Re-export types for a better developer experience, mirroring the web component's API\n// export type {\n//   PivotHeadElement,\n//   PivotOptions,\n//   PivotDataRecord,\n//   FormatOptions,\n// } from '@mindfiredigital/pivothead-web-component';\n// export type {\n//   PivotTableState,\n//   FilterConfig,\n//   PaginationConfig,\n//   MeasureConfig,\n//   Dimension,\n//   GroupConfig,\n//   AggregationType,\n//   Group,\n// } from '@mindfiredigital/pivothead';\n// packages/angular/src/public-api.ts\n/*\n * Public API Surface of pivothead-angular\n */\nexport * from './lib/pivothead-wrapper.component';\n"
+    ],
+    "mappings": "AAAA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA,cAAc,mCAAmC",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "module",
+  "externalDependencies": []
+}

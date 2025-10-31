@@ -1,0 +1,28 @@
+{
+  "id": "getting-started/installation",
+  "title": "Installation Guide",
+  "description": "Easily integrate PivotHead, the next-generation headless pivot table solution, into your web projects. Whether you're using React, Angular, or Vue, PivotHead provides flexible and high-performance tools for building dynamic pivot tables that adapt to your data needs.",
+  "source": "@site/docs/getting-started/installation.md",
+  "sourceDirName": "getting-started",
+  "slug": "/getting-started/installation",
+  "permalink": "/PivotHead/docs/getting-started/installation",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/getting-started/installation.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "installation",
+    "title": "Installation Guide",
+    "sidebar_label": "Installation"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Headless Quick Start",
+    "permalink": "/PivotHead/docs/getting-started/headless-quick-start"
+  },
+  "next": {
+    "title": "Basic Setup",
+    "permalink": "/PivotHead/docs/getting-started/basic-setup"
+  }
+}

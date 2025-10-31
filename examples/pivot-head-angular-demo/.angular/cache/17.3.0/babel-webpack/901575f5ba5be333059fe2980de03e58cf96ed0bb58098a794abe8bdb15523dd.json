@@ -1,0 +1,19 @@
+{
+  "ast": null,
+  "code": "const preview = {\n  parameters: {\n    controls: {\n      matchers: {\n        color: /(background|color)$/i,\n        date: /Date$/i\n      }\n    }\n  }\n};\nexport default preview;",
+  "map": {
+    "version": 3,
+    "names": ["preview", "parameters", "controls", "matchers", "color", "date"],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/examples/pivot-head-angular-demo/.storybook/preview.ts"
+    ],
+    "sourcesContent": [
+      "const preview = {\n    parameters: {\n        controls: {\n            matchers: {\n                color: /(background|color)$/i,\n                date: /Date$/i,\n            },\n        },\n    },\n};\nexport default preview;\n"
+    ],
+    "mappings": "AAAA,MAAMA,OAAO,GAAG;EACZC,UAAU,EAAE;IACRC,QAAQ,EAAE;MACNC,QAAQ,EAAE;QACNC,KAAK,EAAE,sBAAsB;QAC7BC,IAAI,EAAE;MACV;IACJ;EACJ;AACJ,CAAC;AACD,eAAeL,OAAO",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "module",
+  "externalDependencies": []
+}

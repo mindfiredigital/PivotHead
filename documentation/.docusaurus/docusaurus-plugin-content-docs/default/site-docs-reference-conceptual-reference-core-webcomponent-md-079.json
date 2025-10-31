@@ -1,0 +1,28 @@
+{
+  "id": "reference/conceptual-reference/core-webcomponent-conceptual-reference",
+  "title": "Core Web Component Concepts",
+  "description": "The PivotHead Web Component (@mindfiredigital/pivothead-web-component) provides a flexible, framework-agnostic solution for integrating pivot table functionality into any web application. Built as a native Web Component, it offers three distinct rendering modes to accommodate different use cases and UI requirements.",
+  "source": "@site/docs/reference/conceptual-reference/core-webcomponent.md",
+  "sourceDirName": "reference/conceptual-reference",
+  "slug": "/reference/conceptual-reference/core-webcomponent-conceptual-reference",
+  "permalink": "/PivotHead/docs/reference/conceptual-reference/core-webcomponent-conceptual-reference",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/reference/conceptual-reference/core-webcomponent.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "core-webcomponent-conceptual-reference",
+    "title": "Core Web Component Concepts",
+    "sidebar_label": "Core Web Component"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "setup-for-user-project",
+    "permalink": "/PivotHead/docs/tutorials/vue/setup-for-user-project"
+  },
+  "next": {
+    "title": "React",
+    "permalink": "/PivotHead/docs/reference/conceptual-reference/react-conceptual-reference"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "ast": null,
+  "code": "module.exports = require('@storybook/core/docs-tools');",
+  "map": {
+    "version": 3,
+    "names": ["module", "exports", "require"],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/storybook@8.6.14_prettier@3.6.2/node_modules/storybook/core/docs-tools/index.cjs"
+    ],
+    "sourcesContent": [
+      "module.exports = require('@storybook/core/docs-tools');\n"
+    ],
+    "mappings": "AAAAA,MAAM,CAACC,OAAO,GAAGC,OAAO,CAAC,4BAA4B,CAAC",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

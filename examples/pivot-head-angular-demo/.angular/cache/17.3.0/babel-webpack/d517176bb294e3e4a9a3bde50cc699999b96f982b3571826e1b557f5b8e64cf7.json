@@ -1,0 +1,47 @@
+{
+  "ast": null,
+  "code": "\"use strict\";\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.switchMap = void 0;\nvar innerFrom_1 = require(\"../observable/innerFrom\");\nvar lift_1 = require(\"../util/lift\");\nvar OperatorSubscriber_1 = require(\"./OperatorSubscriber\");\nfunction switchMap(project, resultSelector) {\n  return lift_1.operate(function (source, subscriber) {\n    var innerSubscriber = null;\n    var index = 0;\n    var isComplete = false;\n    var checkComplete = function () {\n      return isComplete && !innerSubscriber && subscriber.complete();\n    };\n    source.subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, function (value) {\n      innerSubscriber === null || innerSubscriber === void 0 ? void 0 : innerSubscriber.unsubscribe();\n      var innerIndex = 0;\n      var outerIndex = index++;\n      innerFrom_1.innerFrom(project(value, outerIndex)).subscribe(innerSubscriber = OperatorSubscriber_1.createOperatorSubscriber(subscriber, function (innerValue) {\n        return subscriber.next(resultSelector ? resultSelector(value, innerValue, outerIndex, innerIndex++) : innerValue);\n      }, function () {\n        innerSubscriber = null;\n        checkComplete();\n      }));\n    }, function () {\n      isComplete = true;\n      checkComplete();\n    }));\n  });\n}\nexports.switchMap = switchMap;\n//# sourceMappingURL=switchMap.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "Object",
+      "defineProperty",
+      "exports",
+      "value",
+      "switchMap",
+      "innerFrom_1",
+      "require",
+      "lift_1",
+      "OperatorSubscriber_1",
+      "project",
+      "resultSelector",
+      "operate",
+      "source",
+      "subscriber",
+      "innerSubscriber",
+      "index",
+      "isComplete",
+      "checkComplete",
+      "complete",
+      "subscribe",
+      "createOperatorSubscriber",
+      "unsubscribe",
+      "innerIndex",
+      "outerIndex",
+      "innerFrom",
+      "innerValue",
+      "next"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/cjs/internal/operators/switchMap.js"
+    ],
+    "sourcesContent": [
+      "\"use strict\";\nObject.defineProperty(exports, \"__esModule\", { value: true });\nexports.switchMap = void 0;\nvar innerFrom_1 = require(\"../observable/innerFrom\");\nvar lift_1 = require(\"../util/lift\");\nvar OperatorSubscriber_1 = require(\"./OperatorSubscriber\");\nfunction switchMap(project, resultSelector) {\n    return lift_1.operate(function (source, subscriber) {\n        var innerSubscriber = null;\n        var index = 0;\n        var isComplete = false;\n        var checkComplete = function () { return isComplete && !innerSubscriber && subscriber.complete(); };\n        source.subscribe(OperatorSubscriber_1.createOperatorSubscriber(subscriber, function (value) {\n            innerSubscriber === null || innerSubscriber === void 0 ? void 0 : innerSubscriber.unsubscribe();\n            var innerIndex = 0;\n            var outerIndex = index++;\n            innerFrom_1.innerFrom(project(value, outerIndex)).subscribe((innerSubscriber = OperatorSubscriber_1.createOperatorSubscriber(subscriber, function (innerValue) { return subscriber.next(resultSelector ? resultSelector(value, innerValue, outerIndex, innerIndex++) : innerValue); }, function () {\n                innerSubscriber = null;\n                checkComplete();\n            })));\n        }, function () {\n            isComplete = true;\n            checkComplete();\n        }));\n    });\n}\nexports.switchMap = switchMap;\n//# sourceMappingURL=switchMap.js.map"
+    ],
+    "mappings": "AAAA,YAAY;;AACZA,MAAM,CAACC,cAAc,CAACC,OAAO,EAAE,YAAY,EAAE;EAAEC,KAAK,EAAE;AAAK,CAAC,CAAC;AAC7DD,OAAO,CAACE,SAAS,GAAG,KAAK,CAAC;AAC1B,IAAIC,WAAW,GAAGC,OAAO,CAAC,yBAAyB,CAAC;AACpD,IAAIC,MAAM,GAAGD,OAAO,CAAC,cAAc,CAAC;AACpC,IAAIE,oBAAoB,GAAGF,OAAO,CAAC,sBAAsB,CAAC;AAC1D,SAASF,SAASA,CAACK,OAAO,EAAEC,cAAc,EAAE;EACxC,OAAOH,MAAM,CAACI,OAAO,CAAC,UAAUC,MAAM,EAAEC,UAAU,EAAE;IAChD,IAAIC,eAAe,GAAG,IAAI;IAC1B,IAAIC,KAAK,GAAG,CAAC;IACb,IAAIC,UAAU,GAAG,KAAK;IACtB,IAAIC,aAAa,GAAG,SAAAA,CAAA,EAAY;MAAE,OAAOD,UAAU,IAAI,CAACF,eAAe,IAAID,UAAU,CAACK,QAAQ,CAAC,CAAC;IAAE,CAAC;IACnGN,MAAM,CAACO,SAAS,CAACX,oBAAoB,CAACY,wBAAwB,CAACP,UAAU,EAAE,UAAUV,KAAK,EAAE;MACxFW,eAAe,KAAK,IAAI,IAAIA,eAAe,KAAK,KAAK,CAAC,GAAG,KAAK,CAAC,GAAGA,eAAe,CAACO,WAAW,CAAC,CAAC;MAC/F,IAAIC,UAAU,GAAG,CAAC;MAClB,IAAIC,UAAU,GAAGR,KAAK,EAAE;MACxBV,WAAW,CAACmB,SAAS,CAACf,OAAO,CAACN,KAAK,EAAEoB,UAAU,CAAC,CAAC,CAACJ,SAAS,CAAEL,eAAe,GAAGN,oBAAoB,CAACY,wBAAwB,CAACP,UAAU,EAAE,UAAUY,UAAU,EAAE;QAAE,OAAOZ,UAAU,CAACa,IAAI,CAAChB,cAAc,GAAGA,cAAc,CAACP,KAAK,EAAEsB,UAAU,EAAEF,UAAU,EAAED,UAAU,EAAE,CAAC,GAAGG,UAAU,CAAC;MAAE,CAAC,EAAE,YAAY;QAC/RX,eAAe,GAAG,IAAI;QACtBG,aAAa,CAAC,CAAC;MACnB,CAAC,CAAE,CAAC;IACR,CAAC,EAAE,YAAY;MACXD,UAAU,GAAG,IAAI;MACjBC,aAAa,CAAC,CAAC;IACnB,CAAC,CAAC,CAAC;EACP,CAAC,CAAC;AACN;AACAf,OAAO,CAACE,SAAS,GAAGA,SAAS;AAC7B",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "script",
+  "externalDependencies": []
+}

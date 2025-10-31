@@ -1,0 +1,26 @@
+{
+  "ast": null,
+  "code": "import { createErrorClass } from './createErrorClass';\nexport var EmptyError = createErrorClass(function (_super) {\n  return function EmptyErrorImpl() {\n    _super(this);\n    this.name = 'EmptyError';\n    this.message = 'no elements in sequence';\n  };\n});\n//# sourceMappingURL=EmptyError.js.map",
+  "map": {
+    "version": 3,
+    "names": [
+      "createErrorClass",
+      "EmptyError",
+      "_super",
+      "EmptyErrorImpl",
+      "name",
+      "message"
+    ],
+    "sources": [
+      "/home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/node_modules/.pnpm/rxjs@7.8.0/node_modules/rxjs/dist/esm5/internal/util/EmptyError.js"
+    ],
+    "sourcesContent": [
+      "import { createErrorClass } from './createErrorClass';\nexport var EmptyError = createErrorClass(function (_super) { return function EmptyErrorImpl() {\n    _super(this);\n    this.name = 'EmptyError';\n    this.message = 'no elements in sequence';\n}; });\n//# sourceMappingURL=EmptyError.js.map"
+    ],
+    "mappings": "AAAA,SAASA,gBAAgB,QAAQ,oBAAoB;AACrD,OAAO,IAAIC,UAAU,GAAGD,gBAAgB,CAAC,UAAUE,MAAM,EAAE;EAAE,OAAO,SAASC,cAAcA,CAAA,EAAG;IAC1FD,MAAM,CAAC,IAAI,CAAC;IACZ,IAAI,CAACE,IAAI,GAAG,YAAY;IACxB,IAAI,CAACC,OAAO,GAAG,yBAAyB;EAC5C,CAAC;AAAE,CAAC,CAAC;AACL",
+    "ignoreList": []
+  },
+  "metadata": {},
+  "sourceType": "module",
+  "externalDependencies": []
+}

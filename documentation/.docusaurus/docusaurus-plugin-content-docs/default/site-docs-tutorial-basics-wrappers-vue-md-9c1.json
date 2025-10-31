@@ -11,14 +11,5 @@
   "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorial-basics/wrappers/vue.md",
   "tags": [],
   "version": "current",
-  "frontMatter": {},
-  "sidebar": "tutorialSidebar",
-  "previous": {
-    "title": "React Wrapper",
-    "permalink": "/PivotHead/docs/tutorial-basics/wrappers/react"
-  },
-  "next": {
-    "title": "Troubleshooting",
-    "permalink": "/PivotHead/docs/tutorial-basics/troubleshooting"
-  }
+  "frontMatter": {}
 }
