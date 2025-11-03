@@ -1,0 +1,147 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 900" style="max-width: 100%; height: auto;">
+  <defs>
+    <linearGradient id="coreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#dc2626;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#991b1b;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="bridgeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6d28d9;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="uiGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1d4ed8;stop-opacity:1" />
+    </linearGradient>
+    
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Title -->
+  <text x="400" y="40" font-size="28" font-weight="bold" text-anchor="middle" fill="#1f2937">
+    PivotHead Headless Architecture
+  </text>
+  
+  <!-- Data Source -->
+  <g transform="translate(300, 80)">
+    <rect x="0" y="0" width="200" height="70" rx="10" fill="#f3f4f6" stroke="#d1d5db" stroke-width="2" filter="url(#shadow)"/>
+    <text x="100" y="30" font-size="36" text-anchor="middle">📊</text>
+    <text x="100" y="55" font-size="16" font-weight="600" text-anchor="middle" fill="#1f2937">Your Data</text>
+  </g>
+
+  <!-- Arrow Down -->
+  <path d="M 400 160 L 400 200" stroke="#dc2626" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+      <polygon points="0 0, 10 5, 0 10" fill="#dc2626"/>
+    </marker>
+  </defs>
+
+  <!-- Core Engine Layer -->
+  <g transform="translate(150, 210)">
+    <rect x="0" y="0" width="500" height="150" rx="15" fill="url(#coreGradient)" filter="url(#shadow)"/>
+    <text x="50" y="45" font-size="40">⚙️</text>
+    <text x="120" y="50" font-size="24" font-weight="bold" fill="white">Core Pivot Engine</text>
+    <text x="250" y="80" font-size="14" text-anchor="middle" fill="#fee2e2">@pivothead/core (~50KB)</text>
+    
+    <g transform="translate(20, 95)">
+      <text x="0" y="0" font-size="12" fill="white">✓ Data Transformation</text>
+      <text x="0" y="20" font-size="12" fill="white">✓ Pivot Calculations</text>
+    </g>
+    <g transform="translate(250, 95)">
+      <text x="0" y="0" font-size="12" fill="white">✓ Aggregations</text>
+      <text x="0" y="20" font-size="12" fill="white">✓ Filtering & Sorting</text>
+    </g>
+  </g>
+
+  <!-- Bidirectional Arrow -->
+  <g transform="translate(400, 370)">
+    <path d="M 0 0 L 0 40" stroke="#8b5cf6" stroke-width="3" fill="none" marker-end="url(#arrowhead2)"/>
+    <path d="M 0 40 L 0 0" stroke="#8b5cf6" stroke-width="3" fill="none" marker-start="url(#arrowhead2)"/>
+  </g>
+  <defs>
+    <marker id="arrowhead2" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+      <polygon points="0 0, 10 5, 0 10" fill="#8b5cf6"/>
+    </marker>
+  </defs>
+
+  <!-- Web Component Bridge -->
+  <g transform="translate(150, 420)">
+    <rect x="0" y="0" width="500" height="120" rx="15" fill="url(#bridgeGradient)" filter="url(#shadow)"/>
+    <text x="50" y="45" font-size="40">🌉</text>
+    <text x="120" y="50" font-size="24" font-weight="bold" fill="white">Web Component Bridge</text>
+    <text x="250" y="75" font-size="14" text-anchor="middle" fill="#e9d5ff">@pivothead/webcomponent</text>
+    
+    <g transform="translate(60, 90)">
+      <text x="0" y="0" font-size="12" fill="white">✓ Framework Agnostic API</text>
+      <text x="230" y="0" font-size="12" fill="white">✓ Browser Compatible</text>
+    </g>
+  </g>
+
+  <!-- Arrow Up -->
+  <path d="M 400 550 L 400 590" stroke="#3b82f6" stroke-width="3" fill="none" marker-end="url(#arrowhead3)"/>
+  <defs>
+    <marker id="arrowhead3" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+      <polygon points="0 0, 10 5, 0 10" fill="#3b82f6"/>
+    </marker>
+  </defs>
+
+  <!-- Presentation Layer -->
+  <g transform="translate(150, 600)">
+    <rect x="0" y="0" width="500" height="150" rx="15" fill="url(#uiGradient)" filter="url(#shadow)"/>
+    <text x="50" y="45" font-size="40">🎨</text>
+    <text x="120" y="50" font-size="24" font-weight="bold" fill="white">Presentation Layer</text>
+    <text x="250" y="75" font-size="14" text-anchor="middle" fill="#dbeafe">Your Custom UI Components</text>
+    
+    <!-- Framework Icons -->
+    <g transform="translate(150, 90)">
+      <text x="0" y="0" font-size="30">⚛️</text>
+      <text x="50" y="0" font-size="30">🖖</text>
+      <text x="100" y="0" font-size="30">🅰️</text>
+      <text x="150" y="0" font-size="30">🧡</text>
+      <text x="200" y="0" font-size="30">📜</text>
+    </g>
+    <g transform="translate(150, 90)">
+      <text x="0" y="25" font-size="10" fill="white">React</text>
+      <text x="50" y="25" font-size="10" fill="white">Vue</text>
+      <text x="95" y="25" font-size="10" fill="white">Angular</text>
+      <text x="150" y="25" font-size="10" fill="white">Svelte</text>
+      <text x="195" y="25" font-size="10" fill="white">Vanilla</text>
+    </g>
+  </g>
+
+  <!-- Arrow Down -->
+  <path d="M 400 760 L 400 800" stroke="#10b981" stroke-width="3" fill="none" marker-end="url(#arrowhead4)"/>
+  <defs>
+    <marker id="arrowhead4" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+      <polygon points="0 0, 10 5, 0 10" fill="#10b981"/>
+    </marker>
+  </defs>
+
+  <!-- Output -->
+  <g transform="translate(250, 810)">
+    <rect x="0" y="0" width="300" height="70" rx="10" fill="#ecfdf5" stroke="#10b981" stroke-width="2" filter="url(#shadow)"/>
+    <text x="150" y="30" font-size="36" text-anchor="middle">✨</text>
+    <text x="150" y="55" font-size="16" font-weight="600" text-anchor="middle" fill="#065f46">Your Custom Pivot Table</text>
+  </g>
+
+  <!-- Side Notes -->
+  <g transform="translate(20, 250)">
+    <text x="0" y="0" font-size="12" font-weight="600" fill="#dc2626">Framework</text>
+    <text x="0" y="15" font-size="12" font-weight="600" fill="#dc2626">Agnostic</text>
+    <text x="0" y="35" font-size="11" fill="#6b7280">Pure Logic</text>
+  </g>
+
+  <g transform="translate(680, 460)">
+    <text x="0" y="0" font-size="12" font-weight="600" fill="#8b5cf6">Standard</text>
+    <text x="0" y="15" font-size="12" font-weight="600" fill="#8b5cf6">Interface</text>
+    <text x="0" y="35" font-size="11" fill="#6b7280">Web APIs</text>
+  </g>
+
+  <g transform="translate(20, 650)">
+    <text x="0" y="0" font-size="12" font-weight="600" fill="#3b82f6">Complete</text>
+    <text x="0" y="15" font-size="12" font-weight="600" fill="#3b82f6">Freedom</text>
+    <text x="0" y="35" font-size="11" fill="#6b7280">Your Style</text>
+  </g>
+</svg>
