@@ -23,7 +23,7 @@
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.3",
-    "@mindfiredigital/pivothead-angular": "file:../../dist/angular"
+    "@mindfiredigital/pivothead-angular": "workspace:*"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^17.3.0",
