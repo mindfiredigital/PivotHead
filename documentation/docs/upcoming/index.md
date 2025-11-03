@@ -31,8 +31,6 @@ import TabItem from '@theme/TabItem';
   marginTop: '2rem' 
 }}>
 
-{/_ Feature Card 1 _/}
-
 <div style={{
   background: 'linear-gradient(135deg, #fecaca 0%, #f87171 100%)',
   padding: '2rem',
@@ -69,8 +67,6 @@ onMouseLeave={(e) => {
   </div>
 </div>
 
-{/_ Feature Card 2 _/}
-
 <div style={{
   background: 'linear-gradient(135deg, #fecaca 0%, #f87171 100%)',
   padding: '2rem',
@@ -106,8 +102,6 @@ onMouseLeave={(e) => {
     ✓ CSV & JSON Support
   </div>
 </div>
-
-{/_ Feature Card 3 _/}
 
 <div style={{
   background: 'linear-gradient(135deg, #fecaca 0%, #f87171 100%)',
@@ -329,8 +323,6 @@ onMouseLeave={(e) => {
   marginTop: '2rem' 
 }}>
 
-{/_ Angular Support _/}
-
 <div style={{
   background: 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
   padding: '2rem',
@@ -397,8 +389,6 @@ onMouseLeave={(e) => {
     }}>Zone.js ready</span>
   </div>
 </div>
-
-{/_ High-Volume Processing _/}
 
 <div style={{
   background: 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
