@@ -1,8 +1,0 @@
-{
-  "ast": null,
-  "code": "export const appConfig = {\n  providers: []\n};",
-  "map": null,
-  "metadata": {},
-  "sourceType": "module",
-  "externalDependencies": []
-}
