@@ -1,8 +1,0 @@
-{
-  "ast": null,
-  "code": "import { bootstrapApplication } from '@angular/platform-browser';\nimport { AppComponent } from './app/app.component';\nimport { appConfig } from './app/app.config';\nbootstrapApplication(AppComponent, appConfig).catch(err => console.error(err));",
-  "map": null,
-  "metadata": {},
-  "sourceType": "module",
-  "externalDependencies": []
-}
