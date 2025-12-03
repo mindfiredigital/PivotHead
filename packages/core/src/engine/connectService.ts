@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { PivotEngine } from './pivotEngine';
 import type { AxisConfig, MeasureConfig } from '../types/interfaces';
+import { WorkerPool } from '../workers/WorkerPool';
+import { StreamingFileReader } from '../workers/StreamingFileReader';
+import { PerformanceConfig } from './PerformanceConfig';
 
 type FieldType = 'number' | 'string' | 'date' | 'boolean' | 'null' | 'unknown';
 
@@ -174,7 +177,10 @@ function buildAutoLayout(data: any[]): AutoLayoutResult {
     // If the only column is numeric -> add __all__ and make it a measure
     const types = inferFieldTypes(workingData, columns);
     if (types[only] === 'number') {
-      workingData = workingData.map(row => ({ ...row, __all__: 'All' }));
+      // OPTIMIZED: Mutate in place
+      for (let i = 0; i < workingData.length; i++) {
+        workingData[i].__all__ = 'All';
+      }
       const rows: AxisConfig[] = [{ uniqueName: '__all__', caption: 'All' }];
       // Changed: ensure there is always a column axis
       const columnsAxis: AxisConfig[] = [
@@ -199,7 +205,10 @@ function buildAutoLayout(data: any[]): AutoLayoutResult {
       };
     }
     // Otherwise treat it as a row dimension but still create a single synthetic column
-    workingData = workingData.map(row => ({ ...row, __all__: 'All' }));
+    // OPTIMIZED: Mutate in place
+    for (let i = 0; i < workingData.length; i++) {
+      workingData[i].__all__ = 'All';
+    }
     const rows: AxisConfig[] = [{ uniqueName: only, caption: only }];
     const columnsAxis: AxisConfig[] = [
       { uniqueName: '__all__', caption: 'All' },
@@ -245,14 +254,31 @@ function buildAutoLayout(data: any[]): AutoLayoutResult {
   let rows: AxisConfig[] = [];
   let columnsAxis: AxisConfig[] = [];
 
-  // Utility to compute cardinality
-  const uniqueCount = (field: string) =>
-    new Set(workingData.map(r => r?.[field])).size;
+  // Utility to compute cardinality - OPTIMIZED for large datasets
   const totalRows = workingData.length || 1;
+  const shouldSample = totalRows > 10000; // Sample if more than 10k rows
+  const sampleSize = shouldSample ? Math.min(5000, totalRows) : totalRows;
+  const sampleData = shouldSample
+    ? workingData.slice(0, sampleSize)
+    : workingData;
+
+  const uniqueCount = (field: string) => {
+    // For large datasets, estimate cardinality from sample
+    const uniqueInSample = new Set(sampleData.map(r => r?.[field])).size;
+    if (!shouldSample) return uniqueInSample;
+
+    // Estimate total unique count: unique_in_sample * (total_rows / sample_size)
+    // But cap at total rows
+    const estimated = Math.round(uniqueInSample * (totalRows / sampleSize));
+    return Math.min(estimated, totalRows);
+  };
 
   if (nonNumericFields.length === 0) {
     // All numeric -> add __all__ and set both rows and columns as All
-    workingData = workingData.map(row => ({ ...row, __all__: 'All' }));
+    // OPTIMIZED: Mutate in place instead of creating new array
+    for (let i = 0; i < workingData.length; i++) {
+      workingData[i].__all__ = 'All';
+    }
     rows = [{ uniqueName: '__all__', caption: 'All' }];
     columnsAxis = [{ uniqueName: '__all__', caption: 'All' }];
     return {
@@ -277,9 +303,17 @@ function buildAutoLayout(data: any[]): AutoLayoutResult {
 
   // Select candidate dimensions - fields that have more than one unique value
   // but fewer than the total number of rows (indicating repetition)
-  const candidateDims = ranked.filter(x => x.u > 1 && x.u < totalRows);
+  // IMPORTANT: Limit cardinality to prevent performance issues with large tables
+  // Max 100 unique values prevents creating pivot tables with hundreds of rows/columns
+  const MAX_CARDINALITY_FOR_DIMENSIONS = 100;
+  const candidateDims = ranked.filter(
+    x => x.u > 1 && x.u < totalRows && x.u <= MAX_CARDINALITY_FOR_DIMENSIONS
+  );
 
-  console.log('DEBUG: Candidate dimensions:', candidateDims);
+  console.log(
+    'DEBUG: Candidate dimensions (filtered by max cardinality):',
+    candidateDims
+  );
   console.log(
     'DEBUG: Detailed ranked fields:',
     ranked.map(r => ({ field: r.f, unique: r.u }))
@@ -422,7 +456,10 @@ function buildAutoLayout(data: any[]): AutoLayoutResult {
 
   // NEW: If no column axis was selected, synthesize a single '__all__' column
   if (!columnsAxis || columnsAxis.length === 0) {
-    workingData = workingData.map(row => ({ ...row, __all__: 'All' }));
+    // OPTIMIZED: Mutate in place
+    for (let i = 0; i < workingData.length; i++) {
+      workingData[i].__all__ = 'All';
+    }
     columnsAxis = [{ uniqueName: '__all__', caption: 'All' }];
   }
 
@@ -447,6 +484,9 @@ export interface FileConnectionResult {
   columns?: string[];
   error?: string;
   validationErrors?: string[];
+  performanceMode?: 'standard' | 'workers' | 'wasm'; // Performance mode used
+  allowDragDrop?: boolean; // Whether drag/drop should be enabled
+  requiresPagination?: boolean; // Whether pagination is required
 }
 
 /**
@@ -477,6 +517,9 @@ export interface ConnectionOptions {
   maxFileSize?: number; // in bytes
   maxRecords?: number;
   onProgress?: (progress: number) => void;
+  useWorkers?: boolean; // Enable Web Workers for large files
+  workerCount?: number; // Number of workers to use
+  chunkSizeBytes?: number; // Chunk size for streaming
 }
 
 /**
@@ -487,6 +530,12 @@ export class ConnectService {
   private static readonly DEFAULT_MAX_RECORDS = 100000; // 100k records
   private static readonly SUPPORTED_CSV_EXTENSIONS = ['.csv', '.txt'];
   private static readonly SUPPORTED_JSON_EXTENSIONS = ['.json', '.jsonl'];
+
+  // Worker thresholds (aligned with SDS)
+  private static readonly WORKER_FILE_SIZE_THRESHOLD = 5 * 1024 * 1024; // 5MB
+
+  // Worker pool instance (reused across imports)
+  private static workerPool: WorkerPool | null = null;
 
   /**
    * Opens a file picker for CSV files and imports data into the pivot engine
@@ -627,6 +676,18 @@ export class ConnectService {
       return validationResult;
     }
 
+    // Decide whether to use workers based on file size
+    const useWorkers =
+      options.useWorkers !== false &&
+      file.size >= this.WORKER_FILE_SIZE_THRESHOLD;
+
+    if (useWorkers) {
+      console.log(
+        `Large file detected (${this.formatFileSize(file.size)}). Using Web Workers for processing.`
+      );
+      return this.processCSVFileWithWorkers(file, engine, options);
+    }
+
     try {
       const csvOptions = {
         delimiter: ',',
@@ -666,13 +727,18 @@ export class ConnectService {
       // Enable engine-level synthetic column behavior for imported datasets
       engine.setAutoAllColumn(true);
 
-      // Update the pivot engine with new data (engine will handle '__all__' if needed)
-      engine.updateDataSource(processedData);
-
       // Generate automatic layout based on data content
       const layout = buildAutoLayout(processedData);
-      const { rows, columns: initialColumnsAxis, measures } = layout as any;
+      const {
+        rows,
+        columns: initialColumnsAxis,
+        measures,
+        data: augmentedData,
+      } = layout as any;
       const columnsAxis = initialColumnsAxis as AxisConfig[];
+
+      // Update the pivot engine with augmented data from layout (includes __all__ if needed)
+      engine.updateDataSource(augmentedData);
 
       // Apply automatic layout with proper formatting; engine will synthesize column axis if empty
       engine.setLayout(rows, columnsAxis, measures);
@@ -714,16 +780,30 @@ export class ConnectService {
         );
       }
 
+      const performanceMode = PerformanceConfig.getPerformanceMode(
+        file.size,
+        augmentedData.length
+      );
+      const allowDragDrop = PerformanceConfig.isDragDropAllowed(
+        augmentedData.length
+      );
+      const requiresPagination = PerformanceConfig.requiresPagination(
+        augmentedData.length
+      );
+
       return {
         success: true,
-        data: processedData,
+        data: augmentedData,
         fileName: file.name,
         fileSize: file.size,
-        recordCount: processedData.length,
+        recordCount: augmentedData.length,
         // Return original columns (exclude helper fields like __all__)
         columns,
         validationErrors:
           validationErrors.length > 0 ? validationErrors : undefined,
+        performanceMode,
+        allowDragDrop,
+        requiresPagination,
       };
     } catch (error) {
       return {
@@ -731,6 +811,325 @@ export class ConnectService {
         error: `Failed to parse CSV file: ${error instanceof Error ? error.message : 'Unknown error'}`,
       };
     }
+  }
+
+  /**
+   * Processes a CSV file using Web Workers and streaming
+   * @private
+   */
+  private static async processCSVFileWithWorkers(
+    file: File,
+    engine: PivotEngine<any>,
+    options: ConnectionOptions
+  ): Promise<FileConnectionResult> {
+    try {
+      const csvOptions = {
+        delimiter: ',',
+        hasHeader: true,
+        skipEmptyLines: true,
+        trimValues: true,
+        ...options.csv,
+      };
+
+      // Initialize worker pool if needed
+      if (!this.workerPool) {
+        // Create worker blob URL from worker code
+        const workerCode = await this.getWorkerCode();
+        const blob = new Blob([workerCode], { type: 'application/javascript' });
+        const workerUrl = URL.createObjectURL(blob);
+
+        this.workerPool = new WorkerPool(
+          workerUrl,
+          options.workerCount || Math.max(1, navigator.hardwareConcurrency - 1)
+        );
+      }
+
+      const allData: any[] = [];
+      let headers: string[] | undefined;
+      let leftover: string | undefined;
+      let chunkCount = 0;
+
+      const chunkSize =
+        options.chunkSizeBytes ||
+        StreamingFileReader.getOptimalChunkSize(file.size);
+
+      console.log(
+        `Processing with ${this.workerPool.getWorkerCount()} workers, chunk size: ${this.formatFileSize(chunkSize)}`
+      );
+
+      const startTime = performance.now();
+
+      // Process file in chunks
+      await StreamingFileReader.readFileInChunks(file, {
+        chunkSizeBytes: chunkSize,
+        encoding: csvOptions.encoding,
+        onProgress: progress => {
+          if (options.onProgress) {
+            options.onProgress(progress);
+          }
+        },
+        onChunk: async chunk => {
+          chunkCount++;
+
+          // Send chunk to worker for parsing
+          const result = await this.workerPool!.execute({
+            type: 'PARSE_CHUNK',
+            chunkId: chunk.chunkId,
+            text: chunk.text,
+            isFirstChunk: chunk.isFirstChunk,
+            isLastChunk: chunk.isLastChunk,
+            delimiter: csvOptions.delimiter,
+            headers,
+            leftover,
+          });
+
+          // Update headers from first chunk
+          if (result.headers) {
+            headers = result.headers;
+          }
+
+          // Update leftover for next chunk
+          leftover = result.leftover;
+
+          // Accumulate parsed data - OPTIMIZED: Use Array.concat for better performance with large arrays
+          if (result.data && result.data.length > 0) {
+            // For large datasets, direct concat is faster than spread operator
+            for (let i = 0; i < result.data.length; i++) {
+              allData.push(result.data[i]);
+            }
+          }
+
+          console.log(
+            `Chunk ${chunk.chunkId} processed: ${result.rowCount} rows (total: ${allData.length})`
+          );
+        },
+      });
+
+      const parseTime = performance.now() - startTime;
+      console.log(`Parsing completed in ${(parseTime / 1000).toFixed(2)}s`);
+
+      console.log(
+        `Streaming complete. Processed ${chunkCount} chunks, ${allData.length} total rows.`
+      );
+
+      // Apply record limit
+      const maxRecords = options.maxRecords ?? this.DEFAULT_MAX_RECORDS;
+      let finalData = allData;
+      if (finalData.length > maxRecords) {
+        console.log(`Limiting data to ${maxRecords} rows`);
+        finalData = finalData.slice(0, maxRecords);
+      }
+
+      if (finalData.length === 0) {
+        return {
+          success: false,
+          error: 'No valid data found in CSV file',
+        };
+      }
+
+      // Validate data structure
+      const columns = Object.keys(finalData[0]);
+      const validationErrors = this.validateDataStructure(finalData, columns);
+
+      if (validationErrors.length > 0) {
+        console.warn('Data validation warnings:', validationErrors);
+      }
+
+      // Enable engine-level synthetic column behavior
+      engine.setAutoAllColumn(true);
+
+      // Generate layout and update engine
+      console.log('Building layout...');
+      const layoutStart = performance.now();
+      const layout = buildAutoLayout(finalData);
+      const layoutTime = performance.now() - layoutStart;
+      console.log(`Layout built in ${(layoutTime / 1000).toFixed(2)}s`);
+
+      const {
+        rows,
+        columns: initialColumnsAxis,
+        measures,
+        data: augmentedData,
+      } = layout as any;
+      const columnsAxis = initialColumnsAxis as AxisConfig[];
+
+      console.log('Updating engine...');
+      const engineStart = performance.now();
+      engine.updateDataSource(augmentedData);
+      engine.setLayout(rows, columnsAxis, measures);
+      const engineTime = performance.now() - engineStart;
+      console.log(`Engine updated in ${(engineTime / 1000).toFixed(2)}s`);
+
+      // Apply conditional formatting
+      try {
+        const anyEngine = engine as any;
+        if (typeof anyEngine.setConditionalFormatting === 'function') {
+          anyEngine.setConditionalFormatting([
+            {
+              value: {
+                type: 'Number',
+                operator: 'Greater than',
+                value1: 1000,
+              },
+              format: {
+                backgroundColor: '#d4edda',
+                color: '#155724',
+              },
+            },
+            {
+              value: {
+                type: 'Number',
+                operator: 'Less than',
+                value1: 0,
+              },
+              format: {
+                backgroundColor: '#f8d7da',
+                color: '#721c24',
+              },
+            },
+          ]);
+        }
+      } catch (e) {
+        console.warn('Conditional formatting not supported:', e);
+      }
+
+      const performanceMode = PerformanceConfig.getPerformanceMode(
+        file.size,
+        augmentedData.length
+      );
+      const allowDragDrop = PerformanceConfig.isDragDropAllowed(
+        augmentedData.length
+      );
+      const requiresPagination = PerformanceConfig.requiresPagination(
+        augmentedData.length
+      );
+
+      // Log performance recommendations
+      if (!allowDragDrop) {
+        console.warn(
+          `⚠️ Drag/drop disabled: Dataset has ${augmentedData.length.toLocaleString()} rows (max: ${PerformanceConfig.getConfig().maxRowsForDragDrop.toLocaleString()})`
+        );
+      }
+
+      return {
+        success: true,
+        data: augmentedData,
+        fileName: file.name,
+        fileSize: file.size,
+        recordCount: augmentedData.length,
+        columns,
+        validationErrors:
+          validationErrors.length > 0 ? validationErrors : undefined,
+        performanceMode,
+        allowDragDrop,
+        requiresPagination,
+      };
+    } catch (error) {
+      console.error('Error in worker-based CSV processing:', error);
+      return {
+        success: false,
+        error: `Failed to parse CSV file: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      };
+    }
+  }
+
+  /**
+   * Get worker code as string for blob URL creation
+   * @private
+   */
+  private static async getWorkerCode(): Promise<string> {
+    // Worker code is inlined to avoid bundling issues
+    return `
+/* CSV Parser Worker */
+function parseCsvLine(line, delimiter) {
+  const result = [];
+  let current = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    if (char === '"' && (i === 0 || line[i - 1] === delimiter || inQuotes)) {
+      inQuotes = !inQuotes;
+    } else if (char === delimiter && !inQuotes) {
+      result.push(current);
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+  result.push(current);
+  return result;
+}
+
+function convertValue(value) {
+  if (value === '' || value === null || value === undefined) return null;
+  const cleaned = value.replace(/^"(.*)"$/, '$1').trim();
+  if (!isNaN(Number(cleaned)) && cleaned !== '') return Number(cleaned);
+  if (cleaned.toLowerCase() === 'true') return true;
+  if (cleaned.toLowerCase() === 'false') return false;
+  const dateValue = Date.parse(cleaned);
+  if (!isNaN(dateValue) && (cleaned.match(/^\\d{4}-\\d{2}-\\d{2}/) || cleaned.includes('/'))) {
+    return new Date(dateValue).toISOString().split('T')[0];
+  }
+  return cleaned;
+}
+
+function parseChunk(text, delimiter, headers, leftover, isFirstChunk, isLastChunk) {
+  const fullText = (leftover || '') + text;
+  const lines = fullText.split('\\n');
+  const incompleteLine = !isLastChunk ? lines.pop() : '';
+  const data = [];
+  let processedHeaders = headers;
+  let startIndex = 0;
+
+  if (isFirstChunk && !processedHeaders) {
+    if (lines.length > 0) {
+      processedHeaders = parseCsvLine(lines[0], delimiter).map(h => h.trim());
+      startIndex = 1;
+    }
+  }
+
+  for (let i = startIndex; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    const values = parseCsvLine(line, delimiter);
+    if (values.length === 0) continue;
+    const row = {};
+    processedHeaders?.forEach((header, index) => {
+      row[header] = convertValue(values[index] || '');
+    });
+    data.push(row);
+  }
+
+  return { data, headers: isFirstChunk ? processedHeaders : undefined, leftover: incompleteLine };
+}
+
+self.onmessage = (event) => {
+  const { type, chunkId, text, isFirstChunk, isLastChunk, delimiter, headers, leftover } = event.data;
+  if (type === 'PARSE_CHUNK') {
+    try {
+      self.postMessage({ type: 'PROGRESS', chunkId, progress: 0 });
+      const result = parseChunk(text, delimiter, headers, leftover, isFirstChunk, isLastChunk);
+      self.postMessage({
+        type: 'CHUNK_PARSED',
+        chunkId,
+        data: result.data,
+        headers: result.headers,
+        leftover: result.leftover,
+        rowCount: result.data.length,
+      });
+    } catch (error) {
+      self.postMessage({
+        type: 'CHUNK_PARSED',
+        chunkId,
+        data: [],
+        rowCount: 0,
+        error: error.message || 'Unknown error',
+      });
+    }
+  }
+};
+`;
   }
 
   /**
@@ -797,22 +1196,27 @@ export class ConnectService {
       // Enable engine-level synthetic column behavior for imported datasets
       engine.setAutoAllColumn(true);
 
-      // Update the pivot engine with new data (engine will handle '__all__' if needed)
-      engine.updateDataSource(arrayData);
-
       const layout = buildAutoLayout(arrayData);
-      const { rows, columns: initialColumnsAxis, measures } = layout as any;
+      const {
+        rows,
+        columns: initialColumnsAxis,
+        measures,
+        data: augmentedData,
+      } = layout as any;
       const columnsAxis = initialColumnsAxis as AxisConfig[];
+
+      // Update the pivot engine with augmented data from layout (includes __all__ if needed)
+      engine.updateDataSource(augmentedData);
 
       // Apply automatic layout; engine will synthesize column axis if empty
       engine.setLayout(rows, columnsAxis, measures);
 
       return {
         success: true,
-        data: arrayData,
+        data: augmentedData,
         fileName: file.name,
         fileSize: file.size,
-        recordCount: arrayData.length,
+        recordCount: augmentedData.length,
         // Return original columns (exclude helper fields like __all__)
         columns,
         validationErrors:
@@ -1003,8 +1407,8 @@ export class ConnectService {
     // Try to convert to date
     const dateValue = Date.parse(cleaned);
     if (
-      (!isNaN(dateValue) && cleaned.match(/^\d{4}-\d{2}-\d{2}/)) ||
-      cleaned.includes('/')
+      !isNaN(dateValue) &&
+      (cleaned.match(/^\d{4}-\d{2}-\d{2}/) || cleaned.includes('/'))
     ) {
       return new Date(dateValue).toISOString().split('T')[0]; // Return as date string
     }

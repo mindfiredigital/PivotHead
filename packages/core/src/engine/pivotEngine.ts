@@ -41,7 +41,7 @@ export class PivotEngine<T extends Record<string, any>> {
   private autoAllColumnEnabled = false;
 
   // Add cache for expensive calculations
-  // private cache: Map<string, any> = new Map();
+  private cache: Map<string, any> = new Map();
 
   constructor(config: PivotTableConfig<T>) {
     // Validate required config properties
@@ -796,25 +796,29 @@ export class PivotEngine<T extends Record<string, any>> {
    * @public
    */
   public getFieldAlignment(field: string): string {
+    // Check cache first for performance
+    const cacheKey = `alignment:${field}`;
+    if (this.cache.has(cacheKey)) {
+      return this.cache.get(cacheKey);
+    }
+
     const format = this.getFieldFormat(field);
 
-    console.log(`getFieldAlignment for field: ${field}`, format); // Debug log
+    let alignment: string;
 
     if (format && format.align) {
-      console.log(`Returning alignment: ${format.align}`); // Debug log
-      return format.align;
+      alignment = format.align;
+    } else if (format && format.type === 'currency' && format.currencyAlign) {
+      alignment = format.currencyAlign;
+    } else {
+      // Default alignment: right for numbers, left for text
+      const measure = this.state.measures.find(m => m.uniqueName === field);
+      alignment = measure ? 'right' : 'left';
     }
 
-    if (format && format.type === 'currency' && format.currencyAlign) {
-      return format.currencyAlign;
-    }
-
-    // Default alignment: right for numbers, left for text
-    const measure = this.state.measures.find(m => m.uniqueName === field);
-    const defaultAlign = measure ? 'right' : 'left';
-
-    console.log(`Using default alignment: ${defaultAlign}`); // Debug log
-    return defaultAlign;
+    // Cache the result for future calls
+    this.cache.set(cacheKey, alignment);
+    return alignment;
   }
 
   /**
@@ -832,6 +836,10 @@ export class PivotEngine<T extends Record<string, any>> {
 
     // Update global formatting
     this.state.formatting[field] = format;
+
+    // Clear alignment cache for this field since formatting changed
+    const cacheKey = `alignment:${field}`;
+    this.cache.delete(cacheKey);
 
     // Regenerate processed data with new formatting
     this.state.processedData = this.generateProcessedDataForDisplay();

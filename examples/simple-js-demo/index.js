@@ -240,7 +240,8 @@ function swapRawDataColumns(fromIndex, toIndex) {
 // FIXED: Raw data table rendering with proper sort icons
 function renderRawDataTable() {
   try {
-    console.log('Rendering raw data table');
+    const startTime = performance.now();
+    console.log('⏱️ Starting raw data table render...');
 
     const rawDataToUse = pivotEngine.getState().rawData;
 
@@ -255,9 +256,7 @@ function renderRawDataTable() {
     }
 
     console.log(
-      'Rendering raw data table with',
-      rawDataToUse.length,
-      'total items'
+      `⏱️ Rendering raw data table with ${rawDataToUse.length.toLocaleString()} total items`
     );
 
     const tableContainer = document.getElementById('myTable');
@@ -393,6 +392,11 @@ function renderRawDataTable() {
 
     // Set up drag and drop
     setupRawDataDragAndDrop(rawDataToUse);
+
+    const endTime = performance.now();
+    console.log(
+      `⏱️ Raw data table rendered in ${((endTime - startTime) / 1000).toFixed(2)}s`
+    );
   } catch (error) {
     console.error('Error rendering raw data table:', error);
     const tableContainer = document.getElementById('myTable');
@@ -548,6 +552,27 @@ function setupRawDataDragAndDrop(rawData) {
     rawData.length,
     'items'
   );
+
+  // Check if dataset is too large for drag/drop
+  const MAX_ROWS_FOR_DRAG_DROP = 1000;
+  if (rawData.length > MAX_ROWS_FOR_DRAG_DROP) {
+    console.warn(
+      `⚠️ Drag/drop disabled: Dataset has ${rawData.length.toLocaleString()} rows (max: ${MAX_ROWS_FOR_DRAG_DROP.toLocaleString()})`
+    );
+
+    // Show warning message to user
+    const tableContainer = document.getElementById('myTable');
+    if (tableContainer && !document.getElementById('drag-drop-warning')) {
+      const warning = document.createElement('div');
+      warning.id = 'drag-drop-warning';
+      warning.style.cssText =
+        'background: #fff3cd; border: 1px solid #ffc107; padding: 10px; margin: 10px 0; border-radius: 4px; color: #856404;';
+      warning.innerHTML = `<strong>⚠️ Performance Notice:</strong> Drag & drop is disabled for datasets with more than ${MAX_ROWS_FOR_DRAG_DROP.toLocaleString()} rows to prevent browser crashes.`;
+      tableContainer.parentElement.insertBefore(warning, tableContainer);
+    }
+
+    return; // Don't set up drag/drop handlers
+  }
 
   // Column drag and drop for raw data
   const headers = document.querySelectorAll(
@@ -1778,9 +1803,10 @@ export async function handleFileConnection(fileType) {
       resetFilters();
 
       // Update the config with new data structure
-      if (result.columns && result.columns.length > 0) {
-        updateConfigFromImportedData(result);
-      }
+      // DISABLED: connectService.ts already does smart field selection with cardinality limits
+      // if (result.columns && result.columns.length > 0) {
+      //   updateConfigFromImportedData(result);
+      // }
 
       // Rebuild filter UI to reflect newly imported fields
       initializeFilters();
