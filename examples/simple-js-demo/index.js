@@ -11,14 +11,19 @@
 
 // Import statements - Make sure these paths are correct
 import { createHeader } from './header/header.js';
-import { PivotEngine } from '@mindfiredigital/pivothead';
+import {
+  PivotEngine,
+  ConnectService,
+  FieldService,
+} from '@mindfiredigital/pivothead';
 import { sampleData, config } from './config/config.js';
-
-import { ConnectService } from '../../packages/core/src/engine/connectService.ts';
-import { FieldService } from '../../packages/core/src/engine/fieldService.ts';
+import { VirtualScroller } from './services/VirtualScroller.js';
 
 // Create a single instance of PivotEngine that will be used throughout the app's lifecycle
 export let pivotEngine;
+
+// Virtual Scroller instance for large datasets
+let virtualScroller = null;
 
 // Store the current full dataset being used (can be original or filtered)
 let currentData = [...sampleData];
@@ -191,6 +196,17 @@ function swapRawDataRows(fromIndex, toIndex, rawData) {
 
   currentData = [...rawData];
 
+  // CRITICAL FIX: Update the pivot engine's data source with the reordered data
+  // This ensures that when switching to processed mode, the engine has the correct data
+  if (pivotEngine) {
+    try {
+      pivotEngine.updateDataSource(rawData);
+      console.log('Pivot engine data source updated with reordered data');
+    } catch (error) {
+      console.error('Error updating pivot engine data source:', error);
+    }
+  }
+
   console.log('Raw data rows swapped successfully');
 }
 
@@ -237,20 +253,47 @@ function swapRawDataColumns(fromIndex, toIndex) {
   renderRawDataTable();
 }
 
-// FIXED: Raw data table rendering with proper sort icons
+// UPDATED: Raw data table rendering with virtual scrolling for large datasets
 function renderRawDataTable() {
   try {
     const startTime = performance.now();
     console.log('⏱️ Starting raw data table render...');
 
-    const rawDataToUse = pivotEngine.getState().rawData;
+    // Log performance mode if available
+    if (window.lastPerformanceMode) {
+      console.log(
+        `📊 Data was processed using: ${window.lastPerformanceMode.toUpperCase()}`
+      );
+    }
+
+    // CRITICAL FIX: Get raw data from pivot engine state
+    // After file upload, the engine's state should have the uploaded data
+    let rawDataToUse = null;
+
+    if (pivotEngine) {
+      const state = pivotEngine.getState();
+      rawDataToUse = state.rawData || state.data;
+
+      console.log('Raw data source check:', {
+        hasRawData: !!state.rawData,
+        hasData: !!state.data,
+        rawDataLength: state.rawData?.length || 0,
+        dataLength: state.data?.length || 0,
+      });
+    }
+
+    // Fallback to currentData if engine state is empty
+    if (!rawDataToUse || rawDataToUse.length === 0) {
+      console.warn('No raw data in engine state, using currentData fallback');
+      rawDataToUse = currentData;
+    }
 
     if (!rawDataToUse || rawDataToUse.length === 0) {
-      console.error('No raw data available');
+      console.error('No raw data available from any source');
       const tableContainer = document.getElementById('myTable');
       if (tableContainer) {
         tableContainer.innerHTML =
-          '<div style="padding: 20px;">No data available to display.</div>';
+          '<div style="padding: 20px;">No data available to display. Please upload a file.</div>';
       }
       return;
     }
@@ -265,14 +308,6 @@ function renderRawDataTable() {
       return;
     }
 
-    tableContainer.innerHTML = '';
-
-    const table = document.createElement('table');
-    table.style.width = '100%';
-    table.style.borderCollapse = 'collapse';
-    table.style.marginTop = '20px';
-    table.style.border = '1px solid #dee2e6';
-
     // Get headers - use custom order if available
     let headers;
     if (window.rawDataColumnOrder && window.rawDataColumnOrder.length > 0) {
@@ -281,117 +316,396 @@ function renderRawDataTable() {
       headers = rawDataToUse.length > 0 ? Object.keys(rawDataToUse[0]) : [];
     }
 
-    // Create table header
-    const thead = document.createElement('thead');
-    const headerRow = document.createElement('tr');
+    // Use virtual scrolling for large datasets (> 1000 rows)
+    const VIRTUAL_SCROLL_THRESHOLD = 1000;
+    const useVirtualScrolling = rawDataToUse.length > VIRTUAL_SCROLL_THRESHOLD;
 
-    // Get current sort state for raw data
-    const currentSort = window.rawDataSort || {};
+    if (useVirtualScrolling) {
+      console.log('✨ Using virtual scrolling for optimal performance');
 
-    headers.forEach((headerText, index) => {
-      const th = document.createElement('th');
-      th.style.padding = '12px';
-      th.style.backgroundColor = '#f8f9fa';
-      th.style.borderBottom = '2px solid #dee2e6';
-      th.style.borderRight = '1px solid #dee2e6';
-      th.style.cursor = 'pointer';
-      th.style.position = 'relative';
-      th.style.userSelect = 'none';
+      // Show info message
+      const infoMessage = document.createElement('div');
+      infoMessage.style.cssText = `
+        background: #e3f2fd;
+        border: 1px solid #2196f3;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+        color: #1565c0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      `;
+      infoMessage.innerHTML = `
+        <strong>✨ Virtual Scrolling Enabled</strong>
+        <span>Smoothly handling ${rawDataToUse.length.toLocaleString()} rows with drag & drop support!</span>
+      `;
 
-      th.setAttribute('draggable', 'true');
-      th.dataset.columnIndex = index;
-      th.dataset.columnName = headerText;
-      th.className = 'raw-data-header';
+      tableContainer.innerHTML = '';
+      tableContainer.appendChild(infoMessage);
 
-      const headerContent = document.createElement('div');
-      headerContent.style.display = 'flex';
-      headerContent.style.alignItems = 'center';
-      headerContent.style.justifyContent = 'space-between';
+      // Destroy existing virtual scroller if any
+      if (virtualScroller) {
+        virtualScroller.destroy();
+      }
 
-      const headerSpan = document.createElement('span');
-      headerSpan.textContent = getFieldDisplayName(headerText);
-      headerContent.appendChild(headerSpan);
+      // Create virtual scroller container
+      const scrollerContainer = document.createElement('div');
+      scrollerContainer.id = 'virtual-scroller-container';
+      tableContainer.appendChild(scrollerContainer);
 
-      // FIXED: Use the proper sort icon function with current state
-      const sortIcon = createSortIcon(headerText, {
-        field: currentSort.column,
-        direction: currentSort.direction,
-      });
-      headerContent.appendChild(sortIcon);
+      // Get current sort state
+      const currentSort = window.rawDataSort || {};
 
-      th.appendChild(headerContent);
+      // Header renderer
+      const renderHeader = headersList => {
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
 
-      // FIXED: Click handler for sorting
-      th.addEventListener('click', e => {
-        // Prevent drag when clicking on sort
-        e.stopPropagation();
-        sortRawDataByColumn(headerText, rawDataToUse);
-      });
+        headersList.forEach((headerText, index) => {
+          const th = document.createElement('th');
+          th.style.cssText = `
+            padding: 12px 16px;
+            background-color: #f5f7fa;
+            border-bottom: 2px solid #dee2e6;
+            border-right: 1px solid #e8eaed;
+            cursor: pointer;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            user-select: none;
+            font-weight: 600;
+            font-size: 13px;
+            color: #202124;
+            min-width: 120px;
+            max-width: 300px;
+            text-align: left;
+            white-space: nowrap;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+          `;
 
-      headerRow.appendChild(th);
-    });
+          th.setAttribute('draggable', 'true');
+          th.dataset.columnIndex = index;
+          th.dataset.columnName = headerText;
+          th.className = 'raw-data-header';
 
-    thead.appendChild(headerRow);
-    table.appendChild(thead);
+          const headerContent = document.createElement('div');
+          headerContent.style.display = 'flex';
+          headerContent.style.alignItems = 'center';
+          headerContent.style.justifyContent = 'space-between';
 
-    // Update pagination
-    updateRawDataPagination(rawDataToUse);
+          const headerSpan = document.createElement('span');
+          headerSpan.textContent = getFieldDisplayName(headerText);
+          headerContent.appendChild(headerSpan);
 
-    // Get paginated data
-    const paginatedData = getPaginatedData(rawDataToUse, paginationState);
+          const sortIcon = createSortIcon(headerText, {
+            field: currentSort.column,
+            direction: currentSort.direction,
+          });
+          headerContent.appendChild(sortIcon);
 
-    // Create table body - use the custom header order for cells too
-    const tbody = document.createElement('tbody');
+          th.appendChild(headerContent);
 
-    paginatedData.forEach((rowData, rowIndex) => {
-      const tr = document.createElement('tr');
-      tr.dataset.rowIndex = rowIndex;
-      tr.dataset.globalIndex = rawDataToUse.indexOf(rowData);
-      tr.setAttribute('draggable', 'true');
-      tr.style.cursor = 'move';
-      tr.className = 'raw-data-row';
+          // Click handler for sorting
+          th.addEventListener('click', e => {
+            e.stopPropagation();
+            sortRawDataByColumn(headerText, rawDataToUse);
+          });
 
-      // Use the headers array (which respects custom order) for cell creation
-      headers.forEach(header => {
-        const td = document.createElement('td');
-        td.style.padding = '8px';
-        td.style.borderBottom = '1px solid #dee2e6';
-        td.style.borderRight = '1px solid #dee2e6';
+          headerRow.appendChild(th);
+        });
 
-        let cellValue = rowData[header];
-        if (cellValue === null || cellValue === undefined) {
-          cellValue = '';
-        } else if (typeof cellValue === 'number') {
-          if (
-            header === 'price' ||
-            header === 'sales' ||
-            header === 'revenue' ||
-            header === 'discount'
-          ) {
-            cellValue = new Intl.NumberFormat('en-US', {
-              style: 'currency',
-              currency: 'USD',
-            }).format(cellValue);
-          } else if (typeof cellValue === 'number' && cellValue % 1 !== 0) {
-            cellValue = cellValue.toFixed(2);
+        thead.appendChild(headerRow);
+        return thead;
+      };
+
+      // Row renderer
+      const renderRow = (rowData, rowIndex, headersList) => {
+        const tr = document.createElement('tr');
+        tr.dataset.rowIndex = rowIndex;
+        tr.dataset.globalIndex = rowIndex;
+        tr.className = 'raw-data-row';
+        tr.style.height = '40px';
+
+        headersList.forEach(header => {
+          const td = document.createElement('td');
+          td.style.cssText = `
+            padding: 10px 16px;
+            border-bottom: 1px solid #e8eaed;
+            border-right: 1px solid #e8eaed;
+            min-width: 120px;
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 13px;
+            color: #3c4043;
+            line-height: 20px;
+            background-color: #fff;
+            transition: background-color 0.2s;
+          `;
+
+          let cellValue = rowData[header];
+          let displayValue = cellValue;
+
+          if (cellValue === null || cellValue === undefined) {
+            displayValue = '';
+          } else if (typeof cellValue === 'number') {
+            if (
+              header === 'price' ||
+              header === 'sales' ||
+              header === 'revenue' ||
+              header === 'discount'
+            ) {
+              displayValue = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+              }).format(cellValue);
+            } else if (typeof cellValue === 'number' && cellValue % 1 !== 0) {
+              displayValue = cellValue.toFixed(2);
+            }
+          } else {
+            displayValue = String(cellValue);
           }
-        }
 
-        td.textContent = cellValue;
-        tr.appendChild(td);
+          td.textContent = displayValue;
+
+          // Add tooltip if text is truncated
+          if (displayValue && String(displayValue).length > 30) {
+            td.title = String(displayValue);
+            td.style.cursor = 'help';
+          }
+
+          // Hover effect
+          td.addEventListener('mouseenter', () => {
+            td.style.backgroundColor = '#f8f9fa';
+          });
+          td.addEventListener('mouseleave', () => {
+            td.style.backgroundColor = '#fff';
+          });
+
+          tr.appendChild(td);
+        });
+
+        return tr;
+      };
+
+      // Drag and drop handler
+      const handleDragDrop = (fromIndex, toIndex) => {
+        console.log(`Swapping rows: ${fromIndex} <-> ${toIndex}`);
+        const temp = rawDataToUse[fromIndex];
+        rawDataToUse[fromIndex] = rawDataToUse[toIndex];
+        rawDataToUse[toIndex] = temp;
+
+        // Update the engine's raw data
+        pivotEngine.getState().rawData = rawDataToUse;
+
+        // Refresh the virtual scroller
+        virtualScroller.refresh();
+      };
+
+      // Initialize virtual scroller
+      virtualScroller = new VirtualScroller({
+        container: scrollerContainer,
+        data: rawDataToUse,
+        headers: headers,
+        rowHeight: 40,
+        bufferSize: 10,
+        renderRow: renderRow,
+        renderHeader: renderHeader,
+        onDragDrop: handleDragDrop,
       });
 
-      tbody.appendChild(tr);
-    });
+      virtualScroller.mount(scrollerContainer);
 
-    table.appendChild(tbody);
-    tableContainer.appendChild(table);
+      // Update pagination info
+      const paginationInfo = document.getElementById('paginationInfo');
+      if (paginationInfo) {
+        paginationInfo.textContent = `Showing all ${rawDataToUse.length.toLocaleString()} rows (virtual scrolling)`;
+      }
+    } else {
+      // Use traditional rendering for small datasets (< 1000 rows)
+      tableContainer.innerHTML = '';
 
-    // Update pagination info
-    updatePaginationInfo('Raw Data');
+      // Destroy existing virtual scroller if any
+      if (virtualScroller) {
+        virtualScroller.destroy();
+        virtualScroller = null;
+      }
 
-    // Set up drag and drop
-    setupRawDataDragAndDrop(rawDataToUse);
+      // Create scrollable wrapper
+      const tableWrapper = document.createElement('div');
+      tableWrapper.style.cssText = `
+        max-height: 600px;
+        overflow: auto;
+        border: 1px solid #e8eaed;
+        border-radius: 4px;
+        background-color: #fff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+        margin-top: 10px;
+      `;
+
+      const table = document.createElement('table');
+      table.style.cssText = `
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: auto;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      `;
+
+      // Create table header
+      const thead = document.createElement('thead');
+      const headerRow = document.createElement('tr');
+
+      // Get current sort state for raw data
+      const currentSort = window.rawDataSort || {};
+
+      headers.forEach((headerText, index) => {
+        const th = document.createElement('th');
+        th.style.cssText = `
+          padding: 12px 16px;
+          background-color: #f5f7fa;
+          border-bottom: 2px solid #dee2e6;
+          border-right: 1px solid #e8eaed;
+          cursor: pointer;
+          position: sticky;
+          top: 0;
+          z-index: 10;
+          user-select: none;
+          font-weight: 600;
+          font-size: 13px;
+          color: #202124;
+          min-width: 120px;
+          max-width: 300px;
+          text-align: left;
+          white-space: nowrap;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        `;
+
+        th.setAttribute('draggable', 'true');
+        th.dataset.columnIndex = index;
+        th.dataset.columnName = headerText;
+        th.className = 'raw-data-header';
+
+        const headerContent = document.createElement('div');
+        headerContent.style.display = 'flex';
+        headerContent.style.alignItems = 'center';
+        headerContent.style.justifyContent = 'space-between';
+
+        const headerSpan = document.createElement('span');
+        headerSpan.textContent = getFieldDisplayName(headerText);
+        headerContent.appendChild(headerSpan);
+
+        const sortIcon = createSortIcon(headerText, {
+          field: currentSort.column,
+          direction: currentSort.direction,
+        });
+        headerContent.appendChild(sortIcon);
+
+        th.appendChild(headerContent);
+
+        // Click handler for sorting
+        th.addEventListener('click', e => {
+          e.stopPropagation();
+          sortRawDataByColumn(headerText, rawDataToUse);
+        });
+
+        headerRow.appendChild(th);
+      });
+
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      // Update pagination
+      updateRawDataPagination(rawDataToUse);
+
+      // Get paginated data
+      const paginatedData = getPaginatedData(rawDataToUse, paginationState);
+
+      // Create table body
+      const tbody = document.createElement('tbody');
+
+      paginatedData.forEach((rowData, rowIndex) => {
+        const tr = document.createElement('tr');
+        tr.dataset.rowIndex = rowIndex;
+        tr.dataset.globalIndex = rawDataToUse.indexOf(rowData);
+        tr.setAttribute('draggable', 'true');
+        tr.style.cursor = 'move';
+        tr.className = 'raw-data-row';
+
+        headers.forEach(header => {
+          const td = document.createElement('td');
+          td.style.cssText = `
+            padding: 10px 16px;
+            border-bottom: 1px solid #e8eaed;
+            border-right: 1px solid #e8eaed;
+            min-width: 120px;
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 13px;
+            color: #3c4043;
+            line-height: 20px;
+            background-color: #fff;
+            transition: background-color 0.2s;
+          `;
+
+          let cellValue = rowData[header];
+          let displayValue = cellValue;
+
+          if (cellValue === null || cellValue === undefined) {
+            displayValue = '';
+          } else if (typeof cellValue === 'number') {
+            if (
+              header === 'price' ||
+              header === 'sales' ||
+              header === 'revenue' ||
+              header === 'discount'
+            ) {
+              displayValue = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+              }).format(cellValue);
+            } else if (typeof cellValue === 'number' && cellValue % 1 !== 0) {
+              displayValue = cellValue.toFixed(2);
+            }
+          } else {
+            displayValue = String(cellValue);
+          }
+
+          td.textContent = displayValue;
+
+          // Add tooltip if text is truncated
+          if (displayValue && String(displayValue).length > 30) {
+            td.title = String(displayValue);
+            td.style.cursor = 'help';
+          }
+
+          // Hover effect
+          td.addEventListener('mouseenter', () => {
+            td.style.backgroundColor = '#f8f9fa';
+          });
+          td.addEventListener('mouseleave', () => {
+            td.style.backgroundColor = '#fff';
+          });
+
+          tr.appendChild(td);
+        });
+
+        tbody.appendChild(tr);
+      });
+
+      table.appendChild(tbody);
+      tableWrapper.appendChild(table);
+      tableContainer.appendChild(tableWrapper);
+
+      // Update pagination info
+      updatePaginationInfo('Raw Data');
+
+      // Set up drag and drop for small datasets
+      setupRawDataDragAndDrop(rawDataToUse);
+    }
 
     const endTime = performance.now();
     console.log(
@@ -547,32 +861,10 @@ function getSortedRowValuesByMeasure(
 }
 
 function setupRawDataDragAndDrop(rawData) {
-  console.log(
-    'Setting up raw data drag and drop with',
-    rawData.length,
-    'items'
-  );
+  console.log('✨ Setting up drag and drop with', rawData.length, 'items');
 
-  // Check if dataset is too large for drag/drop
-  const MAX_ROWS_FOR_DRAG_DROP = 1000;
-  if (rawData.length > MAX_ROWS_FOR_DRAG_DROP) {
-    console.warn(
-      `⚠️ Drag/drop disabled: Dataset has ${rawData.length.toLocaleString()} rows (max: ${MAX_ROWS_FOR_DRAG_DROP.toLocaleString()})`
-    );
-
-    // Show warning message to user
-    const tableContainer = document.getElementById('myTable');
-    if (tableContainer && !document.getElementById('drag-drop-warning')) {
-      const warning = document.createElement('div');
-      warning.id = 'drag-drop-warning';
-      warning.style.cssText =
-        'background: #fff3cd; border: 1px solid #ffc107; padding: 10px; margin: 10px 0; border-radius: 4px; color: #856404;';
-      warning.innerHTML = `<strong>⚠️ Performance Notice:</strong> Drag & drop is disabled for datasets with more than ${MAX_ROWS_FOR_DRAG_DROP.toLocaleString()} rows to prevent browser crashes.`;
-      tableContainer.parentElement.insertBefore(warning, tableContainer);
-    }
-
-    return; // Don't set up drag/drop handlers
-  }
+  // Note: For large datasets (> 1000 rows), virtual scrolling handles drag/drop
+  // This function only sets up drag/drop for traditional rendering (< 1000 rows)
 
   // Column drag and drop for raw data
   const headers = document.querySelectorAll(
@@ -673,15 +965,33 @@ function renderTable() {
 
   if (!pivotEngine) {
     console.error('PivotEngine not initialized');
+    const tableContainer = document.getElementById('myTable');
+    if (tableContainer) {
+      tableContainer.innerHTML =
+        '<div style="padding: 20px; color: red;">Error: Pivot engine not initialized. Please refresh the page.</div>';
+    }
     return;
   }
 
   try {
+    console.log('🔄 Starting renderTable for processed mode...');
     const state = pivotEngine.getState();
-    console.log('Current Engine State:', state);
+    console.log('📊 Current Engine State:', {
+      hasProcessedData: !!state.processedData,
+      hasRawData: !!state.rawData,
+      dataHandlingMode: state.dataHandlingMode,
+      rowsCount: state.rows?.length || 0,
+      columnsCount: state.columns?.length || 0,
+      measuresCount: state.measures?.length || 0,
+    });
 
     if (!state.processedData) {
-      console.error('No processed data available');
+      console.error('❌ No processed data available in engine state');
+      const tableContainer = document.getElementById('myTable');
+      if (tableContainer) {
+        tableContainer.innerHTML =
+          '<div style="padding: 20px; color: red;">Error: No processed data available. Please upload a file.</div>';
+      }
       return;
     }
 
@@ -808,7 +1118,7 @@ function renderTable() {
             ...new Set(filteredRawData.map(item => item[rowFieldName])),
           ];
           const sortedRows = [...uniqueRowValues].sort((a, b) => {
-            const result = a.localeCompare(b);
+            const result = String(a).localeCompare(String(b));
             return nextDir === 'asc' ? result : -result;
           });
           if (sortedRows.length > 0) {
@@ -1241,62 +1551,99 @@ function addEnhancedDragStyles() {
 }
 
 function setupRowDragAndDrop(rowFieldName) {
-  // Prefer attaching drag to the first cell for broader browser support with table rows
-  const rowCells = document.querySelectorAll(
-    'tbody td.row-cell[draggable="true"]'
-  );
-  let draggedRowValue = null;
+  try {
+    console.log('🎯 Setting up row drag and drop for field:', rowFieldName);
 
-  if (!pivotEngine) return;
-  const uniqueRowValues = pivotEngine.getOrderedUniqueFieldValues(
-    rowFieldName,
-    true
-  );
-
-  rowCells.forEach(cell => {
-    const fieldValue = cell.dataset.fieldValue;
-    const row = cell.parentElement;
-
-    cell.addEventListener('dragstart', e => {
-      draggedRowValue = fieldValue;
-      try {
-        e.dataTransfer.setData('text/plain', fieldValue);
-      } catch {}
-      setTimeout(() => row && row.classList.add('dragging'), 0);
-    });
-
-    cell.addEventListener('dragend', () => {
-      if (row) row.classList.remove('dragging');
-      draggedRowValue = null;
-    });
-
-    cell.addEventListener('dragover', e => e.preventDefault());
-    cell.addEventListener('dragenter', e => {
-      e.preventDefault();
-      if (draggedRowValue && draggedRowValue !== fieldValue && row) {
-        row.classList.add('drag-over');
-      }
-    });
-    cell.addEventListener(
-      'dragleave',
-      () => row && row.classList.remove('drag-over')
+    // Prefer attaching drag to the first cell for broader browser support with table rows
+    const rowCells = document.querySelectorAll(
+      'tbody td.row-cell[draggable="true"]'
     );
-    cell.addEventListener('drop', e => {
-      e.preventDefault();
-      if (row) row.classList.remove('drag-over');
 
-      const targetRowValue = fieldValue;
-      const fromIndex = uniqueRowValues.indexOf(draggedRowValue);
-      const toIndex = uniqueRowValues.indexOf(targetRowValue);
+    console.log('📍 Found', rowCells.length, 'draggable row cells');
 
-      if (fromIndex !== -1 && toIndex !== -1 && fromIndex !== toIndex) {
-        pivotEngine.swapDataRows(fromIndex, toIndex);
-        // Force re-render to reflect new order
-        setTimeout(renderTable, 0);
-      }
-    });
-  });
-}
+    let draggedRowValue = null;
+
+    if (!pivotEngine) {
+      console.error('❌ PivotEngine not available for row drag setup');
+      return;
+    }
+
+    const uniqueRowValues = pivotEngine.getOrderedUniqueFieldValues(
+      rowFieldName,
+      true
+    );
+
+    console.log('📊 Unique row values for drag:', uniqueRowValues?.length || 0);
+
+    if (!uniqueRowValues || uniqueRowValues.length === 0) {
+      console.warn('⚠️ No unique row values available for drag and drop');
+      return;
+    }
+
+    rowCells.forEach(cell => {
+      const fieldValue = cell.dataset.fieldValue;
+      const row = cell.parentElement;
+
+      cell.addEventListener('dragstart', e => {
+        draggedRowValue = fieldValue;
+        try {
+          e.dataTransfer.setData('text/plain', fieldValue);
+        } catch {}
+        setTimeout(() => row && row.classList.add('dragging'), 0);
+      });
+
+      cell.addEventListener('dragend', () => {
+        if (row) row.classList.remove('dragging');
+        draggedRowValue = null;
+      });
+
+      cell.addEventListener('dragover', e => e.preventDefault());
+      cell.addEventListener('dragenter', e => {
+        e.preventDefault();
+        if (draggedRowValue && draggedRowValue !== fieldValue && row) {
+          row.classList.add('drag-over');
+        }
+      });
+      cell.addEventListener(
+        'dragleave',
+        () => row && row.classList.remove('drag-over')
+      );
+      cell.addEventListener('drop', e => {
+        e.preventDefault();
+        if (row) row.classList.remove('drag-over');
+
+        const targetRowValue = fieldValue;
+        const fromIndex = uniqueRowValues.indexOf(draggedRowValue);
+        const toIndex = uniqueRowValues.indexOf(targetRowValue);
+
+        if (fromIndex !== -1 && toIndex !== -1 && fromIndex !== toIndex) {
+          try {
+            console.log('🔄 Attempting to swap rows in processed mode:', {
+              draggedValue: draggedRowValue,
+              targetValue: fieldValue,
+              fromIndex,
+              toIndex,
+            });
+            pivotEngine.swapDataRows(fromIndex, toIndex);
+            console.log('✓ Row swap completed, re-rendering table');
+            // Force re-render to reflect new order
+            setTimeout(renderTable, 0);
+          } catch (error) {
+            console.error('❌ Error during row swap in processed mode:', error);
+            alert(
+              'Error reordering data. Please refresh the page and try again.\n\nError: ' +
+                error.message
+            );
+          }
+        }
+      });
+    }); // <-- FIX: This is the correctly placed closing brace for rowCells.forEach
+
+    console.log('✓ Row drag and drop setup completed');
+  } catch (error) {
+    console.error('❌ Error setting up row drag and drop:', error);
+  }
+} // <-- This is the correctly placed closing brace for function setupRowDragAndDrop
 
 function getFieldDisplayName(fieldName) {
   return fieldName.charAt(0).toUpperCase() + fieldName.slice(1);
@@ -1391,24 +1738,133 @@ function setupEventListeners() {
   const switchButton = document.getElementById('switchView');
   if (switchButton) {
     switchButton.addEventListener('click', () => {
-      currentViewMode = currentViewMode === 'processed' ? 'raw' : 'processed';
-      switchButton.textContent =
-        currentViewMode === 'processed'
-          ? 'Switch to Raw Data'
-          : 'Switch to Processed Data';
-      paginationState.currentPage = 1;
+      // Show loading indicator for smooth transition
+      const tableContainer = document.getElementById('myTable');
+      if (tableContainer) {
+        const loadingIndicator = document.createElement('div');
+        loadingIndicator.id = 'view-loading-indicator';
+        loadingIndicator.style.cssText = `
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: rgba(255, 255, 255, 0.95);
+          padding: 30px 50px;
+          border-radius: 10px;
+          box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+          z-index: 10000;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 15px;
+        `;
+        loadingIndicator.innerHTML = `
+          <div style="width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid #2196f3; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+          <div style="font-size: 16px; font-weight: 600; color: #333;">
+            Switching to ${currentViewMode === 'processed' ? 'Raw' : 'Processed'} Data...
+          </div>
+        `;
 
-      if (pivotEngine) {
-        pivotEngine.setDataHandlingMode(
-          currentViewMode === 'processed' ? 'processed' : 'raw'
-        );
+        // Add animation
+        const style = document.createElement('style');
+        style.textContent = `
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `;
+        document.head.appendChild(style);
+
+        document.body.appendChild(loadingIndicator);
+
+        // Use setTimeout to allow the loading indicator to render
+        setTimeout(() => {
+          currentViewMode =
+            currentViewMode === 'processed' ? 'raw' : 'processed';
+          switchButton.textContent =
+            currentViewMode === 'processed'
+              ? 'Switch to Raw Data'
+              : 'Switch to Processed Data';
+          paginationState.currentPage = 1;
+
+          if (pivotEngine) {
+            try {
+              console.log('🔄 Switching to mode:', currentViewMode);
+
+              // CRITICAL FIX: Sync currentData with pivot engine state BEFORE mode switch
+              const stateBeforeSwitch = pivotEngine.getState();
+              if (
+                stateBeforeSwitch.rawData &&
+                stateBeforeSwitch.rawData.length > 0
+              ) {
+                currentData = stateBeforeSwitch.rawData;
+                console.log(
+                  '✓ Pre-switch sync: currentData updated with',
+                  currentData.length,
+                  'rows'
+                );
+              }
+
+              // Now switch the mode
+              pivotEngine.setDataHandlingMode(
+                currentViewMode === 'processed' ? 'processed' : 'raw'
+              );
+              console.log('✓ Mode switched successfully');
+
+              // Verify state after switch
+              const stateAfterSwitch = pivotEngine.getState();
+              console.log('📊 State after mode switch:', {
+                mode: stateAfterSwitch.dataHandlingMode,
+                hasProcessedData: !!stateAfterSwitch.processedData,
+                hasRawData: !!stateAfterSwitch.rawData,
+                rawDataLength: stateAfterSwitch.rawData?.length || 0,
+              });
+            } catch (error) {
+              console.error('❌ Error during mode switch:', error);
+              alert(
+                'Error switching view mode. Please refresh the page and try again.\n\nError: ' +
+                  error.message
+              );
+
+              // Try to revert to previous mode
+              currentViewMode =
+                currentViewMode === 'processed' ? 'raw' : 'processed';
+              switchButton.textContent =
+                currentViewMode === 'processed'
+                  ? 'Switch to Raw Data'
+                  : 'Switch to Processed Data';
+              return;
+            }
+          }
+
+          // Also update pagination info label immediately for better UX
+          updatePaginationInfo(
+            currentViewMode === 'processed' ? 'Processed Data' : 'Raw Data'
+          );
+
+          // Wrap renderTable in try-catch to handle rendering errors
+          try {
+            renderTable();
+          } catch (renderError) {
+            console.error(
+              '❌ Error rendering table after mode switch:',
+              renderError
+            );
+            const tableContainer = document.getElementById('myTable');
+            if (tableContainer) {
+              tableContainer.innerHTML = `<div style="padding: 20px; color: red;">Error rendering table: ${renderError.message}<br><br>Please refresh the page and try again.</div>`;
+            }
+          }
+
+          // Remove loading indicator after a short delay
+          setTimeout(() => {
+            const indicator = document.getElementById('view-loading-indicator');
+            if (indicator) {
+              indicator.remove();
+            }
+          }, 300);
+        }, 50);
       }
-
-      // Also update pagination info label immediately for better UX
-      updatePaginationInfo(
-        currentViewMode === 'processed' ? 'Processed Data' : 'Raw Data'
-      );
-      renderTable();
     });
   }
 
@@ -1434,9 +1890,9 @@ function setupEventListeners() {
     });
   }
 
-  const nextButton = document.getElementById('nextPage');
-  if (nextButton) {
-    nextButton.addEventListener('click', () => {
+  const nextPageButton = document.getElementById('nextPage');
+  if (nextPageButton) {
+    nextPageButton.addEventListener('click', () => {
       if (paginationState.currentPage < paginationState.totalPages) {
         paginationState.currentPage++;
         renderTable();
@@ -1736,11 +2192,42 @@ function addControlsHTML() {
 
 // Set up drag and drop functionality
 function setupDragAndDrop() {
-  if (!pivotEngine) return;
-  const rowFieldName = pivotEngine.getRowFieldName();
-  const columnFieldName = pivotEngine.getColumnFieldName();
-  if (rowFieldName) setupRowDragAndDrop(rowFieldName);
-  if (columnFieldName) setupColumnDragAndDropFixed(columnFieldName);
+  try {
+    console.log('🎯 Starting drag and drop setup...');
+
+    if (!pivotEngine) {
+      console.error(
+        '❌ Cannot setup drag and drop: pivotEngine not initialized'
+      );
+      return;
+    }
+
+    const rowFieldName = pivotEngine.getRowFieldName();
+    const columnFieldName = pivotEngine.getColumnFieldName();
+
+    console.log('📋 Field names:', {
+      rowFieldName,
+      columnFieldName,
+    });
+
+    if (rowFieldName) {
+      setupRowDragAndDrop(rowFieldName);
+    } else {
+      console.warn('⚠️ No row field name available, skipping row drag setup');
+    }
+
+    if (columnFieldName && columnFieldName !== '__all__') {
+      setupColumnDragAndDropFixed(columnFieldName);
+    } else {
+      console.log(
+        'ℹ️ Skipping column drag setup (no column field or synthetic __all__ column)'
+      );
+    }
+
+    console.log('✓ Drag and drop setup completed');
+  } catch (error) {
+    console.error('❌ Error in setupDragAndDrop:', error);
+  }
 }
 
 // Add this new function to handle file connections
@@ -1762,7 +2249,7 @@ export async function handleFileConnection(fileType) {
             trimValues: true,
             dynamicTyping: false,
           },
-          maxFileSize: 150 * 1024 * 1024, // 50MB
+          maxFileSize: 1024 * 1024 * 1024, // 1GB (1024MB) - supports large files up to 800MB+
           onProgress: progress => {
             updateLoadingProgress(progress);
           },
@@ -1775,7 +2262,7 @@ export async function handleFileConnection(fileType) {
             arrayPath: null, // Will auto-detect
             validateSchema: true,
           },
-          maxFileSize: 150 * 1024 * 1024, // 50MB
+          maxFileSize: 1024 * 1024 * 1024, // 1GB (1024MB) - supports large files up to 800MB+
           onProgress: progress => {
             updateLoadingProgress(progress);
           },
@@ -1784,7 +2271,7 @@ export async function handleFileConnection(fileType) {
 
       default:
         result = await ConnectService.connectToLocalFile(pivotEngine, {
-          maxFileSize: 50 * 1024 * 1024, // 50MB
+          maxFileSize: 1024 * 1024 * 1024, // 1GB (1024MB) - supports large files up to 800MB+
           onProgress: progress => {
             updateLoadingProgress(progress);
           },
@@ -1795,6 +2282,27 @@ export async function handleFileConnection(fileType) {
     hideLoadingIndicator();
 
     if (result.success) {
+      // Store performance mode for debugging
+      window.lastPerformanceMode = result.performanceMode || 'unknown';
+
+      // Log performance information
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('📊 FILE PROCESSING SUMMARY');
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log(
+        `🔧 Processing Mode: ${(result.performanceMode || 'standard').toUpperCase()}`
+      );
+      console.log(
+        `📁 File Size: ${(result.fileSize / 1024 / 1024).toFixed(2)} MB`
+      );
+      console.log(
+        `📊 Records: ${result.recordCount?.toLocaleString() || 'N/A'}`
+      );
+      if (result.parseTime) {
+        console.log(`⏱️  Parse Time: ${(result.parseTime / 1000).toFixed(2)}s`);
+      }
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
       // Update current data reference
       currentData = result.data;
 
@@ -1805,7 +2313,7 @@ export async function handleFileConnection(fileType) {
       // Update the config with new data structure
       // DISABLED: connectService.ts already does smart field selection with cardinality limits
       // if (result.columns && result.columns.length > 0) {
-      //   updateConfigFromImportedData(result);
+      //    updateConfigFromImportedData(result);
       // }
 
       // Rebuild filter UI to reflect newly imported fields
@@ -1932,11 +2440,12 @@ function showLoadingIndicator(message = 'Loading...') {
       box-shadow: 0 4px 20px rgba(0,0,0,0.3);
       z-index: 10000;
       text-align: center;
-      min-width: 300px;
+      min-width: 350px;
+      max-width: 500px;
     `;
 
     loader.innerHTML = `
-      <div style="margin-bottom: 20px; font-size: 16px; font-weight: bold;">
+      <div id="loading-message" style="margin-bottom: 20px; font-size: 16px; font-weight: bold;">
         ${message}
       </div>
       <div style="background: #f0f0f0; height: 20px; border-radius: 10px; overflow: hidden;">
@@ -1944,6 +2453,8 @@ function showLoadingIndicator(message = 'Loading...') {
       </div>
       <div id="progress-text" style="margin-top: 10px; font-size: 14px; color: #666;">
         0%
+      </div>
+      <div id="progress-status" style="margin-top: 10px; font-size: 12px; color: #999; min-height: 18px;">
       </div>
     `;
 
@@ -1968,12 +2479,25 @@ function showLoadingIndicator(message = 'Loading...') {
 function updateLoadingProgress(progress) {
   const progressBar = document.getElementById('progress-bar');
   const progressText = document.getElementById('progress-text');
+  const progressStatus = document.getElementById('progress-status');
 
   if (progressBar) {
     progressBar.style.width = `${progress}%`;
   }
   if (progressText) {
     progressText.textContent = `${Math.round(progress)}%`;
+  }
+  if (progressStatus) {
+    // Update status message based on progress
+    if (progress < 70) {
+      progressStatus.textContent = 'Reading and parsing file...';
+    } else if (progress < 90) {
+      progressStatus.textContent = 'Processing data...';
+    } else if (progress < 95) {
+      progressStatus.textContent = 'Building pivot layout...';
+    } else {
+      progressStatus.textContent = 'Finalizing...';
+    }
   }
 }
 
@@ -2182,9 +2706,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-window.debugPivotState = function () {
+window.debugPivotState = () => {
+  if (!pivotEngine) {
+    console.warn('pivotEngine not initialized');
+    return;
+  }
   const state = pivotEngine.getState();
   console.log('Sort config:', state.sortConfig);
-  console.log('Groups count:', state.groups.length);
+  console.log('Groups count:', (state.groups || []).length);
   console.log('Data handling mode:', state.dataHandlingMode);
 };
