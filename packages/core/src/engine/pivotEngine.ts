@@ -26,6 +26,15 @@ import { PivotExportService } from './exportService';
  * @param {PivotTableConfig<T>} config - The configuration for the pivot table.
  */
 export class PivotEngine<T extends Record<string, any>> {
+  setColumns(columns: any) {
+    throw new Error('Method not implemented.');
+  }
+  setRows(rows: any) {
+    throw new Error('Method not implemented.');
+  }
+  setData(augmentedData: any[]) {
+    throw new Error('Method not implemented.');
+  }
   private config: PivotTableConfig<T>;
   private state: PivotTableState<T>;
   private filterConfig: FilterConfig[] = [];
@@ -407,9 +416,18 @@ export class PivotEngine<T extends Record<string, any>> {
   }
   /**
    * Emit state changes to all subscribers.
+   * CRITICAL FIX: Wrap each listener in try-catch to prevent one subscriber error from crashing others
    */
   private _emit() {
-    this.listeners.forEach(fn => fn(this.getState()));
+    const state = this.getState();
+    this.listeners.forEach(fn => {
+      try {
+        fn(state);
+      } catch (error) {
+        console.error('Error in pivot engine subscriber:', error);
+        // Continue processing other subscribers even if one fails
+      }
+    });
   }
 
   /**

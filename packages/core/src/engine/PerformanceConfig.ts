@@ -25,17 +25,18 @@ export interface PerformanceThresholds {
 
 export class PerformanceConfig {
   private static config: PerformanceThresholds = {
-    // Worker configuration (SDS aligned)
-    useWorkersAboveSize: 5 * 1024 * 1024, // 5MB
-    useWorkersAboveRows: 10000, // 10k rows
+    // Worker configuration - for files < 5MB
+    useWorkersAboveSize: 1 * 1024 * 1024, // 1MB (workers for smaller files)
+    useWorkersAboveRows: 5000, // 5k rows
 
-    // WASM configuration (SDS aligned)
-    useWasmAboveSize: 10 * 1024 * 1024, // 10MB
-    useWasmAboveRows: 50000, // 50k rows
+    // WASM configuration - for files >= 5MB (up to 8MB safety limit)
+    // Strategy: Workers for < 5MB, WASM for 5-8MB, Workers for > 8MB (streaming)
+    useWasmAboveSize: 5 * 1024 * 1024, // 5MB (WASM for larger files)
+    useWasmAboveRows: 20000, // 20k rows
 
-    // UI interaction limits
-    maxRowsForDragDrop: 1000, // Disable drag/drop above 1k rows
-    maxRowsForFullRender: 10000, // Paginate above 10k rows
+    // UI interaction limits (with virtual scrolling support)
+    maxRowsForDragDrop: 1000, // Traditional rendering limit (virtual scrolling handles larger datasets)
+    maxRowsForFullRender: 10000, // Virtual scrolling threshold
     defaultPageSize: 50, // Show 50 rows per page
     maxPageSize: 500, // Max 500 rows per page
 
@@ -135,13 +136,31 @@ export class PerformanceConfig {
 
   /**
    * Get performance mode for dataset
+   * Returns the optimal processing mode based on file size
    */
   public static getPerformanceMode(
     fileSize: number,
     rowCount: number
-  ): 'standard' | 'workers' | 'wasm' {
-    if (this.shouldUseWasm(fileSize, rowCount)) return 'wasm';
-    if (this.shouldUseWorkers(fileSize, rowCount)) return 'workers';
+  ): 'standard' | 'workers' | 'wasm' | 'streaming-wasm' {
+    const WASM_THRESHOLD = 5 * 1024 * 1024; // 5MB
+    const WASM_SAFETY_LIMIT = 8 * 1024 * 1024; // 8MB
+
+    // TIER 3: Files > 8MB → Streaming + WASM Hybrid
+    if (fileSize > WASM_SAFETY_LIMIT) {
+      return 'streaming-wasm';
+    }
+
+    // TIER 2: Files 5-8MB → Pure WASM (in-memory, fastest)
+    if (fileSize >= WASM_THRESHOLD && fileSize <= WASM_SAFETY_LIMIT) {
+      return 'wasm';
+    }
+
+    // TIER 1: Files 1-5MB → Web Workers (parallel processing)
+    if (this.shouldUseWorkers(fileSize, rowCount)) {
+      return 'workers';
+    }
+
+    // TIER 0: Small files < 1MB → Standard JavaScript
     return 'standard';
   }
 }

@@ -4,6 +4,8 @@ import type { AxisConfig, MeasureConfig } from '../types/interfaces';
 import { WorkerPool } from '../workers/WorkerPool';
 import { StreamingFileReader } from '../workers/StreamingFileReader';
 import { PerformanceConfig } from './PerformanceConfig';
+import { getWasmCSVProcessor } from '../wasm/WasmCSVProcessor';
+import { WasmLoader } from '../wasm/WasmLoader';
 
 type FieldType = 'number' | 'string' | 'date' | 'boolean' | 'null' | 'unknown';
 
@@ -484,9 +486,10 @@ export interface FileConnectionResult {
   columns?: string[];
   error?: string;
   validationErrors?: string[];
-  performanceMode?: 'standard' | 'workers' | 'wasm'; // Performance mode used
+  performanceMode?: 'standard' | 'workers' | 'wasm' | 'streaming-wasm'; // Performance mode used
   allowDragDrop?: boolean; // Whether drag/drop should be enabled
   requiresPagination?: boolean; // Whether pagination is required
+  parseTime?: number; // Time taken to parse the file (milliseconds)
 }
 
 /**
@@ -526,13 +529,11 @@ export interface ConnectionOptions {
  * Service class for handling local file connections
  */
 export class ConnectService {
-  private static readonly DEFAULT_MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
-  private static readonly DEFAULT_MAX_RECORDS = 100000; // 100k records
+  private static readonly DEFAULT_MAX_FILE_SIZE = 1024 * 1024 * 1024; // 1GB (1024MB) - supports large files up to 800MB+
+  private static readonly DEFAULT_MAX_RECORDS = 50000; // 50k records (reduced for better performance)
+  private static readonly LARGE_FILE_MAX_RECORDS = 20000; // 20k for files > 10MB
   private static readonly SUPPORTED_CSV_EXTENSIONS = ['.csv', '.txt'];
   private static readonly SUPPORTED_JSON_EXTENSIONS = ['.json', '.jsonl'];
-
-  // Worker thresholds (aligned with SDS)
-  private static readonly WORKER_FILE_SIZE_THRESHOLD = 5 * 1024 * 1024; // 5MB
 
   // Worker pool instance (reused across imports)
   private static workerPool: WorkerPool | null = null;
@@ -676,14 +677,61 @@ export class ConnectService {
       return validationResult;
     }
 
-    // Decide whether to use workers based on file size
-    const useWorkers =
-      options.useWorkers !== false &&
-      file.size >= this.WORKER_FILE_SIZE_THRESHOLD;
+    // Optimized architecture based on file size
+    const WASM_THRESHOLD = 5 * 1024 * 1024; // 5MB
+    const WASM_SAFETY_LIMIT = 8 * 1024 * 1024; // 8MB
+    const WORKERS_THRESHOLD = 1 * 1024 * 1024; // 1MB
 
-    if (useWorkers) {
+    // 🚀 TIER 3: Files > 8MB → Streaming + WASM Hybrid (chunks)
+    if (file.size > WASM_SAFETY_LIMIT && WasmLoader.isSupported()) {
       console.log(
-        `Large file detected (${this.formatFileSize(file.size)}). Using Web Workers for processing.`
+        `🚀 Large file detected (${this.formatFileSize(file.size)}). Using Streaming + WASM hybrid mode...`
+      );
+      try {
+        const result = await this.processCSVFileWithStreamingWasm(
+          file,
+          engine,
+          options
+        );
+        if (result.success) {
+          return result;
+        }
+        console.warn('⚠️ Streaming + WASM failed, falling back to Workers');
+      } catch (error) {
+        console.warn('⚠️ Streaming + WASM error:', error);
+        console.warn('Falling back to Web Workers');
+      }
+    }
+
+    // 🔥 TIER 2: Files 5-8MB → Pure WASM (in-memory, fastest)
+    if (
+      file.size >= WASM_THRESHOLD &&
+      file.size <= WASM_SAFETY_LIMIT &&
+      WasmLoader.isSupported()
+    ) {
+      console.log(
+        `🚀 Medium-large file detected (${this.formatFileSize(file.size)}). Using WASM for maximum speed...`
+      );
+      try {
+        const wasmResult = await this.processCSVFileWithWasm(
+          file,
+          engine,
+          options
+        );
+        if (wasmResult.success) {
+          return wasmResult;
+        }
+        console.warn('⚠️ WASM processing failed, falling back to Workers');
+      } catch (error) {
+        console.warn('⚠️ WASM processing error:', error);
+        console.warn('Falling back to Web Workers');
+      }
+    }
+
+    // ⚡ TIER 1: Files 1-5MB → Web Workers (parallel processing)
+    if (file.size >= WORKERS_THRESHOLD && options.useWorkers !== false) {
+      console.log(
+        `Medium file detected (${this.formatFileSize(file.size)}). Using Web Workers for parallel processing.`
       );
       return this.processCSVFileWithWorkers(file, engine, options);
     }
@@ -700,9 +748,17 @@ export class ConnectService {
       const text = await this.readFileAsText(file, options.onProgress);
       let parsedData = this.parseCSV(text, csvOptions);
 
-      // Apply record limit (use default if not provided)
-      const maxRecords = options.maxRecords ?? this.DEFAULT_MAX_RECORDS;
+      // Apply record limit based on file size for better UX
+      const isLargeFile = file.size > 10 * 1024 * 1024; // 10MB
+      const maxRecords =
+        options.maxRecords ??
+        (isLargeFile ? this.LARGE_FILE_MAX_RECORDS : this.DEFAULT_MAX_RECORDS);
+
+      const totalRows = parsedData.length;
       if (parsedData.length > maxRecords) {
+        console.warn(
+          `⚠️ Dataset has ${totalRows.toLocaleString()} rows. Loading first ${maxRecords.toLocaleString()} rows for performance.`
+        );
         parsedData = parsedData.slice(0, maxRecords);
       }
 
@@ -814,6 +870,319 @@ export class ConnectService {
   }
 
   /**
+   * Processes a CSV file using WebAssembly for maximum performance
+   * @private
+   */
+  private static async processCSVFileWithWasm(
+    file: File,
+    engine: PivotEngine<any>,
+    options: ConnectionOptions
+  ): Promise<FileConnectionResult> {
+    try {
+      const csvOptions = {
+        delimiter: ',',
+        hasHeader: true,
+        skipEmptyLines: true,
+        trimValues: true,
+        ...options.csv,
+      };
+
+      // Initialize WASM processor
+      const wasmProcessor = getWasmCSVProcessor();
+      await wasmProcessor.initialize();
+
+      // Process file with WASM
+      const wasmResult = await wasmProcessor.processFile(file, {
+        delimiter: csvOptions.delimiter,
+        hasHeader: csvOptions.hasHeader,
+        trimValues: csvOptions.trimValues,
+      });
+
+      if (!wasmResult.success) {
+        return {
+          success: false,
+          error: 'WASM processing failed',
+        };
+      }
+
+      let processedData = wasmResult.data;
+
+      // Apply record limit based on file size for better UX
+      const isLargeFile = file.size > 10 * 1024 * 1024; // 10MB
+      const maxRecords =
+        options.maxRecords ??
+        (isLargeFile ? this.LARGE_FILE_MAX_RECORDS : this.DEFAULT_MAX_RECORDS);
+
+      const totalRows = processedData.length;
+
+      if (processedData.length > maxRecords) {
+        console.warn(
+          `⚠️ Dataset has ${totalRows.toLocaleString()} rows. Loading first ${maxRecords.toLocaleString()} rows for performance.`
+        );
+        processedData = processedData.slice(0, maxRecords);
+      }
+
+      // Validate data structure
+      if (processedData.length === 0) {
+        return {
+          success: false,
+          error: 'No valid data found in CSV file',
+        };
+      }
+
+      const columns = Object.keys(processedData[0]);
+      const validationErrors = this.validateDataStructure(
+        processedData,
+        columns
+      );
+
+      if (validationErrors.length > 0) {
+        console.warn('Data validation warnings:', validationErrors);
+      }
+
+      // Enable engine-level synthetic column behavior
+      engine.setAutoAllColumn(true);
+
+      // Generate layout and update engine (same as Workers method)
+      console.log('Building layout...');
+      const layout = buildAutoLayout(processedData);
+
+      const {
+        rows,
+        columns: initialColumnsAxis,
+        measures,
+        data: augmentedData,
+      } = layout as any;
+      const columnsAxis = initialColumnsAxis as AxisConfig[];
+
+      console.log('Updating engine with WASM-processed data...');
+      engine.updateDataSource(augmentedData);
+      engine.setLayout(rows, columnsAxis, measures);
+
+      return {
+        success: true,
+        recordCount: processedData.length,
+        fileSize: file.size,
+        performanceMode: 'wasm',
+      };
+    } catch (error) {
+      console.error('WASM processing error:', error);
+      return {
+        success: false,
+        error: `WASM processing failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      };
+    }
+  }
+
+  /**
+   * Processes large CSV files using Streaming + WASM chunks
+   * Optimized for files > 8MB
+   * @private
+   */
+  private static async processCSVFileWithStreamingWasm(
+    file: File,
+    engine: PivotEngine<any>,
+    options: ConnectionOptions
+  ): Promise<FileConnectionResult> {
+    try {
+      console.log('🚀 Using Streaming + WASM hybrid mode for large file...');
+
+      const csvOptions = {
+        delimiter: ',',
+        hasHeader: true,
+        skipEmptyLines: true,
+        trimValues: true,
+        ...options.csv,
+      };
+
+      // Initialize WASM processor once
+      const wasmProcessor = getWasmCSVProcessor();
+      await wasmProcessor.initialize();
+
+      const allData: any[] = [];
+      let headers: string[] | undefined;
+      let leftover = '';
+      let chunkCount = 0;
+      const CHUNK_SIZE = 4 * 1024 * 1024; // 4MB chunks (safe for WASM)
+
+      console.log(
+        `Processing with WASM, chunk size: ${this.formatFileSize(CHUNK_SIZE)}`
+      );
+
+      const startTime = performance.now();
+
+      // Stream file and process each chunk with WASM
+      await StreamingFileReader.readFileInChunks(file, {
+        chunkSizeBytes: CHUNK_SIZE,
+        encoding: csvOptions.encoding,
+        onProgress: progress => {
+          if (options.onProgress) {
+            options.onProgress(progress);
+          }
+        },
+        onChunk: async chunk => {
+          chunkCount++;
+
+          // Combine leftover from previous chunk
+          const fullText = leftover + chunk.text;
+
+          // Parse with WASM
+          const wasmResult = await wasmProcessor.processCSV(fullText, {
+            delimiter: csvOptions.delimiter,
+            hasHeader: chunk.isFirstChunk && csvOptions.hasHeader,
+            trimValues: csvOptions.trimValues,
+          });
+
+          if (!wasmResult.success || !wasmResult.data) {
+            console.warn(
+              `⚠️ WASM failed on chunk ${chunk.chunkId}, chunk skipped`
+            );
+            return;
+          }
+
+          // Extract headers from first chunk
+          if (chunk.isFirstChunk && wasmResult.data.length > 0) {
+            headers = Object.keys(wasmResult.data[0]);
+            console.log(`📋 Headers detected: ${headers.join(', ')}`);
+          }
+
+          // Find incomplete last line for next chunk
+          if (!chunk.isLastChunk) {
+            const lastNewline = fullText.lastIndexOf('\n');
+            if (lastNewline !== -1) {
+              leftover = fullText.substring(lastNewline + 1);
+              // Remove incomplete row from results
+              if (wasmResult.data.length > 0) {
+                wasmResult.data.pop();
+              }
+            }
+          }
+
+          // Accumulate data
+          allData.push(...wasmResult.data);
+
+          console.log(
+            `Chunk ${chunk.chunkId} processed: ${wasmResult.data.length} rows (total: ${allData.length})`
+          );
+        },
+      });
+
+      const parseTime = performance.now() - startTime;
+      console.log(
+        `✅ Streaming + WASM completed in ${(parseTime / 1000).toFixed(2)}s`
+      );
+      console.log(
+        `Processed ${chunkCount} chunks, ${allData.length} total rows.`
+      );
+
+      // Apply record limit based on file size for better UX
+      const isLargeFile = file.size > 10 * 1024 * 1024; // 10MB
+      const maxRecords =
+        options.maxRecords ??
+        (isLargeFile ? this.LARGE_FILE_MAX_RECORDS : this.DEFAULT_MAX_RECORDS);
+
+      let finalData = allData;
+      const totalRows = allData.length;
+
+      if (finalData.length > maxRecords) {
+        console.warn(
+          `⚠️ Dataset has ${totalRows.toLocaleString()} rows. Loading first ${maxRecords.toLocaleString()} rows for performance.`
+        );
+        finalData = finalData.slice(0, maxRecords);
+      }
+
+      if (finalData.length === 0) {
+        return {
+          success: false,
+          error: 'No valid data found in CSV file',
+        };
+      }
+
+      // Validate data structure
+      const columns = Object.keys(finalData[0]);
+      const validationErrors = this.validateDataStructure(finalData, columns);
+
+      if (validationErrors.length > 0) {
+        console.warn('Data validation warnings:', validationErrors);
+      }
+
+      // Enable engine-level synthetic column behavior
+      engine.setAutoAllColumn(true);
+
+      // Generate layout and update engine with progress reporting
+      console.log('Building pivot layout...');
+      if (options.onProgress) {
+        options.onProgress(90); // Show we're in the final processing stage
+      }
+
+      const layoutStart = performance.now();
+      const layout = buildAutoLayout(finalData);
+      const layoutTime = performance.now() - layoutStart;
+      console.log(`✓ Layout built in ${(layoutTime / 1000).toFixed(2)}s`);
+
+      const {
+        rows,
+        columns: initialColumnsAxis,
+        measures,
+        data: augmentedData,
+      } = layout as any;
+      const columnsAxis = initialColumnsAxis as AxisConfig[];
+
+      console.log('Updating pivot engine...');
+      if (options.onProgress) {
+        options.onProgress(95);
+      }
+
+      const engineStart = performance.now();
+      engine.updateDataSource(augmentedData);
+      engine.setLayout(rows, columnsAxis, measures);
+      const engineTime = performance.now() - engineStart;
+      console.log(`✓ Engine updated in ${(engineTime / 1000).toFixed(2)}s`);
+
+      if (totalRows > maxRecords) {
+        validationErrors.push(
+          `Note: Displaying ${maxRecords.toLocaleString()} of ${totalRows.toLocaleString()} rows for optimal performance.`
+        );
+      }
+
+      const performanceMode = 'streaming-wasm';
+      const allowDragDrop = PerformanceConfig.isDragDropAllowed(
+        augmentedData.length
+      );
+      const requiresPagination = PerformanceConfig.requiresPagination(
+        augmentedData.length
+      );
+
+      if (!allowDragDrop) {
+        console.info(
+          `ℹ️ Large dataset detected: ${augmentedData.length.toLocaleString()} rows. Virtual scrolling will be used for optimal performance.`
+        );
+      }
+
+      return {
+        success: true,
+        data: augmentedData,
+        fileName: file.name,
+        fileSize: file.size,
+        recordCount: augmentedData.length,
+        columns,
+        validationErrors:
+          validationErrors.length > 0 ? validationErrors : undefined,
+        performanceMode,
+        allowDragDrop,
+        requiresPagination,
+        parseTime,
+      };
+    } catch (error) {
+      console.error('Error in Streaming + WASM processing:', error);
+      return {
+        success: false,
+        error: `Streaming + WASM failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      };
+    }
+  }
+
+  /**
    * Processes a CSV file using Web Workers and streaming
    * @private
    */
@@ -912,11 +1281,19 @@ export class ConnectService {
         `Streaming complete. Processed ${chunkCount} chunks, ${allData.length} total rows.`
       );
 
-      // Apply record limit
-      const maxRecords = options.maxRecords ?? this.DEFAULT_MAX_RECORDS;
+      // Apply record limit based on file size for better UX
+      const isLargeFile = file.size > 10 * 1024 * 1024; // 10MB
+      const maxRecords =
+        options.maxRecords ??
+        (isLargeFile ? this.LARGE_FILE_MAX_RECORDS : this.DEFAULT_MAX_RECORDS);
+
       let finalData = allData;
+      const totalRows = allData.length;
+
       if (finalData.length > maxRecords) {
-        console.log(`Limiting data to ${maxRecords} rows`);
+        console.warn(
+          `⚠️ Dataset has ${totalRows.toLocaleString()} rows. Loading first ${maxRecords.toLocaleString()} rows for performance.`
+        );
         finalData = finalData.slice(0, maxRecords);
       }
 
@@ -938,12 +1315,16 @@ export class ConnectService {
       // Enable engine-level synthetic column behavior
       engine.setAutoAllColumn(true);
 
-      // Generate layout and update engine
-      console.log('Building layout...');
+      // Generate layout and update engine with progress reporting
+      console.log('Building pivot layout...');
+      if (options.onProgress) {
+        options.onProgress(90); // Show we're in the final processing stage
+      }
+
       const layoutStart = performance.now();
       const layout = buildAutoLayout(finalData);
       const layoutTime = performance.now() - layoutStart;
-      console.log(`Layout built in ${(layoutTime / 1000).toFixed(2)}s`);
+      console.log(`✓ Layout built in ${(layoutTime / 1000).toFixed(2)}s`);
 
       const {
         rows,
@@ -953,12 +1334,22 @@ export class ConnectService {
       } = layout as any;
       const columnsAxis = initialColumnsAxis as AxisConfig[];
 
-      console.log('Updating engine...');
+      console.log('Updating pivot engine...');
+      if (options.onProgress) {
+        options.onProgress(95);
+      }
+
       const engineStart = performance.now();
       engine.updateDataSource(augmentedData);
       engine.setLayout(rows, columnsAxis, measures);
       const engineTime = performance.now() - engineStart;
-      console.log(`Engine updated in ${(engineTime / 1000).toFixed(2)}s`);
+      console.log(`✓ Engine updated in ${(engineTime / 1000).toFixed(2)}s`);
+
+      if (totalRows > maxRecords) {
+        validationErrors.push(
+          `Note: Displaying ${maxRecords.toLocaleString()} of ${totalRows.toLocaleString()} rows for optimal performance.`
+        );
+      }
 
       // Apply conditional formatting
       try {
@@ -1004,10 +1395,10 @@ export class ConnectService {
         augmentedData.length
       );
 
-      // Log performance recommendations
+      // Log performance info (virtual scrolling handles large datasets)
       if (!allowDragDrop) {
-        console.warn(
-          `⚠️ Drag/drop disabled: Dataset has ${augmentedData.length.toLocaleString()} rows (max: ${PerformanceConfig.getConfig().maxRowsForDragDrop.toLocaleString()})`
+        console.info(
+          `ℹ️ Large dataset detected: ${augmentedData.length.toLocaleString()} rows. Virtual scrolling will be used for optimal performance.`
         );
       }
 
@@ -1179,9 +1570,17 @@ self.onmessage = (event) => {
         };
       }
 
-      // Apply record limit (use default if not provided)
-      const maxRecords = options.maxRecords ?? this.DEFAULT_MAX_RECORDS;
+      // Apply record limit based on file size for better UX
+      const isLargeFile = file.size > 10 * 1024 * 1024; // 10MB
+      const maxRecords =
+        options.maxRecords ??
+        (isLargeFile ? this.LARGE_FILE_MAX_RECORDS : this.DEFAULT_MAX_RECORDS);
+
+      const totalRows = arrayData.length;
       if (arrayData.length > maxRecords) {
+        console.warn(
+          `⚠️ Dataset has ${totalRows.toLocaleString()} rows. Loading first ${maxRecords.toLocaleString()} rows for performance.`
+        );
         arrayData = arrayData.slice(0, maxRecords);
       }
 
