@@ -13,6 +13,6 @@
   "dependencies": {
     "@mindfiredigital/pivothead-web-component": "workspace:*",
     "serve": "^14.2.4",
-    "vite": "^4.3.9"
+    "vite": "^7.2.6"
   }
 }

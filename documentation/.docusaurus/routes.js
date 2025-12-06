@@ -53,15 +53,15 @@ export default [
   },
   {
     path: '/PivotHead/docs',
-    component: ComponentCreator('/PivotHead/docs', '929'),
+    component: ComponentCreator('/PivotHead/docs', '1fd'),
     routes: [
       {
         path: '/PivotHead/docs',
-        component: ComponentCreator('/PivotHead/docs', '46d'),
+        component: ComponentCreator('/PivotHead/docs', '4f6'),
         routes: [
           {
             path: '/PivotHead/docs',
-            component: ComponentCreator('/PivotHead/docs', 'c56'),
+            component: ComponentCreator('/PivotHead/docs', 'b05'),
             routes: [
               {
                 path: '/PivotHead/docs/contributors/',
@@ -236,6 +236,15 @@ export default [
                 component: ComponentCreator(
                   '/PivotHead/docs/reference/conceptual-reference/vue-conceptual-reference',
                   '08d'
+                ),
+                exact: true,
+                sidebar: 'tutorialSidebar',
+              },
+              {
+                path: '/PivotHead/docs/reference/conceptual-reference/webassembly-conceptual-reference',
+                component: ComponentCreator(
+                  '/PivotHead/docs/reference/conceptual-reference/webassembly-conceptual-reference',
+                  '493'
                 ),
                 exact: true,
                 sidebar: 'tutorialSidebar',

@@ -297,6 +297,17 @@ export default {
       '@site/docs/reference/conceptual-reference/vue.md',
       require.resolveWeak('@site/docs/reference/conceptual-reference/vue.md'),
     ],
+  'content---pivot-head-docs-reference-conceptual-reference-webassembly-conceptual-referenced-9-e-58e':
+    [
+      () =>
+        import(
+          /* webpackChunkName: "content---pivot-head-docs-reference-conceptual-reference-webassembly-conceptual-referenced-9-e-58e" */ '@site/docs/reference/conceptual-reference/webassembly.md'
+        ),
+      '@site/docs/reference/conceptual-reference/webassembly.md',
+      require.resolveWeak(
+        '@site/docs/reference/conceptual-reference/webassembly.md'
+      ),
+    ],
   'content---pivot-head-docs-tutorial-basics-core-api-reference-190-54c': [
     () =>
       import(
