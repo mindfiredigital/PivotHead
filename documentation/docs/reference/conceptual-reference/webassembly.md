@@ -14,14 +14,7 @@ PivotHead incorporates a sophisticated **three-tier performance architecture** w
 
 The performance system automatically selects the optimal processing method based on file characteristics, ensuring the best possible performance without any configuration required.
 
-### **Key Features**
-
-- ✅ **WebAssembly Integration** - Near-native performance for large files
-- ✅ **Multi-Tier Architecture** - Automatically selects best processing mode
-- ✅ **Web Workers Support** - Parallel processing for medium files
-- ✅ **Streaming Support** - Memory-efficient handling of huge files (800MB+)
-- ✅ **Automatic Fallback** - Graceful degradation to ensure compatibility
-- ✅ **Progress Tracking** - Real-time feedback during file processing
+![PivotHead Performance Architecture](/Media.jpeg)
 
 ---
 
@@ -159,15 +152,30 @@ Comparison across various CSV file sizes (all with ~50 columns):
 
 100,000 row CSV file performance across different browsers:
 
-| Browser         | Standard JS | WASM Mode        | Speedup | WASM Support           |
-| --------------- | ----------- | ---------------- | ------- | ---------------------- |
-| **Chrome 120**  | 8.2s        | 0.82s            | 10x     | ✅ Full                |
-| **Firefox 121** | 8.8s        | 0.88s            | 10x     | ✅ Full                |
-| **Safari 17**   | 9.1s        | 0.91s            | 10x     | ✅ Full                |
-| **Edge 120**    | 8.3s        | 0.83s            | 10x     | ✅ Full                |
-| IE 11           | 12.5s       | 12.5s (fallback) | 1x      | ❌ None (uses Workers) |
+| Browser         | Standard JS | WASM Mode        | Speedup | WASM Support        |
+| --------------- | ----------- | ---------------- | ------- | ------------------- |
+| **Chrome 120**  | 8.2s        | 0.82s            | 10x     | Full                |
+| **Firefox 121** | 8.8s        | 0.88s            | 10x     | Full                |
+| **Safari 17**   | 9.1s        | 0.91s            | 10x     | Full                |
+| **Edge 120**    | 8.3s        | 0.83s            | 10x     | Full                |
+| IE 11           | 12.5s       | 12.5s (fallback) | 1x      | None (uses Workers) |
 
 **Key Insight**: All modern browsers benefit equally from WASM optimization!
+
+---
+
+### **Table 6: Performance Evolution Journey**
+
+Our journey to optimize large file uploads - from crashes to lightning-fast processing:
+
+| Approach                    | File Size Handled | Processing Time | Issues / Status                                           | Outcome            |
+| --------------------------- | ----------------- | --------------- | --------------------------------------------------------- | ------------------ |
+| **Standard JavaScript**     | 5 MB              | N/A             | ❌ Website crashed                                        | Unusable           |
+| **Web Workers**             | 5 MB              | 8-10 minutes    | ❌ No crash but extremely slow                            | Too slow           |
+| **Pure WASM**               | 5 MB              | 2-3 minutes     | ⚠️ Fast but flaws in string manipulation & dynamic typing | Partial success    |
+| **WASM + Hybrid (Current)** | 700-800 MB        | 2-3 seconds     | Optimized - strings handled by JS, compute by WASM        | Production-ready ✓ |
+
+**Key Insight**: By combining WASM's computational speed with JavaScript's string/object handling strengths, we achieved **240x faster** processing (from 10 minutes to 2-3 seconds) and can now handle **160x larger files** (from 5 MB to 800 MB)!
 
 ---
 
@@ -184,22 +192,22 @@ parseCSVChunk(input, delimiter, hasHeader, trimValues)
   ↓ Counts rows and columns
   ↓ Handles quoted fields
   ↓ Returns structure metadata
-  ⏱️ 10x faster than JavaScript
+    10x faster than JavaScript
 
 detectFieldType(value)
   ↓ Detects: number, string, boolean, null
   ↓ Fast character analysis
-  ⏱️ 8x faster than JavaScript
+    8x faster than JavaScript
 
 parseNumber(input)
   ↓ Fast number parsing
   ↓ Handles decimals, negatives
-  ⏱️ 5x faster than parseFloat()
+    5x faster than parseFloat()
 
 estimateMemory(rowCount, colCount)
   ↓ Calculates memory requirements
   ↓ 64 bytes per cell estimate
-  ⏱️ Instant calculation
+    Instant calculation
 ```
 
 ### **JavaScript Responsibilities (Complex Logic)**
@@ -211,13 +219,13 @@ parseCSVRows(csv, options)
   ↓ Extracts quoted fields: "John ""The Boss"" Doe"
   ↓ Handles escaped characters
   ↓ Complex string manipulation
-  ✅ JavaScript's specialty
+    JavaScript's specialty
 
 rowsToObjects(rows, headers)
   ↓ Creates dynamic objects: { name: "John", age: 30 }
   ↓ Type conversion and validation
   ↓ Error handling
-  ✅ JavaScript's object model
+    JavaScript's object model
 ```
 
 ### **Processing Flow**
@@ -264,7 +272,7 @@ rowsToObjects(rows, headers)
               ┌──────────────────────┐
               │   TOTAL: 0.85s       │
               │   vs 8.5s in pure JS │
-              │   = 10x FASTER! 🚀   │
+              │   = 10x FASTER!      │
               └──────────────────────┘
 ```
 
@@ -283,8 +291,8 @@ import { ConnectService } from '@mindfiredigital/pivothead';
 const result = await ConnectService.connectToLocalCSV(pivotEngine);
 
 // Console output shows which mode was used:
-// 🚀 Processing Mode: WASM (for 21.38 MB file)
-// ✅ Parsed in 0.85s
+//  Processing Mode: WASM (for 21.38 MB file)
+//  Parsed in 0.85s
 ```
 
 **No configuration needed!** The system detects file size and selects the best approach.
@@ -311,10 +319,10 @@ const result = await ConnectService.connectToLocalCSV(pivotEngine, {
 
 **Benefits:**
 
-- ✅ Handles files up to **1 GB**
-- ✅ Low memory usage (only current chunk in memory)
-- ✅ Progress tracking
-- ✅ Browser stays responsive
+- Handles files up to **1 GB**
+- Low memory usage (only current chunk in memory)
+- Progress tracking
+- Browser stays responsive
 
 ---
 
@@ -329,16 +337,16 @@ Medium files (1-5 MB) use multi-core processing:
 const result = await ConnectService.connectToLocalCSV(pivotEngine);
 
 // Console shows worker activity:
-// 🔧 Using 11 Web Workers for parallel processing
-// ✅ Parsed in 1.67s (5x faster than single-threaded)
+//  Using 11 Web Workers for parallel processing
+//  Parsed in 1.67s (5x faster than single-threaded)
 ```
 
 **Benefits:**
 
-- ✅ Utilizes all CPU cores
-- ✅ Doesn't block UI thread
-- ✅ 5x faster than single-threaded
-- ✅ Automatic worker pool management
+- Utilizes all CPU cores
+- Doesn't block UI thread
+- 5x faster than single-threaded
+- Automatic worker pool management
 
 ---
 
@@ -360,10 +368,10 @@ Result: Still fast, just not as fast as WASM
 
 **Compatibility:**
 
-- ✅ Works in **all browsers**
-- ✅ Automatic degradation
-- ✅ No errors or crashes
-- ✅ Always functional
+- Works in **all browsers**
+- Automatic degradation
+- No errors or crashes
+- Always functional
 
 ---
 
@@ -384,84 +392,10 @@ const result = await ConnectService.connectToLocalCSV(pivotEngine, {
 // Progress: 50%
 // Progress: 75%
 // Progress: 100%
-// ✅ Complete!
+//  Complete!
 ```
 
 ---
-
-## **Real-World Performance Examples**
-
-### **Example 1: Sales Data (100k rows, 40 columns, 21 MB)**
-
-**Before (Standard JavaScript):**
-
-```
-⏱️ File Read: 1.2s
-⏱️ CSV Parsing: 8.5s
-⏱️ Type Detection: 1.8s
-⏱️ Data Processing: 45s
-━━━━━━━━━━━━━━━━━━━━━━━
-⏱️ TOTAL: 56.5s ❌ Too slow!
-```
-
-**After (WASM):**
-
-```
-⏱️ File Read: 1.2s
-⚡ CSV Parsing: 0.85s (10x faster!)
-⚡ Type Detection: 0.12s (15x faster!)
-⚡ Data Processing: 0.45s (100x faster!)
-━━━━━━━━━━━━━━━━━━━━━━━
-⏱️ TOTAL: 2.62s ✅ 21.6x faster!
-```
-
-**User Experience:**
-
-- ❌ Before: User waits almost 1 minute, browser may freeze
-- ✅ After: User waits 3 seconds, browser stays responsive
-
----
-
-### **Example 2: Customer Database (500k rows, 50 columns, 105 MB)**
-
-**Before:**
-
-```
-⏱️ Total Time: 4 minutes 30 seconds
-💾 Memory: 2.1 GB
-⚠️ Risk: Browser crash on low-memory devices
-```
-
-**After (Streaming + WASM):**
-
-```
-⏱️ Total Time: 24 seconds (11x faster!)
-💾 Memory: 150 MB (14x less!)
-✅ Result: Works on all devices
-```
-
----
-
-### **Example 3: Log Files (1 million rows, 30 columns, 250 MB)**
-
-**Before:**
-
-```
-❌ Browser Crash: File too large
-```
-
-**After (Streaming + WASM):**
-
-```
-⏱️ Total Time: 58 seconds
-💾 Memory: 180 MB
-✅ Result: Successfully processed!
-📊 Displayed: First 50,000 rows (configurable)
-```
-
----
-
-## **Technical Implementation Details**
 
 ### **WASM Module Specifications**
 
@@ -518,18 +452,16 @@ Buffer: Handles incomplete rows at chunk boundaries
 
 ---
 
-## **Browser Compatibility**
-
 ### **WebAssembly Support**
 
 | Browser | Version    | WASM Support | Performance           |
 | ------- | ---------- | ------------ | --------------------- |
-| Chrome  | 57+ (2017) | ✅ Full      | Excellent             |
-| Firefox | 52+ (2017) | ✅ Full      | Excellent             |
-| Safari  | 11+ (2017) | ✅ Full      | Excellent             |
-| Edge    | 16+ (2017) | ✅ Full      | Excellent             |
-| Opera   | 44+ (2017) | ✅ Full      | Excellent             |
-| IE 11   | -          | ❌ None      | Falls back to Workers |
+| Chrome  | 57+ (2017) | Full         | Excellent             |
+| Firefox | 52+ (2017) | Full         | Excellent             |
+| Safari  | 11+ (2017) | Full         | Excellent             |
+| Edge    | 16+ (2017) | Full         | Excellent             |
+| Opera   | 44+ (2017) | Full         | Excellent             |
+| IE 11   | -          | None         | Falls back to Workers |
 
 **Market Coverage:** ~95% of global browsers support WASM
 
@@ -613,130 +545,6 @@ PerformanceConfig.updateConfig({
 
 ---
 
-## **Best Practices**
-
-### **1. Let the System Choose**
-
-✅ **DO:** Let automatic mode selection handle optimization
-
-```javascript
-const result = await ConnectService.connectToLocalCSV(pivotEngine);
-```
-
-❌ **DON'T:** Try to manually select processing mode
-
-```javascript
-// Not recommended - system knows best!
-```
-
----
-
-### **2. Show Progress for Large Files**
-
-✅ **DO:** Provide user feedback during processing
-
-```javascript
-await ConnectService.connectToLocalCSV(pivotEngine, {
-  onProgress: progress => {
-    updateProgressBar(progress);
-    document.getElementById('status').textContent = `${progress}%`;
-  },
-});
-```
-
----
-
-### **3. Set Appropriate File Size Limits**
-
-✅ **DO:** Set reasonable limits based on use case
-
-```javascript
-// For desktop app: Allow large files
-maxFileSize: 1024 * 1024 * 1024,  // 1 GB
-
-// For mobile web: Limit file size
-maxFileSize: 50 * 1024 * 1024,    // 50 MB
-```
-
----
-
-### **4. Limit Rows for UI Performance**
-
-✅ **DO:** Limit displayed rows for large datasets
-
-```javascript
-await ConnectService.connectToLocalCSV(pivotEngine, {
-  maxRecords: 50000, // Show first 50k rows
-});
-```
-
-**Reasoning:**
-
-- Browser can efficiently render 50k rows with virtual scrolling
-- User rarely needs to see all 1M rows at once
-- Can always export full dataset if needed
-
----
-
-## **Troubleshooting**
-
-### **Issue: WASM Not Activating**
-
-**Symptom:** Console shows "Using Web Workers" for 10 MB file
-
-**Solution:**
-
-```javascript
-// Check if WASM is supported
-import { WasmLoader } from '@mindfiredigital/pivothead';
-
-if (WasmLoader.isSupported()) {
-  console.log('✅ WASM supported');
-} else {
-  console.log('❌ WASM not supported - check browser version');
-}
-```
-
----
-
-### **Issue: Slow Performance Despite WASM**
-
-**Symptom:** Large file still slow
-
-**Possible Causes:**
-
-1. File size exceeds memory limits
-2. Too many rows being rendered
-3. Browser extensions interfering
-
-**Solutions:**
-
-```javascript
-// 1. Enable streaming for large files (automatic for >8MB)
-// 2. Limit displayed rows
-maxRecords: 50000;
-
-// 3. Disable browser extensions and retry
-```
-
----
-
-### **Issue: Memory Errors**
-
-**Symptom:** "Out of memory" error
-
-**Solution:**
-
-```javascript
-// Reduce batch size and enable streaming
-await ConnectService.connectToLocalCSV(pivotEngine, {
-  maxRecords: 20000, // Reduce from default 50k
-  maxFileSize: 100 * 1024 * 1024, // 100 MB limit
-});
-```
-
----
-
 ## **Performance Monitoring**
 
 ### **Built-in Performance Metrics**
@@ -768,62 +576,15 @@ Total Time: 2.62s
 
 ---
 
-## **Future Enhancements**
-
-The following improvements are planned for future releases:
-
-### **Phase 2: Full WASM Parsing**
-
-- Move all CSV parsing to WASM
-- Expected improvement: **2-3x faster**
-- Target: 0.3s for 100k row file
-
-### **Phase 3: Multi-threaded WASM**
-
-- Combine WASM with Web Workers
-- Parallel WASM execution across cores
-- Expected improvement: **5x faster**
-
-### **Phase 4: SIMD Optimizations**
-
-- WebAssembly SIMD instructions
-- Vectorized operations for aggregations
-- Expected improvement: **4-8x faster** for numeric operations
-
----
-
 ## **Summary**
 
 PivotHead's WebAssembly integration delivers exceptional performance improvements:
 
 ### **Key Achievements**
 
-- ✅ **37x faster** complete processing for large files
-- ✅ **10x faster** CSV parsing with WASM
-- ✅ **14x less** memory usage with streaming
-- ✅ Handles files up to **1 GB** in browser
-- ✅ **Automatic optimization** - no configuration needed
-- ✅ **95% browser compatibility** with graceful fallback
-
-### **Business Impact**
-
-- 🚀 Users can process large datasets **instantly**
-- 💰 No server-side processing needed (cost savings)
-- 📱 Works on desktop and mobile devices
-- 🌐 Scales to millions of users
-
-### **Technical Excellence**
-
-- 🎯 Three-tier architecture for optimal performance
-- 🔄 Hybrid WASM + JavaScript approach
-- 🛡️ Graceful fallback for compatibility
-- 📊 Real-time progress tracking
-- 🧪 Production-tested with 100k+ row datasets
-
----
-
-For more information:
-
-- **API Documentation**: See [API Reference](../api-reference/core-webcomponent.md)
-- **Examples**: Check out the [tutorials](../../tutorials/core-webcomponent/setup-for-user-project.md)
-- **Source Code**: View on [GitHub](https://github.com/mindfiredigital/pivothead)
+- **37x faster** complete processing for large files
+- **10x faster** CSV parsing with WASM
+- **14x less** memory usage with streaming
+- Handles files up to **1 GB** in browser
+- **Automatic optimization** - no configuration needed
+- **95% browser compatibility** with graceful fallback
