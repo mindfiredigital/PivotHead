@@ -202,12 +202,13 @@ export class PivotEngine<T extends Record<string, any>> {
   }
 
   /**
-   * Updates the engine's data source and applies current filters
-   * This method allows external components to update the data while preserving filtering
+   * Updates the engine's data source and clears filters
+   * This method allows external components to update the data with fresh filtering state
    * @param {T[]} newData - The new data to use as the source
+   * @param {boolean} clearFilters - Whether to clear existing filters (default: true)
    * @public
    */
-  public updateDataSource(newData: T[]) {
+  public updateDataSource(newData: T[], clearFilters = true) {
     // Update the config data (original source)
     this.config.data = [...newData];
 
@@ -215,10 +216,16 @@ export class PivotEngine<T extends Record<string, any>> {
     this.state.data = [...newData];
     this.state.rawData = [...newData];
 
+    // Clear filters when loading new data to prevent old filters from interfering
+    if (clearFilters) {
+      this.filterConfig = [];
+      this.state.filterConfig = [];
+    }
+
     // Ensure column axis/data consistency before refresh (only if enabled)
     this.ensureSyntheticAllColumn();
 
-    // Refresh with current filters applied
+    // Refresh with current filters applied (will be empty if cleared above)
     this.refreshData();
     this._emit(); // Notify subscribers after state change
   }

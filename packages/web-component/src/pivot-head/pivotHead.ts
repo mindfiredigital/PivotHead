@@ -122,6 +122,10 @@ export class PivotHeadElement extends HTMLElement {
   set data(value: PivotDataRecord[]) {
     this._data = value || [];
     this._originalData = [...(value || [])];
+    // Clear filters when new data is loaded to prevent old filters from interfering
+    this._filters = [];
+    this._rawFilters = [];
+    this._processedFilters = [];
     this.tryInitializeEngine();
   }
   get data(): PivotDataRecord[] {
