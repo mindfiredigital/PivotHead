@@ -75,8 +75,8 @@ function initializeFilters() {
   }
 
   filterOperator.innerHTML = `
+    <option value="contains" selected>Contains</option>
     <option value="equals">Equals</option>
-    <option value="contains">Contains</option>
     <option value="greaterThan">Greater Than</option>
     <option value="lessThan">Less Than</option>
   `;
