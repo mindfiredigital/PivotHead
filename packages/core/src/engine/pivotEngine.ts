@@ -1387,8 +1387,13 @@ export class PivotEngine<T extends Record<string, any>> {
 
         switch (filter.operator) {
           case 'equals':
+            // Case-insensitive comparison for strings
+            if (typeof value === 'string' && typeof filterValue === 'string') {
+              return value.toLowerCase() === filterValue.toLowerCase();
+            }
             return value === filterValue;
           case 'contains':
+            // Case-insensitive partial matching - supports even 1-2 letters
             return String(value)
               .toLowerCase()
               .includes(String(filterValue).toLowerCase());
@@ -2162,8 +2167,16 @@ export class PivotEngine<T extends Record<string, any>> {
 
           switch (filter.operator) {
             case 'equals':
+              // Case-insensitive comparison for strings
+              if (
+                typeof value === 'string' &&
+                typeof filterValue === 'string'
+              ) {
+                return value.toLowerCase() === filterValue.toLowerCase();
+              }
               return value === filterValue;
             case 'contains':
+              // Case-insensitive partial matching - supports even 1-2 letters
               return String(value)
                 .toLowerCase()
                 .includes(String(filterValue).toLowerCase());

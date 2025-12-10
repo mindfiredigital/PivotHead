@@ -39,13 +39,19 @@ flowchart LR
     Head ==> Out[" Custom<br/>Pivot Table"]
 
     %% Styling
-    classDef bad fill:#fee,stroke:#c33,stroke-width:2px
-    classDef good fill:#efe,stroke:#3c3,stroke-width:2px
-    classDef output fill:#d1fae5,stroke:#10b981,stroke-width:3px
+    classDef bad fill:#fee,stroke:#c33,stroke-width:2px,color:#991b1b
+    classDef good fill:#efe,stroke:#3c3,stroke-width:2px,color:#166534
+    classDef output fill:#d1fae5,stroke:#10b981,stroke-width:3px,color:#065f46
 
     class Trad,T1,T2,T3 bad
     class Head,H1,H2,H3 good
     class Out output
+
+    %% Arrow styling for better visibility in dark mode
+    linkStyle 0,1 stroke:#dc2626,stroke-width:3px
+    linkStyle 2 stroke:#64748b,stroke-width:3px
+    linkStyle 3,4 stroke:#16a34a,stroke-width:3px
+    linkStyle 5 stroke:#10b981,stroke-width:4px
 
 
 ```

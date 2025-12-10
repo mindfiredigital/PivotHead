@@ -19,11 +19,11 @@
   },
   "sidebar": "tutorialSidebar",
   "previous": {
-    "title": "Headless Architecture",
-    "permalink": "/PivotHead/docs/headless-architecture"
+    "title": "Basic Setup",
+    "permalink": "/PivotHead/docs/getting-started/basic-setup"
   },
   "next": {
-    "title": "Headless Quick Start",
-    "permalink": "/PivotHead/docs/getting-started/headless-quick-start"
+    "title": "Sample Project",
+    "permalink": "/PivotHead/docs/tutorials/core-webcomponent/core-webcomponent-sample-project"
   }
 }
