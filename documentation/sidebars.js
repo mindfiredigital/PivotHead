@@ -113,17 +113,10 @@ const sidebars = {
   tutorialSidebar: [
     'introduction',
     'headless-architecture',
-    {
-      type: 'category',
-      label: 'Getting Started',
-      // Corrected paths to match the flattened structure
-      items: [
-        'getting-started/Why-we-use-pivothead',
-        'getting-started/headless-quick-start',
-        'getting-started/installation',
-        'getting-started/basic-setup',
-      ],
-    },
+    'getting-started/headless-quick-start',
+    'getting-started/installation',
+    'getting-started/basic-setup',
+    'getting-started/Why-we-use-pivothead',
     {
       type: 'category',
       label: 'Tutorial',

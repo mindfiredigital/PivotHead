@@ -17,8 +17,8 @@
   },
   "sidebar": "tutorialSidebar",
   "previous": {
-    "title": "Why Use PivotHead",
-    "permalink": "/PivotHead/docs/getting-started/Why-we-use-pivothead"
+    "title": "Headless Architecture",
+    "permalink": "/PivotHead/docs/headless-architecture"
   },
   "next": {
     "title": "Installation",

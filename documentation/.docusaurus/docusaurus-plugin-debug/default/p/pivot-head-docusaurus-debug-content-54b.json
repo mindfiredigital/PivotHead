@@ -169,8 +169,8 @@
                   "permalink": "/PivotHead/docs/getting-started/installation"
                 },
                 "next": {
-                  "title": "Sample Project",
-                  "permalink": "/PivotHead/docs/tutorials/core-webcomponent/core-webcomponent-sample-project"
+                  "title": "Why Use PivotHead",
+                  "permalink": "/PivotHead/docs/getting-started/Why-we-use-pivothead"
                 }
               },
               {
@@ -192,8 +192,8 @@
                 },
                 "sidebar": "tutorialSidebar",
                 "previous": {
-                  "title": "Why Use PivotHead",
-                  "permalink": "/PivotHead/docs/getting-started/Why-we-use-pivothead"
+                  "title": "Headless Architecture",
+                  "permalink": "/PivotHead/docs/headless-architecture"
                 },
                 "next": {
                   "title": "Installation",
@@ -249,12 +249,12 @@
                 },
                 "sidebar": "tutorialSidebar",
                 "previous": {
-                  "title": "Headless Architecture",
-                  "permalink": "/PivotHead/docs/headless-architecture"
+                  "title": "Basic Setup",
+                  "permalink": "/PivotHead/docs/getting-started/basic-setup"
                 },
                 "next": {
-                  "title": "Headless Quick Start",
-                  "permalink": "/PivotHead/docs/getting-started/headless-quick-start"
+                  "title": "Sample Project",
+                  "permalink": "/PivotHead/docs/tutorials/core-webcomponent/core-webcomponent-sample-project"
                 }
               },
               {
@@ -277,8 +277,8 @@
                   "permalink": "/PivotHead/docs/introduction"
                 },
                 "next": {
-                  "title": "Why Use PivotHead",
-                  "permalink": "/PivotHead/docs/getting-started/Why-we-use-pivothead"
+                  "title": "Headless Quick Start",
+                  "permalink": "/PivotHead/docs/getting-started/headless-quick-start"
                 }
               },
               {
@@ -754,8 +754,8 @@
                 },
                 "sidebar": "tutorialSidebar",
                 "previous": {
-                  "title": "Basic Setup",
-                  "permalink": "/PivotHead/docs/getting-started/basic-setup"
+                  "title": "Why Use PivotHead",
+                  "permalink": "/PivotHead/docs/getting-started/Why-we-use-pivothead"
                 },
                 "next": {
                   "title": "setup-for-user-project",
@@ -927,24 +927,10 @@
               "tutorialSidebar": [
                 { "type": "doc", "id": "introduction" },
                 { "type": "doc", "id": "headless-architecture" },
-                {
-                  "type": "category",
-                  "label": "Getting Started",
-                  "items": [
-                    {
-                      "type": "doc",
-                      "id": "getting-started/Why-we-use-pivothead"
-                    },
-                    {
-                      "type": "doc",
-                      "id": "getting-started/headless-quick-start"
-                    },
-                    { "type": "doc", "id": "getting-started/installation" },
-                    { "type": "doc", "id": "getting-started/basic-setup" }
-                  ],
-                  "collapsed": true,
-                  "collapsible": true
-                },
+                { "type": "doc", "id": "getting-started/headless-quick-start" },
+                { "type": "doc", "id": "getting-started/installation" },
+                { "type": "doc", "id": "getting-started/basic-setup" },
+                { "type": "doc", "id": "getting-started/Why-we-use-pivothead" },
                 {
                   "type": "category",
                   "label": "Tutorial",
