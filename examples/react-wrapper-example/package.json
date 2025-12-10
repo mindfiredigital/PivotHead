@@ -9,17 +9,17 @@
     "preview": "vite preview --config vite.config.js"
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
     "@mindfiredigital/pivothead": "workspace:^1.5.0",
+    "@mindfiredigital/pivothead-react": "workspace:*",
     "@mindfiredigital/pivothead-web-component": "workspace:*",
-    "@mindfiredigital/pivothead-react": "workspace:*"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "typescript": "^5.2.2",
-    "vite": "^4.3.9",
-    "@vitejs/plugin-react": "^4.3.0",
     "@types/react": "^18.2.37",
-    "@types/react-dom": "^18.2.17"
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react": "^4.3.0",
+    "typescript": "^5.2.2",
+    "vite": "^7.2.6"
   }
 }

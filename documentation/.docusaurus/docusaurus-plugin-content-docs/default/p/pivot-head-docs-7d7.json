@@ -151,6 +151,13 @@
                 },
                 {
                   "type": "link",
+                  "label": "WebAssembly & Performance",
+                  "href": "/PivotHead/docs/reference/conceptual-reference/webassembly-conceptual-reference",
+                  "docId": "reference/conceptual-reference/webassembly-conceptual-reference",
+                  "unlisted": false
+                },
+                {
+                  "type": "link",
                   "label": "React",
                   "href": "/PivotHead/docs/reference/conceptual-reference/react-conceptual-reference",
                   "docId": "reference/conceptual-reference/react-conceptual-reference",
@@ -375,6 +382,12 @@
         "id": "reference/conceptual-reference/vue-conceptual-reference",
         "title": "Vue Concepts",
         "description": "For Vue developers, the @pivothead/vue package offers a reactive and intuitive way to build a headless pivot table.",
+        "sidebar": "tutorialSidebar"
+      },
+      "reference/conceptual-reference/webassembly-conceptual-reference": {
+        "id": "reference/conceptual-reference/webassembly-conceptual-reference",
+        "title": "WebAssembly Performance Architecture",
+        "description": "PivotHead incorporates a sophisticated three-tier performance architecture with WebAssembly (WASM) integration that delivers up to 37x faster CSV processing for large datasets. This guide explains the performance features, how they work, and the massive improvements they bring to data processing.",
         "sidebar": "tutorialSidebar"
       },
       "tutorial-basics/core/api-reference": {

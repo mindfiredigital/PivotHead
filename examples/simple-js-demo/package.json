@@ -3,14 +3,15 @@
   "private": true,
   "version": "1.0.13",
   "dependencies": {
+    "@assemblyscript/loader": "^0.27.33",
     "@mindfiredigital/pivothead": "workspace:*",
-    "jspdf": "^2.5.1",
+    "jspdf": "^3.0.2",
     "jspdf-autotable": "^3.8.2"
   },
   "scripts": {
     "dev": "vite"
   },
   "devDependencies": {
-    "vite": "^4.3.9"
+    "vite": "^7.2.6"
   }
 }

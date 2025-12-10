@@ -89,7 +89,7 @@ onMouseLeave={(e) => {
   <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📤</div>
   <h3 style={{ color: '#991b1b', marginBottom: '0.75rem', fontSize: '1.5rem' }}>File Upload & Import</h3>
   <p style={{ fontSize: '1rem', lineHeight: '1.6', margin: 0, opacity: 0.95 }}>
-    Upload CSV or JSON files and watch your data instantly populate the pivot table. Drag & drop or browse!
+    Upload CSV or JSON files and watch your data instantly populate the pivot table. Drag & drop or browse! Supports high-volume files without freezing.
   </p>
   <div style={{
     marginTop: '1rem',
@@ -99,7 +99,7 @@ onMouseLeave={(e) => {
     fontSize: '0.9rem',
     fontWeight: '600'
   }}>
-    ✓ CSV & JSON Support
+    ✓ CSV & JSON • High-Volume Ready
   </div>
 </div>
 
@@ -205,6 +205,8 @@ onMouseLeave={(e) => {
 - **Auto-Detection** - Automatically parse CSV/JSON structure
 - **Data Preview** - See your data before loading
 - **Smart Mapping** - Intelligent column detection
+- **High-Volume Support** - Handle massive files without UI freezing
+- **Advanced Filtering** - Filter your data instantly after upload
 
 **Supported Formats:**
 
@@ -231,7 +233,27 @@ onMouseLeave={(e) => {
   </div>
 </div>
 
-**Maximum file size:** Up to 100MB with progressive loading!
+**File Size Support:**
+
+<div style={{
+  background: 'white',
+  padding: '1.5rem',
+  borderRadius: '0.75rem',
+  marginTop: '1rem',
+  boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+}}>
+  <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+    <div style={{ textAlign: 'center' }}>
+      <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#16a34a' }}>100MB+</div>
+      <div style={{ fontSize: '0.9rem', color: '#666' }}>Client-Side</div>
+    </div>
+    <div style={{ fontSize: '1.5rem', color: '#dc2626' }}>•</div>
+    <div style={{ textAlign: 'center' }}>
+      <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#16a34a' }}>500MB+</div>
+      <div style={{ fontSize: '0.9rem', color: '#666' }}>Server-Side</div>
+    </div>
+  </div>
+</div>
 
 </div>
 
@@ -294,6 +316,154 @@ onMouseLeave={(e) => {
 </div>
 
 **One-click export with all your filters and formatting intact!**
+
+</div>
+
+</TabItem>
+
+<TabItem value="highvolume" label="⚡ High-Volume Data">
+
+<div style={{
+  background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
+  padding: '2rem',
+  borderRadius: '1rem',
+  marginTop: '1rem'
+}}>
+
+### Process Massive Datasets Without Freezing
+
+**What's Coming:**
+
+- **Client-Side Processing** - WebAssembly-powered processing for instant performance
+- **Server-Side Support** - Optional backend processing for ultra-large files
+- **Progressive Loading** - Stream data in chunks for smooth UI experience
+- **Zero UI Freeze** - Handle 100MB+ CSV files without blocking the interface
+
+**Architecture Overview:**
+
+<div style={{
+  background: 'white',
+  padding: '2rem',
+  borderRadius: '0.75rem',
+  marginTop: '1.5rem',
+  boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+}}>
+
+<div style={{
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+  gap: '1rem',
+  marginBottom: '2rem'
+}}>
+  <div style={{ textAlign: 'center', padding: '1rem', background: '#fef2f2', borderRadius: '0.5rem' }}>
+    <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>📁</div>
+    <strong>Upload File</strong>
+    <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.5rem' }}>CSV/JSON up to 500MB</div>
+  </div>
+  <div style={{ fontSize: '2rem', textAlign: 'center', padding: '1rem' }}>→</div>
+  <div style={{ textAlign: 'center', padding: '1rem', background: '#fef2f2', borderRadius: '0.5rem' }}>
+    <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>⚙️</div>
+    <strong>Process</strong>
+    <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.5rem' }}>Client/Server-side</div>
+  </div>
+  <div style={{ fontSize: '2rem', textAlign: 'center', padding: '1rem' }}>→</div>
+  <div style={{ textAlign: 'center', padding: '1rem', background: '#fef2f2', borderRadius: '0.5rem' }}>
+    <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>📊</div>
+    <strong>Visualize</strong>
+    <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.5rem' }}>Instant pivot table</div>
+  </div>
+</div>
+
+**Performance Metrics:**
+
+<div style={{
+  display: 'grid',
+  gridTemplateColumns: 'repeat(2, 1fr)',
+  gap: '1.5rem',
+  marginTop: '1rem'
+}}>
+  <div style={{ textAlign: 'center' }}>
+    <div style={{ fontSize: '3rem', fontWeight: 'bold', color: '#dc2626' }}>10M+</div>
+    <div style={{ fontSize: '1rem', color: '#666' }}>Rows Supported</div>
+  </div>
+  <div style={{ textAlign: 'center' }}>
+    <div style={{ fontSize: '3rem', fontWeight: 'bold', color: '#16a34a' }}>< 2s</div>
+    <div style={{ fontSize: '1rem', color: '#666' }}>Initial Load Time</div>
+  </div>
+</div>
+
+</div>
+
+**Key Features:**
+
+<div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1.5rem' }}>
+  <div style={{
+    background: 'white',
+    padding: '1rem',
+    borderRadius: '0.5rem',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '1rem'
+  }}>
+    <div style={{ fontSize: '2rem' }}>🌐</div>
+    <div>
+      <strong>Client-Side Processing:</strong> WebAssembly-powered data processing directly in the browser for maximum speed
+    </div>
+  </div>
+
+  <div style={{
+    background: 'white',
+    padding: '1rem',
+    borderRadius: '0.5rem',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '1rem'
+  }}>
+    <div style={{ fontSize: '2rem' }}>⚙️</div>
+    <div>
+      <strong>Server-Side Processing:</strong> Optional backend API for processing extremely large files with REST endpoints
+    </div>
+  </div>
+
+  <div style={{
+    background: 'white',
+    padding: '1rem',
+    borderRadius: '0.5rem',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '1rem'
+  }}>
+    <div style={{ fontSize: '2rem' }}>🔍</div>
+    <div>
+      <strong>Advanced Filtering:</strong> Filter millions of rows in real-time with complex conditions and instant results
+    </div>
+  </div>
+
+  <div style={{
+    background: 'white',
+    padding: '1rem',
+    borderRadius: '0.5rem',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '1rem'
+  }}>
+    <div style={{ fontSize: '2rem' }}>📦</div>
+    <div>
+      <strong>Progressive Loading:</strong> Stream data in chunks for smooth UI experience without blocking the main thread
+    </div>
+  </div>
+</div>
+
+**Available in:**
+
+- **@pivothead/core** - Core processing engine with WASM
+- **@pivothead/webcomponent** - Native web component support
+- **@pivothead/react** - React hooks with streaming
+- **@pivothead/vue** - Vue composables with reactivity
 
 </div>
 
@@ -421,10 +591,33 @@ onMouseLeave={(e) => {
     Coming Soon
   </div>
   <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>⚡</div>
-  <h3 style={{ color: '#7f1d1d', marginBottom: '1rem', fontSize: '1.5rem' }}>High-Volume Data</h3>
+  <h3 style={{ color: '#7f1d1d', marginBottom: '1rem', fontSize: '1.5rem' }}>High-Volume Data Processing</h3>
   <p style={{ color: '#991b1b', fontSize: '1rem', lineHeight: '1.6', marginBottom: '1rem' }}>
-    Handle massive CSV and JSON files without freezing or crashing. Process millions of rows smoothly!
+    Upload massive CSV files without UI freezing! Seamless client-side processing with optional server-side support for ultra-large datasets.
   </p>
+
+{/_ Performance Infographic _/}
+
+  <div style={{
+    background: 'white',
+    padding: '1rem',
+    borderRadius: '0.75rem',
+    marginBottom: '1rem',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+  }}>
+    <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', marginBottom: '0.75rem' }}>
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#dc2626' }}>1GB+</div>
+        <div style={{ fontSize: '0.75rem', color: '#666' }}>File Size</div>
+      </div>
+      <div style={{ fontSize: '2rem', color: '#dc2626' }}>→</div>
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#16a34a' }}>0ms</div>
+        <div style={{ fontSize: '0.75rem', color: '#666' }}>UI Freeze</div>
+      </div>
+    </div>
+  </div>
+
   <div style={{
     display: 'flex',
     flexWrap: 'wrap',
@@ -437,7 +630,7 @@ onMouseLeave={(e) => {
       fontSize: '0.85rem',
       color: '#991b1b',
       fontWeight: '600'
-    }}>100MB+ files</span>
+    }}>🌐 Client-Side Processing</span>
     <span style={{
       background: 'white',
       padding: '0.25rem 0.75rem',
@@ -445,7 +638,7 @@ onMouseLeave={(e) => {
       fontSize: '0.85rem',
       color: '#991b1b',
       fontWeight: '600'
-    }}>No freezing</span>
+    }}>⚙️ Server-Side Ready</span>
     <span style={{
       background: 'white',
       padding: '0.25rem 0.75rem',
@@ -453,7 +646,15 @@ onMouseLeave={(e) => {
       fontSize: '0.85rem',
       color: '#991b1b',
       fontWeight: '600'
-    }}>WebAssembly</span>
+    }}>🚀 WebAssembly</span>
+    <span style={{
+      background: 'white',
+      padding: '0.25rem 0.75rem',
+      borderRadius: '1rem',
+      fontSize: '0.85rem',
+      color: '#991b1b',
+      fontWeight: '600'
+    }}>📊 Advanced Filtering</span>
   </div>
 </div>
 
@@ -481,6 +682,7 @@ onMouseLeave={(e) => {
 | **Vue Support**              |                                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg>                                   | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg> |
 | **Angular Support**          | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="3" style={{display: 'inline-block'}}><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="12" r="8"></circle><path d="M12 3v18M3 12h18"></path></svg> | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg> |
 | **High-Volume Processing**   | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="3" style={{display: 'inline-block'}}><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="12" r="8"></circle><path d="M12 3v18M3 12h18"></path></svg> | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg> |
+| **Server-Side Processing**   | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="3" style={{display: 'inline-block'}}><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="12" r="8"></circle><path d="M12 3v18M3 12h18"></path></svg> | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg> |
 | **WebAssembly Acceleration** | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="3" style={{display: 'inline-block'}}><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="12" r="8"></circle><path d="M12 3v18M3 12h18"></path></svg> | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg> |
 | **Progressive Loading**      | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="3" style={{display: 'inline-block'}}><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="12" r="8"></circle><path d="M12 3v18M3 12h18"></path></svg> | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg> |
 

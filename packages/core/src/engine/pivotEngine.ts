@@ -26,6 +26,15 @@ import { PivotExportService } from './exportService';
  * @param {PivotTableConfig<T>} config - The configuration for the pivot table.
  */
 export class PivotEngine<T extends Record<string, any>> {
+  setColumns(columns: any) {
+    throw new Error('Method not implemented.');
+  }
+  setRows(rows: any) {
+    throw new Error('Method not implemented.');
+  }
+  setData(augmentedData: any[]) {
+    throw new Error('Method not implemented.');
+  }
   private config: PivotTableConfig<T>;
   private state: PivotTableState<T>;
   private filterConfig: FilterConfig[] = [];
@@ -193,12 +202,13 @@ export class PivotEngine<T extends Record<string, any>> {
   }
 
   /**
-   * Updates the engine's data source and applies current filters
-   * This method allows external components to update the data while preserving filtering
+   * Updates the engine's data source and clears filters
+   * This method allows external components to update the data with fresh filtering state
    * @param {T[]} newData - The new data to use as the source
+   * @param {boolean} clearFilters - Whether to clear existing filters (default: true)
    * @public
    */
-  public updateDataSource(newData: T[]) {
+  public updateDataSource(newData: T[], clearFilters = true) {
     // Update the config data (original source)
     this.config.data = [...newData];
 
@@ -206,10 +216,16 @@ export class PivotEngine<T extends Record<string, any>> {
     this.state.data = [...newData];
     this.state.rawData = [...newData];
 
+    // Clear filters when loading new data to prevent old filters from interfering
+    if (clearFilters) {
+      this.filterConfig = [];
+      this.state.filterConfig = [];
+    }
+
     // Ensure column axis/data consistency before refresh (only if enabled)
     this.ensureSyntheticAllColumn();
 
-    // Refresh with current filters applied
+    // Refresh with current filters applied (will be empty if cleared above)
     this.refreshData();
     this._emit(); // Notify subscribers after state change
   }
@@ -407,9 +423,18 @@ export class PivotEngine<T extends Record<string, any>> {
   }
   /**
    * Emit state changes to all subscribers.
+   * CRITICAL FIX: Wrap each listener in try-catch to prevent one subscriber error from crashing others
    */
   private _emit() {
-    this.listeners.forEach(fn => fn(this.getState()));
+    const state = this.getState();
+    this.listeners.forEach(fn => {
+      try {
+        fn(state);
+      } catch (error) {
+        console.error('Error in pivot engine subscriber:', error);
+        // Continue processing other subscribers even if one fails
+      }
+    });
   }
 
   /**

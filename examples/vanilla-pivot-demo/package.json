@@ -11,6 +11,6 @@
     "@mindfiredigital/pivothead-web-component": "workspace:*"
   },
   "devDependencies": {
-    "vite": "^5.1.4"
+    "vite": "^7.2.6"
   }
 }
