@@ -3,50 +3,6 @@ import ComponentCreator from '@docusaurus/ComponentCreator';
 
 export default [
   {
-    path: '/PivotHead/__docusaurus/debug',
-    component: ComponentCreator('/PivotHead/__docusaurus/debug', 'aa4'),
-    exact: true,
-  },
-  {
-    path: '/PivotHead/__docusaurus/debug/config',
-    component: ComponentCreator('/PivotHead/__docusaurus/debug/config', '251'),
-    exact: true,
-  },
-  {
-    path: '/PivotHead/__docusaurus/debug/content',
-    component: ComponentCreator('/PivotHead/__docusaurus/debug/content', '0aa'),
-    exact: true,
-  },
-  {
-    path: '/PivotHead/__docusaurus/debug/globalData',
-    component: ComponentCreator(
-      '/PivotHead/__docusaurus/debug/globalData',
-      '6ba'
-    ),
-    exact: true,
-  },
-  {
-    path: '/PivotHead/__docusaurus/debug/metadata',
-    component: ComponentCreator(
-      '/PivotHead/__docusaurus/debug/metadata',
-      'a8d'
-    ),
-    exact: true,
-  },
-  {
-    path: '/PivotHead/__docusaurus/debug/registry',
-    component: ComponentCreator(
-      '/PivotHead/__docusaurus/debug/registry',
-      'f54'
-    ),
-    exact: true,
-  },
-  {
-    path: '/PivotHead/__docusaurus/debug/routes',
-    component: ComponentCreator('/PivotHead/__docusaurus/debug/routes', '9ce'),
-    exact: true,
-  },
-  {
     path: '/PivotHead/markdown-page',
     component: ComponentCreator('/PivotHead/markdown-page', '9e2'),
     exact: true,
