@@ -596,8 +596,6 @@ onMouseLeave={(e) => {
     Upload massive CSV files without UI freezing! Seamless client-side processing with optional server-side support for ultra-large datasets.
   </p>
 
-{/_ Performance Infographic _/}
-
   <div style={{
     background: 'white',
     padding: '1rem',
