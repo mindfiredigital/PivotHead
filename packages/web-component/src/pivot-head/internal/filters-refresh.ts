@@ -24,6 +24,11 @@ export function setFilters(host: PivotHeadHost, value: FilterConfig[]): void {
 
   host._filters = value || [];
   host.setAttribute('filters', JSON.stringify(value));
+
+  // Clear filter UI if no filters are applied
+  if (!value || value.length === 0) {
+    clearFilterUI(host);
+  }
 }
 
 export function getFilters(host: PivotHeadHost): FilterConfig[] {

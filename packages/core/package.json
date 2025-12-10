@@ -75,7 +75,9 @@
     "html"
   ],
   "scripts": {
-    "build": "vite build",
+    "build": "npm run build:wasm || true && vite build",
+    "build:wasm": "mkdir -p dist/wasm && asc assembly/csvParser.ts --outFile dist/wasm/csvParser.wasm --optimize --exportRuntime || echo 'WASM build skipped - run npm run build:wasm manually'",
+    "build:wasm:debug": "mkdir -p dist/wasm && asc assembly/csvParser.ts --outFile dist/wasm/csvParser.debug.wasm --debug --exportRuntime",
     "dev": "vite build --watch",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -86,14 +88,16 @@
   },
   "devDependencies": {
     "@types/node": "^22.10.1",
+    "assemblyscript": "^0.27.33",
     "typescript": "^5.0.2",
-    "vite": "^4.3.9",
+    "vite": "^7.2.6",
     "vite-plugin-dts": "^2.3.0",
     "vitest": "^0.32.0"
   },
   "dependencies": {
+    "@assemblyscript/loader": "^0.27.33",
     "jsdom": "^26.0.0",
-    "jspdf": "^3.0.1",
+    "jspdf": "^3.0.2",
     "jspdf-autotable": "^5.0.2",
     "xlsx": "^0.18.5"
   },

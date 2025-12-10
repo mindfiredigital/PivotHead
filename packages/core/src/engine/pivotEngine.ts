@@ -26,6 +26,15 @@ import { PivotExportService } from './exportService';
  * @param {PivotTableConfig<T>} config - The configuration for the pivot table.
  */
 export class PivotEngine<T extends Record<string, any>> {
+  setColumns(columns: any) {
+    throw new Error('Method not implemented.');
+  }
+  setRows(rows: any) {
+    throw new Error('Method not implemented.');
+  }
+  setData(augmentedData: any[]) {
+    throw new Error('Method not implemented.');
+  }
   private config: PivotTableConfig<T>;
   private state: PivotTableState<T>;
   private filterConfig: FilterConfig[] = [];
@@ -41,7 +50,7 @@ export class PivotEngine<T extends Record<string, any>> {
   private autoAllColumnEnabled = false;
 
   // Add cache for expensive calculations
-  // private cache: Map<string, any> = new Map();
+  private cache: Map<string, any> = new Map();
 
   constructor(config: PivotTableConfig<T>) {
     // Validate required config properties
@@ -193,12 +202,13 @@ export class PivotEngine<T extends Record<string, any>> {
   }
 
   /**
-   * Updates the engine's data source and applies current filters
-   * This method allows external components to update the data while preserving filtering
+   * Updates the engine's data source and clears filters
+   * This method allows external components to update the data with fresh filtering state
    * @param {T[]} newData - The new data to use as the source
+   * @param {boolean} clearFilters - Whether to clear existing filters (default: true)
    * @public
    */
-  public updateDataSource(newData: T[]) {
+  public updateDataSource(newData: T[], clearFilters = true) {
     // Update the config data (original source)
     this.config.data = [...newData];
 
@@ -206,10 +216,16 @@ export class PivotEngine<T extends Record<string, any>> {
     this.state.data = [...newData];
     this.state.rawData = [...newData];
 
+    // Clear filters when loading new data to prevent old filters from interfering
+    if (clearFilters) {
+      this.filterConfig = [];
+      this.state.filterConfig = [];
+    }
+
     // Ensure column axis/data consistency before refresh (only if enabled)
     this.ensureSyntheticAllColumn();
 
-    // Refresh with current filters applied
+    // Refresh with current filters applied (will be empty if cleared above)
     this.refreshData();
     this._emit(); // Notify subscribers after state change
   }
@@ -407,9 +423,18 @@ export class PivotEngine<T extends Record<string, any>> {
   }
   /**
    * Emit state changes to all subscribers.
+   * CRITICAL FIX: Wrap each listener in try-catch to prevent one subscriber error from crashing others
    */
   private _emit() {
-    this.listeners.forEach(fn => fn(this.getState()));
+    const state = this.getState();
+    this.listeners.forEach(fn => {
+      try {
+        fn(state);
+      } catch (error) {
+        console.error('Error in pivot engine subscriber:', error);
+        // Continue processing other subscribers even if one fails
+      }
+    });
   }
 
   /**
@@ -796,25 +821,29 @@ export class PivotEngine<T extends Record<string, any>> {
    * @public
    */
   public getFieldAlignment(field: string): string {
+    // Check cache first for performance
+    const cacheKey = `alignment:${field}`;
+    if (this.cache.has(cacheKey)) {
+      return this.cache.get(cacheKey);
+    }
+
     const format = this.getFieldFormat(field);
 
-    console.log(`getFieldAlignment for field: ${field}`, format); // Debug log
+    let alignment: string;
 
     if (format && format.align) {
-      console.log(`Returning alignment: ${format.align}`); // Debug log
-      return format.align;
+      alignment = format.align;
+    } else if (format && format.type === 'currency' && format.currencyAlign) {
+      alignment = format.currencyAlign;
+    } else {
+      // Default alignment: right for numbers, left for text
+      const measure = this.state.measures.find(m => m.uniqueName === field);
+      alignment = measure ? 'right' : 'left';
     }
 
-    if (format && format.type === 'currency' && format.currencyAlign) {
-      return format.currencyAlign;
-    }
-
-    // Default alignment: right for numbers, left for text
-    const measure = this.state.measures.find(m => m.uniqueName === field);
-    const defaultAlign = measure ? 'right' : 'left';
-
-    console.log(`Using default alignment: ${defaultAlign}`); // Debug log
-    return defaultAlign;
+    // Cache the result for future calls
+    this.cache.set(cacheKey, alignment);
+    return alignment;
   }
 
   /**
@@ -832,6 +861,10 @@ export class PivotEngine<T extends Record<string, any>> {
 
     // Update global formatting
     this.state.formatting[field] = format;
+
+    // Clear alignment cache for this field since formatting changed
+    const cacheKey = `alignment:${field}`;
+    this.cache.delete(cacheKey);
 
     // Regenerate processed data with new formatting
     this.state.processedData = this.generateProcessedDataForDisplay();
@@ -1354,8 +1387,13 @@ export class PivotEngine<T extends Record<string, any>> {
 
         switch (filter.operator) {
           case 'equals':
+            // Case-insensitive comparison for strings
+            if (typeof value === 'string' && typeof filterValue === 'string') {
+              return value.toLowerCase() === filterValue.toLowerCase();
+            }
             return value === filterValue;
           case 'contains':
+            // Case-insensitive partial matching - supports even 1-2 letters
             return String(value)
               .toLowerCase()
               .includes(String(filterValue).toLowerCase());
@@ -2129,8 +2167,16 @@ export class PivotEngine<T extends Record<string, any>> {
 
           switch (filter.operator) {
             case 'equals':
+              // Case-insensitive comparison for strings
+              if (
+                typeof value === 'string' &&
+                typeof filterValue === 'string'
+              ) {
+                return value.toLowerCase() === filterValue.toLowerCase();
+              }
               return value === filterValue;
             case 'contains':
+              // Case-insensitive partial matching - supports even 1-2 letters
               return String(value)
                 .toLowerCase()
                 .includes(String(filterValue).toLowerCase());

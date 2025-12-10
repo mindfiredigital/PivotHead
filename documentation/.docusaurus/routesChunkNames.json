@@ -49,17 +49,17 @@
     },
     "content": "content---pivot-head-markdown-page-393-f56"
   },
-  "/PivotHead/docs-929": {
+  "/PivotHead/docs-1fd": {
     "__comp": "__comp---theme-docs-root-5-e-9-0b6",
     "__context": {
       "plugin": "plugin---pivot-head-docsaba-41e"
     }
   },
-  "/PivotHead/docs-46d": {
+  "/PivotHead/docs-4f6": {
     "__comp": "__comp---theme-doc-version-roota-7-b-5de",
     "__props": "__props---pivot-head-docs-162-87b"
   },
-  "/PivotHead/docs-c56": {
+  "/PivotHead/docs-b05": {
     "__comp": "__comp---theme-doc-roota-94-67a"
   },
   "/PivotHead/docs/contributors/-f21": {
@@ -141,6 +141,10 @@
   "/PivotHead/docs/reference/conceptual-reference/vue-conceptual-reference-08d": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---pivot-head-docs-reference-conceptual-reference-vue-conceptual-referenceaff-136"
+  },
+  "/PivotHead/docs/reference/conceptual-reference/webassembly-conceptual-reference-493": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-reference-conceptual-reference-webassembly-conceptual-referenced-9-e-58e"
   },
   "/PivotHead/docs/tutorial-basics/core/api-reference-0be": {
     "__comp": "__comp---theme-doc-item-178-a40",

@@ -18,8 +18,8 @@
   },
   "sidebar": "tutorialSidebar",
   "previous": {
-    "title": "Core Web Component",
-    "permalink": "/PivotHead/docs/reference/conceptual-reference/core-webcomponent-conceptual-reference"
+    "title": "WebAssembly & Performance",
+    "permalink": "/PivotHead/docs/reference/conceptual-reference/webassembly-conceptual-reference"
   },
   "next": {
     "title": "Vue",
