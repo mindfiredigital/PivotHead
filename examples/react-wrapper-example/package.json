@@ -1,7 +1,7 @@
 {
   "name": "react-wrapper-example",
   "private": true,
-  "version": "0.0.5",
+  "version": "0.0.6",
   "type": "module",
   "scripts": {
     "dev": "vite --config vite.config.js",
@@ -11,7 +11,7 @@
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "@mindfiredigital/pivothead": "workspace:^1.7.0",
+    "@mindfiredigital/pivothead": "workspace:^1.8.0",
     "@mindfiredigital/pivothead-web-component": "workspace:*"
   },
   "devDependencies": {
