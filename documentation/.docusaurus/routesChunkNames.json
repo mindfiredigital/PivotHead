@@ -1,220 +1,177 @@
 {
-  "/PivotHead/__docusaurus/debug-aa4": {
-    "__comp": "__comp---theme-debug-config-23-a-2ff",
-    "__context": {
-      "plugin": "plugin---pivot-head-docusaurus-debugb-38-19d"
-    }
-  },
-  "/PivotHead/__docusaurus/debug/config-251": {
-    "__comp": "__comp---theme-debug-config-23-a-2ff",
-    "__context": {
-      "plugin": "plugin---pivot-head-docusaurus-debugb-38-19d"
-    }
-  },
-  "/PivotHead/__docusaurus/debug/content-0aa": {
-    "__comp": "__comp---theme-debug-contentba-8-ce7",
-    "__context": {
-      "plugin": "plugin---pivot-head-docusaurus-debugb-38-19d"
-    },
-    "__props": "__props---pivot-head-docusaurus-debug-contentf-9-e-32b"
-  },
-  "/PivotHead/__docusaurus/debug/globalData-6ba": {
-    "__comp": "__comp---theme-debug-global-dataede-0fa",
-    "__context": {
-      "plugin": "plugin---pivot-head-docusaurus-debugb-38-19d"
-    }
-  },
-  "/PivotHead/__docusaurus/debug/metadata-a8d": {
-    "__comp": "__comp---theme-debug-site-metadata-68-e-3d4",
-    "__context": {
-      "plugin": "plugin---pivot-head-docusaurus-debugb-38-19d"
-    }
-  },
-  "/PivotHead/__docusaurus/debug/registry-f54": {
-    "__comp": "__comp---theme-debug-registry-679-501",
-    "__context": {
-      "plugin": "plugin---pivot-head-docusaurus-debugb-38-19d"
-    }
-  },
-  "/PivotHead/__docusaurus/debug/routes-9ce": {
-    "__comp": "__comp---theme-debug-routes-946-699",
-    "__context": {
-      "plugin": "plugin---pivot-head-docusaurus-debugb-38-19d"
-    }
-  },
   "/PivotHead/markdown-page-9e2": {
-    "__comp": "__comp---theme-mdx-page-1-f-3-b90",
+    "__comp": "1f391b9e",
     "__context": {
-      "plugin": "plugin---pivot-head-markdown-pagea-74-230"
+      "plugin": "a7456010"
     },
-    "content": "content---pivot-head-markdown-page-393-f56"
+    "content": "393be207"
   },
   "/PivotHead/docs-1fd": {
-    "__comp": "__comp---theme-docs-root-5-e-9-0b6",
+    "__comp": "5e95c892",
     "__context": {
-      "plugin": "plugin---pivot-head-docsaba-41e"
+      "plugin": "aba21aa0"
     }
   },
   "/PivotHead/docs-4f6": {
-    "__comp": "__comp---theme-doc-version-roota-7-b-5de",
-    "__props": "__props---pivot-head-docs-162-87b"
+    "__comp": "a7bd4aaa",
+    "__props": "162b762a"
   },
   "/PivotHead/docs-b05": {
-    "__comp": "__comp---theme-doc-roota-94-67a"
+    "__comp": "a94703ab"
   },
   "/PivotHead/docs/contributors/-f21": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-contributors-6-f-4-1d5"
+    "__comp": "17896441",
+    "content": "6f41419f"
   },
   "/PivotHead/docs/contributors/code-of-conduct-e61": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-contributors-code-of-conductf-3-e-e7d"
+    "__comp": "17896441",
+    "content": "f3ee8136"
   },
   "/PivotHead/docs/contributors/how-to-contribute-ca9": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-contributors-how-to-contribute-42-f-4f6"
+    "__comp": "17896441",
+    "content": "42f26196"
   },
   "/PivotHead/docs/contributors/monorepo-setup-c2e": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-contributors-monorepo-setup-78-c-bb8"
+    "__comp": "17896441",
+    "content": "78c5d49a"
   },
   "/PivotHead/docs/contributors/quick-start-384": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-contributors-quick-startbb-9-9e6"
+    "__comp": "17896441",
+    "content": "bb9987f4"
   },
   "/PivotHead/docs/getting-started/basic-setup-2b9": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-getting-started-basic-setupc-9-d-e6d"
+    "__comp": "17896441",
+    "content": "c9dad2b7"
   },
   "/PivotHead/docs/getting-started/headless-quick-start-271": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-getting-started-headless-quick-start-92-d-446"
+    "__comp": "17896441",
+    "content": "92d2bf0f"
   },
   "/PivotHead/docs/getting-started/installation-30f": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-getting-started-installation-54-f-dbe"
+    "__comp": "17896441",
+    "content": "54f44165"
   },
   "/PivotHead/docs/getting-started/Why-we-use-pivothead-e9b": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-getting-started-why-we-use-pivotheada-47-6c0"
+    "__comp": "17896441",
+    "content": "a470fc3c"
   },
   "/PivotHead/docs/headless-architecture-0ca": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-headless-architecturef-74-9ed"
+    "__comp": "17896441",
+    "content": "f747d7dd"
   },
   "/PivotHead/docs/Installation-e1c": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-installation-1-ff-9e1"
+    "__comp": "17896441",
+    "content": "1ff659d4"
   },
   "/PivotHead/docs/introduction-db5": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-introductiona-09-d41"
+    "__comp": "17896441",
+    "content": "a09c2993"
   },
   "/PivotHead/docs/reference/api-reference/angular-api-reference-1e0": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-reference-api-reference-angular-api-reference-257-544"
+    "__comp": "17896441",
+    "content": "2576e8ad"
   },
   "/PivotHead/docs/reference/api-reference/core-webcomponent-api-reference-312": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-reference-api-reference-core-webcomponent-api-referenceae-3-7c2"
+    "__comp": "17896441",
+    "content": "ae316f43"
   },
   "/PivotHead/docs/reference/api-reference/react-api-reference-46a": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-reference-api-reference-react-api-referencece-6-0e8"
+    "__comp": "17896441",
+    "content": "ce662fef"
   },
   "/PivotHead/docs/reference/api-reference/vue-api-reference-cc0": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-reference-api-reference-vue-api-referencebc-2-021"
+    "__comp": "17896441",
+    "content": "bc27b32c"
   },
   "/PivotHead/docs/reference/conceptual-reference/angular-conceptual-reference-28e": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-reference-conceptual-reference-angular-conceptual-reference-907-07b"
+    "__comp": "17896441",
+    "content": "907eefd9"
   },
   "/PivotHead/docs/reference/conceptual-reference/core-webcomponent-conceptual-reference-c2b": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-reference-conceptual-reference-core-webcomponent-conceptual-reference-079-8c3"
+    "__comp": "17896441",
+    "content": "079a4878"
   },
   "/PivotHead/docs/reference/conceptual-reference/react-conceptual-reference-9ee": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-reference-conceptual-reference-react-conceptual-reference-09-b-cd1"
+    "__comp": "17896441",
+    "content": "09b3c45c"
   },
   "/PivotHead/docs/reference/conceptual-reference/vue-conceptual-reference-08d": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-reference-conceptual-reference-vue-conceptual-referenceaff-136"
+    "__comp": "17896441",
+    "content": "aff94433"
   },
   "/PivotHead/docs/reference/conceptual-reference/webassembly-conceptual-reference-493": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-reference-conceptual-reference-webassembly-conceptual-referenced-9-e-58e"
+    "__comp": "17896441",
+    "content": "d9e2605b"
   },
   "/PivotHead/docs/tutorial-basics/core/api-reference-0be": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-tutorial-basics-core-api-reference-190-54c"
+    "__comp": "17896441",
+    "content": "1906e69e"
   },
   "/PivotHead/docs/tutorial-basics/core/core-concepts-496": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-tutorial-basics-core-core-conceptsb-6-f-842"
+    "__comp": "17896441",
+    "content": "b6f885a7"
   },
   "/PivotHead/docs/tutorial-basics/core/examples-85b": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-tutorial-basics-core-examples-8-fa-07f"
+    "__comp": "17896441",
+    "content": "8fa52543"
   },
   "/PivotHead/docs/tutorial-basics/troubleshooting-988": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-tutorial-basics-troubleshooting-18-f-fd8"
+    "__comp": "17896441",
+    "content": "18f4eb3b"
   },
   "/PivotHead/docs/tutorial-basics/web-component-f28": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-tutorial-basics-web-component-841-478"
+    "__comp": "17896441",
+    "content": "8417d92c"
   },
   "/PivotHead/docs/tutorial-basics/wrappers/react-2a0": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-tutorial-basics-wrappers-reactc-03-958"
+    "__comp": "17896441",
+    "content": "c032008b"
   },
   "/PivotHead/docs/tutorial-basics/wrappers/vue-69f": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-tutorial-basics-wrappers-vue-9-c-1-c95"
+    "__comp": "17896441",
+    "content": "9c1df5c8"
   },
   "/PivotHead/docs/tutorials/angular/angular-sample-project-7a0": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-tutorials-angular-angular-sample-projecta-6-d-bd2"
+    "__comp": "17896441",
+    "content": "a6d52b28"
   },
   "/PivotHead/docs/tutorials/angular/angular-setup-for-user-project-87f": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-tutorials-angular-angular-setup-for-user-projectcec-4c5"
+    "__comp": "17896441",
+    "content": "cecb2d38"
   },
   "/PivotHead/docs/tutorials/core-webcomponent/core-webcomponent-sample-project-c32": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-tutorials-core-webcomponent-core-webcomponent-sample-project-4-ee-0ac"
+    "__comp": "17896441",
+    "content": "4ee08b04"
   },
   "/PivotHead/docs/tutorials/core-webcomponent/setup-for-user-project-83d": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-tutorials-core-webcomponent-setup-for-user-projectf-9-c-bc6"
+    "__comp": "17896441",
+    "content": "f9c50032"
   },
   "/PivotHead/docs/tutorials/react/react-sample-project-1f6": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-tutorials-react-react-sample-project-93-c-8a2"
+    "__comp": "17896441",
+    "content": "93c0831d"
   },
   "/PivotHead/docs/tutorials/react/setup-for-user-project-953": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-tutorials-react-setup-for-user-project-030-56c"
+    "__comp": "17896441",
+    "content": "03056e27"
   },
   "/PivotHead/docs/tutorials/vue/setup-for-user-project-d76": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-tutorials-vue-setup-for-user-project-860-9a2"
+    "__comp": "17896441",
+    "content": "86010177"
   },
   "/PivotHead/docs/tutorials/vue/vue-sample-project-041": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-tutorials-vue-vue-sample-project-00-f-082"
+    "__comp": "17896441",
+    "content": "00f058b1"
   },
   "/PivotHead/docs/upcoming/-249": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---pivot-head-docs-upcoming-192-7de"
+    "__comp": "17896441",
+    "content": "19283ebe"
   },
   "/PivotHead/-409": {
-    "__comp": "__comp---site-src-pages-index-jsc-4-f-f99",
+    "__comp": "c4f5d8e4",
     "__context": {
-      "plugin": "plugin---pivot-head-markdown-pagea-74-230"
+      "plugin": "a7456010"
     },
-    "config": "config---pivot-head-5-e-9-392"
+    "config": "5e9f5e1a"
   }
 }
