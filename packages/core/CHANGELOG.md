@@ -1,5 +1,11 @@
 # @mindfiredigital/pivothead
 
+## 1.8.1
+
+### Patch Changes
+
+- Update package.json (#237)
+
 ## 1.8.0
 
 ### Minor Changes
