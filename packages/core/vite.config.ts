@@ -16,7 +16,7 @@ export default defineConfig({
       output: {
         globals: {},
         assetFileNames: assetInfo => {
-          // Keep WASM files with .wasm extension
+          // Keep WASM files with .wasm extension in wasm folder
           if (assetInfo.name && assetInfo.name.endsWith('.wasm')) {
             return 'wasm/[name][extname]';
           }
@@ -24,7 +24,8 @@ export default defineConfig({
         },
       },
     },
-    assetsInlineLimit: 0, // Don't inline WASM files
+    assetsInlineLimit: 0, // Don't inline WASM files - keep them as separate assets
+    copyPublicDir: false, // Don't copy public dir for library builds
   },
   plugins: [
     dts({ include: ['src/**/*'], rollupTypes: false }),

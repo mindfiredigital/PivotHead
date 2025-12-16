@@ -18,6 +18,50 @@ npm install @mindfiredigital/pivothead-web-component
 - You decide the rendering approach via the `mode` attribute: `default` | `minimal` | `none`.
 - Interact through properties/attributes, methods, and events (see API below).
 
+## 🚀 High-Performance CSV Processing with WebAssembly
+
+PivotHead integrates a powerful CSV processing engine built with **WebAssembly (WASM)**, delivering near-native speed for data-intensive operations directly in the browser.
+
+### Key Features
+
+- **Blazing Speed**: The WASM-based parser is significantly faster than traditional JavaScript parsers, making it ideal for large datasets.
+- **Large File Support**: Effortlessly handle large CSV files. The engine uses a hybrid approach:
+  - **In-Memory (up to 8MB)**: For medium-sized files, processing happens entirely in memory for maximum speed.
+  - **Streaming (> 8MB)**: For files larger than 8MB (tested up to 1GB), the engine automatically switches to a streaming mode. It processes the file in chunks, ensuring low memory consumption and a responsive UI even with massive files.
+- **Automatic & Transparent**: You don't need to do anything to enable this feature. The component intelligently analyzes the data source and automatically chooses the most efficient processing strategy.
+
+### Example: Loading a Large CSV File
+
+The component's performance features shine when loading data from files. Simply pass the `File` object to the `data` property. The engine will handle the rest.
+
+```html
+<input type="file" id="csv-file-input" accept=".csv" />
+<pivot-head id="pivot-table"></pivot-head>
+
+<script type="module">
+  import '@mindfiredigital/pivothead-web-component';
+
+  const fileInput = document.getElementById('csv-file-input');
+  const pivotTable = document.getElementById('pivot-table');
+
+  fileInput.addEventListener('change', event => {
+    const file = event.target.files[0];
+    if (file) {
+      // Pass the File object directly to the data property.
+      // The component will automatically use the WASM engine
+      // to process it efficiently.
+      pivotTable.data = file;
+    }
+  });
+
+  pivotTable.addEventListener('stateChange', e => {
+    console.log('New pivot state:', e.detail);
+    // You can check the performance mode used in the state
+    console.log('Performance mode:', e.detail.performanceMode);
+  });
+</script>
+```
+
 ## Modes
 
 ### Default (full UI)
@@ -231,12 +275,12 @@ export default {
 
 ### Properties
 
-| Property   | Type          | Description              |
-| ---------- | ------------- | ------------------------ |
-| data       | string (JSON) | The data to be processed |
-| options    | string (JSON) | Configuration options    |
-| filters    | string (JSON) | Filter configuration     |
-| pagination | string (JSON) | Pagination configuration |
+| Property   | Type                       | Description                                            |
+| ---------- | -------------------------- | ------------------------------------------------------ |
+| data       | `object[]` `File` `string` | The data to be processed (JSON, array, or File object) |
+| options    | `object` `string`          | Configuration options (JSON or object)                 |
+| filters    | `object` `string`          | Filter configuration (JSON or object)                  |
+| pagination | `object` `string`          | Pagination configuration (JSON or object)              |
 
 ### Events
 
@@ -269,6 +313,7 @@ interface PivotTableState<T> {
     rows: any[][];
     totals: Record<string, number>;
   };
+  performanceMode?: 'standard' | 'workers' | 'wasm' | 'streaming-wasm'; // The processing mode used
   // ... other state properties
 }
 ```

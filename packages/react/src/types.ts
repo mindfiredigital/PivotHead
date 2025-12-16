@@ -78,11 +78,11 @@ export type PivotHeadEl = HTMLElement & {
   exportToPDF(fileName?: string): void;
   exportToExcel(fileName?: string): void;
   openPrintDialog(): void;
-
-  exportToExcel(fileName?: string): void;
-  openPrintDialog(): void;
   loadFromFile(file: File): Promise<void>;
   loadFromUrl(url: string): Promise<void>;
+  connectToLocalCSV(options?: any): Promise<any>;
+  connectToLocalJSON(options?: any): Promise<any>;
+  connectToLocalFile(options?: any): Promise<any>;
 };
 
 export type PivotHeadMode = 'default' | 'minimal' | 'none';

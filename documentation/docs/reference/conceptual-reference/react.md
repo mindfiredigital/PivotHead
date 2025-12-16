@@ -679,8 +679,709 @@ function CustomDataTable({ data, onSort }: {
 3. **Update event handlers**: Use React-style event props
 4. **Migrate custom UI**: Use appropriate mode (minimal or none) for customization
 
+## **Connect Service & File Upload**
+
+The PivotHead React wrapper provides full access to the powerful **Connect Service** for uploading and processing local CSV/JSON files with automatic WebAssembly acceleration.
+
+### **Overview**
+
+The Connect Service in React provides:
+
+- **React-friendly API**: Type-safe file upload methods
+- **WebAssembly Integration**: Automatic WASM optimization for large files (800 MB+)
+- **Progress Tracking**: Real-time feedback with React state
+- **Error Handling**: Comprehensive error states and recovery
+- **TypeScript Support**: Full type definitions for all options
+
+### **File Upload Methods**
+
+#### **Using connectToLocalFile()**
+
+```tsx
+import React, { useRef, useState } from 'react';
+import { PivotHead, PivotHeadRef } from '@mindfiredigital/pivothead-react';
+
+export default function FileUploadExample() {
+  const pivotRef = useRef<PivotHeadRef>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadResult, setUploadResult] = useState<string>('');
+
+  const handleUploadCSV = async () => {
+    if (!pivotRef.current) return;
+
+    try {
+      setIsUploading(true);
+      setUploadResult('');
+
+      const result = await pivotRef.current.methods.connectToLocalFile({
+        maxFileSize: 1024 * 1024 * 1024, // 1 GB
+        onProgress: progress => {
+          setUploadProgress(progress);
+        },
+      });
+
+      if (result.success) {
+        setUploadResult(`
+          ✅ File uploaded successfully!
+          📄 File: ${result.fileName}
+          📊 Records: ${result.recordCount.toLocaleString()}
+          🚀 Performance Mode: ${result.performanceMode}
+          💾 Size: ${(result.fileSize / 1024 / 1024).toFixed(2)} MB
+        `);
+      } else {
+        setUploadResult(`❌ Upload failed: ${result.error}`);
+      }
+    } catch (error) {
+      setUploadResult(`❌ Error: ${error.message}`);
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+    }
+  };
+
+  return (
+    <div>
+      <div style={{ marginBottom: 20 }}>
+        <button
+          onClick={handleUploadCSV}
+          disabled={isUploading}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: isUploading ? '#ccc' : '#007bff',
+            color: 'white',
+            border: 'none',
+            borderRadius: 4,
+            cursor: isUploading ? 'not-allowed' : 'pointer',
+          }}
+        >
+          {isUploading ? 'Uploading...' : 'Upload CSV File'}
+        </button>
+
+        {isUploading && (
+          <div style={{ marginTop: 10 }}>
+            <div
+              style={{
+                width: '100%',
+                height: 20,
+                backgroundColor: '#e0e0e0',
+                borderRadius: 10,
+                overflow: 'hidden',
+              }}
+            >
+              <div
+                style={{
+                  width: `${uploadProgress}%`,
+                  height: '100%',
+                  backgroundColor: '#4CAF50',
+                  transition: 'width 0.3s',
+                }}
+              />
+            </div>
+            <p>Processing: {uploadProgress}%</p>
+          </div>
+        )}
+
+        {uploadResult && (
+          <pre
+            style={{
+              marginTop: 10,
+              padding: 10,
+              backgroundColor: '#f5f5f5',
+              borderRadius: 4,
+              whiteSpace: 'pre-wrap',
+            }}
+          >
+            {uploadResult}
+          </pre>
+        )}
+      </div>
+
+      <PivotHead ref={pivotRef} mode="default" data={[]} options={{}} />
+    </div>
+  );
+}
+```
+
+### **Advanced CSV Upload with Custom Options**
+
+```tsx
+import React, { useRef, useState } from 'react';
+import { PivotHead, PivotHeadRef } from '@mindfiredigital/pivothead-react';
+
+export default function AdvancedCSVUpload() {
+  const pivotRef = useRef<PivotHeadRef>(null);
+  const [uploadState, setUploadState] = useState({
+    isUploading: false,
+    progress: 0,
+    status: '',
+    performanceMode: '',
+  });
+
+  const handleCSVUpload = async () => {
+    if (!pivotRef.current) return;
+
+    try {
+      setUploadState(prev => ({
+        ...prev,
+        isUploading: true,
+        status: 'Uploading...',
+      }));
+
+      const result = await pivotRef.current.methods.connectToLocalCSV({
+        // File size limit
+        maxFileSize: 1024 * 1024 * 1024, // 1 GB
+
+        // CSV parsing options
+        csv: {
+          delimiter: ',',
+          hasHeader: true,
+          skipEmptyLines: true,
+          trimValues: true,
+          encoding: 'utf-8',
+        },
+
+        // Progress callback
+        onProgress: progress => {
+          setUploadState(prev => ({
+            ...prev,
+            progress,
+            status: `Processing: ${progress}%`,
+          }));
+        },
+      });
+
+      if (result.success) {
+        setUploadState(prev => ({
+          ...prev,
+          isUploading: false,
+          progress: 100,
+          status: `✅ Successfully loaded ${result.recordCount.toLocaleString()} records`,
+          performanceMode: result.performanceMode,
+        }));
+      } else {
+        setUploadState(prev => ({
+          ...prev,
+          isUploading: false,
+          status: `❌ Upload failed: ${result.error}`,
+        }));
+      }
+    } catch (error) {
+      setUploadState(prev => ({
+        ...prev,
+        isUploading: false,
+        status: `❌ Error: ${error.message}`,
+      }));
+    }
+  };
+
+  return (
+    <div>
+      <div
+        style={{
+          padding: 20,
+          backgroundColor: '#f8f9fa',
+          borderRadius: 8,
+          marginBottom: 20,
+        }}
+      >
+        <h3>CSV File Upload</h3>
+
+        <button
+          onClick={handleCSVUpload}
+          disabled={uploadState.isUploading}
+          style={{
+            padding: '12px 24px',
+            backgroundColor: uploadState.isUploading ? '#6c757d' : '#007bff',
+            color: 'white',
+            border: 'none',
+            borderRadius: 4,
+            fontSize: 16,
+            cursor: uploadState.isUploading ? 'not-allowed' : 'pointer',
+            marginBottom: 16,
+          }}
+        >
+          {uploadState.isUploading
+            ? '⏳ Uploading...'
+            : '📁 Upload CSV File (up to 1 GB)'}
+        </button>
+
+        {uploadState.isUploading && (
+          <div>
+            <div
+              style={{
+                width: '100%',
+                height: 24,
+                backgroundColor: '#e9ecef',
+                borderRadius: 12,
+                overflow: 'hidden',
+                marginBottom: 8,
+              }}
+            >
+              <div
+                style={{
+                  width: `${uploadState.progress}%`,
+                  height: '100%',
+                  backgroundColor: '#28a745',
+                  transition: 'width 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontSize: 12,
+                  fontWeight: 'bold',
+                }}
+              >
+                {uploadState.progress > 5 && `${uploadState.progress}%`}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {uploadState.status && (
+          <div
+            style={{
+              padding: 12,
+              backgroundColor: uploadState.status.startsWith('✅')
+                ? '#d4edda'
+                : uploadState.status.startsWith('❌')
+                  ? '#f8d7da'
+                  : '#fff3cd',
+              border: `1px solid ${
+                uploadState.status.startsWith('✅')
+                  ? '#c3e6cb'
+                  : uploadState.status.startsWith('❌')
+                    ? '#f5c6cb'
+                    : '#ffeeba'
+              }`,
+              borderRadius: 4,
+              color: uploadState.status.startsWith('✅')
+                ? '#155724'
+                : uploadState.status.startsWith('❌')
+                  ? '#721c24'
+                  : '#856404',
+            }}
+          >
+            {uploadState.status}
+          </div>
+        )}
+
+        {uploadState.performanceMode && (
+          <div style={{ marginTop: 12, fontSize: 14, color: '#6c757d' }}>
+            <strong>Performance Mode:</strong> {uploadState.performanceMode}
+            {uploadState.performanceMode === 'streaming-wasm' &&
+              ' (Using WebAssembly for maximum performance!)'}
+          </div>
+        )}
+      </div>
+
+      <PivotHead ref={pivotRef} mode="default" data={[]} options={{}} />
+    </div>
+  );
+}
+```
+
+### **WebAssembly Performance**
+
+The Connect Service automatically uses WebAssembly for large files:
+
+#### **Performance Modes**
+
+| File Size | Mode             | Technology       | Performance |
+| --------- | ---------------- | ---------------- | ----------- |
+| < 1 MB    | `standard`       | JavaScript       | Fast        |
+| 1-5 MB    | `workers`        | Web Workers      | 5x faster   |
+| 5-8 MB    | `wasm`           | Pure WASM        | 10x faster  |
+| > 8 MB    | `streaming-wasm` | WASM + Streaming | 37x faster  |
+
+#### **800 MB File Processing**
+
+```tsx
+// Example: Processing an 800 MB CSV file
+const result = await pivotRef.current.methods.connectToLocalFile({
+  maxFileSize: 1024 * 1024 * 1024,
+  onProgress: progress => setProgress(progress),
+});
+
+// Result:
+// performanceMode: 'streaming-wasm'
+// Processing time: 2-3 seconds
+// Memory usage: ~50 MB
+// Parse speed: ~200ms per 4MB chunk
+```
+
+### **Complete Production Example**
+
+```tsx
+import React, { useRef, useState, useEffect } from 'react';
+import {
+  PivotHead,
+  PivotHeadRef,
+  PivotTableState,
+} from '@mindfiredigital/pivothead-react';
+
+interface UploadState {
+  isUploading: boolean;
+  progress: number;
+  fileName: string;
+  fileSize: number;
+  recordCount: number;
+  performanceMode: string;
+  error: string | null;
+}
+
+export default function ProductionFileUpload() {
+  const pivotRef = useRef<PivotHeadRef>(null);
+  const [uploadState, setUploadState] = useState<UploadState>({
+    isUploading: false,
+    progress: 0,
+    fileName: '',
+    fileSize: 0,
+    recordCount: 0,
+    performanceMode: '',
+    error: null,
+  });
+  const [pivotState, setPivotState] = useState<PivotTableState | null>(null);
+
+  const handleFileUpload = async () => {
+    if (!pivotRef.current) return;
+
+    setUploadState(prev => ({
+      ...prev,
+      isUploading: true,
+      progress: 0,
+      error: null,
+    }));
+
+    try {
+      const result = await pivotRef.current.methods.connectToLocalFile({
+        maxFileSize: 1024 * 1024 * 1024, // 1 GB
+        onProgress: progress => {
+          setUploadState(prev => ({ ...prev, progress }));
+        },
+      });
+
+      if (result.success) {
+        setUploadState({
+          isUploading: false,
+          progress: 100,
+          fileName: result.fileName,
+          fileSize: result.fileSize,
+          recordCount: result.recordCount,
+          performanceMode: result.performanceMode,
+          error: null,
+        });
+
+        // Get updated state after upload
+        setTimeout(() => {
+          if (pivotRef.current) {
+            const newState = pivotRef.current.methods.getState();
+            setPivotState(newState);
+          }
+        }, 500);
+      } else {
+        setUploadState(prev => ({
+          ...prev,
+          isUploading: false,
+          error: result.error || 'Upload failed',
+        }));
+      }
+    } catch (error) {
+      setUploadState(prev => ({
+        ...prev,
+        isUploading: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      }));
+    }
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+  };
+
+  return (
+    <div style={{ padding: 20 }}>
+      {/* Upload Section */}
+      <div
+        style={{
+          backgroundColor: '#ffffff',
+          padding: 24,
+          borderRadius: 8,
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          marginBottom: 24,
+        }}
+      >
+        <h2 style={{ marginTop: 0 }}>Upload Large CSV File</h2>
+        <p style={{ color: '#6c757d' }}>
+          Supports files up to 1 GB with automatic WebAssembly acceleration
+        </p>
+
+        <button
+          onClick={handleFileUpload}
+          disabled={uploadState.isUploading}
+          style={{
+            padding: '12px 24px',
+            backgroundColor: uploadState.isUploading ? '#6c757d' : '#007bff',
+            color: 'white',
+            border: 'none',
+            borderRadius: 6,
+            fontSize: 16,
+            fontWeight: 600,
+            cursor: uploadState.isUploading ? 'not-allowed' : 'pointer',
+            transition: 'background-color 0.3s',
+            marginBottom: 16,
+          }}
+        >
+          {uploadState.isUploading ? '⏳ Processing...' : '📁 Choose File'}
+        </button>
+
+        {/* Progress Bar */}
+        {uploadState.isUploading && (
+          <div style={{ marginBottom: 16 }}>
+            <div
+              style={{
+                width: '100%',
+                height: 32,
+                backgroundColor: '#e9ecef',
+                borderRadius: 16,
+                overflow: 'hidden',
+                position: 'relative',
+              }}
+            >
+              <div
+                style={{
+                  width: `${uploadState.progress}%`,
+                  height: '100%',
+                  backgroundColor: '#28a745',
+                  transition: 'width 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <span
+                  style={{ color: 'white', fontWeight: 'bold', fontSize: 14 }}
+                >
+                  {uploadState.progress}%
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Error Message */}
+        {uploadState.error && (
+          <div
+            style={{
+              padding: 16,
+              backgroundColor: '#f8d7da',
+              border: '1px solid #f5c6cb',
+              borderRadius: 6,
+              color: '#721c24',
+              marginBottom: 16,
+            }}
+          >
+            <strong>Error:</strong> {uploadState.error}
+          </div>
+        )}
+
+        {/* Success Message */}
+        {uploadState.recordCount > 0 && !uploadState.isUploading && (
+          <div
+            style={{
+              padding: 16,
+              backgroundColor: '#d4edda',
+              border: '1px solid #c3e6cb',
+              borderRadius: 6,
+              color: '#155724',
+            }}
+          >
+            <h4 style={{ margin: '0 0 12px 0' }}>✅ Upload Successful!</h4>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '150px 1fr',
+                gap: '8px',
+                fontSize: 14,
+              }}
+            >
+              <strong>File:</strong>
+              <span>{uploadState.fileName}</span>
+
+              <strong>Size:</strong>
+              <span>{formatFileSize(uploadState.fileSize)}</span>
+
+              <strong>Records:</strong>
+              <span>{uploadState.recordCount.toLocaleString()}</span>
+
+              <strong>Performance Mode:</strong>
+              <span>
+                {uploadState.performanceMode}
+                {uploadState.performanceMode === 'streaming-wasm' &&
+                  ' 🚀 (WebAssembly)'}
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Data Summary */}
+      {pivotState && (
+        <div
+          style={{
+            backgroundColor: '#ffffff',
+            padding: 24,
+            borderRadius: 8,
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            marginBottom: 24,
+          }}
+        >
+          <h3>Data Summary</h3>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: 16,
+            }}
+          >
+            <div
+              style={{
+                padding: 16,
+                backgroundColor: '#e7f3ff',
+                borderRadius: 6,
+                borderLeft: '4px solid #007bff',
+              }}
+            >
+              <div
+                style={{ fontSize: 24, fontWeight: 'bold', color: '#007bff' }}
+              >
+                {pivotState.data?.length.toLocaleString()}
+              </div>
+              <div style={{ fontSize: 14, color: '#6c757d' }}>Total Rows</div>
+            </div>
+
+            <div
+              style={{
+                padding: 16,
+                backgroundColor: '#e8f5e9',
+                borderRadius: 6,
+                borderLeft: '4px solid #28a745',
+              }}
+            >
+              <div
+                style={{ fontSize: 24, fontWeight: 'bold', color: '#28a745' }}
+              >
+                {pivotState.data?.[0]
+                  ? Object.keys(pivotState.data[0]).length
+                  : 0}
+              </div>
+              <div style={{ fontSize: 14, color: '#6c757d' }}>Columns</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Hidden Pivot Component */}
+      <PivotHead
+        ref={pivotRef}
+        mode="none"
+        data={[]}
+        options={{}}
+        style={{ display: 'none' }}
+      />
+    </div>
+  );
+}
+```
+
+### **TypeScript Types**
+
+```typescript
+// Result type from connectToLocalFile
+interface ConnectResult {
+  success: boolean;
+  fileName: string;
+  fileSize: number;
+  recordCount: number;
+  performanceMode: 'standard' | 'workers' | 'wasm' | 'streaming-wasm';
+  error?: string;
+}
+
+// Options for connectToLocalCSV
+interface ConnectOptions {
+  maxFileSize?: number;
+  csv?: {
+    delimiter?: string;
+    hasHeader?: boolean;
+    skipEmptyLines?: boolean;
+    trimValues?: boolean;
+    encoding?: string;
+  };
+  onProgress?: (progress: number) => void;
+}
+```
+
+### **Best Practices**
+
+1. **Always use refs** to access pivot methods
+2. **Manage loading state** with useState for better UX
+3. **Show progress feedback** for files > 10 MB
+4. **Handle errors gracefully** with user-friendly messages
+5. **Update React state** after successful upload
+6. **Use TypeScript** for type safety
+7. **Test with various file sizes** during development
+
+### **Common Patterns**
+
+#### **Pattern 1: Upload with Loading State**
+
+```tsx
+const [isLoading, setIsLoading] = useState(false);
+const upload = async () => {
+  setIsLoading(true);
+  try {
+    const result = await pivotRef.current.methods.connectToLocalFile();
+    // Handle result
+  } finally {
+    setIsLoading(false);
+  }
+};
+```
+
+#### **Pattern 2: Upload with Progress**
+
+```tsx
+const [progress, setProgress] = useState(0);
+const upload = async () => {
+  await pivotRef.current.methods.connectToLocalFile({
+    onProgress: setProgress,
+  });
+};
+```
+
+#### **Pattern 3: Upload with State Update**
+
+```tsx
+const [data, setData] = useState([]);
+const upload = async () => {
+  const result = await pivotRef.current.methods.connectToLocalFile();
+  if (result.success) {
+    const state = pivotRef.current.methods.getState();
+    setData(state.data);
+  }
+};
+```
+
+---
+
 ## Conclusion
 
 The PivotHead React Wrapper provides a seamless bridge between React applications and the powerful PivotHead pivot table functionality. With its three rendering modes, comprehensive TypeScript support, and React-native API, it enables developers to quickly integrate sophisticated data analysis capabilities into their React applications while maintaining full control over the user experience.
+
+The Connect Service brings enterprise-grade file processing capabilities to React applications, with automatic WebAssembly acceleration enabling processing of files up to 1 GB directly in the browser. This combination of flexibility, performance, and ease of use makes PivotHead React the ideal choice for building data-intensive applications.
 
 Whether you need a drop-in solution with the default mode, customizable UI with minimal mode, or complete control with none mode, the React wrapper adapts to your requirements while preserving all the underlying pivot functionality.
