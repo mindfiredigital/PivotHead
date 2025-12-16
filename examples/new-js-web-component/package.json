@@ -12,6 +12,6 @@
     "vite": "^7.2.6"
   },
   "dependencies": {
-    "@mindfiredigital/pivothead-web-component": "workspace:^1.0.2"
+    "@mindfiredigital/pivothead-web-component": "workspace:*"
   }
 }
