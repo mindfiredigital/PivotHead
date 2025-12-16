@@ -6,6 +6,8 @@
  * for near-native performance with large datasets.
  */
 
+import { fetchWasmBinary, getWasmUrl } from './wasmAssets';
+
 // Dynamic import to make it optional
 let instantiate: any = null;
 
@@ -120,38 +122,25 @@ export class WasmLoader {
 
       console.log('🚀 Loading WebAssembly CSV parser...');
 
-      // Try multiple paths for WASM file (dev and production)
-      const wasmPaths = [
-        // Development mode: served from public folder
-        '/wasm/csvParser.wasm',
-        // Production mode: relative to built file
-        new URL('../../dist/wasm/csvParser.wasm', import.meta.url).href,
-        // Alternative: node_modules path
-        '/node_modules/@mindfiredigital/pivothead/dist/wasm/csvParser.wasm',
-      ];
+      // Get WASM URL from the bundler-friendly helper
+      // This automatically works with Vite, Webpack, Rollup, etc.
+      const wasmUrl = getWasmUrl();
+      console.log(`Loading WASM from: ${wasmUrl}`);
 
-      let wasmBinary: ArrayBuffer | null = null;
-      let lastError: Error | null = null;
-
-      for (const wasmPath of wasmPaths) {
-        try {
-          console.log(`Trying to load WASM from: ${wasmPath}`);
-          const response = await fetch(wasmPath);
-          if (response.ok) {
-            wasmBinary = await response.arrayBuffer();
-            console.log(`✅ WASM file loaded from: ${wasmPath}`);
-            break;
-          }
-        } catch (error) {
-          lastError = error instanceof Error ? error : new Error(String(error));
-          console.warn(`Failed to load from ${wasmPath}:`, error);
-        }
-      }
-
-      if (!wasmBinary) {
-        console.error('⚠️ Could not fetch WASM file from any location');
+      // Fetch the WASM binary using the helper
+      let wasmBinary: ArrayBuffer;
+      try {
+        wasmBinary = await fetchWasmBinary();
+        console.log(
+          `✅ WASM file loaded successfully (${wasmBinary.byteLength} bytes)`
+        );
+      } catch (fetchError) {
+        console.error(
+          `❌ Failed to fetch WASM file from ${wasmUrl}:`,
+          fetchError
+        );
         throw new Error(
-          `WASM module not found. Tried paths: ${wasmPaths.join(', ')}. Last error: ${lastError?.message}`
+          `WASM file not found at ${wasmUrl}. Make sure to run 'npm run build:wasm' in the core package.`
         );
       }
 
@@ -173,6 +162,7 @@ export class WasmLoader {
     } catch (error) {
       this.isLoaded = false;
       this.loadPromise = null;
+      console.error('❌ Failed to load WASM module:', error);
       throw error;
     }
   }

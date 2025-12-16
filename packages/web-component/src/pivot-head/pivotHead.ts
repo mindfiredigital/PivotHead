@@ -78,7 +78,14 @@ import {
   openPrintDialog as openPrintDialogHelper,
   loadFromFile as loadFromFileHelper,
   loadFromUrl as loadFromUrlHelper,
+  connectToLocalCSV as connectToLocalCSVHelper,
+  connectToLocalJSON as connectToLocalJSONHelper,
+  connectToLocalFile as connectToLocalFileHelper,
 } from './internal/io';
+import type {
+  ConnectionOptions,
+  FileConnectionResult,
+} from '@mindfiredigital/pivothead';
 import {
   dragRow as dragRowApiHelper,
   dragColumn as dragColumnApiHelper,
@@ -304,6 +311,21 @@ export class PivotHeadElement extends HTMLElement {
   }
   public loadFromUrl(url: string): Promise<void> {
     return loadFromUrlHelper(this as unknown as PivotHeadHost, url);
+  }
+  public connectToLocalCSV(
+    options: ConnectionOptions = {}
+  ): Promise<FileConnectionResult> {
+    return connectToLocalCSVHelper(this as unknown as PivotHeadHost, options);
+  }
+  public connectToLocalJSON(
+    options: ConnectionOptions = {}
+  ): Promise<FileConnectionResult> {
+    return connectToLocalJSONHelper(this as unknown as PivotHeadHost, options);
+  }
+  public connectToLocalFile(
+    options: ConnectionOptions = {}
+  ): Promise<FileConnectionResult> {
+    return connectToLocalFileHelper(this as unknown as PivotHeadHost, options);
   }
   public dragRow(fromIndex: number, toIndex: number): void {
     dragRowApiHelper(this as unknown as PivotHeadHost, fromIndex, toIndex);

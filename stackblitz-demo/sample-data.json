@@ -1,0 +1,128 @@
+[
+  {
+    "date": "2024-01-01",
+    "product": "Laptop",
+    "region": "North",
+    "sales": 1500,
+    "quantity": 3
+  },
+  {
+    "date": "2024-01-02",
+    "product": "Laptop",
+    "region": "South",
+    "sales": 2000,
+    "quantity": 4
+  },
+  {
+    "date": "2024-01-03",
+    "product": "Mouse",
+    "region": "North",
+    "sales": 150,
+    "quantity": 10
+  },
+  {
+    "date": "2024-01-04",
+    "product": "Mouse",
+    "region": "South",
+    "sales": 200,
+    "quantity": 15
+  },
+  {
+    "date": "2024-01-05",
+    "product": "Keyboard",
+    "region": "North",
+    "sales": 500,
+    "quantity": 5
+  },
+  {
+    "date": "2024-01-06",
+    "product": "Keyboard",
+    "region": "South",
+    "sales": 600,
+    "quantity": 6
+  },
+  {
+    "date": "2024-01-07",
+    "product": "Monitor",
+    "region": "North",
+    "sales": 3000,
+    "quantity": 8
+  },
+  {
+    "date": "2024-01-08",
+    "product": "Monitor",
+    "region": "South",
+    "sales": 3500,
+    "quantity": 10
+  },
+  {
+    "date": "2024-01-09",
+    "product": "Laptop",
+    "region": "East",
+    "sales": 2500,
+    "quantity": 5
+  },
+  {
+    "date": "2024-01-10",
+    "product": "Mouse",
+    "region": "East",
+    "sales": 180,
+    "quantity": 12
+  },
+  {
+    "date": "2024-01-11",
+    "product": "Keyboard",
+    "region": "East",
+    "sales": 550,
+    "quantity": 7
+  },
+  {
+    "date": "2024-01-12",
+    "product": "Monitor",
+    "region": "East",
+    "sales": 3200,
+    "quantity": 9
+  },
+  {
+    "date": "2024-01-13",
+    "product": "Tablet",
+    "region": "North",
+    "sales": 800,
+    "quantity": 4
+  },
+  {
+    "date": "2024-01-14",
+    "product": "Tablet",
+    "region": "South",
+    "sales": 900,
+    "quantity": 5
+  },
+  {
+    "date": "2024-01-15",
+    "product": "Tablet",
+    "region": "East",
+    "sales": 850,
+    "quantity": 6
+  },
+  {
+    "date": "2024-01-16",
+    "product": "Headphones",
+    "region": "North",
+    "sales": 120,
+    "quantity": 20
+  },
+  {
+    "date": "2024-01-17",
+    "product": "Headphones",
+    "region": "South",
+    "sales": 150,
+    "quantity": 25
+  },
+  {
+    "date": "2024-01-18",
+    "product": "Headphones",
+    "region": "East",
+    "sales": 130,
+    "quantity": 22
+  }
+]
