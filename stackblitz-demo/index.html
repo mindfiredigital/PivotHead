@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PivotHead Demo - Simple Pivot Table</title>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>PivotHead - Interactive Pivot Table Demo</h1>
+        <p>A simple demonstration of @mindfiredigital/pivothead package</p>
+      </header>
+
+      <div class="controls">
+        <div class="control-group">
+          <h3>Sort & Filter</h3>
+          <button id="sort-sales-asc">Sort Sales ↑</button>
+          <button id="sort-sales-desc">Sort Sales ↓</button>
+          <button id="reset-table">Reset</button>
+        </div>
+
+        <div class="control-group">
+          <h3>Pagination</h3>
+          <label for="page-size">Rows per page:</label>
+          <select id="page-size">
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5" selected>5</option>
+            <option value="10">10</option>
+          </select>
+          <button id="prev-page">← Prev</button>
+          <span id="page-info">Page 1 of 1</span>
+          <button id="next-page">Next →</button>
+        </div>
+
+        <div class="control-group">
+          <h3>Import Data</h3>
+          <button id="file-upload-btn" class="upload-btn">📁 Upload File</button>
+          <small>Supported formats: JSON, CSV</small>
+        </div>
+      </div>
+
+      <div class="pivot-container">
+        <h2>Sales by Product and Region</h2>
+        <div class="feature-badges">
+          <span class="badge">✨ Drag & Drop Rows/Columns</span>
+          <span class="badge">📊 Conditional Formatting</span>
+          <span class="badge">📄 Pagination</span>
+          <span class="badge">📤 CSV Import</span>
+        </div>
+        <div id="pivot-table"></div>
+      </div>
+
+      <div class="state-container">
+        <h3>Current State</h3>
+        <pre id="state-display"></pre>
+      </div>
+    </div>
+
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>

@@ -1,4 +1,9 @@
 import type { PivotHeadHost } from './host';
+import {
+  ConnectService,
+  type ConnectionOptions,
+  type FileConnectionResult,
+} from '@mindfiredigital/pivothead';
 
 // Exporting helpers
 export function exportToHTML(
@@ -78,4 +83,77 @@ export function loadFromUrl(host: PivotHeadHost, url: string): Promise<void> {
     .then(data => {
       host.data = data;
     });
+}
+
+// ConnectService-based file upload methods
+export async function connectToLocalCSV(
+  host: PivotHeadHost,
+  options: ConnectionOptions = {}
+): Promise<FileConnectionResult> {
+  if (!host.engine) {
+    console.error('Engine not initialized. Cannot connect to CSV file.');
+    return { success: false, error: 'Engine not initialized' };
+  }
+
+  const result = await ConnectService.connectToLocalCSV(
+    host.engine as any,
+    options
+  );
+
+  if (result.success) {
+    // Update host data with the loaded data
+    if (result.data) {
+      host.data = result.data;
+    }
+  }
+
+  return result;
+}
+
+export async function connectToLocalJSON(
+  host: PivotHeadHost,
+  options: ConnectionOptions = {}
+): Promise<FileConnectionResult> {
+  if (!host.engine) {
+    console.error('Engine not initialized. Cannot connect to JSON file.');
+    return { success: false, error: 'Engine not initialized' };
+  }
+
+  const result = await ConnectService.connectToLocalJSON(
+    host.engine as any,
+    options
+  );
+
+  if (result.success) {
+    // Update host data with the loaded data
+    if (result.data) {
+      host.data = result.data;
+    }
+  }
+
+  return result;
+}
+
+export async function connectToLocalFile(
+  host: PivotHeadHost,
+  options: ConnectionOptions = {}
+): Promise<FileConnectionResult> {
+  if (!host.engine) {
+    console.error('Engine not initialized. Cannot connect to file.');
+    return { success: false, error: 'Engine not initialized' };
+  }
+
+  const result = await ConnectService.connectToLocalFile(
+    host.engine as any,
+    options
+  );
+
+  if (result.success) {
+    // Update host data with the loaded data
+    if (result.data) {
+      host.data = result.data;
+    }
+  }
+
+  return result;
 }

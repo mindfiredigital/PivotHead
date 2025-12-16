@@ -662,6 +662,318 @@ function FlashingTableVisual() {
   );
 }
 
+// WASM Performance Showcase Component
+function WasmPerformanceShowcase() {
+  const { colorMode } = useColorMode();
+  const sectionRef = useRef(null);
+  const [inView, setInView] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+        }
+      },
+      { threshold: 0.2 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
+    };
+  }, []);
+
+  // Update progress based on scroll position
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!sectionRef.current) return;
+
+      const section = sectionRef.current;
+      const rect = section.getBoundingClientRect();
+      const windowHeight = window.innerHeight * 0.2;
+
+      // Calculate how much of the section is visible
+      // Progress starts when section enters viewport and completes when it exits
+      const sectionHeight = rect.height * 0.5;
+      const scrollProgress = Math.min(
+        Math.max(
+          ((windowHeight - rect.top) / (windowHeight + sectionHeight)) * 100,
+          0
+        ),
+        100
+      );
+
+      setUploadProgress(scrollProgress);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Initial calculation
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  return (
+    <div
+      ref={sectionRef}
+      className={clsx(
+        styles.section,
+        colorMode === 'dark' ? 'bg-black' : 'bg-slate-50'
+      )}
+    >
+      <div className="container">
+        <div
+          className={clsx(
+            'text-center mb-12',
+            'transition-all duration-1000',
+            inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          )}
+        >
+          <div className="inline-flex items-center justify-center mb-4">
+            <ZapIcon />
+            <span
+              className={clsx(
+                'ml-2 text-sm font-semibold uppercase tracking-wider',
+                colorMode === 'dark' ? 'text-red-400' : 'text-red-600'
+              )}
+            >
+              Lightning Fast Performance
+            </span>
+          </div>
+          <h2
+            className={clsx(
+              'text-4xl font-bold mb-4',
+              colorMode === 'dark' ? 'text-white' : 'text-slate-900'
+            )}
+          >
+            Handle 1GB Files with Ease
+          </h2>
+          <p
+            className={clsx(
+              'text-xl max-w-3xl mx-auto',
+              colorMode === 'dark' ? 'text-slate-300' : 'text-slate-600'
+            )}
+          >
+            Powered by WebAssembly for blazing-fast CSV processing. Watch as
+            PivotHead automatically optimizes performance based on file size.
+          </p>
+        </div>
+
+        <div
+          className={clsx(
+            'max-w-5xl mx-auto',
+            'transition-all duration-1000 delay-300',
+            inView ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+          )}
+        >
+          {/* Upload Progress Visualization */}
+          <div
+            className={clsx(
+              'p-8 rounded-2xl border',
+              colorMode === 'dark'
+                ? 'bg-slate-800 border-slate-700'
+                : 'bg-white border-slate-200'
+            )}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <div>
+                <div
+                  className={clsx(
+                    'text-sm font-medium mb-1',
+                    colorMode === 'dark' ? 'text-slate-400' : 'text-slate-600'
+                  )}
+                >
+                  Uploading large-dataset.csv
+                </div>
+                <div
+                  className={clsx(
+                    'text-lg font-bold',
+                    colorMode === 'dark' ? 'text-white' : 'text-slate-900'
+                  )}
+                >
+                  {uploadProgress.toFixed(0)}% Complete
+                </div>
+              </div>
+              <div
+                className={clsx(
+                  'px-4 py-2 rounded-lg text-sm font-semibold',
+                  colorMode === 'dark'
+                    ? 'bg-slate-700 text-slate-300'
+                    : 'bg-slate-100 text-slate-700'
+                )}
+              >
+                1.0 GB
+              </div>
+            </div>
+
+            {/* Progress Bar */}
+            <div
+              className={clsx(
+                'relative h-4 rounded-full overflow-hidden',
+                colorMode === 'dark' ? 'bg-slate-700' : 'bg-slate-200'
+              )}
+            >
+              <div
+                className="absolute inset-y-0 left-0 rounded-full transition-all duration-150 ease-out"
+                style={{
+                  width: `${uploadProgress}%`,
+                  background:
+                    'linear-gradient(90deg, #ef4444 0%, #dc2626 100%)',
+                }}
+              >
+                <div
+                  className="absolute inset-0 animate-shimmer"
+                  style={{
+                    background:
+                      'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)',
+                    backgroundSize: '200% 100%',
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-3 gap-4 mt-6">
+              <div className="text-center">
+                <div
+                  className={clsx(
+                    'text-2xl font-bold mb-1',
+                    colorMode === 'dark' ? 'text-white' : 'text-slate-900'
+                  )}
+                >
+                  2-3s
+                </div>
+                <div
+                  className={clsx(
+                    'text-xs',
+                    colorMode === 'dark' ? 'text-slate-400' : 'text-slate-600'
+                  )}
+                >
+                  800 MB Processing
+                </div>
+              </div>
+              <div className="text-center">
+                <div className={clsx('text-2xl font-bold mb-1 text-red-500')}>
+                  37x
+                </div>
+                <div
+                  className={clsx(
+                    'text-xs',
+                    colorMode === 'dark' ? 'text-slate-400' : 'text-slate-600'
+                  )}
+                >
+                  Faster with WASM
+                </div>
+              </div>
+              <div className="text-center">
+                <div
+                  className={clsx(
+                    'text-2xl font-bold mb-1',
+                    colorMode === 'dark' ? 'text-white' : 'text-slate-900'
+                  )}
+                >
+                  4MB
+                </div>
+                <div
+                  className={clsx(
+                    'text-xs',
+                    colorMode === 'dark' ? 'text-slate-400' : 'text-slate-600'
+                  )}
+                >
+                  Chunk Streaming
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Feature Points */}
+          <div className="grid md:grid-cols-3 gap-6 mt-8">
+            <div
+              className={clsx(
+                'p-6 rounded-lg',
+                colorMode === 'dark' ? 'bg-slate-800/50' : 'bg-white'
+              )}
+            >
+              <div className="text-3xl mb-3"></div>
+              <h3
+                className={clsx(
+                  'font-semibold mb-2',
+                  colorMode === 'dark' ? 'text-white' : 'text-slate-900'
+                )}
+              >
+                Auto-Optimization
+              </h3>
+              <p
+                className={clsx(
+                  'text-sm',
+                  colorMode === 'dark' ? 'text-slate-400' : 'text-slate-600'
+                )}
+              >
+                Automatically selects the best processing mode based on file
+                size
+              </p>
+            </div>
+            <div
+              className={clsx(
+                'p-6 rounded-lg',
+                colorMode === 'dark' ? 'bg-slate-800/50' : 'bg-white'
+              )}
+            >
+              <div className="text-3xl mb-3"></div>
+              <h3
+                className={clsx(
+                  'font-semibold mb-2',
+                  colorMode === 'dark' ? 'text-white' : 'text-slate-900'
+                )}
+              >
+                WebAssembly Powered
+              </h3>
+              <p
+                className={clsx(
+                  'text-sm',
+                  colorMode === 'dark' ? 'text-slate-400' : 'text-slate-600'
+                )}
+              >
+                Near-native performance for massive CSV files up to 1GB+
+              </p>
+            </div>
+            <div
+              className={clsx(
+                'p-6 rounded-lg',
+                colorMode === 'dark' ? 'bg-slate-800/50' : 'bg-white'
+              )}
+            >
+              <div className="text-3xl mb-3"></div>
+              <h3
+                className={clsx(
+                  'font-semibold mb-2',
+                  colorMode === 'dark' ? 'text-white' : 'text-slate-900'
+                )}
+              >
+                Streaming Support
+              </h3>
+              <p
+                className={clsx(
+                  'text-sm',
+                  colorMode === 'dark' ? 'text-slate-400' : 'text-slate-600'
+                )}
+              >
+                Process files in 4MB chunks for memory-efficient handling
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ModernDevelopersSection() {
   const sectionRef = useRef(null);
   const [inView, setInView] = useState(false);
@@ -951,6 +1263,7 @@ export default function Home() {
       <div>
         <main>
           <HeroSection />
+          <WasmPerformanceShowcase />
           {/* <section
             className="relative rounded-t-3xl border border-border/60 backdrop-blur overflow-hidden
         bg-[linear-gradient(to_bottom_right,_color-mix(in_oklab,var(--background),_transparent_30%),_color-mix(in_oklab,var(--background),_transparent_10%))]

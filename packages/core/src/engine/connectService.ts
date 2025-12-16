@@ -889,7 +889,17 @@ export class ConnectService {
 
       // Initialize WASM processor
       const wasmProcessor = getWasmCSVProcessor();
-      await wasmProcessor.initialize();
+      const initialized = await wasmProcessor.initialize();
+
+      if (!initialized) {
+        console.warn(
+          '⚠️ WASM initialization failed, falling back to Web Workers'
+        );
+        return {
+          success: false,
+          error: 'WASM initialization failed',
+        };
+      }
 
       // Process file with WASM
       const wasmResult = await wasmProcessor.processFile(file, {
@@ -997,7 +1007,17 @@ export class ConnectService {
 
       // Initialize WASM processor once
       const wasmProcessor = getWasmCSVProcessor();
-      await wasmProcessor.initialize();
+      const initialized = await wasmProcessor.initialize();
+
+      if (!initialized) {
+        console.warn(
+          '⚠️ WASM initialization failed, falling back to Web Workers'
+        );
+        return {
+          success: false,
+          error: 'WASM initialization failed',
+        };
+      }
 
       const allData: any[] = [];
       let headers: string[] | undefined;

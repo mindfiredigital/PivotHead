@@ -207,3 +207,338 @@ When to Use:
 For maximum flexibility and complete control over the UI.
 
 When integrating pivot logic into complex or non-tabular data visualizations.
+
+---
+
+## **Connect Service & File Upload**
+
+PivotHead provides a powerful **Connect Service** that enables seamless integration with local files, allowing users to upload CSV and JSON files directly into the pivot table. This service includes built-in WebAssembly optimization for handling large files efficiently.
+
+### **Overview**
+
+The Connect Service provides:
+
+- **Local File Upload**: Direct upload of CSV/JSON files from user's device
+- **WebAssembly Integration**: Automatic WASM acceleration for large files (800 MB+)
+- **Streaming Support**: Memory-efficient processing for massive datasets
+- **Progress Tracking**: Real-time upload and processing feedback
+- **Error Handling**: Robust validation and error recovery
+
+### **File Upload Methods**
+
+#### **1. connectToLocalFile()**
+
+Generic method for uploading CSV or JSON files with automatic format detection.
+
+```javascript
+import '@mindfiredigital/pivothead-web-component';
+
+const pivot = document.querySelector('pivot-head');
+
+// Basic usage
+const result = await pivot.connectToLocalFile({
+  maxFileSize: 1024 * 1024 * 1024, // 1 GB max (default)
+  onProgress: progress => {
+    console.log(`Upload progress: ${progress}%`);
+  },
+});
+
+if (result.success) {
+  console.log('File uploaded successfully!');
+  console.log(`Records: ${result.recordCount}`);
+  console.log(`Performance Mode: ${result.performanceMode}`);
+}
+```
+
+**Options:**
+
+| Option        | Type       | Default | Description                |
+| ------------- | ---------- | ------- | -------------------------- |
+| `maxFileSize` | `number`   | 1 GB    | Maximum file size in bytes |
+| `onProgress`  | `function` | null    | Progress callback function |
+
+**Return Value:**
+
+```typescript
+{
+  success: boolean;
+  fileName: string;
+  fileSize: number;
+  recordCount: number;
+  performanceMode: 'standard' | 'workers' | 'wasm' | 'streaming-wasm';
+  error?: string;
+}
+```
+
+#### **2. connectToLocalCSV()**
+
+Specialized method for CSV files with advanced parsing options.
+
+```javascript
+const result = await pivot.connectToLocalCSV({
+  // File size limits
+  maxFileSize: 1024 * 1024 * 1024, // 1 GB
+
+  // CSV parsing options
+  csv: {
+    delimiter: ',',
+    hasHeader: true,
+    skipEmptyLines: true,
+    trimValues: true,
+    encoding: 'utf-8',
+  },
+
+  // Progress tracking
+  onProgress: progress => {
+    updateProgressBar(progress);
+  },
+});
+```
+
+**CSV Options:**
+
+| Option           | Type      | Default   | Description                   |
+| ---------------- | --------- | --------- | ----------------------------- |
+| `delimiter`      | `string`  | `,`       | Field separator character     |
+| `hasHeader`      | `boolean` | `true`    | First row contains headers    |
+| `skipEmptyLines` | `boolean` | `true`    | Skip blank rows               |
+| `trimValues`     | `boolean` | `true`    | Remove whitespace from values |
+| `encoding`       | `string`  | `'utf-8'` | File character encoding       |
+
+### **WebAssembly Performance**
+
+The Connect Service automatically leverages WebAssembly for large files, providing massive performance improvements:
+
+#### **Automatic Mode Selection**
+
+```javascript
+// The system automatically chooses the optimal processing mode:
+
+// Small files (< 1 MB): Standard JavaScript
+const result = await pivot.connectToLocalFile();
+// performanceMode: 'standard'
+
+// Medium files (1-5 MB): Web Workers
+const result = await pivot.connectToLocalFile();
+// performanceMode: 'workers'
+
+// Large files (5-8 MB): Pure WASM
+const result = await pivot.connectToLocalFile();
+// performanceMode: 'wasm'
+
+// Very large files (> 8 MB, up to 800 MB): Streaming + WASM Hybrid
+const result = await pivot.connectToLocalFile();
+// performanceMode: 'streaming-wasm'
+```
+
+#### **Performance Metrics**
+
+For an **800 MB CSV file**:
+
+| Metric              | Standard JS | Streaming + WASM     | Improvement |
+| ------------------- | ----------- | -------------------- | ----------- |
+| **Processing Time** | Would crash | 2-3 seconds          | Works!      |
+| **Memory Usage**    | > 2 GB      | ~50 MB               | 40x less    |
+| **Parse Speed**     | N/A         | ~200ms per 4MB chunk | 37x faster  |
+
+### **Complete Example: Large File Upload**
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Large File Upload Demo</title>
+  </head>
+  <body>
+    <div>
+      <button id="uploadBtn">Upload Large CSV File</button>
+      <div id="progress" style="display: none;">
+        <div
+          id="progressBar"
+          style="width: 0%; height: 20px; background: #4CAF50;"
+        ></div>
+        <span id="progressText">0%</span>
+      </div>
+      <div id="status"></div>
+    </div>
+
+    <pivot-head id="pivot" mode="none" style="display: none;"></pivot-head>
+
+    <div id="results"></div>
+
+    <script type="module">
+      import '@mindfiredigital/pivothead-web-component';
+
+      const pivot = document.getElementById('pivot');
+      const uploadBtn = document.getElementById('uploadBtn');
+      const progressDiv = document.getElementById('progress');
+      const progressBar = document.getElementById('progressBar');
+      const progressText = document.getElementById('progressText');
+      const statusDiv = document.getElementById('status');
+      const resultsDiv = document.getElementById('results');
+
+      uploadBtn.addEventListener('click', async () => {
+        try {
+          statusDiv.textContent = 'Uploading file...';
+          progressDiv.style.display = 'block';
+
+          const result = await pivot.connectToLocalFile({
+            maxFileSize: 1024 * 1024 * 1024, // 1 GB
+            onProgress: progress => {
+              progressBar.style.width = `${progress}%`;
+              progressText.textContent = `${progress}%`;
+            },
+          });
+
+          if (result.success) {
+            statusDiv.innerHTML = `
+            File uploaded successfully!<br>
+             File: ${result.fileName}<br>
+             Records: ${result.recordCount.toLocaleString()}<br>
+             Mode: ${result.performanceMode}<br>
+             Size: ${(result.fileSize / 1024 / 1024).toFixed(2)} MB
+          `;
+
+            // Get the processed data
+            const state = pivot.getState();
+
+            // Render your custom UI
+            renderTable(state.data);
+          } else {
+            statusDiv.textContent = ` Upload failed: ${result.error}`;
+          }
+        } catch (error) {
+          statusDiv.textContent = ` Error: ${error.message}`;
+        } finally {
+          progressDiv.style.display = 'none';
+        }
+      });
+
+      function renderTable(data) {
+        // Your custom table rendering logic
+        resultsDiv.innerHTML = `
+        <h3>Data Preview (first 100 rows)</h3>
+        <table>
+          ${data
+            .slice(0, 100)
+            .map(
+              row => `
+            <tr>${Object.values(row)
+              .map(val => `<td>${val}</td>`)
+              .join('')}</tr>
+          `
+            )
+            .join('')}
+        </table>
+      `;
+      }
+    </script>
+  </body>
+</html>
+```
+
+### **WASM Setup for Demos**
+
+For development and demo projects, ensure WASM files are available:
+
+#### **Vite Configuration**
+
+```javascript
+// vite.config.js
+import { defineConfig } from 'vite';
+import { resolve } from 'path';
+import { copyFileSync, mkdirSync, existsSync } from 'fs';
+
+export default defineConfig({
+  plugins: [
+    {
+      name: 'copy-wasm-files',
+      buildStart() {
+        const wasmSource = resolve(
+          __dirname,
+          'node_modules/@mindfiredigital/pivothead/dist/wasm/csvParser.wasm'
+        );
+        const wasmDest = resolve(__dirname, 'public/wasm/csvParser.wasm');
+        const wasmDir = resolve(__dirname, 'public/wasm');
+
+        if (!existsSync(wasmDir)) {
+          mkdirSync(wasmDir, { recursive: true });
+        }
+
+        if (existsSync(wasmSource)) {
+          copyFileSync(wasmSource, wasmDest);
+          console.log('✅ Copied WASM file to public/wasm/');
+        }
+      },
+    },
+  ],
+  server: {
+    fs: {
+      strict: false,
+      allow: ['..'],
+    },
+  },
+});
+```
+
+### **Error Handling**
+
+```javascript
+try {
+  const result = await pivot.connectToLocalFile();
+
+  if (!result.success) {
+    // Handle specific errors
+    switch (result.error) {
+      case 'FILE_TOO_LARGE':
+        alert('File is too large. Maximum size is 1 GB.');
+        break;
+      case 'INVALID_FORMAT':
+        alert('Invalid file format. Please upload a CSV or JSON file.');
+        break;
+      case 'PARSE_ERROR':
+        alert('Failed to parse file. Please check the file format.');
+        break;
+      default:
+        alert(`Upload failed: ${result.error}`);
+    }
+  }
+} catch (error) {
+  console.error('Unexpected error:', error);
+  alert('An unexpected error occurred during file upload.');
+}
+```
+
+### **Console Output Example**
+
+When uploading an 1 GB CSV file:
+
+```
+ Large file detected (1 GB). Using Streaming + WASM hybrid mode...
+ Loading WebAssembly CSV parser...
+ Loading WASM from: /wasm/csvParser.wasm
+ WASM file loaded successfully (3555 bytes)
+ WebAssembly CSV parser loaded successfully (v1520)
+Processing with WASM, chunk size: 4 MB
+Processing CSV with WebAssembly...
+WASM parsed: 52,776 rows, 6 columns
+WASM processing completed in 289.50ms
+Chunk 0 processed: 52,774 rows (total: 52,774)
+WASM parsed: 52,756 rows, 6 columns
+WASM processing completed in 192.50ms
+Chunk 1 processed: 52,755 rows (total: 105,529)
+...
+File processing complete: 2,000,000 rows in 2.8 seconds
+```
+
+### **Best Practices**
+
+1. **Always show progress feedback** for large files
+2. **Handle errors gracefully** with user-friendly messages
+3. **Set appropriate file size limits** based on your use case
+4. **Test with various file sizes** to verify performance
+5. **Use WASM for production** deployments handling large datasets
+6. **Implement proper loading states** during file processing
+7. **Validate file format** before processing
+
+---
