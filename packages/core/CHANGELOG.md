@@ -1,5 +1,11 @@
 # @mindfiredigital/pivothead
 
+## 1.8.2
+
+### Patch Changes
+
+- Release from Dev branch (#239)
+
 ## 1.8.1
 
 ### Patch Changes

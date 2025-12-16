@@ -1,5 +1,12 @@
 # vue-headless-example
 
+## 1.0.7
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead-vue@0.1.7
+
 ## 1.0.6
 
 ### Patch Changes
