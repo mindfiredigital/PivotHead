@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@mindfiredigital/pivothead-web-component": "workspace:*"
+    "@mindfiredigital/pivothead-web-component": "workspace:*",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
