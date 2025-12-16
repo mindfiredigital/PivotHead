@@ -1,5 +1,12 @@
 # simple-js-demo
 
+## 1.0.18
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.8.2
+
 ## 1.0.17
 
 ### Patch Changes
