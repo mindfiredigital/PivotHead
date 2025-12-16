@@ -10,6 +10,56 @@
   "files": [
     "dist"
   ],
+  "author": "Mindfiredigital",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mindfiredigital/PivotHead.git"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "keywords": [
+    "pivothead-web-component",
+    "pivot",
+    "pivotTable",
+    "table",
+    "headless",
+    "typescript",
+    "react",
+    "framework",
+    "cli",
+    "javascript",
+    "npm-package",
+    "spreadsheet",
+    "data-drill-down",
+    "data-analysis",
+    "data-visualization",
+    "dynamic-table",
+    "data-aggregation",
+    "data-grid",
+    "interactive-reports",
+    "data-exploration",
+    "olap",
+    "data-pivoting",
+    "data-summarization",
+    "business-intelligence",
+    "analytics-tool",
+    "no-code",
+    "low-code",
+    "component-based",
+    "responsive-design",
+    "components",
+    "component",
+    "modern",
+    "plugin",
+    "eslint",
+    "web",
+    "webpack",
+    "css",
+    "html"
+  ],
   "scripts": {
     "build": "rimraf dist && rollup -c && tsc --emitDeclarationOnly",
     "dev": "rollup -c -w",
@@ -17,15 +67,6 @@
     "test": "vitest run",
     "test:watch": "vitest"
   },
-  "keywords": [
-    "pivothead",
-    "web-components",
-    "pivot-table",
-    "framework-agnostic",
-    "custom-elements"
-  ],
-  "author": "Mindfiredigital",
-  "license": "MIT",
   "dependencies": {
     "@mindfiredigital/pivothead": "workspace:*"
   },
