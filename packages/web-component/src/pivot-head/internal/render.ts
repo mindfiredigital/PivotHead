@@ -81,19 +81,46 @@ export function handleEngineStateChange(host: PivotHeadHost, state: unknown) {
 export function renderFullUI(host: PivotHeadHost) {
   const engine = host.engine;
   if (!engine) {
+    console.error('❌ renderFullUI: No engine');
     if (host.shadowRoot) host.shadowRoot.innerHTML = '';
     return;
   }
   const state = engine.getState();
+  console.log('🔍 renderFullUI - State check:', {
+    hasState: !!state,
+    hasProcessedData: !!state?.processedData,
+    processedDataType: state?.processedData
+      ? typeof state.processedData
+      : 'undefined',
+    processedDataLength: Array.isArray(state?.processedData)
+      ? state.processedData.length
+      : 'not array',
+  });
+
   if (!state.processedData) {
-    console.error('No processed data available');
+    console.error('❌ renderFullUI: No processed data available', state);
     return;
   }
   const rowField = host._options.rows?.[0];
   const columnField = host._options.columns?.[0];
   const measures = host._options.measures || [];
+
+  console.log('🔍 renderFullUI - Options check:', {
+    rowField,
+    columnField,
+    measuresCount: measures.length,
+    allOptions: host._options,
+  });
+
   if (!rowField || !columnField || !measures.length) {
-    console.error('Missing row, column, or measures configuration');
+    console.error(
+      '❌ renderFullUI: Missing row, column, or measures configuration',
+      {
+        rowField,
+        columnField,
+        measures,
+      }
+    );
     return;
   }
   host.calculatePaginationForCurrentView();
@@ -258,6 +285,14 @@ export function renderFullUI(host: PivotHeadHost) {
 
   // Determine column labels using engine's custom column order if any
   const groupedData = engine.getGroupedData();
+  console.log('🔍 renderFullUI - Grouped data:', {
+    count: groupedData?.length || 0,
+    sample: groupedData?.[0],
+    sampleKey: groupedData?.[0]?.key,
+    sampleAggregates: groupedData?.[0]?.aggregates,
+  });
+  console.log('🔍 renderFullUI - GroupConfig:', host._options?.groupConfig);
+
   let uniqueColumnValues =
     engine.getOrderedColumnValues() ||
     ([
@@ -268,6 +303,8 @@ export function renderFullUI(host: PivotHeadHost) {
         })
       ),
     ].filter(Boolean) as string[]);
+
+  console.log('🔍 renderFullUI - Column values:', uniqueColumnValues);
   if (host._processedColumnOrder.length === 0) {
     host._processedColumnOrder = [...uniqueColumnValues];
   }
@@ -317,7 +354,18 @@ export function renderFullUI(host: PivotHeadHost) {
       ),
     ].filter(Boolean) as string[];
   }
+
+  console.log('🔍 renderFullUI - Row values:', {
+    total: uniqueRowValues.length,
+    values: uniqueRowValues,
+  });
+
   const paginatedRowValues = host.getPaginatedData(uniqueRowValues);
+
+  console.log('🔍 renderFullUI - Paginated rows:', {
+    count: paginatedRowValues.length,
+    values: paginatedRowValues,
+  });
   paginatedRowValues.forEach((rowValue, rowIndex) => {
     html += `<tr draggable="true" data-row-index="${rowIndex}" data-row-value="${rowValue}">`;
     html += `<td class="row-cell">${rowValue}</td>`;
@@ -362,6 +410,16 @@ export function renderFullUI(host: PivotHeadHost) {
   });
   html += '</tbody>';
   html += '</table>';
+
+  // Debug: Log table header structure
+  const theadMatch = html.match(/<thead>.*?<\/thead>/s);
+  if (theadMatch) {
+    console.log(
+      '🔍 renderFullUI - Table header HTML:',
+      theadMatch[0].substring(0, 500)
+    );
+  }
+
   if (host.shadowRoot) host.shadowRoot.innerHTML = html;
   host.addDragListeners();
   host.setupControls();

@@ -12,6 +12,42 @@ export interface PivotOptions {
 
 export type FilterConfig = unknown;
 
+// ConnectService types
+export interface ConnectionOptions {
+  csv?: {
+    delimiter?: string;
+    hasHeader?: boolean;
+    skipEmptyLines?: boolean;
+    trimValues?: boolean;
+    encoding?: string;
+  };
+  json?: {
+    arrayPath?: string;
+    validateSchema?: boolean;
+  };
+  maxFileSize?: number;
+  maxRecords?: number;
+  onProgress?: (progress: number) => void;
+  useWorkers?: boolean;
+  workerCount?: number;
+  chunkSizeBytes?: number;
+}
+
+export interface FileConnectionResult {
+  success: boolean;
+  data?: unknown[];
+  fileName?: string;
+  fileSize?: number;
+  recordCount?: number;
+  columns?: string[];
+  error?: string;
+  validationErrors?: string[];
+  performanceMode?: 'standard' | 'workers' | 'wasm' | 'streaming-wasm';
+  allowDragDrop?: boolean;
+  requiresPagination?: boolean;
+  parseTime?: number;
+}
+
 export interface FormatOptions {
   type?: 'currency' | 'number' | 'percentage' | 'date';
   decimals?: number;
@@ -77,6 +113,16 @@ export type PivotHeadEl = HTMLElement & {
   exportToPDF(fileName?: string): void;
   exportToExcel(fileName?: string): void;
   openPrintDialog(): void;
+  // ConnectService methods
+  connectToLocalCSV?: (
+    options?: ConnectionOptions
+  ) => Promise<FileConnectionResult>;
+  connectToLocalJSON?: (
+    options?: ConnectionOptions
+  ) => Promise<FileConnectionResult>;
+  connectToLocalFile?: (
+    options?: ConnectionOptions
+  ) => Promise<FileConnectionResult>;
 };
 
 export type PivotHeadMode = 'default' | 'minimal' | 'none';
@@ -137,4 +183,14 @@ export interface PivotHeadMethods {
   exportToPDF: (fileName?: string) => void;
   exportToExcel: (fileName?: string) => void;
   openPrintDialog: () => void;
+  // ConnectService methods
+  connectToLocalCSV: (
+    options?: ConnectionOptions
+  ) => Promise<FileConnectionResult>;
+  connectToLocalJSON: (
+    options?: ConnectionOptions
+  ) => Promise<FileConnectionResult>;
+  connectToLocalFile: (
+    options?: ConnectionOptions
+  ) => Promise<FileConnectionResult>;
 }

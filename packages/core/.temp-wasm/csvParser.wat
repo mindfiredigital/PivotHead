@@ -2,13 +2,19 @@
  (type $0 (func (param i32) (result i32)))
  (type $1 (func (param i32 i32) (result i32)))
  (type $2 (func (param i32 i32)))
- (type $3 (func (result i32)))
- (type $4 (func (param i32)))
- (type $5 (func (param i32 i32 i32 i32) (result i32)))
- (type $6 (func))
+ (type $3 (func (param i32)))
+ (type $4 (func (param i32 f64)))
+ (type $5 (func (result i32)))
+ (type $6 (func (result f64)))
  (type $7 (func (param i32) (result f64)))
- (type $8 (func (param i32 i32 i32 i32)))
- (type $9 (func (param i32 i32 i32) (result i32)))
+ (type $8 (func))
+ (type $9 (func (param i32 i32 i32 i32)))
+ (type $10 (func (param i32 f64) (result f64)))
+ (type $11 (func (param i32 f64 i32 i32) (result f64)))
+ (type $12 (func (param i32 i32 i32) (result i32)))
+ (type $13 (func (param i32 i32 i32 i32) (result i32)))
+ (type $14 (func (param i32 f64 f64 i32) (result i32)))
+ (type $15 (func (param f64 f64) (result f64)))
  (import "env" "abort" (func $~lib/builtins/abort (param i32 i32 i32 i32)))
  (global $~lib/rt/stub/offset (mut i32) (i32.const 0))
  (global $assembly/csvParser/lastResult (mut i32) (i32.const 0))
@@ -149,16 +155,6 @@
   call $~lib/rt/common/BLOCK#set:mmInfo
   local.get $2
  )
- (func $~lib/rt/common/OBJECT#set:gcInfo (param $0 i32) (param $1 i32)
-  local.get $0
-  local.get $1
-  i32.store offset=4
- )
- (func $~lib/rt/common/OBJECT#set:gcInfo2 (param $0 i32) (param $1 i32)
-  local.get $0
-  local.get $1
-  i32.store offset=8
- )
  (func $~lib/rt/common/OBJECT#set:rtSize (param $0 i32) (param $1 i32)
   local.get $0
   local.get $1
@@ -187,10 +183,10 @@
   i32.sub
   local.tee $2
   i32.const 0
-  call $~lib/rt/common/OBJECT#set:gcInfo
+  i32.store offset=4
   local.get $2
   i32.const 0
-  call $~lib/rt/common/OBJECT#set:gcInfo2
+  i32.store offset=8
   local.get $2
   local.get $1
   i32.store offset=12
@@ -211,46 +207,61 @@
    call $~lib/rt/stub/__new
   end
  )
+ (func $assembly/csvParser/CSVResult#set:rowCount (param $0 i32) (param $1 f64)
+  local.get $0
+  local.get $1
+  f64.store
+ )
+ (func $assembly/csvParser/CSVResult#set:colCount (param $0 i32) (param $1 f64)
+  local.get $0
+  local.get $1
+  f64.store offset=8
+ )
+ (func $assembly/csvParser/CSVResult#set:errorCode (param $0 i32) (param $1 f64)
+  local.get $0
+  local.get $1
+  f64.store offset=16
+ )
  (func $assembly/csvParser/CSVResult#set:errorMessage (param $0 i32) (param $1 i32)
   local.get $0
   local.get $1
-  i32.store offset=12
+  i32.store offset=24
  )
  (func $assembly/csvParser/CSVResult#constructor (result i32)
   (local $0 i32)
-  i32.const 16
+  i32.const 28
   i32.const 4
   call $~lib/rt/stub/__new
   call $~lib/object/Object#constructor
   local.tee $0
-  i32.const 0
-  call $~lib/rt/common/BLOCK#set:mmInfo
+  f64.const 0
+  call $assembly/csvParser/CSVResult#set:rowCount
   local.get $0
-  i32.const 0
-  call $~lib/rt/common/OBJECT#set:gcInfo
+  f64.const 0
+  call $assembly/csvParser/CSVResult#set:colCount
   local.get $0
-  i32.const 0
-  call $~lib/rt/common/OBJECT#set:gcInfo2
+  f64.const 0
+  call $assembly/csvParser/CSVResult#set:errorCode
   local.get $0
   i32.const 1184
   call $assembly/csvParser/CSVResult#set:errorMessage
   local.get $0
  )
- (func $assembly/csvParser/getLastRowCount (result i32)
+ (func $assembly/csvParser/getLastRowCount (result f64)
   global.get $assembly/csvParser/lastResult
-  i32.load
+  f64.load
  )
- (func $assembly/csvParser/getLastColCount (result i32)
+ (func $assembly/csvParser/getLastColCount (result f64)
   global.get $assembly/csvParser/lastResult
-  i32.load offset=4
+  f64.load offset=8
  )
- (func $assembly/csvParser/getLastErrorCode (result i32)
+ (func $assembly/csvParser/getLastErrorCode (result f64)
   global.get $assembly/csvParser/lastResult
-  i32.load offset=8
+  f64.load offset=16
  )
  (func $assembly/csvParser/getLastErrorMessage (result i32)
   global.get $assembly/csvParser/lastResult
-  i32.load offset=12
+  i32.load offset=24
  )
  (func $~lib/string/String#get:length (param $0 i32) (result i32)
   local.get $0
@@ -263,7 +274,7 @@
  (func $assembly/csvParser/ParseState#set:inQuotes (param $0 i32) (param $1 i32)
   local.get $0
   local.get $1
-  i32.store8 offset=12
+  i32.store8 offset=24
  )
  (func $~lib/string/String#charCodeAt (param $0 i32) (param $1 i32) (result i32)
   local.get $0
@@ -281,7 +292,7 @@
   i32.add
   i32.load16_u
  )
- (func $assembly/csvParser/parseCSVChunk (param $0 i32) (param $1 i32) (result i32)
+ (func $assembly/csvParser/parseCSVChunk (param $0 i32) (param $1 f64) (result f64)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -295,63 +306,67 @@
   i32.eqz
   if
    global.get $assembly/csvParser/lastResult
-   i32.const 1
-   call $~lib/rt/common/OBJECT#set:gcInfo2
+   f64.const 1
+   call $assembly/csvParser/CSVResult#set:errorCode
    global.get $assembly/csvParser/lastResult
    i32.const 1216
    call $assembly/csvParser/CSVResult#set:errorMessage
-   i32.const 1
+   f64.const 1
    return
   end
-  i32.const 20
+  i32.const 40
   i32.const 5
   call $~lib/rt/stub/__new
   call $~lib/object/Object#constructor
   local.tee $4
-  i32.const 0
-  call $~lib/rt/common/BLOCK#set:mmInfo
+  f64.const 0
+  call $assembly/csvParser/CSVResult#set:rowCount
   local.get $4
-  i32.const 0
-  call $~lib/rt/common/OBJECT#set:gcInfo
+  f64.const 0
+  call $assembly/csvParser/CSVResult#set:colCount
   local.get $4
-  i32.const 0
-  call $~lib/rt/common/OBJECT#set:gcInfo2
+  f64.const 0
+  call $assembly/csvParser/CSVResult#set:errorCode
   local.get $4
   i32.const 0
   call $assembly/csvParser/ParseState#set:inQuotes
   local.get $4
-  i32.const 0
-  call $~lib/rt/common/OBJECT#set:rtSize
+  f64.const 0
+  f64.store offset=32
   local.get $0
   call $~lib/string/String#get:length
   local.set $7
   loop $while-continue|0
-   local.get $7
    local.get $4
-   i32.load
-   i32.gt_s
+   f64.load
+   local.get $7
+   f64.convert_i32_s
+   f64.lt
    if
     local.get $0
     local.get $4
-    i32.load
+    f64.load
+    i32.trunc_sat_f64_s
     call $~lib/string/String#charCodeAt
     local.tee $5
-    i32.const 34
-    i32.eq
+    f64.convert_i32_s
+    f64.const 34
+    f64.eq
     if
      local.get $4
      local.get $4
-     i32.load8_u offset=12
+     i32.load8_u offset=24
      i32.eqz
      call $assembly/csvParser/ParseState#set:inQuotes
     else
      local.get $4
-     i32.load8_u offset=12
+     i32.load8_u offset=24
      i32.eqz
      if
-      local.get $1
       local.get $5
-      i32.eq
+      f64.convert_i32_s
+      local.get $1
+      f64.eq
       if
        local.get $3
        i32.const 1
@@ -359,33 +374,38 @@
        local.set $3
       else
        local.get $5
-       i32.const 10
-       i32.eq
+       f64.convert_i32_s
+       f64.const 10
+       f64.eq
        if (result i32)
         i32.const 1
        else
         local.get $5
-        i32.const 13
-        i32.eq
+        f64.convert_i32_s
+        f64.const 13
+        f64.eq
         if (result i32)
-         local.get $4
-         i32.load
-         i32.const 1
-         i32.add
          local.get $7
-         i32.lt_s
+         f64.convert_i32_s
+         local.get $4
+         f64.load
+         f64.const 1
+         f64.add
+         f64.gt
         else
          i32.const 0
         end
         if (result i32)
          local.get $0
          local.get $4
-         i32.load
-         i32.const 1
-         i32.add
+         f64.load
+         f64.const 1
+         f64.add
+         i32.trunc_sat_f64_s
          call $~lib/string/String#charCodeAt
-         i32.const 10
-         i32.eq
+         f64.convert_i32_s
+         f64.const 10
+         f64.eq
         else
          i32.const 0
         end
@@ -408,25 +428,27 @@
         i32.const 0
         local.set $3
         local.get $5
-        i32.const 13
-        i32.eq
+        f64.convert_i32_s
+        f64.const 13
+        f64.eq
         if (result i32)
-         local.get $4
-         i32.load
-         i32.const 1
-         i32.add
          local.get $7
-         i32.lt_s
+         f64.convert_i32_s
+         local.get $4
+         f64.load
+         f64.const 1
+         f64.add
+         f64.gt
         else
          i32.const 0
         end
         if
          local.get $4
          local.get $4
-         i32.load
-         i32.const 1
-         i32.add
-         call $~lib/rt/common/BLOCK#set:mmInfo
+         f64.load
+         f64.const 1
+         f64.add
+         call $assembly/csvParser/CSVResult#set:rowCount
         end
        end
       end
@@ -434,10 +456,10 @@
     end
     local.get $4
     local.get $4
-    i32.load
-    i32.const 1
-    i32.add
-    call $~lib/rt/common/BLOCK#set:mmInfo
+    f64.load
+    f64.const 1
+    f64.add
+    call $assembly/csvParser/CSVResult#set:rowCount
     br $while-continue|0
    end
   end
@@ -459,16 +481,18 @@
   end
   global.get $assembly/csvParser/lastResult
   local.get $6
-  call $~lib/rt/common/BLOCK#set:mmInfo
+  f64.convert_i32_s
+  call $assembly/csvParser/CSVResult#set:rowCount
   global.get $assembly/csvParser/lastResult
   local.get $2
-  call $~lib/rt/common/OBJECT#set:gcInfo
+  f64.convert_i32_s
+  call $assembly/csvParser/CSVResult#set:colCount
   global.get $assembly/csvParser/lastResult
-  i32.const 0
-  call $~lib/rt/common/OBJECT#set:gcInfo2
-  i32.const 0
+  f64.const 0
+  call $assembly/csvParser/CSVResult#set:errorCode
+  f64.const 0
  )
- (func $assembly/csvParser/parseCSVChunk@varargs (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (result i32)
+ (func $assembly/csvParser/parseCSVChunk@varargs (param $0 i32) (param $1 f64) (param $2 i32) (param $3 i32) (result f64)
   block $3of3
    block $0of3
     block $outOfRange
@@ -479,7 +503,7 @@
     end
     unreachable
    end
-   i32.const 44
+   f64.const 44
    local.set $1
   end
   local.get $0
@@ -1245,17 +1269,19 @@
   memory.copy
   local.get $3
  )
- (func $assembly/csvParser/extractField (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (result i32)
+ (func $assembly/csvParser/extractField (param $0 i32) (param $1 f64) (param $2 f64) (param $3 i32) (result i32)
   local.get $1
   local.get $2
-  i32.ge_s
+  f64.ge
   if
    i32.const 1184
    return
   end
   local.get $0
   local.get $1
+  i32.trunc_sat_f64_s
   local.get $2
+  i32.trunc_sat_f64_s
   call $~lib/string/String#substring
   local.tee $0
   call $~lib/string/String#get:length
@@ -1265,8 +1291,9 @@
    local.get $0
    i32.const 0
    call $~lib/string/String#charCodeAt
-   i32.const 34
-   i32.eq
+   f64.convert_i32_s
+   f64.const 34
+   f64.eq
   else
    i32.const 0
   end
@@ -1277,8 +1304,9 @@
    i32.const 1
    i32.sub
    call $~lib/string/String#charCodeAt
-   i32.const 34
-   i32.eq
+   f64.convert_i32_s
+   f64.const 34
+   f64.eq
   else
    i32.const 0
   end
@@ -1307,9 +1335,8 @@
   (local $3 i32)
   (local $4 i32)
   (local $5 f64)
-  (local $6 i64)
+  (local $6 f64)
   (local $7 i32)
-  (local $8 f64)
   local.get $0
   call $~lib/string/String#get:length
   i32.eqz
@@ -1364,6 +1391,16 @@
       f64.const 10
       f64.mul
       local.set $1
+      local.get $6
+      f64.const 10
+      f64.mul
+      local.get $2
+      i32.const 48
+      i32.sub
+      f64.convert_i32_s
+      f64.add
+      local.set $6
+     else
       local.get $5
       f64.const 10
       f64.mul
@@ -1373,16 +1410,6 @@
       f64.convert_i32_s
       f64.add
       local.set $5
-     else
-      local.get $2
-      i32.const 48
-      i32.sub
-      i64.extend_i32_s
-      local.get $6
-      i64.const 10
-      i64.mul
-      i64.add
-      local.set $6
      end
     else
      local.get $2
@@ -1408,14 +1435,12 @@
     br $while-continue|0
    end
   end
-  local.get $6
-  f64.convert_i64_s
-  local.tee $8
   local.get $5
+  local.get $6
   local.get $1
   f64.div
   f64.add
-  local.get $8
+  local.get $5
   local.get $4
   select
   local.tee $1
@@ -1424,7 +1449,7 @@
   local.get $7
   select
  )
- (func $assembly/csvParser/detectFieldType (param $0 i32) (result i32)
+ (func $assembly/csvParser/detectFieldType (param $0 i32) (result f64)
   (local $1 f64)
   local.get $0
   call $~lib/string/String#get:length
@@ -1443,7 +1468,7 @@
    call $~lib/string/String.__eq
   end
   if
-   i32.const 3
+   f64.const 3
    return
   end
   local.get $0
@@ -1471,7 +1496,7 @@
    call $~lib/string/String.__eq
   end
   if
-   i32.const 2
+   f64.const 2
    return
   end
   local.get $0
@@ -1480,17 +1505,17 @@
   local.get $1
   f64.eq
   if
-   i32.const 1
+   f64.const 1
    return
   end
-  i32.const 0
+  f64.const 0
  )
- (func $assembly/csvParser/estimateMemory (param $0 i32) (param $1 i32) (result i32)
+ (func $assembly/csvParser/estimateMemory (param $0 f64) (param $1 f64) (result f64)
   local.get $0
   local.get $1
-  i32.mul
-  i32.const 6
-  i32.shl
+  f64.mul
+  f64.const 64
+  f64.mul
  )
  (func $assembly/csvParser/initialize
   call $assembly/csvParser/CSVResult#constructor
@@ -1503,14 +1528,13 @@
   i32.const 1
   global.set $~argumentsLength
   local.get $0
-  i32.const 0
+  f64.const 0
   i32.const 1
   i32.const 1
   call $assembly/csvParser/parseCSVChunk@varargs
   drop
   global.get $assembly/csvParser/lastResult
-  i32.load
-  f64.convert_i32_s
+  f64.load
   f64.const 0.001
   f64.mul
  )

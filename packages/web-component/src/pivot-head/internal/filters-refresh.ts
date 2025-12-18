@@ -29,6 +29,9 @@ export function setFilters(host: PivotHeadHost, value: FilterConfig[]): void {
   if (!value || value.length === 0) {
     clearFilterUI(host);
   }
+
+  // CRITICAL: Trigger re-render after applying filters
+  host._renderSwitch();
 }
 
 export function getFilters(host: PivotHeadHost): FilterConfig[] {
@@ -74,6 +77,9 @@ export function reset(host: PivotHeadHost): void {
   host.engine.reset();
 
   clearFilterUI(host);
+
+  // Trigger re-render after resetting filters
+  host._renderSwitch();
 }
 
 export function clearFilterUI(host: PivotHeadHost): void {
