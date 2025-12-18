@@ -25,7 +25,7 @@ async function instantiate(module, imports = {}) {
         return __liftString(exports.getLastErrorMessage() >>> 0);
       },
       parseCSVChunk(input, delimiter, hasHeader, trimValues) {
-        // assembly/csvParser/parseCSVChunk(~lib/string/String, i32?, bool?, bool?) => i32
+        // assembly/csvParser/parseCSVChunk(~lib/string/String, f64?, bool?, bool?) => f64
         input = __lowerString(input) || __notnull();
         hasHeader = hasHeader ? 1 : 0;
         trimValues = trimValues ? 1 : 0;
@@ -33,7 +33,7 @@ async function instantiate(module, imports = {}) {
         return exports.parseCSVChunk(input, delimiter, hasHeader, trimValues);
       },
       extractField(input, start, end, trimValues) {
-        // assembly/csvParser/extractField(~lib/string/String, i32, i32, bool) => ~lib/string/String
+        // assembly/csvParser/extractField(~lib/string/String, f64, f64, bool) => ~lib/string/String
         input = __lowerString(input) || __notnull();
         trimValues = trimValues ? 1 : 0;
         return __liftString(
@@ -46,7 +46,7 @@ async function instantiate(module, imports = {}) {
         return exports.parseNumber(input);
       },
       detectFieldType(value) {
-        // assembly/csvParser/detectFieldType(~lib/string/String) => i32
+        // assembly/csvParser/detectFieldType(~lib/string/String) => f64
         value = __lowerString(value) || __notnull();
         return exports.detectFieldType(value);
       },

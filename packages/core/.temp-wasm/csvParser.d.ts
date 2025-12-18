@@ -8,17 +8,17 @@ export declare function __collect(): void;
 export declare const __rtti_base: number;
 /**
  * assembly/csvParser/getLastRowCount
- * @returns `i32`
+ * @returns `f64`
  */
 export declare function getLastRowCount(): number;
 /**
  * assembly/csvParser/getLastColCount
- * @returns `i32`
+ * @returns `f64`
  */
 export declare function getLastColCount(): number;
 /**
  * assembly/csvParser/getLastErrorCode
- * @returns `i32`
+ * @returns `f64`
  */
 export declare function getLastErrorCode(): number;
 /**
@@ -29,10 +29,10 @@ export declare function getLastErrorMessage(): string;
 /**
  * assembly/csvParser/parseCSVChunk
  * @param input `~lib/string/String`
- * @param delimiter `i32`
+ * @param delimiter `f64`
  * @param hasHeader `bool`
  * @param trimValues `bool`
- * @returns `i32`
+ * @returns `f64`
  */
 export declare function parseCSVChunk(
   input: string,
@@ -43,8 +43,8 @@ export declare function parseCSVChunk(
 /**
  * assembly/csvParser/extractField
  * @param input `~lib/string/String`
- * @param start `i32`
- * @param end `i32`
+ * @param start `f64`
+ * @param end `f64`
  * @param trimValues `bool`
  * @returns `~lib/string/String`
  */
@@ -63,14 +63,14 @@ export declare function parseNumber(input: string): number;
 /**
  * assembly/csvParser/detectFieldType
  * @param value `~lib/string/String`
- * @returns `i32`
+ * @returns `f64`
  */
 export declare function detectFieldType(value: string): number;
 /**
  * assembly/csvParser/estimateMemory
- * @param rowCount `i32`
- * @param colCount `i32`
- * @returns `i32`
+ * @param rowCount `f64`
+ * @param colCount `f64`
+ * @returns `f64`
  */
 export declare function estimateMemory(
   rowCount: number,
