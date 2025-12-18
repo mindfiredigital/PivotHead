@@ -22,6 +22,8 @@ import type {
   PivotOptions,
   FilterConfig,
   PivotHeadMode,
+  ConnectionOptions,
+  FileConnectionResult,
 } from './types';
 
 type EmitEvents = {
@@ -253,58 +255,63 @@ export const PivotHead = defineComponent({
     let cleanupListeners: (() => void) | null = null;
 
     onMounted(() => {
-      setupEventListeners();
+      // CRITICAL: Set data and options BEFORE setting up event listeners
+      // This prevents rendering with an uninitialized engine
+      const el = elRef.value;
+      if (el) {
+        // Set initial data if provided - convert to plain objects
+        if (props.data !== undefined) {
+          el.data = JSON.parse(JSON.stringify(toRaw(props.data)));
+        }
 
-      // Use nextTick to ensure the custom element is fully initialized
+        // Set initial options if provided - convert to plain objects
+        if (props.options !== undefined) {
+          try {
+            const clonedOptions = JSON.parse(
+              JSON.stringify(toRaw(props.options))
+            );
+            el.options = clonedOptions;
+          } catch (error) {
+            console.error(
+              'Error setting initial options in Vue wrapper:',
+              error,
+              props.options
+            );
+          }
+        }
+
+        // Set initial filters if provided and not empty
+        if (
+          props.filters !== undefined &&
+          props.filters !== null &&
+          props.filters.length > 0
+        ) {
+          el.filters = JSON.parse(JSON.stringify(toRaw(props.filters)));
+        }
+
+        // Set initial pagination if provided
+        if (props.pagination !== undefined) {
+          const plainPagination = JSON.parse(
+            JSON.stringify(toRaw(props.pagination))
+          );
+          el.pagination = {
+            ...(el.pagination || {
+              currentPage: 1,
+              pageSize: 10,
+              totalPages: 1,
+            }),
+            ...plainPagination,
+          };
+        }
+      }
+
+      // NOW set up event listeners after data/options are set and engine is initialized
       nextTick(() => {
+        setupEventListeners();
+
+        // Manually trigger state change after initial setup
         const el = elRef.value;
         if (el) {
-          // Set initial data if provided - convert to plain objects
-          if (props.data !== undefined) {
-            el.data = JSON.parse(JSON.stringify(toRaw(props.data)));
-          }
-
-          // Set initial options if provided - convert to plain objects
-          if (props.options !== undefined) {
-            try {
-              const clonedOptions = JSON.parse(
-                JSON.stringify(toRaw(props.options))
-              );
-              el.options = clonedOptions;
-            } catch (error) {
-              console.error(
-                'Error setting initial options in Vue wrapper:',
-                error,
-                props.options
-              );
-            }
-          }
-
-          // Set initial filters if provided and not empty
-          if (
-            props.filters !== undefined &&
-            props.filters !== null &&
-            props.filters.length > 0
-          ) {
-            el.filters = JSON.parse(JSON.stringify(toRaw(props.filters)));
-          }
-
-          // Set initial pagination if provided
-          if (props.pagination !== undefined) {
-            const plainPagination = JSON.parse(
-              JSON.stringify(toRaw(props.pagination))
-            );
-            el.pagination = {
-              ...(el.pagination || {
-                currentPage: 1,
-                pageSize: 10,
-                totalPages: 1,
-              }),
-              ...plainPagination,
-            };
-          }
-
-          // Manually trigger state change after initial setup
           setTimeout(() => {
             try {
               const currentState = el.getState?.();
@@ -420,6 +427,46 @@ export const PivotHead = defineComponent({
       exportToExcel: (fileName?: string) =>
         elRef.value?.exportToExcel?.(fileName),
       openPrintDialog: () => elRef.value?.openPrintDialog?.(),
+
+      // ConnectService methods
+      connectToLocalCSV: async (
+        options?: ConnectionOptions
+      ): Promise<FileConnectionResult> => {
+        const el = elRef.value;
+        if (!el || !el.connectToLocalCSV) {
+          return {
+            success: false,
+            error: 'ConnectService not available on the element',
+          };
+        }
+        return el.connectToLocalCSV(options);
+      },
+
+      connectToLocalJSON: async (
+        options?: ConnectionOptions
+      ): Promise<FileConnectionResult> => {
+        const el = elRef.value;
+        if (!el || !el.connectToLocalJSON) {
+          return {
+            success: false,
+            error: 'ConnectService not available on the element',
+          };
+        }
+        return el.connectToLocalJSON(options);
+      },
+
+      connectToLocalFile: async (
+        options?: ConnectionOptions
+      ): Promise<FileConnectionResult> => {
+        const el = elRef.value;
+        if (!el || !el.connectToLocalFile) {
+          return {
+            success: false,
+            error: 'ConnectService not available on the element',
+          };
+        }
+        return el.connectToLocalFile(options);
+      },
     };
 
     expose(methods);

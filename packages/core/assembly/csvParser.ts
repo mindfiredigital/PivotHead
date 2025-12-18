@@ -85,7 +85,7 @@ export function parseCSVChunk(
 
   // First pass: count rows and columns
   while (state.position < length) {
-    const char = input.charCodeAt(state.position);
+    const char = input.charCodeAt(i32(state.position));
 
     if (char === QUOTE) {
       state.inQuotes = !state.inQuotes;
@@ -96,7 +96,7 @@ export function parseCSVChunk(
         char === NEWLINE ||
         (char === CARRIAGE &&
           state.position + 1 < length &&
-          input.charCodeAt(state.position + 1) === NEWLINE)
+          input.charCodeAt(i32(state.position + 1)) === NEWLINE)
       ) {
         cols++; // Count last column
         if (cols > maxCols) {
@@ -149,7 +149,7 @@ export function extractField(
     return '';
   }
 
-  let value = input.substring(start, end);
+  let value = input.substring(i32(start), i32(end));
 
   // Remove quotes if present
   if (

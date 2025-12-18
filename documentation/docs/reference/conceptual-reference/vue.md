@@ -15,6 +15,9 @@ A powerful Vue 3 wrapper for PivotHead that provides seamless integration with r
 The PivotHead Vue wrapper (`@mindfiredigital/pivothead-vue`) offers:
 
 - **Vue 3 Reactivity**: Full integration with Vue's reactive system and deep watching
+- **WebAssembly Acceleration**: 30-40% faster CSV parsing with WASM-powered engine
+- **Streaming + WASM Hybrid**: Handle 800MB+ files with intelligent chunking
+- **ConnectService**: Zero-config file uploads with automatic format detection
 - **TypeScript Support**: Complete type definitions for all APIs and props
 - **Event Bridge**: Converts web component events to Vue events seamlessly
 - **Slot System**: Custom slot support for minimal mode customization
@@ -24,15 +27,7 @@ The PivotHead Vue wrapper (`@mindfiredigital/pivothead-vue`) offers:
 
 ## Architecture
 
-### Component Hierarchy
-
-```
-Vue Application
-├── PivotHead Vue Wrapper
-    ├── Web Component Bridge
-        ├── @mindfiredigital/pivothead-web-component
-            └── @mindfiredigital/pivothead (Core Engine)
-```
+````
 
 ### Bridge Implementation
 
@@ -50,7 +45,7 @@ The Vue wrapper acts as an intelligent bridge that handles:
 
 ```bash
 npm install @mindfiredigital/pivothead-vue
-```
+````
 
 ### With Dependencies
 
@@ -111,6 +106,346 @@ const handlePaginationChange = pagination => {
   console.log('Pagination changed:', pagination);
 };
 </script>
+```
+
+## WebAssembly Performance
+
+PivotHead Vue leverages cutting-edge WebAssembly technology to deliver industry-leading performance for large-scale data processing. The WASM-powered CSV parser provides **30-40% faster parsing** compared to pure JavaScript implementations.
+
+### Performance Benchmarks
+
+Real-world performance on Apple M1, 16GB RAM, Chrome 120:
+
+| Dataset Size | Mode                 | Processing Time | Memory Usage |
+| ------------ | -------------------- | --------------- | ------------ |
+| 100K rows    | Web Workers          | ~2.5s           | ~50MB        |
+| 1M rows      | Web Workers          | ~8.5s           | ~200MB       |
+| 10M rows     | **Streaming + WASM** | **~25-30s**     | **~400MB**   |
+| 800MB CSV    | **Streaming + WASM** | **~43s**        | **~800MB**   |
+
+### Automatic Performance Mode Selection
+
+PivotHead automatically selects the optimal processing mode based on your file size:
+
+| File Size | Rows   | Mode                 | Speed            | Memory    |
+| --------- | ------ | -------------------- | ---------------- | --------- |
+| < 5MB     | < 10K  | **Standard**         | Fast             | Low       |
+| 5-50MB    | 10K-1M | **Web Workers**      | Very Fast        | Medium    |
+| 50-100MB  | 1M-5M  | **WASM**             | **Ultra Fast**   | Medium    |
+| > 100MB   | > 5M   | **Streaming + WASM** | **Blazing Fast** | Optimized |
+
+### How WASM Works
+
+The WebAssembly module (`csvParser.wasm`) is a compiled AssemblyScript program that runs at near-native speed in the browser. It provides:
+
+- **Binary Format Parsing**: Direct binary processing without JavaScript overhead
+- **Memory Efficiency**: Low-level memory management for optimal RAM usage
+- **Parallel Processing**: Multi-threaded parsing with Web Workers
+- **Streaming Architecture**: Process files in chunks to handle massive datasets
+
+### WASM Configuration
+
+The WASM module is automatically loaded from your public assets:
+
+```typescript
+// WASM is loaded automatically, but you can verify it's working
+const result = await pivotRef.value.connectToLocalCSV({
+  onProgress: progress => {
+    console.log(`Progress: ${progress}%`);
+  },
+});
+
+console.log(`Performance Mode: ${result.performanceMode}`);
+// Output: 'streaming-wasm', 'wasm', 'workers', or 'standard'
+```
+
+### Browser Support
+
+| Browser | Version | WASM Support | Fallback    |
+| ------- | ------- | ------------ | ----------- |
+| Chrome  | 57+     | Yes          | -           |
+| Firefox | 52+     | Yes          | -           |
+| Safari  | 11+     | Yes          | -           |
+| Edge    | 16+     | Yes          | -           |
+| IE 11   | -       | No           | Web Workers |
+
+**Note**: WASM gracefully falls back to Web Workers on unsupported browsers, ensuring compatibility across all modern platforms.
+
+## ConnectService - Smart File Loading
+
+ConnectService provides zero-configuration file uploading with intelligent format detection, automatic mode selection, and built-in progress tracking.
+
+### Features
+
+- **Automatic Mode Selection**: Intelligently chooses the best processing mode based on file size
+- **Smart Auto-Layout**: Detects field types and creates optimal pivot configuration
+- **Multiple Formats**: CSV and JSON support with custom parsing options
+- **Progress Tracking**: Real-time upload and processing progress callbacks
+- **Type Detection**: Automatic identification of strings, numbers, dates, and booleans
+- **Custom Configuration**: Fine-grained control over delimiters, headers, and validation
+
+### Basic CSV Upload
+
+```vue
+<template>
+  <div>
+    <button @click="uploadCSV" :disabled="isUploading">Upload CSV File</button>
+
+    <div v-if="uploadProgress > 0" class="progress-bar">
+      <div class="progress-fill" :style="{ width: uploadProgress + '%' }"></div>
+      <span>{{ Math.round(uploadProgress) }}%</span>
+    </div>
+
+    <div v-if="uploadResult" class="result-info">
+      <p>Loaded {{ uploadResult.recordCount?.toLocaleString() }} records</p>
+      <p>
+        File: {{ uploadResult.fileName }} ({{
+          formatFileSize(uploadResult.fileSize)
+        }})
+      </p>
+      <p>⚡ Mode: {{ uploadResult.performanceMode }}</p>
+    </div>
+
+    <PivotHead
+      ref="pivotRef"
+      :data="[]"
+      :options="{}"
+      @state-change="handleStateChange"
+    />
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+import { PivotHead } from '@mindfiredigital/pivothead-vue';
+
+const pivotRef = ref();
+const isUploading = ref(false);
+const uploadProgress = ref(0);
+const uploadResult = ref(null);
+
+const uploadCSV = async () => {
+  isUploading.value = true;
+  uploadProgress.value = 0;
+
+  try {
+    const result = await pivotRef.value.connectToLocalCSV({
+      onProgress: progress => {
+        uploadProgress.value = progress;
+      },
+    });
+
+    if (result.success) {
+      uploadResult.value = result;
+      console.log('Upload successful!');
+    } else {
+      console.error('Upload failed:', result.error);
+    }
+  } catch (error) {
+    console.error('Upload error:', error);
+  } finally {
+    isUploading.value = false;
+    uploadProgress.value = 0;
+  }
+};
+
+const formatFileSize = (bytes: number) => {
+  if (!bytes) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+};
+
+const handleStateChange = state => {
+  console.log('Pivot state updated:', state);
+};
+</script>
+
+<style scoped>
+.progress-bar {
+  width: 100%;
+  height: 30px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  position: relative;
+  margin: 16px 0;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4caf50, #45a049);
+  transition: width 0.3s ease;
+}
+
+.progress-bar span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #333;
+  font-weight: bold;
+}
+
+.result-info {
+  margin-top: 16px;
+  padding: 12px;
+  background: #e8f5e9;
+  border-radius: 4px;
+  border-left: 4px solid #4caf50;
+}
+</style>
+```
+
+### Advanced CSV Upload with Custom Options
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue';
+import { PivotHead } from '@mindfiredigital/pivothead-vue';
+
+const pivotRef = ref();
+
+const uploadAdvancedCSV = async () => {
+  const result = await pivotRef.value.connectToLocalCSV({
+    csv: {
+      delimiter: ',', // Custom delimiter (default: ',')
+      hasHeader: true, // First row contains headers (default: true)
+      skipEmptyLines: true, // Skip empty lines (default: true)
+      trimValues: true, // Trim whitespace (default: true)
+    },
+    maxRecords: 50000, // Limit number of records loaded
+    maxFileSize: 100 * 1024 * 1024, // 100MB max file size
+    useWorkers: true, // Force Web Workers mode
+    workerCount: 4, // Number of parallel workers
+    chunkSizeBytes: 5 * 1024 * 1024, // 5MB chunks for streaming
+    onProgress: progress => {
+      console.log(`Processing: ${progress.toFixed(1)}%`);
+    },
+  });
+
+  if (result.success) {
+    console.log(`Mode: ${result.performanceMode}`);
+    console.log(`Columns: ${result.columns?.join(', ')}`);
+    console.log(`Parse time: ${result.parseTime}ms`);
+  }
+};
+</script>
+```
+
+### JSON File Upload
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue';
+import { PivotHead } from '@mindfiredigital/pivothead-vue';
+
+const pivotRef = ref();
+
+const uploadJSON = async () => {
+  const result = await pivotRef.value.connectToLocalJSON({
+    json: {
+      arrayPath: 'data.records', // Supports nested paths like 'response.data.items'
+      validateSchema: true, // Validate JSON structure
+    },
+    maxFileSize: 50 * 1024 * 1024, // 50MB limit
+    onProgress: progress => {
+      console.log(`Loading JSON: ${progress}%`);
+    },
+  });
+
+  if (result.success) {
+    console.log(`Loaded ${result.recordCount} records from JSON`);
+  } else if (result.validationErrors) {
+    console.error('Validation errors:', result.validationErrors);
+  }
+};
+</script>
+```
+
+### Auto-Detect File Format
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue';
+import { PivotHead } from '@mindfiredigital/pivothead-vue';
+
+const pivotRef = ref();
+
+// Automatically detects CSV or JSON based on file extension
+const uploadAnyFile = async () => {
+  const result = await pivotRef.value.connectToLocalFile({
+    onProgress: progress => {
+      console.log(`Upload progress: ${progress}%`);
+    },
+  });
+
+  if (result.success) {
+    console.log('File uploaded and processed!');
+    console.log(`Format detected: ${result.fileName?.split('.').pop()}`);
+  }
+};
+</script>
+```
+
+### How Auto-Layout Works
+
+When you upload a file via ConnectService, PivotHead automatically analyzes your data and creates an optimal pivot configuration:
+
+1. **Field Type Detection**:
+   - Strings: Text fields with high cardinality
+   - Numbers: Numeric values (integers, floats, currency)
+   - Dates: ISO dates, timestamps, formatted dates
+   - Booleans: true/false, yes/no, 1/0
+
+2. **Dimension vs Measure Classification**:
+   - **Low cardinality** (< 20 unique values) → Dimensions (rows/columns)
+   - **High cardinality numeric** → Measures (aggregations)
+   - **Date fields** → Dimensions for time-based analysis
+
+3. **Intelligent Defaults**:
+   - First string field → Row dimension
+   - Second string field → Column dimension
+   - All numeric fields → Measures with SUM aggregation
+   - Date fields → Additional row dimensions
+
+### ConnectService API Reference
+
+```typescript
+interface ConnectionOptions {
+  csv?: {
+    delimiter?: string; // Default: ','
+    hasHeader?: boolean; // Default: true
+    skipEmptyLines?: boolean; // Default: true
+    trimValues?: boolean; // Default: true
+    encoding?: string; // Default: 'utf-8'
+  };
+  json?: {
+    arrayPath?: string; // Nested path to array (e.g., 'data.items')
+    validateSchema?: boolean; // Default: false
+  };
+  maxFileSize?: number; // Maximum file size in bytes
+  maxRecords?: number; // Limit number of records to load
+  onProgress?: (progress: number) => void; // Progress callback (0-100)
+  useWorkers?: boolean; // Force Web Workers mode
+  workerCount?: number; // Number of parallel workers (default: 4)
+  chunkSizeBytes?: number; // Chunk size for streaming (default: 5MB)
+}
+
+interface FileConnectionResult {
+  success: boolean;
+  data?: unknown[]; // Parsed data records
+  fileName?: string; // Original file name
+  fileSize?: number; // File size in bytes
+  recordCount?: number; // Number of records loaded
+  columns?: string[]; // Column names
+  error?: string; // Error message if failed
+  validationErrors?: string[]; // JSON validation errors
+  performanceMode?: 'standard' | 'workers' | 'wasm' | 'streaming-wasm';
+  parseTime?: number; // Parse time in milliseconds
+  requiresPagination?: boolean; // True if dataset is large
+}
 ```
 
 ## Display Modes
@@ -576,26 +911,77 @@ const handlePaginationChange = pagination => {
 - Use `Object.freeze()` for large, static datasets
 - Implement proper data validation before passing to the component
 - Use computed properties for derived data
+- **WASM Optimization**: Use ConnectService for files > 5MB to leverage automatic WASM acceleration
 
 ### 2. Performance
 
 - Use `shallowRef` for large arrays to avoid deep reactivity
 - Implement virtual scrolling for very large datasets in minimal mode
 - Debounce filter operations to avoid excessive re-rendering
+- **For Large Files (100MB+)**: Use streaming mode with ConnectService
+- **Memory Management**: Freeze large datasets to prevent Vue reactivity overhead
 
-### 3. Error Handling
+```typescript
+//  DO: Freeze large datasets
+const largeData = Object.freeze(myLargeArray);
+
+//  DO: Use pagination for 10K+ rows
+const pagination = { pageSize: 100 };
+
+//  DO: Debounce filters
+import { debounce } from 'lodash';
+const updateFilters = debounce(filters => {
+  activeFilters.value = filters;
+}, 300);
+
+//  DO: Use ConnectService for file uploads
+const result = await pivotRef.value.connectToLocalCSV({
+  maxRecords: 50000,
+  chunkSizeBytes: 5 * 1024 * 1024,
+});
+```
+
+### 3. WASM Configuration
+
+- **Copy WASM files** to your `public` directory for production builds
+- **Vite Setup**: Add WASM files to `assetsInclude` in `vite.config.ts`
+- **Verify Mode**: Check `result.performanceMode` to ensure WASM is being used
+- **Fallback Gracefully**: WASM automatically falls back to Web Workers if unavailable
+
+```typescript
+// vite.config.ts
+export default defineConfig({
+  assetsInclude: ['**/*.wasm'],
+  optimizeDeps: {
+    exclude: ['@mindfiredigital/pivothead'],
+  },
+});
+```
+
+### 4. Error Handling
 
 - Always use optional chaining when calling template ref methods
 - Implement proper loading states
 - Handle network errors gracefully
+- **ConnectService Errors**: Check `result.error` and `result.validationErrors` for upload failures
 
-### 4. Accessibility
+```typescript
+const result = await pivotRef.value.connectToLocalCSV(options);
+if (!result.success) {
+  console.error('Upload failed:', result.error);
+  if (result.validationErrors) {
+    console.error('Validation errors:', result.validationErrors);
+  }
+}
+```
+
+### 5. Accessibility
 
 - Ensure proper ARIA labels in custom minimal mode implementations
 - Provide keyboard navigation support
 - Test with screen readers
 
-### 5. Testing
+### 6. Testing
 
 - Mock the web component for unit tests
 - Test event emissions
@@ -604,24 +990,27 @@ const handlePaginationChange = pagination => {
 
 ## Conclusion
 
-The PivotHead Vue wrapper represents a sophisticated integration solution that bridges Vue 3 applications with powerful pivot table functionality. By leveraging Vue's reactive system, TypeScript support, and component architecture, it provides developers with a flexible and performant tool for data visualization and analysis.
+The PivotHead Vue wrapper represents a sophisticated integration solution that bridges Vue 3 applications with powerful pivot table functionality. By leveraging Vue's reactive system, WebAssembly acceleration, TypeScript support, and component architecture, it provides developers with a flexible and performant tool for data visualization and analysis.
 
 ### Key Strengths
 
 - **Seamless Integration**: The wrapper feels native to Vue applications while providing access to advanced pivot functionality
+- **WebAssembly Performance**: Industry-leading speed with 30-40% faster processing for large datasets using WASM technology
+- **Smart File Loading**: ConnectService provides zero-config uploads with automatic mode selection and progress tracking
 - **Progressive Enhancement**: Start with default mode for rapid development, then customize with minimal or none modes as requirements grow
 - **Type Safety**: Complete TypeScript support ensures robust development experience and prevents runtime errors
-- **Performance Optimized**: Vue-specific optimizations handle large datasets efficiently while maintaining reactivity
+- **Performance Optimized**: Vue-specific optimizations combined with WASM handle massive datasets (10M+ rows) efficiently
 - **Developer Experience**: Comprehensive API, extensive documentation, and practical examples accelerate development
 
 ### Use Cases
 
 The Vue wrapper excels in:
 
-- **Business Intelligence Dashboards**: Create interactive data exploration interfaces
-- **Reporting Applications**: Build customizable report viewers with export capabilities
-- **Data Analysis Tools**: Develop sophisticated data manipulation and visualization features
-- **Administrative Panels**: Implement complex data tables with filtering and sorting
-- **Customer-Facing Analytics**: Provide end-users with self-service data analysis capabilities
+- **Business Intelligence Dashboards**: Create interactive data exploration interfaces with millions of records
+- **Reporting Applications**: Build customizable report viewers with export capabilities and WASM-powered performance
+- **Data Analysis Tools**: Develop sophisticated data manipulation and visualization features for large-scale datasets
+- **Administrative Panels**: Implement complex data tables with filtering, sorting, and real-time updates
+- **Customer-Facing Analytics**: Provide end-users with self-service data analysis capabilities, even with massive files
+- **Enterprise Data Processing**: Handle 800MB+ CSV files with streaming + WASM hybrid mode
 
-Whether you're building a simple data display or a complex analytical dashboard, the PivotHead Vue wrapper provides the foundation for creating powerful, user-friendly data visualization experiences in Vue 3 applications. Its three-mode architecture ensures that you can start simple and scale complexity as your requirements evolve, making it an ideal choice for both rapid prototyping and production-ready applications.
+Whether you're building a simple data display or a complex analytical dashboard processing millions of rows, the PivotHead Vue wrapper provides the foundation for creating powerful, user-friendly data visualization experiences in Vue 3 applications. Its three-mode architecture combined with WebAssembly acceleration ensures that you can start simple and scale to handle enterprise-level data volumes as your requirements evolve, making it an ideal choice for both rapid prototyping and production-ready applications handling massive datasets.

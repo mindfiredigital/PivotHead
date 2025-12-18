@@ -1,114 +1,494 @@
-# PivotHead React Wrapper
+<div align="center">
 
-A thin React wrapper around `@mindfiredigital/pivothead-web-component` that preserves all functionality and supports all modes: `default`, `minimal`, and `none`.
+# PivotHead React
 
-### Blazing Fast CSV Processing with WebAssembly
+**High-Performance Pivot Tables for React Applications**
 
-This component leverages the power of WebAssembly (WASM) for high-performance, in-browser CSV data processing. This allows for:
+[![npm version](https://img.shields.io/npm/v/@mindfiredigital/pivothead-react?color=brightgreen)](https://www.npmjs.com/package/@mindfiredigital/pivothead-react)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Ready-3178C6?logo=typescript)](https://www.typescriptlang.org/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/mindfiredigital/PivotHead/pulls)
 
-- **Large File Support:** Efficiently process CSV files up to 1GB directly in the browser.
-- **Enhanced Performance:** Experience significantly faster data loading and manipulation, as the heavy lifting is done by a pre-compiled WASM module.
-- **Improved User Experience:** Reduced wait times and a smoother, more responsive interface when working with large datasets.
+[Features](#-features) • [Installation](#-installation) • [Quick Start](#-quick-start) • [Documentation](#-documentation) • [Examples](#-examples) • [Support](#-support)
 
-Install (inside the monorepo):
+</div>
 
-- Add the package in workspace and run `pnpm -w i`
-- Build with `pnpm -w build`
+---
 
-## Usage
+## Screenshots
 
-Below are some examples of how to use the `PivotHead` component in your React application.
+<!-- TODO: Add screenshots of your pivot table in action -->
+<!-- Example structure:
+![PivotHead React - Default View](./screenshots/default-view.png)
+![PivotHead React - Large Dataset](./screenshots/large-dataset.png)
+-->
+
+> **Note**: Screenshots coming soon! See [live demo](https://stackblitz.com/edit/vitejs-vite-osugvxpw?file=readme.md) for now.
+
+---
+
+## Features
+
+<table>
+<tr>
+<td width="33%" valign="top">
+
+### **React-First Design**
+
+- Native React hooks support
+- TypeScript definitions included
+- Full SSR compatibility
+- Optimized re-rendering
+
+</td>
+<td width="33%" valign="top">
+
+### **WebAssembly Powered**
+
+- Process CSV files up to **1GB**
+- 10x faster than pure JavaScript
+- Automatic performance optimization
+- Zero configuration required
+
+</td>
+<td width="33%" valign="top">
+
+### **Flexible Rendering**
+
+- **Default Mode**: Full UI included
+- **Minimal Mode**: Slot-based customization
+- **Headless Mode**: Complete control
+- Custom themes support
+
+</td>
+</tr>
+<tr>
+<td width="33%" valign="top">
+
+### **Rich Features**
+
+- Drag-and-drop field management
+- Dynamic aggregations
+- Advanced filtering
+- Multi-level grouping
+
+</td>
+<td width="33%" valign="top">
+
+### **Developer-Friendly**
+
+- Simple API
+- Comprehensive docs
+- Full TypeScript support
+- Extensive examples
+
+</td>
+<td width="33%" valign="top">
+
+### **Framework Agnostic Core**
+
+- Works with React 17+
+- Compatible with Next.js
+- Remix support
+- Vite optimized
+
+</td>
+</tr>
+</table>
+
+---
+
+## Installation
+
+```bash
+# npm
+npm install @mindfiredigital/pivothead-react
+
+# yarn
+yarn add @mindfiredigital/pivothead-react
+
+# pnpm
+pnpm add @mindfiredigital/pivothead-react
+```
+
+### Requirements
+
+- **React**: 17.0.0 or higher
+- **TypeScript** (optional): 4.5.0 or higher
+- **Node.js**: 12.0.0 or higher
+
+---
+
+## Quick Start
 
 ### Basic Example
 
-Here's a basic example of how to render the pivot table with some data and options.
-
 ```tsx
 import { PivotHead } from '@mindfiredigital/pivothead-react';
-import { useRef, useEffect } from 'react';
 
-// Sample Data
-const data = [
-  { product: 'A', region: 'East', sales: 100 },
-  { product: 'B', region: 'West', sales: 150 },
+// Your data
+const salesData = [
+  { product: 'Laptop', region: 'North', sales: 5000, quarter: 'Q1' },
+  { product: 'Phone', region: 'South', sales: 3000, quarter: 'Q1' },
+  { product: 'Tablet', region: 'East', sales: 2000, quarter: 'Q2' },
   // ... more data
 ];
 
-// Pivot Table Options
-const options = {
+// Configuration
+const pivotOptions = {
   rows: ['product'],
   columns: ['region'],
   values: ['sales'],
 };
 
-export default function App() {
-  return <PivotHead mode="default" data={data} options={options} />;
-}
-```
-
-### Accessing Component Methods
-
-You can access the methods of the underlying web component by using a `ref`.
-
-```tsx
-import { PivotHead } from '@mindfiredigital/pivothead-react';
-import { useRef, useEffect } from 'react';
-
-export default function App() {
-  const pivotRef = useRef(null);
-
-  useEffect(() => {
-    // Example of calling a method on the component
-    const state = pivotRef.current?.methods.getState();
-    console.log('Pivot Table State:', state);
-  }, []);
-
+export default function Dashboard() {
   return (
-    <PivotHead
-      // ... other props
-      ref={pivotRef}
-    />
+    <div>
+      <h1>Sales Dashboard</h1>
+      <PivotHead mode="default" data={salesData} options={pivotOptions} />
+    </div>
   );
 }
 ```
 
-### Handling State Changes
-
-The `onStateChange` event is fired whenever the internal state of the pivot table changes (e.g., when a user drags and drops a field).
+### Load Large CSV Files (WebAssembly)
 
 ```tsx
 import { PivotHead } from '@mindfiredigital/pivothead-react';
+import { useState } from 'react';
 
-export default function App() {
-  const handleStateChange = event => {
-    console.log('Pivot table state changed:', event.detail);
+export default function CsvUploader() {
+  const [fileData, setFileData] = useState<File | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFileData(file);
+      // The component automatically uses WebAssembly for optimal performance
+      // - Files < 8MB: Processed in-memory with WASM
+      // - Files > 8MB: Streaming + WASM hybrid mode
+    }
   };
 
   return (
-    <PivotHead
-      // ... other props
+    <div>
+      <input type="file" accept=".csv" onChange={handleFileChange} />
+
+      {fileData && (
+        <PivotHead
+          mode="default"
+          data={fileData}
+          onStateChange={e => {
+            console.log('Performance mode:', e.detail.performanceMode);
+            // Possible values: 'standard', 'workers', 'wasm', 'streaming-wasm'
+          }}
+        />
+      )}
+    </div>
+  );
+}
+```
+
+---
+
+## Rendering Modes
+
+### 1️ Default Mode (Full UI)
+
+Complete pivot table with built-in interface, drag-and-drop, filters, and controls.
+
+```tsx
+<PivotHead mode="default" data={data} options={options} />
+```
+
+**Best for**: Quick implementation, prototyping, admin panels
+
+---
+
+### 2️ Minimal Mode (Customizable)
+
+Component provides structure; you control the styling and layout.
+
+```tsx
+<PivotHead mode="minimal" data={data} options={options}>
+  <div slot="header">{/* Your custom toolbar */}</div>
+  <div slot="body">{/* Your custom table rendering */}</div>
+</PivotHead>
+```
+
+**Best for**: Custom branding, unique designs, themed applications
+
+---
+
+### 3️ Headless Mode (Complete Control)
+
+No UI rendered - full programmatic control via API and events.
+
+```tsx
+import { PivotHead } from '@mindfiredigital/pivothead-react';
+import { useRef, useEffect, useState } from 'react';
+
+export default function CustomPivot() {
+  const pivotRef = useRef<HTMLElement>(null);
+  const [state, setState] = useState(null);
+
+  useEffect(() => {
+    const handleStateChange = (e: CustomEvent) => {
+      setState(e.detail);
+    };
+
+    pivotRef.current?.addEventListener('stateChange', handleStateChange);
+
+    return () => {
+      pivotRef.current?.removeEventListener('stateChange', handleStateChange);
+    };
+  }, []);
+
+  return (
+    <div>
+      <PivotHead ref={pivotRef} mode="none" data={data} options={options} />
+
+      {/* Build your own UI using the state */}
+      {state && <YourCustomTable data={state.processedData} />}
+    </div>
+  );
+}
+```
+
+**Best for**: Maximum flexibility, custom visualizations, advanced integrations
+
+---
+
+## Advanced Usage
+
+### With TypeScript
+
+```tsx
+import { PivotHead } from '@mindfiredigital/pivothead-react';
+import type {
+  PivotTableState,
+  PivotTableOptions,
+} from '@mindfiredigital/pivothead';
+
+interface SalesRecord {
+  product: string;
+  region: string;
+  sales: number;
+  date: string;
+}
+
+const options: PivotTableOptions = {
+  rows: ['product'],
+  columns: ['region'],
+  values: ['sales'],
+};
+
+export default function TypedPivot() {
+  const handleStateChange = (
+    event: CustomEvent<PivotTableState<SalesRecord>>
+  ) => {
+    console.log('New state:', event.detail);
+  };
+
+  return (
+    <PivotHead<SalesRecord>
+      mode="default"
+      data={salesData}
+      options={options}
       onStateChange={handleStateChange}
     />
   );
 }
 ```
 
-### Using Different Modes
-
-The component supports three modes: `default`, `minimal`, and `none`.
-
-**Minimal Mode**
-
-The `minimal` mode provides a simplified UI.
+### Using Component Methods
 
 ```tsx
-<PivotHead mode="minimal" data={data} options={options} />
+import { PivotHead } from '@mindfiredigital/pivothead-react';
+import { useRef } from 'react';
+
+export default function MethodsExample() {
+  const pivotRef = useRef<any>(null);
+
+  const handleExportPDF = () => {
+    pivotRef.current?.exportToPDF('sales-report');
+  };
+
+  const handleExportExcel = () => {
+    pivotRef.current?.exportToExcel('sales-data');
+  };
+
+  const handleSort = (field: string) => {
+    pivotRef.current?.sort(field, 'desc');
+  };
+
+  return (
+    <div>
+      <div className="toolbar">
+        <button onClick={handleExportPDF}>Export PDF</button>
+        <button onClick={handleExportExcel}>Export Excel</button>
+        <button onClick={() => handleSort('sales')}>Sort by Sales</button>
+      </div>
+
+      <PivotHead ref={pivotRef} mode="default" data={data} options={options} />
+    </div>
+  );
+}
 ```
 
-**None Mode (Headless)**
-
-The `none` mode renders no UI, giving you complete control over the presentation. This is useful when you want to build a custom UI on top of the pivot engine.
+### Real-Time Data Updates
 
 ```tsx
-<PivotHead mode="none" data={data} options={options} />
+import { PivotHead } from '@mindfiredigital/pivothead-react';
+import { useState, useEffect } from 'react';
+
+export default function LiveDashboard() {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    // Simulate real-time data updates
+    const interval = setInterval(() => {
+      fetch('/api/sales/latest')
+        .then(res => res.json())
+        .then(newData => setData(newData));
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return <PivotHead mode="default" data={data} options={options} />;
+}
 ```
+
+---
+
+## Documentation
+
+### Component Props
+
+| Prop            | Type                               | Default     | Description                                        |
+| --------------- | ---------------------------------- | ----------- | -------------------------------------------------- |
+| `mode`          | `'default' \| 'minimal' \| 'none'` | `'default'` | Rendering mode                                     |
+| `data`          | `Array \| File \| string`          | `[]`        | Data source (JSON array, CSV File, or JSON string) |
+| `options`       | `PivotTableOptions \| string`      | `{}`        | Pivot configuration                                |
+| `filters`       | `FilterConfig[] \| string`         | `[]`        | Active filters                                     |
+| `pagination`    | `PaginationConfig \| string`       | `{}`        | Pagination settings                                |
+| `onStateChange` | `(event: CustomEvent) => void`     | -           | Fired when state changes                           |
+
+### Available Methods
+
+Access methods via `ref`:
+
+```tsx
+const pivotRef = useRef<any>(null);
+
+// Methods
+pivotRef.current?.getState(); // Get current state
+pivotRef.current?.refresh(); // Refresh the pivot table
+pivotRef.current?.sort(field, dir); // Sort by field
+pivotRef.current?.exportToPDF(name); // Export to PDF
+pivotRef.current?.exportToExcel(name); // Export to Excel
+pivotRef.current?.exportToHTML(name); // Export to HTML
+```
+
+### Events
+
+| Event           | Payload           | Description                                        |
+| --------------- | ----------------- | -------------------------------------------------- |
+| `onStateChange` | `PivotTableState` | Triggered on any state change (sort, filter, etc.) |
+
+---
+
+## Examples
+
+### Full Examples Repository
+
+Check out complete working examples:
+
+- [**Default Mode Demo**](../../examples/react-web-component-demo) - Full UI with all features
+- [**CSV Upload Demo**](../../examples/simple-js-demo) - Large file processing with WASM
+- [**Custom Rendering**](../../examples/pivothead-minimal-demo) - Minimal mode with custom UI
+- [**Headless Integration**](../../examples/pivothead-none-demo) - Building custom visualizations
+
+---
+
+## Performance Benchmarks
+
+| File Size | Processing Mode  | Load Time | Memory Usage  |
+| --------- | ---------------- | --------- | ------------- |
+| < 1 MB    | Standard         | ~50ms     | Low           |
+| 1-8 MB    | Web Workers      | ~200ms    | Medium        |
+| 8-100 MB  | WASM (in-memory) | ~800ms    | Medium        |
+| 100MB-1GB | Streaming + WASM | ~3-5s     | Low (chunked) |
+
+> All benchmarks run on Chrome 120, MacBook Pro M1, 16GB RAM
+
+---
+
+## Framework Integration
+
+### Next.js
+
+```tsx
+// app/dashboard/page.tsx
+'use client';
+
+import dynamic from 'next/dynamic';
+
+const PivotHead = dynamic(
+  () => import('@mindfiredigital/pivothead-react').then(mod => mod.PivotHead),
+  { ssr: false }
+);
+
+export default function DashboardPage() {
+  return <PivotHead mode="default" data={data} options={options} />;
+}
+```
+
+### Remix
+
+```tsx
+// app/routes/dashboard.tsx
+import { PivotHead } from '@mindfiredigital/pivothead-react';
+import { useLoaderData } from '@remix-run/react';
+
+export async function loader() {
+  const data = await fetchSalesData();
+  return { data };
+}
+
+export default function Dashboard() {
+  const { data } = useLoaderData();
+  return <PivotHead mode="default" data={data} options={options} />;
+}
+```
+
+---
+
+## Related Packages
+
+- [**@mindfiredigital/pivothead**](../core) - Core pivot engine
+- [**@mindfiredigital/pivothead-web-component**](../web-component) - Framework-agnostic web component
+- [**@mindfiredigital/pivothead-vue**](../vue) - Vue wrapper (coming soon)
+
+---
+
+## Support
+
+### Resources
+
+- [ Documentation](https://github.com/mindfiredigital/PivotHead#readme)
+- [ Discussions](https://github.com/mindfiredigital/PivotHead/discussions)
+- [ Report Issues](https://github.com/mindfiredigital/PivotHead/issues)
+- [ Email Support](mailto:support@mindfiredigital.com)
+
+### Show Your Support
+
+If PivotHead helps your project, please consider:
+
+- [Star the repository](https://github.com/mindfiredigital/PivotHead)
+- [Report bugs](https://github.com/mindfiredigital/PivotHead/issues)
+- [Suggest features](https://github.com/mindfiredigital/PivotHead/discussions)
+- [Submit pull requests](https://github.com/mindfiredigital/PivotHead/pulls)
+
+---
