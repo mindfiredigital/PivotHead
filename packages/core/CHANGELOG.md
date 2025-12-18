@@ -1,5 +1,11 @@
 # @mindfiredigital/pivothead
 
+## 1.9.0
+
+### Minor Changes
+
+- Release (#242)
+
 ## 1.8.2
 
 ### Patch Changes
