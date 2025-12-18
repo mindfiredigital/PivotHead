@@ -1,7 +1,7 @@
 {
   "name": "@mindfiredigital/pivothead-vue",
   "version": "0.1.5",
-  "private": true,
+  "private": false,
   "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
