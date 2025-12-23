@@ -1,5 +1,12 @@
 # vue-example
 
+## 1.0.9
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead-vue@1.0.2
+
 ## 1.0.8
 
 ### Patch Changes
