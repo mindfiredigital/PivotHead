@@ -17,13 +17,9 @@
 
 ## Screenshots
 
-<!-- TODO: Add screenshots of your pivot table in action -->
-<!-- Example structure:
-![PivotHead React - Default View](./screenshots/default-view.png)
-![PivotHead React - Large Dataset](./screenshots/large-dataset.png)
--->
+<img alt="PivotHead React - Interactive Pivot Table Demo" src="../../documentation/static/img/react-demo.png" />
 
-> **Note**: Screenshots coming soon! See [live demo](https://stackblitz.com/edit/vitejs-vite-osugvxpw?file=readme.md) for now.
+> **🚀 Try it live**: [Interactive Demo](https://stackblitz.com/edit/vitejs-vite-osugvxpw?file=readme.md) | [Example Projects](../../examples/react-demo)
 
 ---
 
@@ -403,12 +399,32 @@ pivotRef.current?.exportToHTML(name); // Export to HTML
 
 ### Full Examples Repository
 
-Check out complete working examples:
+Check out complete working examples in the repository:
 
-- [**Default Mode Demo**](../../examples/react-web-component-demo) - Full UI with all features
-- [**CSV Upload Demo**](../../examples/simple-js-demo) - Large file processing with WASM
-- [**Custom Rendering**](../../examples/pivothead-minimal-demo) - Minimal mode with custom UI
-- [**Headless Integration**](../../examples/pivothead-none-demo) - Building custom visualizations
+| Example           | Description                                | Path                                                                |
+| ----------------- | ------------------------------------------ | ------------------------------------------------------------------- |
+| **Default Mode**  | Full UI with all features enabled          | [react-web-component-demo](../../examples/react-web-component-demo) |
+| **React Wrapper** | React-specific implementation              | [react-demo](../../examples/react-demo)                             |
+| **CSV Upload**    | Large file processing with WASM            | [simple-js-demo](../../examples/simple-js-demo)                     |
+| **Minimal Mode**  | Custom rendering with slots                | [pivothead-minimal-demo](../../examples/pivothead-minimal-demo)     |
+| **Headless Mode** | Complete control for custom visualizations | [pivothead-none-demo](../../examples/pivothead-none-demo)           |
+
+### Running Examples Locally
+
+```bash
+# Clone the repository
+git clone https://github.com/mindfiredigital/PivotHead.git
+cd PivotHead
+
+# Navigate to React demo
+cd examples/react-demo
+
+# Install dependencies
+pnpm install
+
+# Start development server
+pnpm dev
+```
 
 ---
 
@@ -465,30 +481,24 @@ export default function Dashboard() {
 
 ---
 
-## Related Packages
-
-- [**@mindfiredigital/pivothead**](../core) - Core pivot engine
-- [**@mindfiredigital/pivothead-web-component**](../web-component) - Framework-agnostic web component
-- [**@mindfiredigital/pivothead-vue**](../vue) - Vue wrapper (coming soon)
-
----
-
 ## Support
-
-### Resources
-
-- [ Documentation](https://github.com/mindfiredigital/PivotHead#readme)
-- [ Discussions](https://github.com/mindfiredigital/PivotHead/discussions)
-- [ Report Issues](https://github.com/mindfiredigital/PivotHead/issues)
-- [ Email Support](mailto:support@mindfiredigital.com)
-
-### Show Your Support
 
 If PivotHead helps your project, please consider:
 
-- [Star the repository](https://github.com/mindfiredigital/PivotHead)
-- [Report bugs](https://github.com/mindfiredigital/PivotHead/issues)
-- [Suggest features](https://github.com/mindfiredigital/PivotHead/discussions)
-- [Submit pull requests](https://github.com/mindfiredigital/PivotHead/pulls)
+- ⭐ [Star the repository](https://github.com/mindfiredigital/PivotHead)
 
 ---
+
+## License
+
+MIT © [Mindfiredigital](https://github.com/mindfiredigital)
+
+---
+
+<div align="center">
+
+**Built with ❤️ by the [Mindfiredigital](https://www.mindfiredigital.com) team**
+
+[GitHub](https://github.com/mindfiredigital/PivotHead) • [NPM](https://www.npmjs.com/package/@mindfiredigital/pivothead-react) • [Website](https://www.mindfiredigital.com)
+
+</div>
