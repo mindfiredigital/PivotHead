@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🧩 PivotHead Web Component
+# PivotHead Web Component
 
 **Universal Pivot Tables for Any JavaScript Framework**
 
@@ -15,20 +15,11 @@
 
 ---
 
-## 📸 Screenshots
+## Screenshots
 
-<!-- TODO: Add screenshots showcasing different modes -->
-<!-- Suggested screenshots:
-- Default mode with full UI
-- Minimal mode with custom styling
-- Headless mode integration
-- Large dataset processing
-- Mobile responsive view
--->
+<!-- <img width="951" alt="PivotHead Web Component - Interactive Pivot Table" src="https://github.com/user-attachments/assets/78de8bf8-7738-4917-88ce-7cf0a16da24b" /> -->
 
-![PivotHead Demo](https://via.placeholder.com/800x400/4A90E2/ffffff?text=PivotHead+Web+Component+-+Add+Your+Screenshot+Here)
-
-> **📷 Add your screenshots**: Place images in `./screenshots/` and update the paths above
+> ** Try it live**: Check out the [examples directory](../../examples) for working demos across different modes and frameworks
 
 ---
 
@@ -38,34 +29,34 @@
 <tr>
 <td width="50%" valign="top">
 
-### 🌐 **Framework Agnostic**
+### **Framework Agnostic**
 
-- ✅ **Vanilla JavaScript** - Works anywhere
-- ✅ **React** - Native wrapper available
-- ✅ **Vue** - Full compatibility
-- ✅ **Angular** - Drop-in component
-- ✅ **Svelte** - Seamless integration
-- ✅ **Any framework** - Standard web component
+- **Vanilla JavaScript** - Works anywhere
+- **React** - Native wrapper available
+- **Vue** - Full compatibility
+- **Angular** - Drop-in component
+- **Svelte** - Seamless integration
+- **Any framework** - Standard web component
 
 </td>
 <td width="50%" valign="top">
 
-### 🚀 **WebAssembly Performance**
+### **WebAssembly Performance**
 
-- ⚡ Process **up to 1GB CSV files**
-- 🔥 **10x faster** than JavaScript
-- 🎯 **Automatic optimization**
-  - < 1MB: Standard processing
-  - 1-8MB: Web Workers parallelization
-  - 8MB+: WASM + streaming hybrid
-- 📊 **Near-native performance**
+- Process **up to 1GB CSV files**
+- **10x faster** than JavaScript
+- **Automatic optimization**
+- < 1MB: Standard processing
+- 1-8MB: Web Workers parallelization
+- 8MB+: WASM + streaming hybrid
+- **Near-native performance**
 
 </td>
 </tr>
 <tr>
 <td width="50%" valign="top">
 
-### 🎨 **Three Rendering Modes**
+### **Three Rendering Modes**
 
 **Default Mode** - Full UI included
 
@@ -92,16 +83,16 @@
 </td>
 <td width="50%" valign="top">
 
-### 📊 **Rich Data Features**
+### **Rich Data Features**
 
-- 🔄 Drag & drop fields
-- 📈 Dynamic aggregations (sum, avg, count, min, max)
-- 🔍 Advanced filtering
-- 📊 Multi-level grouping
-- 📤 Export to PDF, Excel, HTML
-- 🎨 Conditional formatting
-- ⚙️ Custom calculations
-- 📱 Responsive design
+- Drag & drop fields
+- Dynamic aggregations (sum, avg, count, min, max)
+- Advanced filtering
+- Multi-level grouping
+- Export to PDF, Excel, HTML
+- Conditional formatting
+- Custom calculations
+- Responsive design
 
 </td>
 </tr>
@@ -109,7 +100,7 @@
 
 ---
 
-## 📦 Installation
+## Installation
 
 ```bash
 # npm
@@ -125,14 +116,14 @@ pnpm add @mindfiredigital/pivothead-web-component
 <script type="module" src="https://unpkg.com/@mindfiredigital/pivothead-web-component"></script>
 ```
 
-### 📋 Browser Requirements
+### Browser Requirements
 
 - Modern browsers with Web Components support (Chrome 54+, Firefox 63+, Safari 10.1+, Edge 79+)
 - For older browsers, include the [Web Components polyfill](https://www.webcomponents.org/polyfills)
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Vanilla JavaScript
 
@@ -201,7 +192,7 @@ export default function PivotDemo() {
 }
 ```
 
-> 💡 **Prefer React?** Use our official React wrapper: [`@mindfiredigital/pivothead-react`](../react)
+> **Prefer React?** Use our official React wrapper: [`@mindfiredigital/pivothead-react`](../react)
 
 ### Vue Integration
 
@@ -258,9 +249,9 @@ export class AppComponent {
 
 ---
 
-## 🎯 Rendering Modes Deep Dive
+## Rendering Modes Deep Dive
 
-### 1️⃣ Default Mode - Full UI Included
+### 1️ Default Mode - Full UI Included
 
 Perfect for rapid development with zero configuration.
 
@@ -273,18 +264,18 @@ Perfect for rapid development with zero configuration.
 
 **Includes:**
 
-- ✅ Pre-built responsive UI
-- ✅ Drag & drop interface
-- ✅ Filtering controls
-- ✅ Pagination
-- ✅ Export buttons
-- ✅ Sorting indicators
+- Pre-built responsive UI
+- Drag & drop interface
+- Filtering controls
+- Pagination
+- Export buttons
+- Sorting indicators
 
 **Best for**: Admin panels, dashboards, internal tools, rapid prototyping
 
 ---
 
-### 2️⃣ Minimal Mode - Customizable Slots
+### Minimal Mode - Customizable Slots
 
 You control the UI, we handle the data.
 
@@ -293,10 +284,10 @@ You control the UI, we handle the data.
   <!-- Custom Header Slot -->
   <div slot="header" class="my-toolbar">
     <button onclick="document.getElementById('customPivot').exportToPDF()">
-      📄 Export PDF
+      Export PDF
     </button>
     <button onclick="document.getElementById('customPivot').exportToExcel()">
-      📊 Export Excel
+      Export Excel
     </button>
   </div>
 
@@ -342,7 +333,7 @@ You control the UI, we handle the data.
 
 ---
 
-### 3️⃣ Headless Mode - Complete Control
+### Headless Mode - Complete Control
 
 Zero UI, maximum flexibility. Build anything on top of the pivot engine.
 
@@ -385,7 +376,7 @@ Zero UI, maximum flexibility. Build anything on top of the pivot engine.
 
 ---
 
-## 🚀 WebAssembly Power - Large File Processing
+## WebAssembly Power - Large File Processing
 
 ### Automatic Performance Optimization
 
@@ -421,18 +412,16 @@ Zero UI, maximum flexibility. Build anything on top of the pivot engine.
 | 8-100 MB  | WASM (in-memory) | ~800ms            | Medium        |
 | 100MB-1GB | WASM + Streaming | ~3-5s             | Low (chunked) |
 
-_\* MacBook Pro M1, Chrome 120_
-
 **Key Benefits:**
 
-- ⚡ **Zero configuration** - Automatic mode selection
-- 🧠 **Smart memory management** - Chunked processing for large files
-- 📊 **Real-time progress** - Built-in loading indicators
-- 🎯 **Fallback support** - Graceful degradation if WASM unavailable
+- **Zero configuration** - Automatic mode selection
+- **Smart memory management** - Chunked processing for large files
+- **Real-time progress** - Built-in loading indicators
+- **Fallback support** - Graceful degradation if WASM unavailable
 
 ---
 
-## 📚 API Reference
+## API Reference
 
 ### Properties / Attributes
 
@@ -532,7 +521,7 @@ interface PivotTableState<T> {
 
 ---
 
-## 🎯 Real-World Examples
+## Real-World Examples
 
 ### Example 1: Sales Dashboard
 
@@ -543,8 +532,8 @@ interface PivotTableState<T> {
   <pivot-head id="salesPivot"></pivot-head>
 
   <div class="actions">
-    <button onclick="exportReport()">📊 Export Report</button>
-    <button onclick="refreshData()">🔄 Refresh</button>
+    <button onclick="exportReport()">Export Report</button>
+    <button onclick="refreshData()">Refresh</button>
   </div>
 </div>
 
@@ -637,7 +626,7 @@ interface PivotTableState<T> {
 
 ---
 
-## 🎨 Customization & Theming
+## Customization & Theming
 
 ### CSS Custom Properties
 
@@ -670,34 +659,17 @@ pivot-head {
 
 ---
 
-## 🔗 Related Packages
+## Related Packages
 
-| Package                              | Description                    | Link                                                                  |
-| ------------------------------------ | ------------------------------ | --------------------------------------------------------------------- |
-| **@mindfiredigital/pivothead**       | Core pivot engine (TypeScript) | [NPM](https://www.npmjs.com/package/@mindfiredigital/pivothead)       |
-| **@mindfiredigital/pivothead-react** | React wrapper component        | [NPM](https://www.npmjs.com/package/@mindfiredigital/pivothead-react) |
-| **@mindfiredigital/pivothead-vue**   | Vue wrapper (coming soon)      | -                                                                     |
+Build pivot tables for any framework:
 
----
-
-## 📖 Documentation & Resources
-
-- 📚 [Full Documentation](https://github.com/mindfiredigital/PivotHead#readme)
-- 🎮 [Interactive Demos](https://github.com/mindfiredigital/PivotHead/tree/main/examples)
-- 📝 [API Reference](https://github.com/mindfiredigital/PivotHead/wiki/API-Reference)
-- 🎓 [Tutorials](https://github.com/mindfiredigital/PivotHead/wiki/Tutorials)
-- 💬 [Community Discussions](https://github.com/mindfiredigital/PivotHead/discussions)
+| Package                                          | Description             | NPM                                                                                                                         | Documentation                |
+| ------------------------------------------------ | ----------------------- | --------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| **[@mindfiredigital/pivothead](../core)**        | Core TypeScript engine  | [![npm](https://img.shields.io/npm/v/@mindfiredigital/pivothead)](https://www.npmjs.com/package/@mindfiredigital/pivothead) | [README](../core/README.md)  |
+| **[@mindfiredigital/pivothead-react](../react)** | React wrapper component | -                                                                                                                           | [README](../react/README.md) |
+| **[@mindfiredigital/pivothead-vue](../vue)**     | Vue wrapper             | -                                                                                                                           | Coming soon                  |
 
 ---
-
-## 🤝 Support & Community
-
-### Get Help
-
-- 🐛 [Report Bug](https://github.com/mindfiredigital/PivotHead/issues/new?template=bug_report.md)
-- 💡 [Request Feature](https://github.com/mindfiredigital/PivotHead/issues/new?template=feature_request.md)
-- 💬 [Ask Questions](https://github.com/mindfiredigital/PivotHead/discussions)
-- 📧 [Email Support](mailto:support@mindfiredigital.com)
 
 ### Contributing
 
@@ -705,11 +677,45 @@ We welcome contributions! See our [Contributing Guide](../../CONTRIBUTING.md) to
 
 ### Show Your Support
 
-⭐ Star the repo if PivotHead helps your project!
+If PivotHead helps your project, please consider:
+
+- ⭐ [Star the repository](https://github.com/mindfiredigital/PivotHead)
 
 ---
 
-## 📄 License
+## Examples
+
+Check out complete working examples in the repository:
+
+| Example               | Description                                | Path                                                                |
+| --------------------- | ------------------------------------------ | ------------------------------------------------------------------- |
+| **Vanilla JS**        | Pure JavaScript implementation             | [simple-js-demo](../../examples/simple-js-demo)                     |
+| **Default Mode**      | Full UI with all features                  | [pivothead-default-demo](../../examples/pivothead-default-demo)     |
+| **Minimal Mode**      | Custom rendering with slots                | [pivothead-minimal-demo](../../examples/pivothead-minimal-demo)     |
+| **Headless Mode**     | Complete control for custom visualizations | [pivothead-none-demo](../../examples/pivothead-none-demo)           |
+| **React Integration** | Using web component in React               | [react-web-component-demo](../../examples/react-web-component-demo) |
+| **Vue Integration**   | Using web component in Vue                 | [vue-example](../../examples/vue-example)                           |
+
+### Running Examples Locally
+
+```bash
+# Clone the repository
+git clone https://github.com/mindfiredigital/PivotHead.git
+cd PivotHead
+
+# Navigate to an example (e.g., simple-js-demo)
+cd examples/simple-js-demo
+
+# Install dependencies
+pnpm install
+
+# Start development server
+pnpm dev
+```
+
+---
+
+## License
 
 MIT © [Mindfiredigital](https://github.com/mindfiredigital)
 
@@ -719,6 +725,6 @@ MIT © [Mindfiredigital](https://github.com/mindfiredigital)
 
 **Built with ❤️ by the [Mindfiredigital](https://www.mindfiredigital.com) team**
 
-[Website](https://www.mindfiredigital.com) • [GitHub](https://github.com/mindfiredigital) • [NPM](https://www.npmjs.com/org/mindfiredigital) • [Twitter](https://twitter.com/mindfiredigital) • [LinkedIn](https://www.linkedin.com/company/mindfiredigital)
+[GitHub](https://github.com/mindfiredigital/PivotHead) • [NPM](https://www.npmjs.com/package/@mindfiredigital/pivothead-web-component) • [Website](https://www.mindfiredigital.com)
 
 </div>

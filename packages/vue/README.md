@@ -16,6 +16,14 @@ _Built on WebAssembly for unparalleled performance_
 
 ---
 
+## Screenshots
+
+<img alt="PivotHead Vue - Interactive Pivot Table Demo" src="../../documentation/static/img/vue-demo.png" />
+
+> **🚀 Try it live**: Check out the [Vue examples](../../examples/vue-example) for working demos with Vue 3
+
+---
+
 ## Why PivotHead?
 
 PivotHead Vue is the **most performant** pivot table library for Vue 3, powered by cutting-edge WebAssembly technology. Process millions of rows in seconds, not minutes.
