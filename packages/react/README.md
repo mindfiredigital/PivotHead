@@ -481,18 +481,6 @@ export default function Dashboard() {
 
 ---
 
-## Related Packages
-
-Build pivot tables for any framework:
-
-| Package                                                          | Description                      | NPM                                                                                                                         | Documentation                        |
-| ---------------------------------------------------------------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
-| **[@mindfiredigital/pivothead](../core)**                        | Core TypeScript engine           | [![npm](https://img.shields.io/npm/v/@mindfiredigital/pivothead)](https://www.npmjs.com/package/@mindfiredigital/pivothead) | [README](../core/README.md)          |
-| **[@mindfiredigital/pivothead-web-component](../web-component)** | Framework-agnostic web component | -                                                                                                                           | [README](../web-component/README.md) |
-| **[@mindfiredigital/pivothead-vue](../vue)**                     | Vue wrapper                      | -                                                                                                                           | Coming soon                          |
-
----
-
 ## Support
 
 If PivotHead helps your project, please consider:
