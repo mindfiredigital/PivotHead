@@ -1,5 +1,18 @@
-import type { FilterConfig } from '@mindfiredigital/pivothead';
+import type { FilterConfig, AxisConfig } from '@mindfiredigital/pivothead';
 import type { PivotHeadHost } from './host';
+
+/**
+ * Helper function to normalize string | AxisConfig to AxisConfig
+ */
+function normalizeAxisConfig(field: string | AxisConfig): AxisConfig {
+  if (typeof field === 'string') {
+    return {
+      uniqueName: field,
+      caption: field,
+    };
+  }
+  return field;
+}
 
 // Events: bindControls and updatePaginationInfo
 export function bindControls(host: PivotHeadHost) {
@@ -14,12 +27,14 @@ export function bindControls(host: PivotHeadHost) {
     } else {
       let options = '';
       if (host._options.rows) {
-        host._options.rows.forEach(row => {
+        host._options.rows.forEach(rawRow => {
+          const row = normalizeAxisConfig(rawRow);
           options += `<option value="${row.uniqueName}">${row.caption}</option>`;
         });
       }
       if (host._options.columns) {
-        host._options.columns.forEach(col => {
+        host._options.columns.forEach(rawCol => {
+          const col = normalizeAxisConfig(rawCol);
           options += `<option value="${col.uniqueName}">${col.caption}</option>`;
         });
       }
@@ -347,7 +362,10 @@ export function handleSortClick(host: PivotHeadHost, e: Event): void {
         );
         const orderedRows = pairs.map(p => p.row);
 
-        const rowFieldName = host._options.rows?.[0]?.uniqueName || '';
+        const rawRowField = host._options.rows?.[0];
+        const rowFieldName = rawRowField
+          ? normalizeAxisConfig(rawRowField).uniqueName
+          : '';
         if (rowFieldName && orderedRows.length > 0) {
           host.engine.setCustomFieldOrder(rowFieldName, orderedRows, true);
         }
@@ -359,7 +377,10 @@ export function handleSortClick(host: PivotHeadHost, e: Event): void {
       }
     } else {
       // If sorting by the row dimension header, compute alphabetical order
-      const rowFieldName = host._options.rows?.[0]?.uniqueName || '';
+      const rawRowField = host._options.rows?.[0];
+      const rowFieldName = rawRowField
+        ? normalizeAxisConfig(rawRowField).uniqueName
+        : '';
       if (rowFieldName && field === rowFieldName) {
         try {
           const groups = host.engine.getGroupedData();

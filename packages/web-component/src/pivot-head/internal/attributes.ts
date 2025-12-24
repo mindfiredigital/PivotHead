@@ -59,7 +59,10 @@ export function attributeChanged(
 ): void {
   if (oldValue === newValue) return;
   if (name === 'mode') {
-    renderSwitchHelper(host);
+    // Only render if engine is initialized
+    if (host.engine) {
+      renderSwitchHelper(host);
+    }
     return;
   }
   switch (name) {

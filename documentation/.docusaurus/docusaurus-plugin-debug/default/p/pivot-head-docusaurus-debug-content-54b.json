@@ -328,8 +328,8 @@
               },
               {
                 "id": "reference/api-reference/angular-api-reference",
-                "title": "Angular API",
-                "description": "The @pivothead/angular package provides a service for creating your headless pivot table.",
+                "title": "Angular API Reference",
+                "description": "Complete API documentation for @mindfiredigital/pivothead-angular.",
                 "source": "@site/docs/reference/api-reference/angular.md",
                 "sourceDirName": "reference/api-reference",
                 "slug": "/reference/api-reference/angular-api-reference",
@@ -341,8 +341,17 @@
                 "version": "current",
                 "frontMatter": {
                   "id": "angular-api-reference",
-                  "title": "Angular API",
+                  "title": "Angular API Reference",
                   "sidebar_label": "Angular"
+                },
+                "sidebar": "tutorialSidebar",
+                "previous": {
+                  "title": "React",
+                  "permalink": "/PivotHead/docs/reference/api-reference/react-api-reference"
+                },
+                "next": {
+                  "title": "Vue",
+                  "permalink": "/PivotHead/docs/reference/api-reference/vue-api-reference"
                 }
               },
               {
@@ -397,8 +406,8 @@
                   "permalink": "/PivotHead/docs/reference/api-reference/core-webcomponent-api-reference"
                 },
                 "next": {
-                  "title": "Vue",
-                  "permalink": "/PivotHead/docs/reference/api-reference/vue-api-reference"
+                  "title": "Angular",
+                  "permalink": "/PivotHead/docs/reference/api-reference/angular-api-reference"
                 }
               },
               {
@@ -421,8 +430,8 @@
                 },
                 "sidebar": "tutorialSidebar",
                 "previous": {
-                  "title": "React",
-                  "permalink": "/PivotHead/docs/reference/api-reference/react-api-reference"
+                  "title": "Angular",
+                  "permalink": "/PivotHead/docs/reference/api-reference/angular-api-reference"
                 },
                 "next": {
                   "title": "Troubleshooting",
@@ -431,8 +440,8 @@
               },
               {
                 "id": "reference/conceptual-reference/angular-conceptual-reference",
-                "title": "Angular concept",
-                "description": "Angular Service Integration",
+                "title": "Angular Concepts",
+                "description": "The PivotHead Angular Wrapper (@mindfiredigital/pivothead-angular) is a powerful, type-safe Angular component that bridges Angular applications with the PivotHead Web Component. It provides a seamless Angular developer experience with full TypeScript support, reactive data binding, and Angular-specific optimizations while preserving all the functionality and modes of the underlying web component.",
                 "source": "@site/docs/reference/conceptual-reference/angular.md",
                 "sourceDirName": "reference/conceptual-reference",
                 "slug": "/reference/conceptual-reference/angular-conceptual-reference",
@@ -444,8 +453,17 @@
                 "version": "current",
                 "frontMatter": {
                   "id": "angular-conceptual-reference",
-                  "title": "Angular concept",
+                  "title": "Angular Concepts",
                   "sidebar_label": "Angular"
+                },
+                "sidebar": "tutorialSidebar",
+                "previous": {
+                  "title": "React",
+                  "permalink": "/PivotHead/docs/reference/conceptual-reference/react-conceptual-reference"
+                },
+                "next": {
+                  "title": "Vue",
+                  "permalink": "/PivotHead/docs/reference/conceptual-reference/vue-conceptual-reference"
                 }
               },
               {
@@ -500,8 +518,8 @@
                   "permalink": "/PivotHead/docs/reference/conceptual-reference/webassembly-conceptual-reference"
                 },
                 "next": {
-                  "title": "Vue",
-                  "permalink": "/PivotHead/docs/reference/conceptual-reference/vue-conceptual-reference"
+                  "title": "Angular",
+                  "permalink": "/PivotHead/docs/reference/conceptual-reference/angular-conceptual-reference"
                 }
               },
               {
@@ -524,8 +542,8 @@
                 },
                 "sidebar": "tutorialSidebar",
                 "previous": {
-                  "title": "React",
-                  "permalink": "/PivotHead/docs/reference/conceptual-reference/react-conceptual-reference"
+                  "title": "Angular",
+                  "permalink": "/PivotHead/docs/reference/conceptual-reference/angular-conceptual-reference"
                 },
                 "next": {
                   "title": "Core Web Component",
@@ -910,9 +928,10 @@
                     "roadmap",
                     "upcoming",
                     "features",
-                    "angular",
                     "high-volume",
-                    "performance"
+                    "performance",
+                    "webassembly",
+                    "angular"
                   ]
                 },
                 "sidebar": "tutorialSidebar",
@@ -1009,6 +1028,10 @@
                         },
                         {
                           "type": "doc",
+                          "id": "reference/conceptual-reference/angular-conceptual-reference"
+                        },
+                        {
+                          "type": "doc",
                           "id": "reference/conceptual-reference/vue-conceptual-reference"
                         }
                       ],
@@ -1026,6 +1049,10 @@
                         {
                           "type": "doc",
                           "id": "reference/api-reference/react-api-reference"
+                        },
+                        {
+                          "type": "doc",
+                          "id": "reference/api-reference/angular-api-reference"
                         },
                         {
                           "type": "doc",

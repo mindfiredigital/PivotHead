@@ -53,15 +53,15 @@ export default [
   },
   {
     path: '/PivotHead/docs',
-    component: ComponentCreator('/PivotHead/docs', '1fd'),
+    component: ComponentCreator('/PivotHead/docs', '2e7'),
     routes: [
       {
         path: '/PivotHead/docs',
-        component: ComponentCreator('/PivotHead/docs', '4f6'),
+        component: ComponentCreator('/PivotHead/docs', '255'),
         routes: [
           {
             path: '/PivotHead/docs',
-            component: ComponentCreator('/PivotHead/docs', 'b05'),
+            component: ComponentCreator('/PivotHead/docs', '449'),
             routes: [
               {
                 path: '/PivotHead/docs/contributors/',
@@ -174,9 +174,10 @@ export default [
                 path: '/PivotHead/docs/reference/api-reference/angular-api-reference',
                 component: ComponentCreator(
                   '/PivotHead/docs/reference/api-reference/angular-api-reference',
-                  '1e0'
+                  '618'
                 ),
                 exact: true,
+                sidebar: 'tutorialSidebar',
               },
               {
                 path: '/PivotHead/docs/reference/api-reference/core-webcomponent-api-reference',
@@ -209,9 +210,10 @@ export default [
                 path: '/PivotHead/docs/reference/conceptual-reference/angular-conceptual-reference',
                 component: ComponentCreator(
                   '/PivotHead/docs/reference/conceptual-reference/angular-conceptual-reference',
-                  '28e'
+                  '3c6'
                 ),
                 exact: true,
+                sidebar: 'tutorialSidebar',
               },
               {
                 path: '/PivotHead/docs/reference/conceptual-reference/core-webcomponent-conceptual-reference',
