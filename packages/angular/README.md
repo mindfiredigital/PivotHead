@@ -15,6 +15,18 @@
 
 ---
 
+## Demo
+
+<div align="center">
+
+<img alt="PivotHead React - Interactive Pivot Table Demo" src="../../documentation/static/img/angular-demo.png" />
+
+_PivotHead Angular wrapper in action - featuring file import, drag-and-drop configuration, and real-time data processing with WebAssembly acceleration_
+
+</div>
+
+---
+
 ## Features
 
 <table>
@@ -254,7 +266,7 @@ Component provides structure; you control the styling and layout.
 
 ---
 
-### 3️⃣ Headless Mode (Complete Control)
+### 3️ Headless Mode (Complete Control)
 
 No UI rendered - full programmatic control via API and events.
 
@@ -709,7 +721,7 @@ import type {
 
 If PivotHead helps your project, please consider:
 
-- ⭐ [Star the repository](https://github.com/mindfiredigital/PivotHead)
+⭐ [Star the repository](https://github.com/mindfiredigital/PivotHead)
 
 ---
 
