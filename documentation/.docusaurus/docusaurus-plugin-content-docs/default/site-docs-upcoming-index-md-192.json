@@ -18,9 +18,10 @@
       "roadmap",
       "upcoming",
       "features",
-      "angular",
       "high-volume",
-      "performance"
+      "performance",
+      "webassembly",
+      "angular"
     ]
   },
   "sidebar": "tutorialSidebar",

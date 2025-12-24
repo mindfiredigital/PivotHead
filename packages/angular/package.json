@@ -1,0 +1,37 @@
+{
+  "name": "@mindfiredigital/pivothead-angular",
+  "version": "0.1.0",
+  "private": true,
+  "main": "../../dist/angular/fesm2022/mindfiredigital-pivothead-angular.mjs",
+  "module": "../../dist/angular/fesm2022/mindfiredigital-pivothead-angular.mjs",
+  "types": "../../dist/angular/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "../../dist/angular/index.d.ts",
+      "esm2022": "../../dist/angular/esm2022/mindfiredigital-pivothead-angular.mjs",
+      "esm": "../../dist/angular/esm2022/mindfiredigital-pivothead-angular.mjs",
+      "default": "../../dist/angular/fesm2022/mindfiredigital-pivothead-angular.mjs"
+    }
+  },
+  "files": [
+    "fesm2022",
+    "*.mjs",
+    "*.d.ts"
+  ],
+  "peerDependencies": {
+    "@angular/common": "^17.3.0",
+    "@angular/core": "^17.3.0"
+  },
+  "dependencies": {
+    "@mindfiredigital/pivothead-web-component": "workspace:*",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "ng-packagr": "^17.3.0",
+    "typescript": "~5.4.5"
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "ng-packagr -p ng-package.json"
+  }
+}

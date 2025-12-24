@@ -177,7 +177,11 @@ export class PivotHeadElement extends HTMLElement {
     if (!this._data.length && !Object.keys(this._options).length) {
       parseAttributesIfNeededHelper(this as unknown as PivotHeadHost);
     }
-    this._renderSwitch();
+    // Only render if engine is already initialized
+    // If not, render will be triggered when data/options are set
+    if (this.engine) {
+      this._renderSwitch();
+    }
   }
 
   private parseAttributesIfNeeded(): void {

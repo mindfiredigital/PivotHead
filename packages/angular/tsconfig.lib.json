@@ -1,0 +1,36 @@
+// {
+//   "extends": "../../tsconfig.json",
+//   "compilerOptions": {
+//     "outDir": "../../dist/out-tsc",
+//     "declaration": true,
+//     "declarationMap": true,
+//     "inlineSources": true,
+//     "types": [],
+//     "paths": {
+//       "@mindfiredigital/pivothead-web-component": ["../web-component/dist"],
+//       "@mindfiredigital/pivothead": ["../core/dist"]
+//     }
+//   },
+//   "exclude": [
+//     "**/*.spec.ts"
+//   ]
+// }
+
+// packages/angular/tsconfig.lib.json
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../dist/out-tsc",
+    "declaration": true,
+    "declarationMap": true,
+    "inlineSources": true,
+    "types": [],
+    "paths": {
+      "@mindfiredigital/pivothead": ["../core/src"],
+      "@mindfiredigital/pivothead/*": ["../core/src/*"],
+      "@mindfiredigital/pivothead-web-component": ["../web-component/dist"],
+      "@mindfiredigital/pivothead-web-component/*": ["../web-component/dist/*"]
+    }
+  },
+  "exclude": ["**/*.spec.ts"]
+}

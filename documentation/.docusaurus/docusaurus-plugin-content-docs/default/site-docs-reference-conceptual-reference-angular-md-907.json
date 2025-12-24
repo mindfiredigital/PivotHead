@@ -1,7 +1,7 @@
 {
   "id": "reference/conceptual-reference/angular-conceptual-reference",
-  "title": "Angular concept",
-  "description": "Angular Service Integration",
+  "title": "Angular Concepts",
+  "description": "The PivotHead Angular Wrapper (@mindfiredigital/pivothead-angular) is a powerful, type-safe Angular component that bridges Angular applications with the PivotHead Web Component. It provides a seamless Angular developer experience with full TypeScript support, reactive data binding, and Angular-specific optimizations while preserving all the functionality and modes of the underlying web component.",
   "source": "@site/docs/reference/conceptual-reference/angular.md",
   "sourceDirName": "reference/conceptual-reference",
   "slug": "/reference/conceptual-reference/angular-conceptual-reference",
@@ -13,7 +13,16 @@
   "version": "current",
   "frontMatter": {
     "id": "angular-conceptual-reference",
-    "title": "Angular concept",
+    "title": "Angular Concepts",
     "sidebar_label": "Angular"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "React",
+    "permalink": "/PivotHead/docs/reference/conceptual-reference/react-conceptual-reference"
+  },
+  "next": {
+    "title": "Vue",
+    "permalink": "/PivotHead/docs/reference/conceptual-reference/vue-conceptual-reference"
   }
 }

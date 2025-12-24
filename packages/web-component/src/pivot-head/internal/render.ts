@@ -1,5 +1,22 @@
-import type { Group, MeasureConfig } from '@mindfiredigital/pivothead';
+import type {
+  Group,
+  MeasureConfig,
+  AxisConfig,
+} from '@mindfiredigital/pivothead';
 import type { PivotHeadHost } from './host';
+
+/**
+ * Helper function to normalize string | AxisConfig to AxisConfig
+ */
+function normalizeAxisConfig(field: string | AxisConfig): AxisConfig {
+  if (typeof field === 'string') {
+    return {
+      uniqueName: field,
+      caption: field,
+    };
+  }
+  return field;
+}
 
 export function renderSwitch(host: PivotHeadHost) {
   const mode = host.getAttribute('mode') || 'default';
@@ -101,9 +118,25 @@ export function renderFullUI(host: PivotHeadHost) {
     console.error('❌ renderFullUI: No processed data available', state);
     return;
   }
-  const rowField = host._options.rows?.[0];
-  const columnField = host._options.columns?.[0];
+  const rawRowField = host._options.rows?.[0];
+  const rawColumnField = host._options.columns?.[0];
   const measures = host._options.measures || [];
+
+  if (!rawRowField || !rawColumnField || !measures.length) {
+    console.error(
+      '❌ renderFullUI: Missing row, column, or measures configuration',
+      {
+        rawRowField,
+        rawColumnField,
+        measures,
+      }
+    );
+    return;
+  }
+
+  // Normalize row and column fields to AxisConfig objects
+  const rowField = normalizeAxisConfig(rawRowField);
+  const columnField = normalizeAxisConfig(rawColumnField);
 
   console.log('🔍 renderFullUI - Options check:', {
     rowField,
@@ -111,18 +144,6 @@ export function renderFullUI(host: PivotHeadHost) {
     measuresCount: measures.length,
     allOptions: host._options,
   });
-
-  if (!rowField || !columnField || !measures.length) {
-    console.error(
-      '❌ renderFullUI: Missing row, column, or measures configuration',
-      {
-        rowField,
-        columnField,
-        measures,
-      }
-    );
-    return;
-  }
   host.calculatePaginationForCurrentView();
   let html = `
       <style>

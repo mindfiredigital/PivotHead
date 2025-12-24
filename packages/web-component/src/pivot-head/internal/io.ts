@@ -4,6 +4,7 @@ import {
   type ConnectionOptions,
   type FileConnectionResult,
 } from '@mindfiredigital/pivothead';
+import { tryInitializeEngine } from './engine';
 
 // Exporting helpers
 export function exportToHTML(
@@ -90,9 +91,26 @@ export async function connectToLocalCSV(
   host: PivotHeadHost,
   options: ConnectionOptions = {}
 ): Promise<FileConnectionResult> {
+  // If engine doesn't exist, create a minimal/placeholder engine
+  // ConnectService will replace its data and layout when the CSV is loaded
   if (!host.engine) {
-    console.error('Engine not initialized. Cannot connect to CSV file.');
-    return { success: false, error: 'Engine not initialized' };
+    console.log(
+      '📦 No engine found. Creating placeholder engine for file import...'
+    );
+    // Create minimal placeholder data to satisfy engine initialization requirements
+    host._data = [{ placeholder: 'loading' }];
+    host._options = {
+      rows: ['placeholder'],
+      columns: [],
+      measures: [],
+    };
+    tryInitializeEngine(host);
+
+    // If engine still doesn't exist after initialization, return error
+    if (!host.engine) {
+      console.error('Failed to create placeholder engine for CSV import.');
+      return { success: false, error: 'Failed to initialize engine' };
+    }
   }
 
   const result = await ConnectService.connectToLocalCSV(
@@ -180,9 +198,26 @@ export async function connectToLocalJSON(
   host: PivotHeadHost,
   options: ConnectionOptions = {}
 ): Promise<FileConnectionResult> {
+  // If engine doesn't exist, create a minimal/placeholder engine
+  // ConnectService will replace its data and layout when the JSON is loaded
   if (!host.engine) {
-    console.error('Engine not initialized. Cannot connect to JSON file.');
-    return { success: false, error: 'Engine not initialized' };
+    console.log(
+      '📦 No engine found. Creating placeholder engine for file import...'
+    );
+    // Create minimal placeholder data to satisfy engine initialization requirements
+    host._data = [{ placeholder: 'loading' }];
+    host._options = {
+      rows: ['placeholder'],
+      columns: [],
+      measures: [],
+    };
+    tryInitializeEngine(host);
+
+    // If engine still doesn't exist after initialization, return error
+    if (!host.engine) {
+      console.error('Failed to create placeholder engine for JSON import.');
+      return { success: false, error: 'Failed to initialize engine' };
+    }
   }
 
   const result = await ConnectService.connectToLocalJSON(
@@ -270,9 +305,26 @@ export async function connectToLocalFile(
   host: PivotHeadHost,
   options: ConnectionOptions = {}
 ): Promise<FileConnectionResult> {
+  // If engine doesn't exist, create a minimal/placeholder engine
+  // ConnectService will replace its data and layout when the file is loaded
   if (!host.engine) {
-    console.error('Engine not initialized. Cannot connect to file.');
-    return { success: false, error: 'Engine not initialized' };
+    console.log(
+      '📦 No engine found. Creating placeholder engine for file import...'
+    );
+    // Create minimal placeholder data to satisfy engine initialization requirements
+    host._data = [{ placeholder: 'loading' }];
+    host._options = {
+      rows: ['placeholder'],
+      columns: [],
+      measures: [],
+    };
+    tryInitializeEngine(host);
+
+    // If engine still doesn't exist after initialization, return error
+    if (!host.engine) {
+      console.error('Failed to create placeholder engine for file import.');
+      return { success: false, error: 'Failed to initialize engine' };
+    }
   }
 
   const result = await ConnectService.connectToLocalFile(

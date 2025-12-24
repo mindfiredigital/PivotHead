@@ -18,8 +18,8 @@
   },
   "sidebar": "tutorialSidebar",
   "previous": {
-    "title": "React",
-    "permalink": "/PivotHead/docs/reference/api-reference/react-api-reference"
+    "title": "Angular",
+    "permalink": "/PivotHead/docs/reference/api-reference/angular-api-reference"
   },
   "next": {
     "title": "Troubleshooting",

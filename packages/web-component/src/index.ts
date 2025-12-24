@@ -18,6 +18,10 @@ export type {
   Group,
   FieldInfo,
   LayoutSelection,
+  ConnectionOptions,
+  FileConnectionResult,
+  CSVParseOptions,
+  JSONParseOptions,
 } from '@mindfiredigital/pivothead';
 
 // Re-export the custom element type for wrapper usage
