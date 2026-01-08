@@ -1,7 +1,8 @@
 ---
 title: Upcoming Features
 description: What's coming next in PivotHead - exciting features in development
-keywords: [roadmap, upcoming, features, angular, high-volume, performance]
+keywords:
+  [roadmap, upcoming, features, high-volume, performance, webassembly, angular]
 ---
 
 import Tabs from '@theme/Tabs';
@@ -113,7 +114,7 @@ onMouseLeave={(e) => {
   cursor: 'pointer',
   position: 'relative',
   overflow: 'hidden'
-}} 
+}}
 onMouseEnter={(e) => {
   e.currentTarget.style.transform = 'translateY(-8px)';
   e.currentTarget.style.boxShadow = '0 20px 40px rgba(248, 113, 113, 0.4)';
@@ -136,6 +137,42 @@ onMouseLeave={(e) => {
     fontWeight: '600'
   }}>
     ✓ PDF • Excel • HTML
+  </div>
+</div>
+
+<div style={{
+  background: 'linear-gradient(135deg, #fecaca 0%, #f87171 100%)',
+  padding: '2rem',
+  borderRadius: '1rem',
+  color: '#991b1b',
+  boxShadow: '0 10px 30px rgba(248, 113, 113, 0.3)',
+  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+  cursor: 'pointer',
+  position: 'relative',
+  overflow: 'hidden'
+}}
+onMouseEnter={(e) => {
+  e.currentTarget.style.transform = 'translateY(-8px)';
+  e.currentTarget.style.boxShadow = '0 20px 40px rgba(248, 113, 113, 0.4)';
+}}
+onMouseLeave={(e) => {
+  e.currentTarget.style.transform = 'translateY(0)';
+  e.currentTarget.style.boxShadow = '0 10px 30px rgba(248, 113, 113, 0.3)';
+}}>
+  <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🅰️</div>
+  <h3 style={{ color: '#991b1b', marginBottom: '0.75rem', fontSize: '1.5rem' }}>Angular Support</h3>
+  <p style={{ fontSize: '1rem', lineHeight: '1.6', margin: 0, opacity: 0.95 }}>
+    Full Angular integration with TypeScript support, standalone components, and 1GB file import with WebAssembly acceleration!
+  </p>
+  <div style={{
+    marginTop: '1rem',
+    padding: '0.5rem 1rem',
+    background: 'rgba(255, 255, 255, 0.4)',
+    borderRadius: '0.5rem',
+    fontSize: '0.9rem',
+    fontWeight: '600'
+  }}>
+    ✓ TypeScript • WASM • Web Workers
   </div>
 </div>
 
@@ -316,6 +353,98 @@ onMouseLeave={(e) => {
 </div>
 
 **One-click export with all your filters and formatting intact!**
+
+</div>
+
+</TabItem>
+
+<TabItem value="angular" label="🅰️ Angular Support">
+
+<div style={{
+  background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
+  padding: '2rem',
+  borderRadius: '1rem',
+  marginTop: '1rem'
+}}>
+
+### Full Angular Integration
+
+**What's New:**
+
+- **Standalone Component** - Modern Angular 18+ standalone component architecture
+- **TypeScript-First** - Complete type safety with comprehensive type definitions
+- **File Import** - Support for CSV/JSON files up to 1GB with WebAssembly acceleration
+- **Web Workers** - Parallel processing with 4 workers for optimal performance
+- **Reactive Data Binding** - Seamless integration with Angular's change detection
+- **ViewChild Access** - Direct access to all component methods via template references
+
+**Key Features:**
+
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
+  <div style={{
+    background: 'white',
+    padding: '1.5rem',
+    borderRadius: '0.75rem',
+    textAlign: 'center',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+  }}>
+    <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🎯</div>
+    <strong>Three Modes</strong>
+    <div style={{ fontSize: '0.9rem', color: '#666', marginTop: '0.25rem' }}>Default • Minimal • None</div>
+  </div>
+  <div style={{
+    background: 'white',
+    padding: '1.5rem',
+    borderRadius: '0.75rem',
+    textAlign: 'center',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+  }}>
+    <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>📁</div>
+    <strong>File Import</strong>
+    <div style={{ fontSize: '0.9rem', color: '#666', marginTop: '0.25rem' }}>1GB files with WASM</div>
+  </div>
+  <div style={{
+    background: 'white',
+    padding: '1.5rem',
+    borderRadius: '0.75rem',
+    textAlign: 'center',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+  }}>
+    <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>⚡</div>
+    <strong>Performance</strong>
+    <div style={{ fontSize: '0.9rem', color: '#666', marginTop: '0.25rem' }}>WASM + Web Workers</div>
+  </div>
+</div>
+
+**Example Usage:**
+
+```typescript
+import { Component } from '@angular/core';
+import { PivotHeadWrapperComponent } from '@mindfiredigital/pivothead-angular';
+
+@Component({
+  selector: 'app-dashboard',
+  standalone: true,
+  imports: [PivotHeadWrapperComponent],
+  template: `
+    <pivot-head-wrapper
+      [mode]="'default'"
+      [data]="salesData"
+      [options]="options"
+      (dataLoaded)="onDataLoaded($event)"
+    />
+  `,
+})
+export class DashboardComponent {
+  // Your component logic
+}
+```
+
+**Package:**
+
+```bash
+npm install @mindfiredigital/pivothead-angular
+```
 
 </div>
 
@@ -521,73 +650,6 @@ onMouseLeave={(e) => {
     fontWeight: '700',
     textTransform: 'uppercase'
   }}>
-    In Development
-  </div>
-  <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>🅰️</div>
-  <h3 style={{ color: '#7f1d1d', marginBottom: '1rem', fontSize: '1.5rem' }}>Angular Support</h3>
-  <p style={{ color: '#991b1b', fontSize: '1rem', lineHeight: '1.6', marginBottom: '1rem' }}>
-    Full Angular integration with reactive services, directives, and standalone components!
-  </p>
-  <div style={{
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '0.5rem'
-  }}>
-    <span style={{
-      background: 'white',
-      padding: '0.25rem 0.75rem',
-      borderRadius: '1rem',
-      fontSize: '0.85rem',
-      color: '#991b1b',
-      fontWeight: '600'
-    }}>@pivothead/angular</span>
-    <span style={{
-      background: 'white',
-      padding: '0.25rem 0.75rem',
-      borderRadius: '1rem',
-      fontSize: '0.85rem',
-      color: '#991b1b',
-      fontWeight: '600'
-    }}>TypeScript-first</span>
-    <span style={{
-      background: 'white',
-      padding: '0.25rem 0.75rem',
-      borderRadius: '1rem',
-      fontSize: '0.85rem',
-      color: '#991b1b',
-      fontWeight: '600'
-    }}>Zone.js ready</span>
-  </div>
-</div>
-
-<div style={{
-  background: 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
-  padding: '2rem',
-  borderRadius: '1rem',
-  border: '2px solid #dc2626',
-  position: 'relative',
-  boxShadow: '0 10px 30px rgba(220, 38, 38, 0.2)',
-  transition: 'transform 0.3s ease',
-  cursor: 'pointer'
-}}
-onMouseEnter={(e) => {
-  e.currentTarget.style.transform = 'scale(1.05)';
-}}
-onMouseLeave={(e) => {
-  e.currentTarget.style.transform = 'scale(1)';
-}}>
-  <div style={{
-    position: 'absolute',
-    top: '1rem',
-    right: '1rem',
-    background: '#dc2626',
-    color: 'white',
-    padding: '0.25rem 0.75rem',
-    borderRadius: '1rem',
-    fontSize: '0.75rem',
-    fontWeight: '700',
-    textTransform: 'uppercase'
-  }}>
     Coming Soon
   </div>
   <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>⚡</div>
@@ -678,7 +740,7 @@ onMouseLeave={(e) => {
 | **Export (PDF/Excel/HTML)**  |                                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg>                                   | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg> |
 | **React Support**            |                                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg>                                   | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg> |
 | **Vue Support**              |                                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg>                                   | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg> |
-| **Angular Support**          | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="3" style={{display: 'inline-block'}}><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="12" r="8"></circle><path d="M12 3v18M3 12h18"></path></svg> | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg> |
+| **Angular Support**          |                                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg>                                   | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg> |
 | **High-Volume Processing**   | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="3" style={{display: 'inline-block'}}><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="12" r="8"></circle><path d="M12 3v18M3 12h18"></path></svg> | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg> |
 | **Server-Side Processing**   | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="3" style={{display: 'inline-block'}}><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="12" r="8"></circle><path d="M12 3v18M3 12h18"></path></svg> | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg> |
 | **WebAssembly Acceleration** | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="3" style={{display: 'inline-block'}}><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="12" r="8"></circle><path d="M12 3v18M3 12h18"></path></svg> | <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" style={{display: 'inline-block'}}><polyline points="20 6 9 17 4 12"></polyline></svg> |

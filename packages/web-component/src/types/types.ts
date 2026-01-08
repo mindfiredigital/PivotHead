@@ -113,8 +113,8 @@ export interface EnhancedPivotEngine<T extends Record<string, unknown>> {
 
 // Define a type for pivot options used by the component
 export interface PivotOptions {
-  rows?: AxisConfig[];
-  columns?: AxisConfig[];
+  rows?: (string | AxisConfig)[];
+  columns?: (string | AxisConfig)[];
   measures?: MeasureConfig[];
   groupConfig?: GroupConfig;
   // [key: string]: unknown;

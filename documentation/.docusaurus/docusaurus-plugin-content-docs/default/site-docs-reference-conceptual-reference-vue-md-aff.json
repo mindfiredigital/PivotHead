@@ -18,8 +18,8 @@
   },
   "sidebar": "tutorialSidebar",
   "previous": {
-    "title": "React",
-    "permalink": "/PivotHead/docs/reference/conceptual-reference/react-conceptual-reference"
+    "title": "Angular",
+    "permalink": "/PivotHead/docs/reference/conceptual-reference/angular-conceptual-reference"
   },
   "next": {
     "title": "Core Web Component",
