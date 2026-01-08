@@ -29,7 +29,8 @@
               }
             ],
             "styles": ["src/styles.css"],
-            "scripts": []
+            "scripts": [],
+            "externalDependencies": ["fs", "path"]
           },
           "configurations": {
             "production": {
