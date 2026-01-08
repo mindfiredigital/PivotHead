@@ -6,7 +6,7 @@
       "@mindfiredigital/pivothead": ["../../packages/core/dist"],
       "@mindfiredigital/pivothead/*": ["../../packages/core/dist/*"],
       "@mindfiredigital/pivothead-web-component": [
-        "../../packages/web-component/dist"
+        "../../packages/web-component/dist/pivot-head.mjs"
       ],
       "@mindfiredigital/pivothead-web-component/*": [
         "../../packages/web-component/dist/*"
