@@ -1,7 +1,7 @@
 {
   "id": "reference/api-reference/angular-api-reference",
-  "title": "Angular API",
-  "description": "The @pivothead/angular package provides a service for creating your headless pivot table.",
+  "title": "Angular API Reference",
+  "description": "Complete API documentation for @mindfiredigital/pivothead-angular.",
   "source": "@site/docs/reference/api-reference/angular.md",
   "sourceDirName": "reference/api-reference",
   "slug": "/reference/api-reference/angular-api-reference",
@@ -13,7 +13,16 @@
   "version": "current",
   "frontMatter": {
     "id": "angular-api-reference",
-    "title": "Angular API",
+    "title": "Angular API Reference",
     "sidebar_label": "Angular"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "React",
+    "permalink": "/PivotHead/docs/reference/api-reference/react-api-reference"
+  },
+  "next": {
+    "title": "Vue",
+    "permalink": "/PivotHead/docs/reference/api-reference/vue-api-reference"
   }
 }

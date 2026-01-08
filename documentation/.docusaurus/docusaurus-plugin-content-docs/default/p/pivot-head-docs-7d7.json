@@ -157,6 +157,13 @@
                 },
                 {
                   "type": "link",
+                  "label": "Angular",
+                  "href": "/PivotHead/docs/reference/conceptual-reference/angular-conceptual-reference",
+                  "docId": "reference/conceptual-reference/angular-conceptual-reference",
+                  "unlisted": false
+                },
+                {
+                  "type": "link",
                   "label": "Vue",
                   "href": "/PivotHead/docs/reference/conceptual-reference/vue-conceptual-reference",
                   "docId": "reference/conceptual-reference/vue-conceptual-reference",
@@ -182,6 +189,13 @@
                   "label": "React",
                   "href": "/PivotHead/docs/reference/api-reference/react-api-reference",
                   "docId": "reference/api-reference/react-api-reference",
+                  "unlisted": false
+                },
+                {
+                  "type": "link",
+                  "label": "Angular",
+                  "href": "/PivotHead/docs/reference/api-reference/angular-api-reference",
+                  "docId": "reference/api-reference/angular-api-reference",
                   "unlisted": false
                 },
                 {
@@ -332,8 +346,9 @@
       },
       "reference/api-reference/angular-api-reference": {
         "id": "reference/api-reference/angular-api-reference",
-        "title": "Angular API",
-        "description": "The @pivothead/angular package provides a service for creating your headless pivot table."
+        "title": "Angular API Reference",
+        "description": "Complete API documentation for @mindfiredigital/pivothead-angular.",
+        "sidebar": "tutorialSidebar"
       },
       "reference/api-reference/core-webcomponent-api-reference": {
         "id": "reference/api-reference/core-webcomponent-api-reference",
@@ -355,8 +370,9 @@
       },
       "reference/conceptual-reference/angular-conceptual-reference": {
         "id": "reference/conceptual-reference/angular-conceptual-reference",
-        "title": "Angular concept",
-        "description": "Angular Service Integration"
+        "title": "Angular Concepts",
+        "description": "The PivotHead Angular Wrapper (@mindfiredigital/pivothead-angular) is a powerful, type-safe Angular component that bridges Angular applications with the PivotHead Web Component. It provides a seamless Angular developer experience with full TypeScript support, reactive data binding, and Angular-specific optimizations while preserving all the functionality and modes of the underlying web component.",
+        "sidebar": "tutorialSidebar"
       },
       "reference/conceptual-reference/core-webcomponent-conceptual-reference": {
         "id": "reference/conceptual-reference/core-webcomponent-conceptual-reference",

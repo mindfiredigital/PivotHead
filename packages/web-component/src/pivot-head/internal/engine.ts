@@ -12,6 +12,27 @@ import type {
   EnhancedPivotEngine,
 } from '../../types/types';
 
+/**
+ * Helper function to normalize string | AxisConfig to AxisConfig
+ */
+function normalizeAxisConfig(field: string | AxisConfig): AxisConfig {
+  if (typeof field === 'string') {
+    return {
+      uniqueName: field,
+      caption: field,
+    };
+  }
+  return field;
+}
+
+/**
+ * Normalize an array of string | AxisConfig to AxisConfig[]
+ */
+function normalizeAxisConfigs(fields?: (string | AxisConfig)[]): AxisConfig[] {
+  if (!fields) return [];
+  return fields.map(normalizeAxisConfig);
+}
+
 export function tryInitializeEngine(host: PivotHeadHost): void {
   const hasData = host._data && host._data.length > 0;
   const hasOptions = host._options && Object.keys(host._options).length > 0;
@@ -62,15 +83,22 @@ export function tryInitializeEngine(host: PivotHeadHost): void {
       }
     }
 
-    if (!options.groupConfig && options.rows && options.columns) {
+    // Normalize rows and columns to AxisConfig objects
+    const normalizedRows = normalizeAxisConfigs(options.rows);
+    const normalizedColumns = normalizeAxisConfigs(options.columns);
+
+    if (
+      !options.groupConfig &&
+      normalizedRows.length > 0 &&
+      normalizedColumns.length > 0
+    ) {
       options.groupConfig = {
-        rowFields: options.rows.map((r: AxisConfig) => r.uniqueName),
-        columnFields: options.columns.map((c: AxisConfig) => c.uniqueName),
+        rowFields: normalizedRows.map((r: AxisConfig) => r.uniqueName),
+        columnFields: normalizedColumns.map((c: AxisConfig) => c.uniqueName),
         grouper: (item: PivotDataRecord) => {
           return [
-            ...(options.rows?.map((r: AxisConfig) => item[r.uniqueName]) ?? []),
-            ...(options.columns?.map((c: AxisConfig) => item[c.uniqueName]) ??
-              []),
+            ...normalizedRows.map((r: AxisConfig) => item[r.uniqueName]),
+            ...normalizedColumns.map((c: AxisConfig) => item[c.uniqueName]),
           ].join('|');
         },
       };
@@ -81,8 +109,8 @@ export function tryInitializeEngine(host: PivotHeadHost): void {
       rawData: host._data,
       dimensions: [],
       defaultAggregation: 'sum' as AggregationType,
-      rows: options.rows || [],
-      columns: options.columns || [],
+      rows: normalizedRows,
+      columns: normalizedColumns,
       measures: options.measures || [],
       groupConfig: options.groupConfig,
     };

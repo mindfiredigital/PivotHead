@@ -166,7 +166,7 @@ const sidebars = {
             'reference/conceptual-reference/core-webcomponent-conceptual-reference',
             'reference/conceptual-reference/webassembly-conceptual-reference',
             'reference/conceptual-reference/react-conceptual-reference',
-            // 'reference/conceptual-reference/angular-conceptual-reference',
+            'reference/conceptual-reference/angular-conceptual-reference',
             'reference/conceptual-reference/vue-conceptual-reference',
           ],
         },
@@ -176,7 +176,7 @@ const sidebars = {
           items: [
             'reference/api-reference/core-webcomponent-api-reference',
             'reference/api-reference/react-api-reference',
-            // 'reference/api-reference/angular-api-reference',
+            'reference/api-reference/angular-api-reference',
             'reference/api-reference/vue-api-reference',
           ],
         },
