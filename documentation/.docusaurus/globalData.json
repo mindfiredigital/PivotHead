@@ -115,6 +115,11 @@
               "sidebar": "tutorialSidebar"
             },
             {
+              "id": "server-side/overview",
+              "path": "/PivotHead/docs/server-side/overview",
+              "sidebar": "tutorialSidebar"
+            },
+            {
               "id": "tutorial-basics/core/api-reference",
               "path": "/PivotHead/docs/tutorial-basics/core/api-reference"
             },

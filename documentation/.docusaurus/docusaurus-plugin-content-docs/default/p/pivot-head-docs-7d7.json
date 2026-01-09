@@ -168,6 +168,13 @@
                   "href": "/PivotHead/docs/reference/conceptual-reference/vue-conceptual-reference",
                   "docId": "reference/conceptual-reference/vue-conceptual-reference",
                   "unlisted": false
+                },
+                {
+                  "type": "link",
+                  "label": "Server-Side",
+                  "href": "/PivotHead/docs/server-side/overview",
+                  "docId": "server-side/overview",
+                  "unlisted": false
                 }
               ],
               "collapsed": true,
@@ -396,6 +403,12 @@
         "id": "reference/conceptual-reference/webassembly-conceptual-reference",
         "title": "WebAssembly Performance Architecture",
         "description": "PivotHead incorporates a sophisticated three-tier performance architecture with WebAssembly (WASM) integration that delivers up to 37x faster CSV processing for large datasets. This guide explains the performance features, how they work, and the massive improvements they bring to data processing.",
+        "sidebar": "tutorialSidebar"
+      },
+      "server-side/overview": {
+        "id": "server-side/overview",
+        "title": "Server-Side",
+        "description": "Complete guide for using PivotHead in Node.js server environments",
         "sidebar": "tutorialSidebar"
       },
       "tutorial-basics/core/api-reference": {

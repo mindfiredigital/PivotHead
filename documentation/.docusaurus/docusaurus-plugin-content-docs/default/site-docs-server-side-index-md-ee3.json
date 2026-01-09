@@ -1,0 +1,20 @@
+{
+  "id": "server-side/index",
+  "title": "Server-Side Overview",
+  "description": "Introduction to using PivotHead in Node.js server environments",
+  "source": "@site/docs/server-side/index.md",
+  "sourceDirName": "server-side",
+  "slug": "/server-side/",
+  "permalink": "/PivotHead/docs/server-side/",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/server-side/index.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "sidebar_position": 1,
+    "title": "Server-Side Overview",
+    "description": "Introduction to using PivotHead in Node.js server environments"
+  }
+}

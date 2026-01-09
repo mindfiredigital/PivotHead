@@ -11,6 +11,10 @@ export type {
 } from './engine/connectService';
 export { PerformanceConfig } from './engine/PerformanceConfig';
 
+// Export WASM utilities for server-side usage
+export { WasmLoader, getWasmLoader } from './wasm/WasmLoader';
+export type { WasmCSVResult, WasmModule } from './wasm/WasmLoader';
+
 export type { LayoutSelection } from './types/interfaces';
 
 // Ensure all necessary types are exported

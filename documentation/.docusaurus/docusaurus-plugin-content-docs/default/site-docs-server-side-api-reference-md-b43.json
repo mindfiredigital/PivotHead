@@ -1,0 +1,29 @@
+{
+  "id": "server-side/api-reference",
+  "title": "server",
+  "description": "Complete API documentation for server-side PivotHead usage",
+  "source": "@site/docs/server-side/api-reference.md",
+  "sourceDirName": "server-side",
+  "slug": "/server-side/api-reference",
+  "permalink": "/PivotHead/docs/server-side/api-reference",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/server-side/api-reference.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 3,
+  "frontMatter": {
+    "sidebar_position": 3,
+    "title": "server",
+    "description": "Complete API documentation for server-side PivotHead usage"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Core Web Component",
+    "permalink": "/PivotHead/docs/reference/api-reference/core-webcomponent-api-reference"
+  },
+  "next": {
+    "title": "React",
+    "permalink": "/PivotHead/docs/reference/api-reference/react-api-reference"
+  }
+}
