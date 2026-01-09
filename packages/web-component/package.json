@@ -1,6 +1,6 @@
 {
   "name": "@mindfiredigital/pivothead-web-component",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "private": false,
   "type": "module",
   "description": "Web Component implementation of PivotHead for use in any JavaScript framework",
