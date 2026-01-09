@@ -22,7 +22,7 @@
     "permalink": "/PivotHead/docs/reference/conceptual-reference/angular-conceptual-reference"
   },
   "next": {
-    "title": "Core Web Component",
-    "permalink": "/PivotHead/docs/reference/api-reference/core-webcomponent-api-reference"
+    "title": "Server-Side",
+    "permalink": "/PivotHead/docs/server-side/overview"
   }
 }

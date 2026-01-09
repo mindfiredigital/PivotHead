@@ -308,6 +308,14 @@ export default {
         '@site/docs/reference/conceptual-reference/webassembly.md'
       ),
     ],
+  'content---pivot-head-docs-server-side-overview-093-1e5': [
+    () =>
+      import(
+        /* webpackChunkName: "content---pivot-head-docs-server-side-overview-093-1e5" */ '@site/docs/server-side/overview.md'
+      ),
+    '@site/docs/server-side/overview.md',
+    require.resolveWeak('@site/docs/server-side/overview.md'),
+  ],
   'content---pivot-head-docs-tutorial-basics-core-api-reference-190-54c': [
     () =>
       import(

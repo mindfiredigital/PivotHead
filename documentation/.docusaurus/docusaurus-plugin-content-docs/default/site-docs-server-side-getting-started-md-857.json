@@ -1,0 +1,29 @@
+{
+  "id": "server-side/getting-started",
+  "title": "Getting Started",
+  "description": "Quick start guide for using PivotHead in Node.js",
+  "source": "@site/docs/server-side/getting-started.md",
+  "sourceDirName": "server-side",
+  "slug": "/server-side/getting-started",
+  "permalink": "/PivotHead/docs/server-side/getting-started",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/server-side/getting-started.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 2,
+  "frontMatter": {
+    "sidebar_position": 2,
+    "title": "Getting Started",
+    "description": "Quick start guide for using PivotHead in Node.js"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Vue",
+    "permalink": "/PivotHead/docs/reference/conceptual-reference/vue-conceptual-reference"
+  },
+  "next": {
+    "title": "Examples",
+    "permalink": "/PivotHead/docs/server-side/examples"
+  }
+}

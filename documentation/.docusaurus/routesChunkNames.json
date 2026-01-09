@@ -49,17 +49,17 @@
     },
     "content": "content---pivot-head-markdown-page-393-f56"
   },
-  "/PivotHead/docs-2e7": {
+  "/PivotHead/docs-6b6": {
     "__comp": "__comp---theme-docs-root-5-e-9-0b6",
     "__context": {
       "plugin": "plugin---pivot-head-docsaba-41e"
     }
   },
-  "/PivotHead/docs-255": {
+  "/PivotHead/docs-3ee": {
     "__comp": "__comp---theme-doc-version-roota-7-b-5de",
     "__props": "__props---pivot-head-docs-162-87b"
   },
-  "/PivotHead/docs-449": {
+  "/PivotHead/docs-acf": {
     "__comp": "__comp---theme-doc-roota-94-67a"
   },
   "/PivotHead/docs/contributors/-f21": {
@@ -145,6 +145,10 @@
   "/PivotHead/docs/reference/conceptual-reference/webassembly-conceptual-reference-493": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---pivot-head-docs-reference-conceptual-reference-webassembly-conceptual-referenced-9-e-58e"
+  },
+  "/PivotHead/docs/server-side/overview-2ed": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-server-side-overview-093-1e5"
   },
   "/PivotHead/docs/tutorial-basics/core/api-reference-0be": {
     "__comp": "__comp---theme-doc-item-178-a40",

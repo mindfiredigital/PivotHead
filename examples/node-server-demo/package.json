@@ -1,0 +1,36 @@
+{
+  "name": "pivothead-node-server-demo",
+  "version": "1.0.0",
+  "description": "Node.js server-side examples for PivotHead WASM CSV parser",
+  "private": true,
+  "scripts": {
+    "test": "node basic-test.js",
+    "start": "node express-api-swagger.js",
+    "start:basic": "node express-api.js",
+    "start:upload": "node --max-old-space-size=4096 express-api-upload.js",
+    "dev": "nodemon express-api-swagger.js",
+    "dev:basic": "nodemon express-api.js",
+    "dev:upload": "nodemon --max-old-space-size=4096 express-api-upload.js"
+  },
+  "keywords": [
+    "pivothead",
+    "csv",
+    "wasm",
+    "nodejs",
+    "express"
+  ],
+  "author": "Mindfiredigital",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "multer": "^2.0.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=12.0.0"
+  }
+}

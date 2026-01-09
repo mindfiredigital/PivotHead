@@ -4,20 +4,57 @@
  * This file provides the WASM URL in a bundler-friendly way.
  * For library builds, we compute the path at runtime based on where this file is located.
  *
- * How it works:
- * 1. This file is built to dist/wasm/wasmAssets.js
- * 2. The WASM file is in dist/wasm/csvParser.wasm
- * 3. We construct the URL dynamically at runtime
+ * Supports both browser and Node.js environments:
+ * - Browser: Uses import.meta.url and fetch()
+ * - Node.js: Uses __dirname and fs.readFileSync()
  */
+
+/**
+ * Check if running in Node.js environment
+ */
+function isNode(): boolean {
+  return (
+    typeof process !== 'undefined' &&
+    process.versions != null &&
+    process.versions.node != null
+  );
+}
+
+/**
+ * Get the WASM file path for Node.js
+ */
+function getNodeWasmPath(): string {
+  // In Node.js, use __dirname or module resolution
+  // This works because this file is built to dist and csvParser.wasm is in dist/wasm
+
+  try {
+    // Try to resolve relative to this module
+    if (typeof __dirname !== 'undefined') {
+      const path = require('path');
+      // __dirname will be the dist directory (since UMD bundles everything)
+      // WASM file is in dist/wasm/csvParser.wasm
+      const wasmPath = path.join(__dirname, 'wasm', 'csvParser.wasm');
+      return wasmPath;
+    }
+  } catch (error) {
+    console.warn('Could not resolve __dirname:', error);
+  }
+
+  // Fallback: try relative paths
+  return './dist/wasm/csvParser.wasm';
+}
 
 /**
  * Get the URL to the WASM file
  * Returns a path relative to the consuming application
  */
 export function getWasmUrl(): string {
-  // For library builds consumed by other apps, we need to construct the path
-  // at runtime. The consuming app's bundler will handle resolving this.
+  // Node.js environment
+  if (isNode()) {
+    return getNodeWasmPath();
+  }
 
+  // Browser environment
   try {
     // Try to use import.meta.url to get the base path
     if (typeof import.meta !== 'undefined' && import.meta.url) {
@@ -41,12 +78,85 @@ export function getWasmUrl(): string {
 }
 
 /**
+ * Validate WASM magic number
+ */
+function isValidWasm(bytes: Uint8Array): boolean {
+  return (
+    bytes.length >= 4 &&
+    bytes[0] === 0x00 &&
+    bytes[1] === 0x61 &&
+    bytes[2] === 0x73 &&
+    bytes[3] === 0x6d
+  );
+}
+
+/**
+ * Load WASM binary in Node.js environment
+ */
+function loadWasmNode(filePath: string): ArrayBuffer {
+  const fs = require('fs');
+  const path = require('path');
+
+  // Try multiple possible paths
+  const possiblePaths = [
+    filePath,
+    path.resolve(filePath),
+    path.join(__dirname, 'wasm', 'csvParser.wasm'), // For UMD build: dist/wasm/csvParser.wasm
+    path.join(__dirname, 'csvParser.wasm'), // For ESM build in wasm dir
+    path.join(__dirname, '../wasm/csvParser.wasm'), // One level up
+    path.join(
+      process.cwd(),
+      'node_modules/@mindfiredigital/pivothead/dist/wasm/csvParser.wasm'
+    ),
+  ];
+
+  for (const tryPath of possiblePaths) {
+    try {
+      if (fs.existsSync(tryPath)) {
+        console.log(`✅ Loading WASM from: ${tryPath}`);
+        const buffer = fs.readFileSync(tryPath);
+
+        // Convert Node.js Buffer to ArrayBuffer properly
+        // We need to create a new ArrayBuffer and copy the data
+        const arrayBuffer = buffer.buffer.slice(
+          buffer.byteOffset,
+          buffer.byteOffset + buffer.byteLength
+        );
+        const bytes = new Uint8Array(arrayBuffer);
+
+        if (isValidWasm(bytes)) {
+          return arrayBuffer;
+        } else {
+          console.warn(`Invalid WASM file at ${tryPath}`);
+        }
+      }
+    } catch (error) {
+      // Continue to next path
+    }
+  }
+
+  throw new Error(
+    `WASM file not found. Tried paths:\n${possiblePaths.join('\n')}\n\nMake sure the package is properly installed.`
+  );
+}
+
+/**
  * Fetch and return the WASM binary
  */
 export async function fetchWasmBinary(): Promise<ArrayBuffer> {
   const url = getWasmUrl();
 
-  // Try primary URL first
+  // Node.js environment - use fs.readFileSync
+  if (isNode()) {
+    try {
+      return loadWasmNode(url);
+    } catch (error) {
+      console.error('Failed to load WASM in Node.js:', error);
+      throw error;
+    }
+  }
+
+  // Browser environment - use fetch
   try {
     const response = await fetch(url);
     if (!response.ok) {
@@ -57,14 +167,7 @@ export async function fetchWasmBinary(): Promise<ArrayBuffer> {
     const buffer = await response.arrayBuffer();
     const bytes = new Uint8Array(buffer);
 
-    // Check for WASM magic number: 0x00 0x61 0x73 0x6d
-    if (
-      bytes.length >= 4 &&
-      bytes[0] === 0x00 &&
-      bytes[1] === 0x61 &&
-      bytes[2] === 0x73 &&
-      bytes[3] === 0x6d
-    ) {
+    if (isValidWasm(bytes)) {
       return buffer;
     } else {
       // Check if it's an HTML error page
@@ -96,14 +199,7 @@ export async function fetchWasmBinary(): Promise<ArrayBuffer> {
         const buffer = await response.arrayBuffer();
         const bytes = new Uint8Array(buffer);
 
-        // Validate WASM magic number
-        if (
-          bytes.length >= 4 &&
-          bytes[0] === 0x00 &&
-          bytes[1] === 0x61 &&
-          bytes[2] === 0x73 &&
-          bytes[3] === 0x6d
-        ) {
+        if (isValidWasm(bytes)) {
           console.log(
             `✅ Successfully loaded WASM from fallback: ${fallbackUrl}`
           );
