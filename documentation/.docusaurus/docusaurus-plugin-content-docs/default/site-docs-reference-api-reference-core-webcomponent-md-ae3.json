@@ -18,8 +18,8 @@
   },
   "sidebar": "tutorialSidebar",
   "previous": {
-    "title": "Vue",
-    "permalink": "/PivotHead/docs/reference/conceptual-reference/vue-conceptual-reference"
+    "title": "Server-Side",
+    "permalink": "/PivotHead/docs/server-side/overview"
   },
   "next": {
     "title": "React",

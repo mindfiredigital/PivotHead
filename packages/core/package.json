@@ -15,10 +15,14 @@
         "types": "./dist/index.d.ts",
         "default": "./dist/pivothead-core.umd.js"
       }
-    }
+    },
+    "./wasm/*": "./dist/wasm/*"
   },
   "files": [
-    "dist"
+    "dist/**/*",
+    "dist/wasm/*.wasm",
+    "README.md",
+    "LICENSE"
   ],
   "author": "Mindfiredigital",
   "license": "MIT",

@@ -53,15 +53,15 @@ export default [
   },
   {
     path: '/PivotHead/docs',
-    component: ComponentCreator('/PivotHead/docs', '2e7'),
+    component: ComponentCreator('/PivotHead/docs', '6b6'),
     routes: [
       {
         path: '/PivotHead/docs',
-        component: ComponentCreator('/PivotHead/docs', '255'),
+        component: ComponentCreator('/PivotHead/docs', '3ee'),
         routes: [
           {
             path: '/PivotHead/docs',
-            component: ComponentCreator('/PivotHead/docs', '449'),
+            component: ComponentCreator('/PivotHead/docs', 'acf'),
             routes: [
               {
                 path: '/PivotHead/docs/contributors/',
@@ -247,6 +247,15 @@ export default [
                 component: ComponentCreator(
                   '/PivotHead/docs/reference/conceptual-reference/webassembly-conceptual-reference',
                   '493'
+                ),
+                exact: true,
+                sidebar: 'tutorialSidebar',
+              },
+              {
+                path: '/PivotHead/docs/server-side/overview',
+                component: ComponentCreator(
+                  '/PivotHead/docs/server-side/overview',
+                  '2ed'
                 ),
                 exact: true,
                 sidebar: 'tutorialSidebar',

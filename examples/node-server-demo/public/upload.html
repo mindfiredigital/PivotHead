@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PivotHead CSV Parser - File Upload</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 8px;
+            padding: 60px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8f9ff;
+        }
+
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: #f0f2ff;
+        }
+
+        .upload-area.drag-over {
+            border-color: #764ba2;
+            background: #e8ebff;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .upload-hint {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .options {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .option-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        input, select {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .upload-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+
+        .upload-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Console/Log Area */
+        .console-container {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .console-header {
+            background: #2d3748;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .console-log {
+            background: #1a202c;
+            color: #48bb78;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            padding: 15px;
+            border-radius: 0 0 8px 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            line-height: 1.6;
+        }
+
+        .log-entry {
+            margin: 5px 0;
+        }
+
+        .log-info { color: #4299e1; }
+        .log-success { color: #48bb78; }
+        .log-warning { color: #ed8936; }
+        .log-wasm { color: #9f7aea; font-weight: bold; }
+
+        .progress-container {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        /* Data Table View */
+        .data-view {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .view-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .filter-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 15px;
+            max-height: 600px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            cursor: move;
+            user-select: none;
+            z-index: 10;
+        }
+
+        th:hover {
+            background: linear-gradient(135deg, #5568d3 0%, #65398b 100%);
+        }
+
+        th.dragging {
+            opacity: 0.5;
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        tr:hover {
+            background: #f8f9ff;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .stat-label {
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        /* Pivot Statistics */
+        .pivot-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .pivot-stat-card {
+            background: #f8f9ff;
+            border: 2px solid #e0e0ff;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .pivot-stat-header {
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 5px;
+        }
+
+        .pivot-stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 0.9em;
+        }
+
+        .pivot-stat-label {
+            color: #666;
+            font-weight: 600;
+        }
+
+        .pivot-stat-value {
+            color: #333;
+            font-weight: 700;
+        }
+
+        /* Pagination */
+        .pagination-controls select {
+            padding: 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1em;
+        }
+
+        .links {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .links a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 500;
+            opacity: 0.9;
+            transition: opacity 0.3s;
+        }
+
+        .links a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 PivotHead CSV Parser</h1>
+            <p>Upload and process large CSV files with WebAssembly-powered parsing</p>
+        </div>
+
+        <div class="card">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📁</div>
+                <div class="upload-text">Drop your CSV file here</div>
+                <div class="upload-hint">or click to browse (supports files up to 2GB)</div>
+                <input type="file" id="fileInput" accept=".csv,text/csv">
+            </div>
+
+            <div id="fileInfo" style="display: none; margin-top: 20px; padding: 15px; background: #f0f2ff; border-radius: 8px;">
+                <strong>Selected file:</strong> <span id="fileName"></span> (<span id="fileSize"></span>)
+            </div>
+
+            <div class="options">
+                <div class="option-group">
+                    <label for="delimiter">Delimiter</label>
+                    <select id="delimiter">
+                        <option value=",">Comma (,)</option>
+                        <option value=";">Semicolon (;)</option>
+                        <option value="\t">Tab</option>
+                        <option value="|">Pipe (|)</option>
+                    </select>
+                </div>
+                <div class="option-group">
+                    <label for="chunkSize">Chunk Size (rows)</label>
+                    <input type="number" id="chunkSize" value="10000" min="100" max="100000">
+                </div>
+            </div>
+
+            <button class="upload-btn" id="uploadBtn" disabled>Upload & Process</button>
+
+            <!-- Console Log Area -->
+            <div class="console-container" id="consoleContainer">
+                <div class="console-header">
+                    <span>🔧 Processing Console</span>
+                    <button class="btn btn-secondary" style="font-size: 0.8em; padding: 5px 10px;" onclick="document.getElementById('consoleLog').innerHTML = ''">Clear</button>
+                </div>
+                <div class="console-log" id="consoleLog"></div>
+            </div>
+
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill">0%</div>
+                </div>
+                <div class="progress-text" id="progressText">Uploading...</div>
+            </div>
+        </div>
+
+        <!-- Data View Card -->
+        <div class="card data-view" id="dataView">
+            <h2 style="margin-bottom: 20px;">📊 Data View</h2>
+
+            <!-- Stats -->
+            <div class="stats-grid" id="statsGrid"></div>
+
+            <!-- View Controls -->
+            <div class="view-controls">
+                <button class="btn btn-secondary active" id="processedViewBtn" onclick="switchView('processed')">Processed Data (with Pivot Stats)</button>
+                <button class="btn btn-secondary" id="rawViewBtn" onclick="switchView('raw')">Raw Data</button>
+                <input type="text" class="filter-input" id="filterInput" placeholder="🔍 Filter table data...">
+                <button class="btn btn-primary" onclick="exportToCSV()">📥 Export to CSV</button>
+            </div>
+
+            <!-- Partial Data Warning -->
+            <div id="partialDataWarning" style="display: none; margin-top: 15px; padding: 15px; background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; color: #856404;">
+                <strong>ℹ️ Note:</strong> For memory optimization, displaying first <strong><span id="displayedRowCount"></span></strong> rows of <strong><span id="totalRowCount"></span></strong> total rows.
+                Pivot statistics are calculated from ALL rows.
+            </div>
+
+            <!-- Pivot Statistics Panel (shown in Processed Data view) -->
+            <div id="pivotStatsPanel" style="display: none; margin-top: 20px;">
+                <h3 style="margin-bottom: 15px; color: #667eea;">📈 Pivot Statistics (Numeric Columns)</h3>
+                <div id="pivotStatsContainer"></div>
+            </div>
+
+            <!-- Pagination Controls -->
+            <div class="pagination-controls" id="paginationControls" style="display: none; margin: 15px 0;">
+                <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                    <div>
+                        <label for="pageSize" style="margin-right: 5px;">Rows per page:</label>
+                        <select id="pageSize" onchange="changePageSize()">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50" selected>50</option>
+                            <option value="100">100</option>
+                            <option value="500">500</option>
+                            <option value="1000">1000</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1; text-align: center;">
+                        <button class="btn btn-secondary" onclick="goToPage(currentPage - 1)" id="prevBtn">← Previous</button>
+                        <span id="pageInfo" style="margin: 0 15px; font-weight: 600;"></span>
+                        <button class="btn btn-secondary" onclick="goToPage(currentPage + 1)" id="nextBtn">Next →</button>
+                    </div>
+                    <div>
+                        <span id="rowInfo" style="color: #666;"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-container">
+                <table id="dataTable">
+                    <thead id="tableHead"></thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Controls (bottom) -->
+            <div class="pagination-controls" id="paginationControlsBottom" style="display: none; margin-top: 15px;">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 15px;">
+                    <button class="btn btn-secondary" onclick="goToPage(currentPage - 1)" id="prevBtnBottom">← Previous</button>
+                    <span id="pageInfoBottom" style="margin: 0 15px; font-weight: 600;"></span>
+                    <button class="btn btn-secondary" onclick="goToPage(currentPage + 1)" id="nextBtnBottom">Next →</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="links">
+            <a href="/api-docs">📖 API Documentation</a>
+            <a href="https://github.com/mindfiredigital/PivotHead" target="_blank">💻 GitHub</a>
+        </div>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const consoleContainer = document.getElementById('consoleContainer');
+        const consoleLog = document.getElementById('consoleLog');
+        const dataView = document.getElementById('dataView');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+
+        let selectedFile = null;
+        let currentData = null;
+        let currentView = 'processed';
+        let columnOrder = [];
+        let currentPage = 1;
+        let pageSize = 50;
+        let filteredRows = [];
+
+        // Console logging functions
+        function addLog(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            consoleLog.appendChild(entry);
+            consoleLog.scrollTop = consoleLog.scrollHeight;
+        }
+
+        // Click to upload
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileSelect(files[0]);
+            }
+        });
+
+        // File input change
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        function handleFileSelect(file) {
+            if (!file.name.endsWith('.csv')) {
+                alert('Please select a CSV file');
+                return;
+            }
+
+            selectedFile = file;
+            fileName.textContent = file.name;
+            fileSize.textContent = formatBytes(file.size);
+            fileInfo.style.display = 'block';
+            uploadBtn.disabled = false;
+
+            addLog('File selected: ' + file.name, 'info');
+            addLog('File size: ' + formatBytes(file.size), 'info');
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Upload button
+        uploadBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            uploadBtn.disabled = true;
+            dataView.style.display = 'none';
+            progressContainer.style.display = 'block';
+            consoleContainer.style.display = 'block';
+            progressFill.style.width = '0%';
+            progressFill.textContent = '0%';
+            progressText.textContent = 'Initializing upload...';
+
+            consoleLog.innerHTML = '';
+            addLog('🚀 Starting CSV processing...', 'info');
+            addLog('⚙️ Using WebAssembly-powered parser', 'wasm');
+            addLog('📦 Chunk size: ' + document.getElementById('chunkSize').value + ' rows', 'info');
+            addLog('🔄 Streaming mode enabled for large files', 'success');
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            formData.append('delimiter', document.getElementById('delimiter').value);
+            formData.append('chunkSize', document.getElementById('chunkSize').value);
+
+            try {
+                addLog('📤 Uploading file to server...', 'info');
+
+                // Simulate progress
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += 5;
+                    if (progress <= 90) {
+                        progressFill.style.width = progress + '%';
+                        progressFill.textContent = progress + '%';
+
+                        if (progress === 20) addLog('⬆️ Upload in progress...', 'info');
+                        if (progress === 40) addLog('🔧 WASM module processing chunks...', 'wasm');
+                        if (progress === 60) addLog('💾 Parsing CSV structure...', 'info');
+                        if (progress === 80) addLog('✨ Finalizing results...', 'success');
+                    }
+                }, 300);
+
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                clearInterval(progressInterval);
+                progressFill.style.width = '100%';
+                progressFill.textContent = '100%';
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    addLog('✅ Processing complete!', 'success');
+                    addLog(`📊 Parsed ${data.parsing.totalRows.toLocaleString()} rows`, 'success');
+                    addLog(`📋 Detected ${data.parsing.totalColumns} columns`, 'success');
+                    addLog(`⚡ Throughput: ${data.parsing.throughput.split('(')[1].replace(')', '')}`, 'success');
+                    addLog(`⏱️ Total time: ${(data.parsing.totalTime / 1000).toFixed(2)}s`, 'success');
+                    addLog(`🔢 Chunks processed: ${data.parsing.chunksProcessed}`, 'info');
+
+                    // Debug: Check if data.data exists
+                    if (!data.data) {
+                        console.error('Response data structure:', data);
+                        addLog('⚠️ Warning: Data structure missing, checking response...', 'warning');
+                    }
+
+                    currentData = data;
+                    displayData(data);
+                } else {
+                    addLog('❌ Error: ' + data.message, 'warning');
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                addLog('❌ Upload failed: ' + error.message, 'warning');
+                alert('Error: ' + error.message);
+            } finally {
+                uploadBtn.disabled = false;
+                setTimeout(() => {
+                    progressContainer.style.display = 'none';
+                }, 1000);
+            }
+        });
+
+        function displayData(data) {
+            // Validate data structure
+            if (!data.data || !data.data.header || !data.data.rows) {
+                addLog('❌ Error: Invalid response structure from server', 'warning');
+                console.error('Invalid data structure:', data);
+                alert('Error: Server returned invalid data structure. Please check console for details.');
+                return;
+            }
+
+            // Show data view
+            dataView.style.display = 'block';
+
+            // Display stats
+            const statsGrid = document.getElementById('statsGrid');
+            statsGrid.innerHTML = `
+                <div class="stat">
+                    <div class="stat-label">Total Rows</div>
+                    <div class="stat-value">${data.parsing.totalRows.toLocaleString()}</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Columns</div>
+                    <div class="stat-value">${data.parsing.totalColumns}</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Processing Time</div>
+                    <div class="stat-value">${(data.parsing.totalTime / 1000).toFixed(2)}s</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Throughput</div>
+                    <div class="stat-value">${data.parsing.throughput.split('(')[1].replace(')', '')}</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">File Size</div>
+                    <div class="stat-value">${data.fileInfo.sizeFormatted}</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Chunks</div>
+                    <div class="stat-value">${data.parsing.chunksProcessed}</div>
+                </div>
+            `;
+
+            // Initialize column order and pagination
+            columnOrder = data.data.header.map((_, i) => i);
+            currentPage = 1;
+            filteredRows = data.data.rows;
+
+            // Show partial data warning if applicable
+            if (data.data.isPartialData) {
+                document.getElementById('partialDataWarning').style.display = 'block';
+                document.getElementById('displayedRowCount').textContent = data.data.displayedRows.toLocaleString();
+                document.getElementById('totalRowCount').textContent = data.parsing.totalRows.toLocaleString();
+                addLog(`ℹ️ Displaying ${data.data.displayedRows.toLocaleString()} of ${data.parsing.totalRows.toLocaleString()} rows (memory optimization)`, 'info');
+            } else {
+                document.getElementById('partialDataWarning').style.display = 'none';
+            }
+
+            // Display pivot statistics for Processed Data view
+            displayPivotStats(data.data.pivotStats);
+
+            // Display table with pagination
+            renderTableWithPagination(data.data.header, data.data.rows);
+
+            // Scroll to data view
+            dataView.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function displayPivotStats(pivotStats) {
+            const pivotStatsPanel = document.getElementById('pivotStatsPanel');
+            const pivotStatsContainer = document.getElementById('pivotStatsContainer');
+
+            if (!pivotStats || pivotStats.length === 0) {
+                pivotStatsPanel.style.display = 'none';
+                return;
+            }
+
+            // Filter only numeric columns
+            const numericStats = pivotStats.filter(stat => stat.isNumeric);
+
+            if (numericStats.length === 0) {
+                pivotStatsPanel.style.display = 'none';
+                return;
+            }
+
+            pivotStatsPanel.style.display = currentView === 'processed' ? 'block' : 'none';
+
+            // Generate HTML for pivot statistics
+            let statsHTML = '<div class="pivot-stats-grid">';
+            numericStats.forEach(stat => {
+                statsHTML += `
+                    <div class="pivot-stat-card">
+                        <div class="pivot-stat-header">${stat.columnName}</div>
+                        <div class="pivot-stat-row">
+                            <span class="pivot-stat-label">Count:</span>
+                            <span class="pivot-stat-value">${stat.count.toLocaleString()}</span>
+                        </div>
+                        <div class="pivot-stat-row">
+                            <span class="pivot-stat-label">Sum:</span>
+                            <span class="pivot-stat-value">${stat.sum !== null ? stat.sum.toLocaleString(undefined, {maximumFractionDigits: 2}) : 'N/A'}</span>
+                        </div>
+                        <div class="pivot-stat-row">
+                            <span class="pivot-stat-label">Average:</span>
+                            <span class="pivot-stat-value">${stat.avg !== null ? stat.avg.toLocaleString(undefined, {maximumFractionDigits: 2}) : 'N/A'}</span>
+                        </div>
+                        <div class="pivot-stat-row">
+                            <span class="pivot-stat-label">Min:</span>
+                            <span class="pivot-stat-value">${stat.min !== null ? stat.min.toLocaleString(undefined, {maximumFractionDigits: 2}) : 'N/A'}</span>
+                        </div>
+                        <div class="pivot-stat-row">
+                            <span class="pivot-stat-label">Max:</span>
+                            <span class="pivot-stat-value">${stat.max !== null ? stat.max.toLocaleString(undefined, {maximumFractionDigits: 2}) : 'N/A'}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            statsHTML += '</div>';
+
+            pivotStatsContainer.innerHTML = statsHTML;
+            addLog(`📈 Calculated pivot statistics for ${numericStats.length} numeric columns`, 'success');
+        }
+
+        function renderTableWithPagination(headers, rows) {
+            filteredRows = rows;
+            currentPage = 1;
+            renderTable(headers, rows);
+            updatePagination();
+        }
+
+        function renderTable(headers, rows) {
+            const tableHead = document.getElementById('tableHead');
+            const tableBody = document.getElementById('tableBody');
+
+            // Render headers
+            const headerRow = document.createElement('tr');
+            columnOrder.forEach(colIndex => {
+                const th = document.createElement('th');
+                th.textContent = headers[colIndex];
+                th.draggable = true;
+                th.dataset.colIndex = colIndex;
+
+                // Drag events for column reordering
+                th.addEventListener('dragstart', handleDragStart);
+                th.addEventListener('dragover', handleDragOver);
+                th.addEventListener('drop', handleDrop);
+                th.addEventListener('dragend', handleDragEnd);
+
+                headerRow.appendChild(th);
+            });
+            tableHead.innerHTML = '';
+            tableHead.appendChild(headerRow);
+
+            // Calculate pagination
+            const totalRows = rows.length;
+            const totalPages = Math.ceil(totalRows / pageSize);
+            const startIndex = (currentPage - 1) * pageSize;
+            const endIndex = Math.min(startIndex + pageSize, totalRows);
+            const pageRows = rows.slice(startIndex, endIndex);
+
+            // Render rows for current page
+            tableBody.innerHTML = '';
+            pageRows.forEach(row => {
+                const tr = document.createElement('tr');
+                columnOrder.forEach(colIndex => {
+                    const td = document.createElement('td');
+                    td.textContent = row[colIndex] || '';
+                    tr.appendChild(td);
+                });
+                tableBody.appendChild(tr);
+            });
+
+            // Update pagination info
+            updatePaginationInfo(startIndex + 1, endIndex, totalRows, totalPages);
+        }
+
+        function updatePaginationInfo(startRow, endRow, totalRows, totalPages) {
+            const pageInfo = `Page ${currentPage} of ${totalPages}`;
+            const rowInfo = `Showing ${startRow}-${endRow} of ${totalRows.toLocaleString()} rows`;
+
+            document.getElementById('pageInfo').textContent = pageInfo;
+            document.getElementById('pageInfoBottom').textContent = pageInfo;
+            document.getElementById('rowInfo').textContent = rowInfo;
+
+            // Enable/disable buttons
+            const prevDisabled = currentPage === 1;
+            const nextDisabled = currentPage === totalPages;
+
+            document.getElementById('prevBtn').disabled = prevDisabled;
+            document.getElementById('nextBtn').disabled = nextDisabled;
+            document.getElementById('prevBtnBottom').disabled = prevDisabled;
+            document.getElementById('nextBtnBottom').disabled = nextDisabled;
+        }
+
+        function updatePagination() {
+            document.getElementById('paginationControls').style.display = 'block';
+            document.getElementById('paginationControlsBottom').style.display = 'block';
+        }
+
+        function goToPage(page) {
+            const totalPages = Math.ceil(filteredRows.length / pageSize);
+            if (page < 1 || page > totalPages) return;
+
+            currentPage = page;
+            renderTable(currentData.data.header, filteredRows);
+            addLog(`📄 Navigated to page ${currentPage}`, 'info');
+        }
+
+        function changePageSize() {
+            pageSize = parseInt(document.getElementById('pageSize').value);
+            currentPage = 1;
+            renderTable(currentData.data.header, filteredRows);
+            addLog(`📏 Changed page size to ${pageSize} rows`, 'info');
+        }
+
+        // Drag and drop for column reordering
+        let draggedColumn = null;
+
+        function handleDragStart(e) {
+            draggedColumn = parseInt(e.target.dataset.colIndex);
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        }
+
+        function handleDrop(e) {
+            if (e.stopPropagation) e.stopPropagation();
+
+            const targetColumn = parseInt(e.target.dataset.colIndex);
+
+            if (draggedColumn !== targetColumn) {
+                const draggedIndex = columnOrder.indexOf(draggedColumn);
+                const targetIndex = columnOrder.indexOf(targetColumn);
+
+                columnOrder.splice(draggedIndex, 1);
+                columnOrder.splice(targetIndex, 0, draggedColumn);
+
+                renderTable(currentData.data.header, filteredRows);
+                addLog(`🔄 Reordered columns: ${currentData.data.header[draggedColumn]} moved`, 'info');
+            }
+
+            return false;
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function switchView(view) {
+            currentView = view;
+
+            document.getElementById('processedViewBtn').classList.toggle('active', view === 'processed');
+            document.getElementById('rawViewBtn').classList.toggle('active', view === 'raw');
+
+            // Toggle pivot stats panel visibility
+            const pivotStatsPanel = document.getElementById('pivotStatsPanel');
+            pivotStatsPanel.style.display = (view === 'processed' && currentData.data.pivotStats) ? 'block' : 'none';
+
+            if (currentData) {
+                currentPage = 1; // Reset to first page on view switch
+                if (view === 'processed') {
+                    filteredRows = currentData.data.rows;
+                    renderTable(currentData.data.header, currentData.data.rows);
+                    addLog('📊 Switched to Processed Data view with pivot statistics', 'info');
+                } else {
+                    // Raw view - parse raw sample
+                    const delimiter = document.getElementById('delimiter').value;
+                    const rawRows = currentData.data.rawSample.map(line => line.split(delimiter));
+                    filteredRows = rawRows;
+                    renderTable(currentData.data.header, rawRows);
+                    addLog('📄 Switched to Raw Data view', 'info');
+                }
+            }
+        }
+
+        function getCurrentRows() {
+            if (currentView === 'processed') {
+                return currentData.data.rows;
+            } else {
+                const delimiter = document.getElementById('delimiter').value;
+                return currentData.data.rawSample.map(line => line.split(delimiter));
+            }
+        }
+
+        // Filter functionality with pagination support
+        document.getElementById('filterInput').addEventListener('input', (e) => {
+            const filterText = e.target.value.toLowerCase();
+
+            if (!currentData) return;
+
+            if (!filterText) {
+                // No filter - show all rows
+                filteredRows = getCurrentRows();
+                currentPage = 1;
+                renderTable(currentData.data.header, filteredRows);
+                return;
+            }
+
+            // Filter rows
+            const allRows = getCurrentRows();
+            filteredRows = allRows.filter(row => {
+                const rowText = row.join(' ').toLowerCase();
+                return rowText.includes(filterText);
+            });
+
+            currentPage = 1;
+            renderTable(currentData.data.header, filteredRows);
+            addLog(`🔍 Filter applied: ${filteredRows.length} of ${allRows.length} rows match "${filterText}"`, 'info');
+        });
+
+        // Export to CSV
+        function exportToCSV() {
+            if (!currentData) return;
+
+            let csvContent = '';
+
+            // Headers
+            const headers = columnOrder.map(i => currentData.data.header[i]);
+            csvContent += headers.join(',') + '\n';
+
+            // Rows (export filtered rows)
+            filteredRows.forEach(row => {
+                const orderedRow = columnOrder.map(i => row[i] || '');
+                csvContent += orderedRow.join(',') + '\n';
+            });
+
+            // Download
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'pivothead_export_' + new Date().getTime() + '.csv';
+            a.click();
+
+            addLog(`📥 CSV exported successfully (${filteredRows.length} rows)`, 'success');
+        }
+    </script>
+</body>
+</html>

@@ -374,8 +374,8 @@
                 },
                 "sidebar": "tutorialSidebar",
                 "previous": {
-                  "title": "Vue",
-                  "permalink": "/PivotHead/docs/reference/conceptual-reference/vue-conceptual-reference"
+                  "title": "Server-Side",
+                  "permalink": "/PivotHead/docs/server-side/overview"
                 },
                 "next": {
                   "title": "React",
@@ -546,8 +546,8 @@
                   "permalink": "/PivotHead/docs/reference/conceptual-reference/angular-conceptual-reference"
                 },
                 "next": {
-                  "title": "Core Web Component",
-                  "permalink": "/PivotHead/docs/reference/api-reference/core-webcomponent-api-reference"
+                  "title": "Server-Side",
+                  "permalink": "/PivotHead/docs/server-side/overview"
                 }
               },
               {
@@ -576,6 +576,35 @@
                 "next": {
                   "title": "React",
                   "permalink": "/PivotHead/docs/reference/conceptual-reference/react-conceptual-reference"
+                }
+              },
+              {
+                "id": "server-side/overview",
+                "title": "Server-Side",
+                "description": "Complete guide for using PivotHead in Node.js server environments",
+                "source": "@site/docs/server-side/overview.md",
+                "sourceDirName": "server-side",
+                "slug": "/server-side/overview",
+                "permalink": "/PivotHead/docs/server-side/overview",
+                "draft": false,
+                "unlisted": false,
+                "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/server-side/overview.md",
+                "tags": [],
+                "version": "current",
+                "sidebarPosition": 1,
+                "frontMatter": {
+                  "sidebar_position": 1,
+                  "title": "Server-Side",
+                  "description": "Complete guide for using PivotHead in Node.js server environments"
+                },
+                "sidebar": "tutorialSidebar",
+                "previous": {
+                  "title": "Vue",
+                  "permalink": "/PivotHead/docs/reference/conceptual-reference/vue-conceptual-reference"
+                },
+                "next": {
+                  "title": "Core Web Component",
+                  "permalink": "/PivotHead/docs/reference/api-reference/core-webcomponent-api-reference"
                 }
               },
               {
@@ -1033,7 +1062,8 @@
                         {
                           "type": "doc",
                           "id": "reference/conceptual-reference/vue-conceptual-reference"
-                        }
+                        },
+                        { "type": "doc", "id": "server-side/overview" }
                       ],
                       "collapsed": true,
                       "collapsible": true

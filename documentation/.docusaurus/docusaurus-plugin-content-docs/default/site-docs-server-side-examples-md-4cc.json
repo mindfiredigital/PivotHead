@@ -1,0 +1,29 @@
+{
+  "id": "server-side/examples",
+  "title": "Examples",
+  "description": "Practical examples for using PivotHead in various Node.js scenarios",
+  "source": "@site/docs/server-side/examples.md",
+  "sourceDirName": "server-side",
+  "slug": "/server-side/examples",
+  "permalink": "/PivotHead/docs/server-side/examples",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/server-side/examples.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 4,
+  "frontMatter": {
+    "sidebar_position": 4,
+    "title": "Examples",
+    "description": "Practical examples for using PivotHead in various Node.js scenarios"
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Getting Started",
+    "permalink": "/PivotHead/docs/server-side/getting-started"
+  },
+  "next": {
+    "title": "Core Web Component",
+    "permalink": "/PivotHead/docs/reference/api-reference/core-webcomponent-api-reference"
+  }
+}
