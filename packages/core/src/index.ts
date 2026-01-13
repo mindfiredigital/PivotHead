@@ -10,6 +10,11 @@ export type {
   JSONParseOptions,
 } from './engine/connectService';
 export { PerformanceConfig } from './engine/PerformanceConfig';
+export { VirtualScrollManager } from './engine/VirtualScrollManager';
+export type {
+  VirtualScrollConfig,
+  VisibleRange,
+} from './engine/VirtualScrollManager';
 
 // Export WASM utilities for server-side usage
 export { WasmLoader, getWasmLoader } from './wasm/WasmLoader';

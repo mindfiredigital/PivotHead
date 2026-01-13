@@ -21,6 +21,12 @@ export interface PerformanceThresholds {
   // Sampling thresholds
   sampleThreshold: number; // When to start sampling
   sampleSize: number; // How many rows to sample
+
+  // Virtual scrolling configuration
+  enableVirtualScroll: boolean; // Enable virtual scrolling
+  virtualScrollThreshold: number; // Auto-enable at N rows
+  virtualScrollRowHeight: number; // Default row height (px)
+  virtualScrollBuffer: number; // Extra rows for smooth scrolling
 }
 
 export class PerformanceConfig {
@@ -43,6 +49,12 @@ export class PerformanceConfig {
     // Sampling configuration
     sampleThreshold: 10000, // Sample if > 10k rows
     sampleSize: 5000, // Sample 5k rows
+
+    // Virtual scrolling configuration
+    enableVirtualScroll: true, // Enable virtual scrolling
+    virtualScrollThreshold: 1000, // Auto-enable at 1k rows
+    virtualScrollRowHeight: 40, // Default row height (px)
+    virtualScrollBuffer: 10, // Extra rows for smooth scrolling
   };
 
   /**
@@ -162,5 +174,33 @@ export class PerformanceConfig {
 
     // TIER 0: Small files < 1MB → Standard JavaScript
     return 'standard';
+  }
+
+  /**
+   * Check if virtual scrolling should be used
+   * @param rowCount Number of rows in the dataset
+   * @returns true if virtual scrolling should be enabled
+   */
+  public static shouldUseVirtualScroll(rowCount: number): boolean {
+    return (
+      this.config.enableVirtualScroll &&
+      rowCount >= this.config.virtualScrollThreshold
+    );
+  }
+
+  /**
+   * Get virtual scroll configuration
+   * @returns Virtual scroll settings
+   */
+  public static getVirtualScrollConfig(): {
+    rowHeight: number;
+    bufferSize: number;
+    threshold: number;
+  } {
+    return {
+      rowHeight: this.config.virtualScrollRowHeight,
+      bufferSize: this.config.virtualScrollBuffer,
+      threshold: this.config.virtualScrollThreshold,
+    };
   }
 }

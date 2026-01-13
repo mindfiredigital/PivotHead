@@ -3,6 +3,10 @@ import type {
   MeasureConfig,
   AxisConfig,
 } from '@mindfiredigital/pivothead';
+import {
+  VirtualScrollManager,
+  PerformanceConfig,
+} from '@mindfiredigital/pivothead';
 import type { PivotHeadHost } from './host';
 
 /**
@@ -453,9 +457,9 @@ export function renderRawTable(host: PivotHeadHost) {
   // Prefer full rawData first; state.data could be limited by engine defaults
   const allRawData = state.rawData || state.data || [];
   if (!allRawData.length) return;
-  host.updatePaginationForData(allRawData);
-  const displayData = host.getPaginatedData(allRawData);
-  const originalHeaders = Object.keys(displayData[0] || allRawData[0]);
+
+  // Determine headers
+  const originalHeaders = Object.keys(allRawData[0]);
   let headers: string[];
   if (host._rawDataColumnOrder && host._rawDataColumnOrder.length > 0) {
     const missingHeaders = originalHeaders.filter(
@@ -466,6 +470,21 @@ export function renderRawTable(host: PivotHeadHost) {
     headers = originalHeaders;
     host._rawDataColumnOrder = [...headers];
   }
+
+  // Check if we should use virtual scrolling
+  const useVirtualScroll = PerformanceConfig.shouldUseVirtualScroll(
+    allRawData.length
+  );
+
+  if (useVirtualScroll) {
+    // Use virtual scrolling for large datasets
+    renderRawTableWithVirtualScroll(host, allRawData, headers);
+    return;
+  }
+
+  // Traditional rendering for small datasets
+  host.updatePaginationForData(allRawData);
+  const displayData = host.getPaginatedData(allRawData);
   let html = `
       <style>
         :host { display: block; font-family: inherit; }
@@ -547,5 +566,155 @@ export function renderRawTable(host: PivotHeadHost) {
   html += '</tbody></table>';
   if (host.shadowRoot) host.shadowRoot.innerHTML = html;
   host.addDragListeners();
+  host.setupControls();
+}
+
+/**
+ * Helper function to create table header for virtual scrolling
+ */
+function createVirtualScrollHeader(
+  headers: string[],
+  host: PivotHeadHost
+): HTMLElement {
+  const thead = document.createElement('thead');
+  const tr = document.createElement('tr');
+
+  headers.forEach((header, index) => {
+    const th = document.createElement('th');
+    th.className = 'sortable-header';
+    th.dataset.columnIndex = String(index);
+    th.dataset.field = header;
+    th.textContent = header;
+
+    const sortIcon = host.createSortIcon(header);
+    th.innerHTML += sortIcon;
+
+    tr.appendChild(th);
+  });
+
+  thead.appendChild(tr);
+  return thead;
+}
+
+/**
+ * Helper function to create table row for virtual scrolling
+ */
+function createVirtualScrollRow(
+  row: Record<string, unknown>,
+  index: number,
+  headers: string[],
+  host: PivotHeadHost
+): HTMLElement {
+  const engine = host.engine;
+  const tr = document.createElement('tr');
+  tr.dataset.rowIndex = String(index);
+  tr.style.height = '40px';
+
+  headers.forEach(header => {
+    const td = document.createElement('td');
+    const cellValue = row[header];
+    let formattedValue: unknown = cellValue;
+
+    if (cellValue !== undefined && cellValue !== null) {
+      formattedValue = engine.formatValue(cellValue, header);
+    }
+
+    const textAlign = engine.getFieldAlignment(header);
+    td.style.textAlign = textAlign;
+    td.style.padding = '8px';
+    td.style.border = '1px solid #dde1e7';
+    td.textContent = String(formattedValue ?? '');
+
+    tr.appendChild(td);
+  });
+
+  return tr;
+}
+
+/**
+ * Render raw table with virtual scrolling for large datasets
+ */
+function renderRawTableWithVirtualScroll(
+  host: PivotHeadHost,
+  allRawData: any[],
+  headers: string[]
+): void {
+  if (!host.shadowRoot) return;
+
+  // Clean up existing virtual scroller
+  if (host._virtualScroller) {
+    host._virtualScroller.destroy();
+    host._virtualScroller = undefined;
+  }
+
+  const config = PerformanceConfig.getVirtualScrollConfig();
+
+  // Create the UI structure with controls
+  const html = `
+    <style>
+      :host { display: block; font-family: inherit; }
+      .controls-container { margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+      .filter-container, .pagination-container { display: flex; gap: 10px; align-items: center; }
+      .virtual-scroll-info { padding: 10px; background: #e7f3ff; border: 1px solid #b3d9ff; border-radius: 4px; display: flex; align-items: center; gap: 10px; }
+      .virtual-scroll-info strong { color: #0066cc; }
+      table { width: 100%; border-collapse: collapse; background: #ffffff; border: 1px solid #e2e7ed; }
+      th, td { border: 1px solid #dde1e7; padding: 8px; text-align: left; }
+      th { background-color: #eaf2fa; font-weight: 600; }
+      .sortable-header { cursor: pointer !important; position: relative; }
+      .sort-icon { margin-left: 5px; font-size: 12px; color: #6c757d; opacity: 0.5; }
+      .sort-icon.active { color: #007bff; opacity: 1; }
+      button { padding: 5px 10px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
+      button:hover { background-color: #45a049; }
+      select, input { padding: 5px; border-radius: 4px; border: 1px solid #ddd; }
+    </style>
+    <div class="controls-container">
+      <div class="filter-container">
+        <label>Filter:</label>
+        <select id="filterField"></select>
+        <select id="filterOperator">
+          <option value="equals">Equals</option>
+          <option value="contains">Contains</option>
+          <option value="greaterThan">Greater Than</option>
+          <option value="lessThan">Less Than</option>
+        </select>
+        <input type="text" id="filterValue" placeholder="Value">
+        <button id="applyFilter">Apply</button>
+        <button id="resetFilter">Reset</button>
+      </div>
+      <button id="switchView">Switch to Processed Data</button>
+      <button id="formatButton">Format</button>
+      <button id="exportHTML">Export HTML</button>
+      <button id="exportPDF">Export PDF</button>
+      <button id="exportExcel">Export Excel</button>
+      <button id="printTable">Print</button>
+    </div>
+    <div class="virtual-scroll-info">
+      <strong>✨ Virtual Scrolling Enabled</strong>
+      <span>Smoothly handling ${allRawData.length.toLocaleString()} rows!</span>
+    </div>
+    <div id="virtual-scroll-container"></div>
+  `;
+
+  host.shadowRoot.innerHTML = html;
+
+  // Get the container for virtual scrolling
+  const container = host.shadowRoot.getElementById('virtual-scroll-container');
+  if (!container) return;
+
+  // Initialize virtual scroller (wrapper is automatically appended in constructor)
+  host._virtualScroller = new VirtualScrollManager({
+    container: container as HTMLElement,
+    data: allRawData,
+    rowHeight: config.rowHeight,
+    bufferSize: config.bufferSize,
+    renderRow: (item: any, index: number) =>
+      createVirtualScrollRow(item, index, headers, host),
+    renderHeader: () => createVirtualScrollHeader(headers, host),
+  });
+
+  // Render the initial data
+  host._virtualScroller.render();
+
+  // Setup controls (filters, export buttons, etc.)
   host.setupControls();
 }

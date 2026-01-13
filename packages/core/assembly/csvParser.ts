@@ -302,3 +302,6 @@ export function benchmark(input: string): number {
   const rowCount = getLastRowCount();
   return rowCount * 0.001; // Simulated timing
 }
+function i32(position: number): number {
+  throw new Error('Function not implemented.');
+}

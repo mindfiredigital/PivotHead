@@ -8,15 +8,16 @@ sidebar_label: Vue
 
 ### Props
 
-| Prop         | Type                               | Default     | Description         |
-| ------------ | ---------------------------------- | ----------- | ------------------- |
-| `mode`       | `'default' \| 'minimal' \| 'none'` | `'default'` | Display mode        |
-| `data`       | `PivotDataRecord[]`                | `undefined` | Input data array    |
-| `options`    | `PivotOptions`                     | `undefined` | Pivot configuration |
-| `filters`    | `FilterConfig[]`                   | `undefined` | Active filters      |
-| `pagination` | `Partial<PaginationConfig>`        | `undefined` | Pagination settings |
-| `class`      | `string`                           | `undefined` | CSS class           |
-| `style`      | `Record<string, string> \| string` | `undefined` | Inline styles       |
+| Prop               | Type                               | Default     | Description                                  |
+| ------------------ | ---------------------------------- | ----------- | -------------------------------------------- |
+| `mode`             | `'default' \| 'minimal' \| 'none'` | `'default'` | Display mode                                 |
+| `data`             | `PivotDataRecord[]`                | `undefined` | Input data array                             |
+| `options`          | `PivotOptions`                     | `undefined` | Pivot configuration                          |
+| `filters`          | `FilterConfig[]`                   | `undefined` | Active filters                               |
+| `pagination`       | `Partial<PaginationConfig>`        | `undefined` | Pagination settings                          |
+| `class`            | `string`                           | `undefined` | CSS class                                    |
+| `style`            | `Record<string, string> \| string` | `undefined` | Inline styles                                |
+| `virtualScrolling` | `boolean`                          | `false`     | Enables virtual scrolling for large datasets |
 
 ### Events
 

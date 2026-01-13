@@ -430,6 +430,14 @@ export default {
     '@site/docs/tutorials/react/setup-for-user-project.md',
     require.resolveWeak('@site/docs/tutorials/react/setup-for-user-project.md'),
   ],
+  'content---pivot-head-docs-tutorials-virtual-scrolling-16-e-96b': [
+    () =>
+      import(
+        /* webpackChunkName: "content---pivot-head-docs-tutorials-virtual-scrolling-16-e-96b" */ '@site/docs/tutorials/virtual-scrolling.md'
+      ),
+    '@site/docs/tutorials/virtual-scrolling.md',
+    require.resolveWeak('@site/docs/tutorials/virtual-scrolling.md'),
+  ],
   'content---pivot-head-docs-tutorials-vue-setup-for-user-project-860-9a2': [
     () =>
       import(
