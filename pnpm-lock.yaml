@@ -148,7 +148,7 @@ importers:
   examples/new-js-web-component:
     dependencies:
       '@mindfiredigital/pivothead-web-component':
-        specifier: workspace:^1.0.2
+        specifier: workspace:*
         version: link:../../packages/web-component
     devDependencies:
       vite:
@@ -177,7 +177,7 @@ importers:
   examples/react-demo:
     dependencies:
       '@mindfiredigital/pivothead':
-        specifier: workspace:^1.5.0
+        specifier: workspace:^1.8.2
         version: link:../../packages/core
       '@mindfiredigital/pivothead-react':
         specifier: workspace:*
@@ -214,7 +214,7 @@ importers:
   examples/react-web-component-demo:
     dependencies:
       '@mindfiredigital/pivothead-web-component':
-        specifier: workspace:^1.0.2
+        specifier: workspace:*
         version: link:../../packages/web-component
       react:
         specifier: ^19.1.0
@@ -254,11 +254,8 @@ importers:
   examples/react-wrapper-example:
     dependencies:
       '@mindfiredigital/pivothead':
-        specifier: workspace:^1.5.0
+        specifier: workspace:^1.8.2
         version: link:../../packages/core
-      '@mindfiredigital/pivothead-react':
-        specifier: workspace:*
-        version: link:../../packages/react
       '@mindfiredigital/pivothead-web-component':
         specifier: workspace:*
         version: link:../../packages/web-component

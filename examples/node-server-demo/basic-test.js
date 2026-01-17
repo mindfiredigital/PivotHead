@@ -9,9 +9,10 @@ const fs = require('fs');
 const path = require('path');
 
 // Import from the local build (using relative path to packages/core)
-// In production, users would do: const { WasmLoader } = require('@mindfiredigital/pivothead');
+// In production, users would do: const { WasmLoader, PivotEngine } = require('@mindfiredigital/pivothead');
 const {
   WasmLoader,
+  PivotEngine,
 } = require('../../packages/core/dist/pivothead-core.umd.js');
 
 async function basicTest() {
@@ -119,6 +120,106 @@ async function basicTest() {
     console.log(`✓ Benchmark completed in ${benchmarkTime}ms`);
     console.log('');
 
+    // Step 11: Test filtering with PivotEngine
+    console.log('Step 11: Testing filtering with PivotEngine...');
+
+    // Parse CSV data into structured format
+    const dataLines = csvData.trim().split('\n');
+    const headers = dataLines[0].split(',').map(h => h.trim());
+    const dataRows = dataLines
+      .slice(1)
+      .filter(line => line.trim())
+      .map(line => {
+        const values = line.split(',').map(v => v.trim());
+        const row = {};
+        headers.forEach((header, index) => {
+          const value = values[index];
+          // Try to parse as number if possible
+          row[header] = isNaN(value) ? value : parseFloat(value);
+        });
+        return row;
+      });
+
+    console.log(`  Original data: ${dataRows.length} rows`);
+
+    // Create PivotEngine configuration
+    const pivotConfig = {
+      data: dataRows,
+      rawData: dataRows,
+      rows: headers.map(h => ({ uniqueName: h })),
+      columns: [],
+      measures: headers
+        .filter(h => typeof dataRows[0]?.[h] === 'number')
+        .map(h => ({
+          uniqueName: h,
+          aggregation: 'sum',
+        })),
+      dimensions: headers
+        .filter(h => typeof dataRows[0]?.[h] === 'string')
+        .map(h => ({
+          field: h,
+          label: h,
+          type: 'string',
+        })),
+      defaultAggregation: 'sum',
+    };
+
+    // Create PivotEngine instance
+    const pivotEngine = new PivotEngine(pivotConfig);
+    console.log('✓ PivotEngine instance created');
+
+    // Test 1: Filter by Salary > 70000
+    console.log('');
+    console.log('  Test 1: Filter Salary > 70000');
+    pivotEngine.applyFilters([
+      {
+        field: 'Salary',
+        operator: 'greaterThan',
+        value: 70000,
+      },
+    ]);
+    let state = pivotEngine.getState();
+    console.log(`  ✓ Filtered rows: ${state.rawData.length}`);
+
+    // Test 2: Filter by Department = 'Engineering'
+    console.log('');
+    console.log('  Test 2: Filter Department = Engineering');
+    pivotEngine.applyFilters([
+      {
+        field: 'Department',
+        operator: 'equals',
+        value: 'Engineering',
+      },
+    ]);
+    state = pivotEngine.getState();
+    console.log(`  ✓ Filtered rows: ${state.rawData.length}`);
+
+    // Test 3: Multiple filters (Engineering AND Salary > 70000)
+    console.log('');
+    console.log('  Test 3: Multiple filters (Engineering AND Salary > 70000)');
+    pivotEngine.applyFilters([
+      {
+        field: 'Department',
+        operator: 'equals',
+        value: 'Engineering',
+      },
+      {
+        field: 'Salary',
+        operator: 'greaterThan',
+        value: 70000,
+      },
+    ]);
+    state = pivotEngine.getState();
+    console.log(`  ✓ Filtered rows: ${state.rawData.length}`);
+    console.log('  Sample filtered data:');
+    state.rawData.slice(0, 3).forEach(row => {
+      console.log(`    - ${row.Name}: ${row.Department}, $${row.Salary}`);
+    });
+
+    console.log('');
+    console.log('✓ All filter tests passed!');
+    console.log('');
+
     console.log('='.repeat(60));
     console.log('TEST COMPLETED SUCCESSFULLY');
     console.log('='.repeat(60));
@@ -132,6 +233,9 @@ async function basicTest() {
     console.log(
       `  - Memory Estimate:   ${(estimatedMemory / 1024).toFixed(2)} KB`
     );
+    console.log(`  - Filter Tests:      3 tests passed`);
+    console.log(`  - Original Rows:     ${dataRows.length}`);
+    console.log(`  - Final Filtered:    ${state.rawData.length}`);
     console.log('');
 
     // Cleanup

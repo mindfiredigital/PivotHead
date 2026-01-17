@@ -10,17 +10,18 @@ sidebar_label: React
 
 The PivotHead component accepts the following props:
 
-| Prop         | Type                               | Default     | Description                     |
-| ------------ | ---------------------------------- | ----------- | ------------------------------- |
-| `mode`       | `'default' \| 'minimal' \| 'none'` | `'default'` | Rendering mode                  |
-| `data`       | `PivotDataRecord[]`                | -           | Dataset to analyze              |
-| `options`    | `PivotOptions`                     | -           | Pivot configuration             |
-| `filters`    | `FilterConfig[]`                   | -           | Active filters                  |
-| `pagination` | `Partial<PaginationConfig>`        | -           | Pagination settings             |
-| `className`  | `string`                           | -           | CSS class name                  |
-| `style`      | `React.CSSProperties`              | -           | Inline styles                   |
-| `headerSlot` | `React.ReactNode`                  | -           | Header content for minimal mode |
-| `bodySlot`   | `React.ReactNode`                  | -           | Body content for minimal mode   |
+| Prop               | Type                               | Default     | Description                                  |
+| ------------------ | ---------------------------------- | ----------- | -------------------------------------------- |
+| `mode`             | `'default' \| 'minimal' \| 'none'` | `'default'` | Rendering mode                               |
+| `data`             | `PivotDataRecord[]`                | -           | Dataset to analyze                           |
+| `options`          | `PivotOptions`                     | -           | Pivot configuration                          |
+| `filters`          | `FilterConfig[]`                   | -           | Active filters                               |
+| `pagination`       | `Partial<PaginationConfig>`        | -           | Pagination settings                          |
+| `className`        | `string`                           | -           | CSS class name                               |
+| `style`            | `React.CSSProperties`              | -           | Inline styles                                |
+| `headerSlot`       | `React.ReactNode`                  | -           | Header content for minimal mode              |
+| `bodySlot`         | `React.ReactNode`                  | -           | Body content for minimal mode                |
+| `virtualScrolling` | `boolean`                          | `false`     | Enables virtual scrolling for large datasets |
 
 ### Events
 

@@ -153,6 +153,16 @@ interface PaginationConfig {
 <pivot-head-wrapper [mode]="'none'" [data]="salesData" />
 ```
 
+### virtualScrolling
+
+- **Type**: `boolean`
+- **Default**: `false`
+- **Description**: Enables virtual scrolling to efficiently render large datasets. When true, only the visible rows are rendered in the DOM.
+
+```html
+<pivot-head-wrapper [data]="largeDataset" [virtualScrolling]="true" />
+```
+
 ## Outputs
 
 ### stateChange
