@@ -89,6 +89,9 @@ importers:
       '@mindfiredigital/pivothead-web-component':
         specifier: workspace:*
         version: link:../../packages/web-component
+      chart.js:
+        specifier: ^4.4.3
+        version: 4.4.3
       rxjs:
         specifier: ~7.8.0
         version: 7.8.0
@@ -216,6 +219,9 @@ importers:
       '@mindfiredigital/pivothead-web-component':
         specifier: workspace:*
         version: link:../../packages/web-component
+      chart.js:
+        specifier: ^4.4.1
+        version: 4.4.3
       react:
         specifier: ^19.1.0
         version: 19.1.0
@@ -322,6 +328,12 @@ importers:
       '@mindfiredigital/pivothead-vue':
         specifier: workspace:*
         version: link:../../packages/vue
+      '@mindfiredigital/pivothead-web-component':
+        specifier: workspace:*
+        version: link:../../packages/web-component
+      chart.js:
+        specifier: ^4.4.3
+        version: 4.4.3
       vue:
         specifier: ^3.5.21
         version: 3.5.21(typescript@5.4.5)
@@ -3981,6 +3993,10 @@ packages:
       tslib: 2.3.0
     dev: true
 
+  /@kurkle/color@0.3.4:
+    resolution: {integrity: sha512-M5UknZPHRu3DEDWoipU6sE8PdkZ6Z/S+v4dD+Ke8IaNlpdSQah50lz1KtcFBa2vsdOnwbbnxJwVM4wty6udA5w==}
+    dev: false
+
   /@leichtgewicht/ip-codec@2.0.5:
     resolution: {integrity: sha512-Vo+PSpZG2/fmgmiNzYK9qWRh8h/CHrwD0mo1h1DzL4yzHNSfWYujGTYsWGreD000gcgmZ7K4Ys6Tx9TxtsKdDw==}
     dev: true
@@ -6657,6 +6673,13 @@ packages:
   /chardet@2.1.1:
     resolution: {integrity: sha512-PsezH1rqdV9VvyNhxxOW32/d75r01NY7TQCmOqomRo15ZSOKbpTFVsfjghxo6JloQUCGnH4k1LGu0R4yCLlWQQ==}
     dev: true
+
+  /chart.js@4.4.3:
+    resolution: {integrity: sha512-qK1gkGSRYcJzqrrzdR6a+I0vQ4/R+SoODXyAjscQ/4mzuNzySaMCd+hyVxitSY1+L2fjPD1Gbn+ibNqRmwQeLw==}
+    engines: {pnpm: '>=8'}
+    dependencies:
+      '@kurkle/color': 0.3.4
+    dev: false
 
   /check-error@1.0.3:
     resolution: {integrity: sha512-iKEoDYaRmd1mxM90a2OEfWhjsjPpYPuQ+lMYsoxB126+t8fw7ySEO48nmDg5COTjxDI65/Y2OWpeEHk3ZOe8zg==}

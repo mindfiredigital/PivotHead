@@ -86,6 +86,114 @@
       </div>
     </div>
 
+    <!-- Data Visualization Section -->
+    <div class="chart-controls">
+      <h2>Data Visualization</h2>
+      <p class="chart-description">
+        Visualize your pivot table data with various chart types. Select a chart type and configure filters to customize your visualization.
+      </p>
+
+      <div class="chart-config">
+        <!-- Chart Type Selector -->
+        <div class="chart-type-section">
+          <label for="chartType" class="chart-label">Chart Type:</label>
+          <select
+            id="chartType"
+            :value="chartType"
+            @change="handleChartTypeChange"
+            class="chart-select"
+          >
+            <option value="none">-- Select Chart Type --</option>
+            <optgroup v-for="group in chartTypeOptions" :key="group.group" :label="group.group">
+              <option v-for="type in group.types" :key="type.value" :value="type.value">
+                {{ type.label }}
+              </option>
+            </optgroup>
+          </select>
+        </div>
+
+        <!-- Chart Filters (shown when chart type is selected) -->
+        <div v-if="chartType !== 'none'" class="chart-filters">
+          <!-- Measure Selection -->
+          <div class="filter-group">
+            <label class="filter-label">Measure:</label>
+            <select v-model="selectedMeasure" class="filter-select">
+              <option v-for="measure in chartFilterOptions.measures" :key="measure.uniqueName" :value="measure.uniqueName">
+                {{ measure.caption }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Row Selection -->
+          <div class="filter-group">
+            <label class="filter-label">
+              Rows ({{ selectedRows.length }}/{{ chartFilterOptions.rows.length }}):
+              <span class="select-actions">
+                <button type="button" @click="selectAllRows" class="select-action-btn">All</button>
+                <button type="button" @click="deselectAllRows" class="select-action-btn">None</button>
+              </span>
+            </label>
+            <div class="checkbox-list">
+              <label v-for="row in chartFilterOptions.rows" :key="row" class="checkbox-item">
+                <input
+                  type="checkbox"
+                  :checked="selectedRows.includes(row)"
+                  @change="toggleRowSelection(row)"
+                />
+                {{ row }}
+              </label>
+            </div>
+          </div>
+
+          <!-- Column Selection -->
+          <div class="filter-group">
+            <label class="filter-label">
+              Columns ({{ selectedColumns.length }}/{{ chartFilterOptions.columns.length }}):
+              <span class="select-actions">
+                <button type="button" @click="selectAllColumns" class="select-action-btn">All</button>
+                <button type="button" @click="deselectAllColumns" class="select-action-btn">None</button>
+              </span>
+            </label>
+            <div class="checkbox-list">
+              <label v-for="column in chartFilterOptions.columns" :key="column" class="checkbox-item">
+                <input
+                  type="checkbox"
+                  :checked="selectedColumns.includes(column)"
+                  @change="toggleColumnSelection(column)"
+                />
+                {{ column }}
+              </label>
+            </div>
+          </div>
+
+          <!-- Limit -->
+          <div class="filter-group">
+            <label class="filter-label">Limit (Top N):</label>
+            <input
+              type="number"
+              v-model.number="chartLimit"
+              min="1"
+              max="100"
+              class="limit-input"
+            />
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="chart-actions">
+            <button @click="applyChartFilters" class="chart-btn apply-btn">
+              Apply &amp; Render Chart
+            </button>
+            <button @click="resetChartFilters" class="chart-btn reset-btn">
+              Reset Filters
+            </button>
+            <button v-if="showChart" @click="hideChart" class="chart-btn hide-btn">
+              Hide Chart
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Default Mode -->
     <div v-if="currentMode === 'default'">
       <div class="description">
@@ -101,6 +209,7 @@
         @state-change="handleStateChange"
         @view-mode-change="handleViewModeChange"
         @pagination-change="handlePaginationChange"
+        @chart-rendered="handleChartRendered"
         class="pivot-container"
       />
     </div>
@@ -122,11 +231,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, watch, nextTick } from 'vue'
 import { PivotHead } from '@mindfiredigital/pivothead-vue'
 // @ts-ignore
 import MinimalMode from './components/MinimalMode.vue'
 import type { PivotDataRecord, PivotOptions, PaginationConfig, FileConnectionResult } from '@mindfiredigital/pivothead-vue'
+import { ChartService } from '@mindfiredigital/pivothead-analytics'
+import type { ChartType, ChartFilterConfig } from '@mindfiredigital/pivothead-analytics'
+
+// Chart.js is loaded in main.ts to ensure it's available before the web component
 
 // Component refs
 const pivotRef = ref()
@@ -138,6 +251,56 @@ const currentViewMode = ref<'raw' | 'processed'>('processed')
 const isUploading = ref(false)
 const uploadProgress = ref(0)
 const uploadResult = ref<FileConnectionResult | null>(null)
+
+// Chart state
+const showChart = ref(false)
+const chartType = ref<ChartType | 'none'>('none')
+const chartServiceRef = ref<ChartService | null>(null)
+const chartFilterOptions = ref<{
+  measures: Array<{ uniqueName: string; caption: string }>;
+  rows: string[];
+  columns: string[];
+}>({
+  measures: [],
+  rows: [],
+  columns: []
+})
+const selectedMeasure = ref('')
+const selectedRows = ref<string[]>([])
+const selectedColumns = ref<string[]>([])
+const chartLimit = ref(10)
+
+// Chart types grouped by category
+const chartTypeOptions = [
+  { group: 'Basic Charts', types: [
+    { value: 'column', label: 'Column Chart' },
+    { value: 'bar', label: 'Bar Chart' },
+    { value: 'line', label: 'Line Chart' },
+    { value: 'area', label: 'Area Chart' }
+  ]},
+  { group: 'Circular Charts', types: [
+    { value: 'pie', label: 'Pie Chart' },
+    { value: 'doughnut', label: 'Doughnut Chart' }
+  ]},
+  { group: 'Stacked Charts', types: [
+    { value: 'stackedColumn', label: 'Stacked Column' },
+    { value: 'stackedBar', label: 'Stacked Bar' },
+    { value: 'stackedArea', label: 'Stacked Area' }
+  ]},
+  { group: 'Combo Charts', types: [
+    { value: 'comboBarLine', label: 'Bar + Line' },
+    { value: 'comboAreaLine', label: 'Area + Line' }
+  ]},
+  { group: 'Statistical Charts', types: [
+    { value: 'scatter', label: 'Scatter Plot' },
+    { value: 'histogram', label: 'Histogram' }
+  ]},
+  { group: 'Specialized Charts', types: [
+    { value: 'heatmap', label: 'Heatmap' },
+    { value: 'funnel', label: 'Funnel Chart' },
+    { value: 'sankey', label: 'Sankey Diagram' }
+  ]}
+]
 
 // Sample sales data
 const salesData = ref<PivotDataRecord[]>([
@@ -357,8 +520,167 @@ const formatFileSize = (bytes: number): string => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
 }
 
+// Chart methods
+const initChartService = () => {
+  if (!pivotRef.value) return
+
+  try {
+    // Access the underlying web component's engine
+    const el = (pivotRef.value as any).$el || pivotRef.value
+    const pivotElement = el.tagName === 'PIVOT-HEAD' ? el : el.querySelector('pivot-head')
+
+    if (pivotElement && pivotElement.engine) {
+      chartServiceRef.value = new ChartService(pivotElement.engine)
+      console.log('ChartService initialized successfully')
+
+      // Get available filter options
+      const filterOptions = chartServiceRef.value.getAvailableFilterOptions()
+      chartFilterOptions.value = filterOptions
+
+      // Set defaults
+      if (filterOptions.measures.length > 0) {
+        selectedMeasure.value = filterOptions.measures[0].uniqueName
+      }
+      selectedRows.value = [...filterOptions.rows]
+      selectedColumns.value = [...filterOptions.columns]
+
+      statusMessage.value = 'Chart service initialized'
+    } else {
+      console.warn('Pivot engine not available yet')
+      // Retry after a short delay
+      setTimeout(initChartService, 500)
+    }
+  } catch (error) {
+    console.error('Failed to initialize ChartService:', error)
+    statusMessage.value = 'Failed to initialize chart service'
+  }
+}
+
+const handleChartTypeChange = (event: Event) => {
+  const target = event.target as HTMLSelectElement
+  const newType = target.value as ChartType | 'none'
+  chartType.value = newType
+
+  if (newType === 'none') {
+    hideChart()
+  } else {
+    // Initialize chart service if not already done
+    if (!chartServiceRef.value) {
+      initChartService()
+    }
+    showChart.value = true
+    // Render chart immediately when type is selected
+    nextTick(() => {
+      applyChartFilters()
+    })
+  }
+}
+
+const applyChartFilters = () => {
+  console.log('applyChartFilters called', { chartType: chartType.value, pivotRef: pivotRef.value })
+
+  if (!pivotRef.value || chartType.value === 'none') {
+    console.warn('Cannot render chart: pivotRef or chartType not available')
+    return
+  }
+
+  try {
+    const filters: ChartFilterConfig = {
+      selectedMeasure: selectedMeasure.value,
+      selectedRows: selectedRows.value,
+      selectedColumns: selectedColumns.value,
+      limit: chartLimit.value
+    }
+
+    console.log('Chart filters:', filters)
+
+    // Set filters on the chart service (local)
+    if (chartServiceRef.value) {
+      chartServiceRef.value.setFilters(filters)
+    }
+
+    // Set filters on the web component
+    console.log('Setting chart filters on web component...')
+    pivotRef.value.setChartFilters(filters)
+
+    // Render the chart
+    console.log('Rendering chart:', chartType.value)
+    pivotRef.value.renderChart(chartType.value as ChartType)
+
+    showChart.value = true
+    statusMessage.value = `Chart rendered: ${chartType.value}`
+    console.log('Chart render complete')
+  } catch (error) {
+    console.error('Failed to render chart:', error)
+    statusMessage.value = `Failed to render chart: ${error}`
+  }
+}
+
+const resetChartFilters = () => {
+  // Reset to defaults
+  if (chartFilterOptions.value.measures.length > 0) {
+    selectedMeasure.value = chartFilterOptions.value.measures[0].uniqueName
+  }
+  selectedRows.value = [...chartFilterOptions.value.rows]
+  selectedColumns.value = [...chartFilterOptions.value.columns]
+  chartLimit.value = 10
+  statusMessage.value = 'Chart filters reset'
+}
+
+const hideChart = () => {
+  if (pivotRef.value) {
+    pivotRef.value.hideChart()
+  }
+  showChart.value = false
+  chartType.value = 'none'
+  statusMessage.value = 'Chart hidden'
+}
+
+const handleChartRendered = (event: any) => {
+  console.log('Chart rendered:', event)
+  statusMessage.value = `Chart rendered successfully: ${event.type}`
+}
+
+const toggleRowSelection = (row: string) => {
+  const index = selectedRows.value.indexOf(row)
+  if (index > -1) {
+    selectedRows.value.splice(index, 1)
+  } else {
+    selectedRows.value.push(row)
+  }
+}
+
+const toggleColumnSelection = (column: string) => {
+  const index = selectedColumns.value.indexOf(column)
+  if (index > -1) {
+    selectedColumns.value.splice(index, 1)
+  } else {
+    selectedColumns.value.push(column)
+  }
+}
+
+const selectAllRows = () => {
+  selectedRows.value = [...chartFilterOptions.value.rows]
+}
+
+const deselectAllRows = () => {
+  selectedRows.value = []
+}
+
+const selectAllColumns = () => {
+  selectedColumns.value = [...chartFilterOptions.value.columns]
+}
+
+const deselectAllColumns = () => {
+  selectedColumns.value = []
+}
+
 onMounted(() => {
   statusMessage.value = 'PivotHead Vue component loaded successfully'
+  // Initialize chart service after component is mounted
+  nextTick(() => {
+    setTimeout(initChartService, 1000)
+  })
 })
 </script>
 
@@ -585,5 +907,224 @@ onMounted(() => {
   border-radius: 4px;
   color: #004085;
   font-size: 0.95rem;
+}
+
+/* Chart Controls */
+.chart-controls {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.chart-controls h2 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  color: #212529;
+  font-size: 1.5rem;
+}
+
+.chart-description {
+  margin-bottom: 16px;
+  color: #6c757d;
+  font-size: 0.95rem;
+}
+
+.chart-config {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.chart-type-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chart-label {
+  font-weight: 600;
+  color: #212529;
+  min-width: 100px;
+}
+
+.chart-select {
+  padding: 10px 14px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 0.95rem;
+  min-width: 250px;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.chart-select:hover {
+  border-color: #007bff;
+}
+
+.chart-select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+}
+
+.chart-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-label {
+  font-weight: 600;
+  color: #495057;
+  font-size: 0.9rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.select-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.select-action-btn {
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  border: 1px solid #ced4da;
+  background: #fff;
+  border-radius: 3px;
+  cursor: pointer;
+  color: #495057;
+  transition: all 0.2s;
+}
+
+.select-action-btn:hover {
+  background: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.filter-select {
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+}
+
+.checkbox-list {
+  max-height: 150px;
+  overflow-y: auto;
+  padding: 8px;
+  background: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 0.9rem;
+  color: #495057;
+  cursor: pointer;
+}
+
+.checkbox-item:hover {
+  background: #f8f9fa;
+}
+
+.checkbox-item input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.limit-input {
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 0.9rem;
+  width: 100px;
+}
+
+.limit-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+}
+
+.chart-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 1px solid #dee2e6;
+}
+
+.chart-btn {
+  padding: 10px 20px;
+  border: 2px solid;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+}
+
+.apply-btn {
+  background: #28a745;
+  color: white;
+  border-color: #28a745;
+}
+
+.apply-btn:hover {
+  background: #218838;
+  border-color: #1e7e34;
+}
+
+.reset-btn {
+  background: #6c757d;
+  color: white;
+  border-color: #6c757d;
+}
+
+.reset-btn:hover {
+  background: #5a6268;
+  border-color: #545b62;
+}
+
+.hide-btn {
+  background: #dc3545;
+  color: white;
+  border-color: #dc3545;
+}
+
+.hide-btn:hover {
+  background: #c82333;
+  border-color: #bd2130;
 }
 </style>

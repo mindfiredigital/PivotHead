@@ -170,9 +170,6 @@ export interface ProcessedDataResult<T> {
   groups: Group[];
 }
 
-// Chart types supported
-export type ChartType = 'bar' | 'line' | 'pie' | 'scatter';
-
 // Pivot data structure
 export interface PivotData {
   [key: string]: string | number;
