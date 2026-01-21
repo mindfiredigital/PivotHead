@@ -8,6 +8,7 @@
 const express = require('express');
 const {
   WasmLoader,
+  PivotEngine,
 } = require('../../packages/core/dist/pivothead-core.umd.js');
 
 const app = express();
@@ -250,6 +251,127 @@ app.post('/api/detect-types', ensureWasmReady, (req, res) => {
 });
 
 /**
+ * Filter CSV data
+ * POST /api/filter
+ * Body: {
+ *   csv: "...",
+ *   filters: [{ field: "Salary", operator: "greaterThan", value: 70000 }],
+ *   delimiter?: ",",
+ *   hasHeader?: true
+ * }
+ */
+app.post('/api/filter', ensureWasmReady, (req, res) => {
+  try {
+    const startTime = Date.now();
+
+    // Extract CSV data from request
+    let csvData;
+    if (typeof req.body === 'string') {
+      csvData = req.body;
+    } else if (req.body.csv) {
+      csvData = req.body.csv;
+    } else {
+      return res.status(400).json({
+        error: 'Bad Request',
+        message:
+          'CSV data is required. Send as text/csv or JSON with "csv" field.',
+      });
+    }
+
+    // Parse options
+    const options = {
+      delimiter: req.body.delimiter || ',',
+      hasHeader: req.body.hasHeader !== false,
+      trimValues: req.body.trimValues !== false,
+    };
+
+    // Parse CSV using WASM
+    const result = wasm.parseCSVChunk(csvData, options);
+
+    if (result.errorCode !== 0) {
+      return res.status(400).json({
+        error: 'CSV Parse Error',
+        message: result.errorMessage,
+        errorCode: result.errorCode,
+      });
+    }
+
+    // Convert CSV to structured data
+    const lines = csvData.trim().split('\n');
+    const headers = lines[0].split(options.delimiter).map(h => h.trim());
+    const dataRows = lines.slice(1).map(line => {
+      const values = line.split(options.delimiter).map(v => v.trim());
+      const row = {};
+      headers.forEach((header, index) => {
+        // Try to parse as number if possible
+        const value = values[index];
+        row[header] = isNaN(value) ? value : parseFloat(value);
+      });
+      return row;
+    });
+
+    // Get filters from request
+    const filters = req.body.filters || [];
+
+    // Create PivotEngine configuration
+    const config = {
+      data: dataRows,
+      rawData: dataRows,
+      rows: headers.map(h => ({ uniqueName: h })),
+      columns: [],
+      measures: headers
+        .filter(h => typeof dataRows[0]?.[h] === 'number')
+        .map(h => ({
+          uniqueName: h,
+          aggregation: 'sum',
+        })),
+      dimensions: headers
+        .filter(h => typeof dataRows[0]?.[h] === 'string')
+        .map(h => ({
+          field: h,
+          label: h,
+          type: 'string',
+        })),
+      defaultAggregation: 'sum',
+    };
+
+    // Create PivotEngine instance
+    const pivotEngine = new PivotEngine(config);
+
+    // Apply filters if provided
+    if (filters.length > 0) {
+      pivotEngine.applyFilters(filters);
+    }
+
+    // Get filtered state
+    const state = pivotEngine.getState();
+    const parseTime = Date.now() - startTime;
+
+    // Return filtered results
+    res.json({
+      success: true,
+      data: {
+        originalRowCount: dataRows.length,
+        filteredRowCount: state.rawData.length,
+        filters: filters,
+        filteredData: state.rawData,
+        parseTime: parseTime,
+      },
+      meta: {
+        wasmVersion: wasm.getVersion(),
+        options: options,
+      },
+    });
+  } catch (error) {
+    console.error('Error in /api/filter:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: error.message,
+    });
+  }
+});
+
+/**
  * Get WASM version info
  */
 app.get('/api/version', ensureWasmReady, (req, res) => {
@@ -280,6 +402,7 @@ app.use((req, res) => {
       'POST /api/analyze',
       'POST /api/benchmark',
       'POST /api/detect-types',
+      'POST /api/filter',
     ],
   });
 });
@@ -298,12 +421,19 @@ app.listen(PORT, () => {
   console.log(`  POST http://localhost:${PORT}/api/analyze`);
   console.log(`  POST http://localhost:${PORT}/api/benchmark`);
   console.log(`  POST http://localhost:${PORT}/api/detect-types`);
+  console.log(`  POST http://localhost:${PORT}/api/filter`);
   console.log('');
   console.log('Example curl commands:');
   console.log(`  curl http://localhost:${PORT}/health`);
   console.log(`  curl -X POST http://localhost:${PORT}/api/parse \\`);
   console.log(`    -H "Content-Type: application/json" \\`);
   console.log(`    -d '{"csv":"Name,Age\\nJohn,30\\nJane,25"}'`);
+  console.log('');
+  console.log(`  curl -X POST http://localhost:${PORT}/api/filter \\`);
+  console.log(`    -H "Content-Type: application/json" \\`);
+  console.log(
+    `    -d '{"csv":"Name,Age,Salary\\nJohn,30,75000\\nJane,28,65000","filters":[{"field":"Salary","operator":"greaterThan","value":70000}]}'`
+  );
   console.log('='.repeat(60));
 });
 

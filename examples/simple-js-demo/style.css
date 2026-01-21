@@ -131,3 +131,264 @@ tr[draggable='true'] {
 .align-center {
   text-align: center !important;
 }
+
+/* Chart Visualization Styles */
+.chart-container {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: 10px 0;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  flex-wrap: wrap;
+}
+
+.chart-container label {
+  font-weight: 600;
+  color: #333;
+}
+
+.chart-container select {
+  min-width: 200px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.chart-container select:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+#chartSection {
+  margin: 20px;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Chart Header with Title and Filters */
+#chartHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e8eaed;
+}
+
+#chartTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #202124;
+  flex: 0 0 auto;
+}
+
+/* Chart Filters Panel - positioned on the right */
+#chartFilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.chart-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chart-filter-group label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #5f6368;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.chart-filter-group select {
+  padding: 6px 10px;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  background-color: #fff;
+  font-size: 13px;
+  color: #202124;
+  cursor: pointer;
+  min-width: 120px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.chart-filter-group select:focus {
+  outline: none;
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+}
+
+.chart-filter-group select:hover {
+  border-color: #5f6368;
+}
+
+/* Multi-select dropdowns */
+.chart-filter-group select[multiple] {
+  min-height: 60px;
+  max-height: 100px;
+  padding: 4px;
+}
+
+.chart-filter-group select[multiple] option {
+  padding: 4px 8px;
+  border-radius: 2px;
+}
+
+.chart-filter-group select[multiple] option:checked {
+  background: linear-gradient(0deg, #e8f0fe 0%, #e8f0fe 100%);
+  color: #1a73e8;
+}
+
+/* Chart Filter Buttons */
+.chart-filter-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.chart-filter-btn:not(.reset) {
+  background-color: #1a73e8;
+  color: #fff;
+}
+
+.chart-filter-btn:not(.reset):hover {
+  background-color: #1557b0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.chart-filter-btn.reset {
+  background-color: #f1f3f4;
+  color: #5f6368;
+  border: 1px solid #dadce0;
+}
+
+.chart-filter-btn.reset:hover {
+  background-color: #e8eaed;
+  color: #202124;
+}
+
+#chartContainer {
+  position: relative;
+  width: 100%;
+  height: 450px;
+  min-height: 400px;
+  max-height: 600px;
+}
+
+#chartContainer canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Responsive chart adjustments */
+@media (max-width: 992px) {
+  #chartHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  #chartFilters {
+    justify-content: flex-start;
+  }
+
+  #chartTitle {
+    text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+  #chartContainer {
+    height: 350px;
+    min-height: 300px;
+  }
+
+  .chart-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .chart-container select {
+    width: 100%;
+  }
+
+  #chartFilters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .chart-filter-group {
+    width: 100%;
+  }
+
+  .chart-filter-group select {
+    width: 100%;
+  }
+
+  .chart-filter-btn {
+    width: 100%;
+  }
+}
+
+/* Heatmap table styles */
+.heatmap-table {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 13px;
+}
+
+.heatmap-table th,
+.heatmap-table td {
+  transition: all 0.2s ease;
+}
+
+.heatmap-table tr:hover td {
+  opacity: 0.9;
+}
+
+/* Hide chart button styling */
+#hideChart {
+  background-color: #dc3545;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+#hideChart:hover {
+  background-color: #c82333;
+}
+
+/* Chart type dropdown option group styling */
+#chartType optgroup {
+  font-weight: 600;
+  color: #333;
+  background-color: #f0f0f0;
+}
+
+#chartType option {
+  padding: 8px;
+  font-weight: normal;
+}

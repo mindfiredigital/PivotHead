@@ -3,10 +3,52 @@
   <head>
     <title>PivotHead Simple Demo</title>
     <link rel="stylesheet" href="./style.css" />
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- Chart.js plugins for specialized charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@2.0.1/dist/chartjs-chart-matrix.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-sankey@0.12.0/dist/chartjs-chart-sankey.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
   </head>
   <body>
     <div class="controls"></div>
     <div id="myTable"></div>
+    <!-- Chart container -->
+    <div id="chartSection" style="display: none;">
+      <div id="chartHeader">
+        <h3 id="chartTitle">Chart Visualization</h3>
+        <div id="chartFilters">
+          <div class="chart-filter-group">
+            <label for="chartMeasureSelect">Measure:</label>
+            <select id="chartMeasureSelect"></select>
+          </div>
+          <div class="chart-filter-group">
+            <label for="chartRowsSelect">Show Rows:</label>
+            <select id="chartRowsSelect" multiple></select>
+          </div>
+          <div class="chart-filter-group">
+            <label for="chartColumnsSelect">Show Categories:</label>
+            <select id="chartColumnsSelect" multiple></select>
+          </div>
+          <div class="chart-filter-group">
+            <label for="chartLimitSelect">Limit Items:</label>
+            <select id="chartLimitSelect">
+              <option value="0">All</option>
+              <option value="3">Top 3</option>
+              <option value="5" selected>Top 5</option>
+              <option value="10">Top 10</option>
+              <option value="15">Top 15</option>
+              <option value="20">Top 20</option>
+            </select>
+          </div>
+          <button id="applyChartFilter" class="chart-filter-btn">Apply Filter</button>
+          <button id="resetChartFilter" class="chart-filter-btn reset">Reset</button>
+        </div>
+      </div>
+      <div id="chartContainer">
+        <canvas id="pivotChart"></canvas>
+      </div>
+    </div>
     <script type="module" src="./index.js"></script>
   </body>
 </html>

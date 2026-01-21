@@ -11,6 +11,9 @@
   },
   "dependencies": {
     "@mindfiredigital/pivothead-vue": "workspace:*",
+    "@mindfiredigital/pivothead-web-component": "workspace:*",
+    "@mindfiredigital/pivothead-analytics": "workspace:*",
+    "chart.js": "^4.4.3",
     "vue": "^3.5.21"
   },
   "devDependencies": {

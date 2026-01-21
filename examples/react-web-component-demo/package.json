@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@mindfiredigital/pivothead-web-component": "workspace:*",
+    "@mindfiredigital/pivothead-analytics": "workspace:*",
+    "chart.js": "^4.4.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },

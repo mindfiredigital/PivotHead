@@ -145,6 +145,7 @@ const sidebars = {
             'tutorials/vue/setup-for-user-project',
           ],
         },
+        // 'tutorials/virtual-scrolling',
         // {
         //   type: 'category',
         //   label: 'Angular',

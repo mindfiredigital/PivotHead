@@ -1,0 +1,19 @@
+{
+  "id": "tutorials/virtual-scrolling",
+  "title": "Virtual Scrolling for Large Datasets",
+  "description": "When working with very large datasets, rendering thousands of rows in the pivot table can lead to performance issues and a sluggish user interface. To solve this, PivotHead includes a virtual scrolling feature.",
+  "source": "@site/docs/tutorials/virtual-scrolling.md",
+  "sourceDirName": "tutorials",
+  "slug": "/tutorials/virtual-scrolling",
+  "permalink": "/PivotHead/docs/tutorials/virtual-scrolling",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorials/virtual-scrolling.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "virtual-scrolling",
+    "title": "Virtual Scrolling for Large Datasets",
+    "sidebar_label": "Virtual Scrolling"
+  }
+}

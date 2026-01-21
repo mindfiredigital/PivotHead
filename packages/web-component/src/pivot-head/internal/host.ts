@@ -3,6 +3,7 @@ import type {
   Group,
   PaginationConfig,
   PivotTableState,
+  VirtualScrollManager,
 } from '@mindfiredigital/pivothead';
 import type {
   EnhancedPivotEngine,
@@ -26,6 +27,7 @@ export interface PivotHeadHost {
   _showRawData: boolean;
   _rawDataColumnOrder: string[];
   _processedColumnOrder: string[];
+  _virtualScroller?: VirtualScrollManager;
   shadowRoot: ShadowRoot | null;
 
   // methods used across helpers

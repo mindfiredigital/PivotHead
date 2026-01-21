@@ -177,6 +177,10 @@
               "sidebar": "tutorialSidebar"
             },
             {
+              "id": "tutorials/virtual-scrolling",
+              "path": "/PivotHead/docs/tutorials/virtual-scrolling"
+            },
+            {
               "id": "tutorials/vue/setup-for-user-project",
               "path": "/PivotHead/docs/tutorials/vue/setup-for-user-project",
               "sidebar": "tutorialSidebar"

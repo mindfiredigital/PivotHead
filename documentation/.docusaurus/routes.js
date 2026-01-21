@@ -53,15 +53,15 @@ export default [
   },
   {
     path: '/PivotHead/docs',
-    component: ComponentCreator('/PivotHead/docs', '6b6'),
+    component: ComponentCreator('/PivotHead/docs', '42e'),
     routes: [
       {
         path: '/PivotHead/docs',
-        component: ComponentCreator('/PivotHead/docs', '3ee'),
+        component: ComponentCreator('/PivotHead/docs', 'c70'),
         routes: [
           {
             path: '/PivotHead/docs',
-            component: ComponentCreator('/PivotHead/docs', 'acf'),
+            component: ComponentCreator('/PivotHead/docs', '6fa'),
             routes: [
               {
                 path: '/PivotHead/docs/contributors/',
@@ -368,6 +368,14 @@ export default [
                 ),
                 exact: true,
                 sidebar: 'tutorialSidebar',
+              },
+              {
+                path: '/PivotHead/docs/tutorials/virtual-scrolling',
+                component: ComponentCreator(
+                  '/PivotHead/docs/tutorials/virtual-scrolling',
+                  '1cf'
+                ),
+                exact: true,
               },
               {
                 path: '/PivotHead/docs/tutorials/vue/setup-for-user-project',
