@@ -1,0 +1,70 @@
+{
+  "name": "@mindfiredigital/pivothead-analytics",
+  "version": "1.0.0",
+  "private": false,
+  "type": "module",
+  "description": "Data visualization and analytics module for PivotHead - provides chart rendering capabilities with Chart.js integration",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "author": "Mindfiredigital",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mindfiredigital/PivotHead.git"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "keywords": [
+    "pivothead",
+    "analytics",
+    "data-visualization",
+    "charts",
+    "chart.js",
+    "pivot-table",
+    "business-intelligence",
+    "data-analysis",
+    "bar-chart",
+    "pie-chart",
+    "line-chart",
+    "area-chart",
+    "heatmap",
+    "scatter-plot",
+    "histogram"
+  ],
+  "scripts": {
+    "build": "rimraf dist && tsup src/index.ts --format esm,cjs --dts",
+    "dev": "tsup src/index.ts --watch --format esm,cjs --dts",
+    "clean": "rimraf dist",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@mindfiredigital/pivothead": "workspace:*"
+  },
+  "peerDependencies": {
+    "chart.js": "^4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "chart.js": {
+      "optional": false
+    }
+  },
+  "devDependencies": {
+    "chart.js": "^4.4.3",
+    "rimraf": "^5.0.0",
+    "tsup": "^7.2.0",
+    "typescript": "^5.0.0"
+  }
+}
