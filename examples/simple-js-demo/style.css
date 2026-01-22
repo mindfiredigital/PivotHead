@@ -1,3 +1,50 @@
+/* Tab Navigation Styles */
+.tab-container {
+  display: flex;
+  justify-content: flex-end;
+  padding: 15px 20px;
+  margin-top: 10px;
+}
+
+.tab-nav {
+  display: flex;
+  gap: 0;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tab-btn {
+  padding: 10px 24px;
+  border: none;
+  background-color: #f8f9fa;
+  font-size: 14px;
+  font-weight: 500;
+  color: #5f6368;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+  color: #202124;
+  background-color: #e8eaed;
+}
+
+.tab-btn.active {
+  color: #fff;
+  background-color: #1a73e8;
+}
+
+/* Tab Content Styles */
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
 .controls {
   margin: 20px;
   padding: 10px;
@@ -166,21 +213,57 @@ tr[draggable='true'] {
 }
 
 #chartSection {
-  margin: 20px;
+  margin: 80px;
   padding: 20px;
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Chart Header with Title and Filters */
+/* Chart Controls */
+#chartControls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.chart-type-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.chart-type-selector label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #5f6368;
+}
+
+.chart-type-selector select {
+  padding: 8px 12px;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  background-color: #fff;
+  font-size: 14px;
+  color: #202124;
+  cursor: pointer;
+  min-width: 180px;
+}
+
+.chart-type-selector select:focus {
+  outline: none;
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+}
+
+/* Chart Header with Title and Controls */
 #chartHeader {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   flex-wrap: wrap;
   gap: 15px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   padding-bottom: 15px;
   border-bottom: 1px solid #e8eaed;
 }
@@ -193,14 +276,16 @@ tr[draggable='true'] {
   flex: 0 0 auto;
 }
 
-/* Chart Filters Panel - positioned on the right */
+/* Chart Filters Panel */
 #chartFilters {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
   align-items: flex-end;
-  flex: 1;
-  justify-content: flex-end;
+  padding: 15px;
+  margin-bottom: 15px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
 }
 
 .chart-filter-group {

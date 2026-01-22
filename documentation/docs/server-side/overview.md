@@ -486,7 +486,7 @@ With PivotHead's server-side implementation, you can build:
 
 1. Install: `npm install @mindfiredigital/pivothead`
 2. Initialize: `await wasm.load()` (once at startup)
-3. Parse: `wasm.parseCSVChunk(csvData, options)`
+3. Parse: `wasm.parseCSVChunk(csvData, option)`
 4. Use anywhere: REST APIs, background jobs, CLI tools, etc.
 
 **You get:**

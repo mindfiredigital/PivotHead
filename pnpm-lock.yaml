@@ -216,6 +216,9 @@ importers:
 
   examples/react-web-component-demo:
     dependencies:
+      '@mindfiredigital/pivothead-analytics':
+        specifier: workspace:*
+        version: link:../../packages/analytics
       '@mindfiredigital/pivothead-web-component':
         specifier: workspace:*
         version: link:../../packages/web-component
@@ -325,6 +328,9 @@ importers:
 
   examples/vue-example:
     dependencies:
+      '@mindfiredigital/pivothead-analytics':
+        specifier: workspace:*
+        version: link:../../packages/analytics
       '@mindfiredigital/pivothead-vue':
         specifier: workspace:*
         version: link:../../packages/vue
@@ -378,6 +384,25 @@ importers:
       vue-tsc:
         specifier: ^2.0.29
         version: 2.0.29(typescript@5.4.5)
+
+  packages/analytics:
+    dependencies:
+      '@mindfiredigital/pivothead':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      chart.js:
+        specifier: ^4.4.3
+        version: 4.4.3
+      rimraf:
+        specifier: ^5.0.0
+        version: 5.0.0
+      tsup:
+        specifier: ^7.2.0
+        version: 7.2.0(typescript@5.4.5)
+      typescript:
+        specifier: ~5.4.5
+        version: 5.4.5
 
   packages/angular:
     dependencies:
@@ -3995,7 +4020,6 @@ packages:
 
   /@kurkle/color@0.3.4:
     resolution: {integrity: sha512-M5UknZPHRu3DEDWoipU6sE8PdkZ6Z/S+v4dD+Ke8IaNlpdSQah50lz1KtcFBa2vsdOnwbbnxJwVM4wty6udA5w==}
-    dev: false
 
   /@leichtgewicht/ip-codec@2.0.5:
     resolution: {integrity: sha512-Vo+PSpZG2/fmgmiNzYK9qWRh8h/CHrwD0mo1h1DzL4yzHNSfWYujGTYsWGreD000gcgmZ7K4Ys6Tx9TxtsKdDw==}
@@ -6679,7 +6703,6 @@ packages:
     engines: {pnpm: '>=8'}
     dependencies:
       '@kurkle/color': 0.3.4
-    dev: false
 
   /check-error@1.0.3:
     resolution: {integrity: sha512-iKEoDYaRmd1mxM90a2OEfWhjsjPpYPuQ+lMYsoxB126+t8fw7ySEO48nmDg5COTjxDI65/Y2OWpeEHk3ZOe8zg==}
