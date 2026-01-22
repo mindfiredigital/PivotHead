@@ -15,8 +15,8 @@ import {
   PivotEngine,
   ConnectService,
   FieldService,
-  ChartService,
 } from '@mindfiredigital/pivothead';
+import { ChartService } from '@mindfiredigital/pivothead-analytics';
 import { sampleData, config } from './config/config.js';
 import { VirtualScroller } from './services/VirtualScroller.js';
 
