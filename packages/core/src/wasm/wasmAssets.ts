@@ -22,6 +22,7 @@ function isNode(): boolean {
 
 /**
  * Get the WASM file path for Node.js
+ * Uses dynamic require to prevent bundlers from including fs/path in browser builds
  */
 function getNodeWasmPath(): string {
   // In Node.js, use __dirname or module resolution
@@ -30,7 +31,9 @@ function getNodeWasmPath(): string {
   try {
     // Try to resolve relative to this module
     if (typeof __dirname !== 'undefined') {
-      const path = require('path');
+      // Use Function constructor to prevent static analysis by bundlers
+      const requireFunc = new Function('module', 'return require(module)');
+      const path = requireFunc('path');
       // __dirname will be the dist directory (since UMD bundles everything)
       // WASM file is in dist/wasm/csvParser.wasm
       const wasmPath = path.join(__dirname, 'wasm', 'csvParser.wasm');
@@ -92,10 +95,13 @@ function isValidWasm(bytes: Uint8Array): boolean {
 
 /**
  * Load WASM binary in Node.js environment
+ * Uses dynamic require to prevent bundlers from including fs/path in browser builds
  */
 function loadWasmNode(filePath: string): ArrayBuffer {
-  const fs = require('fs');
-  const path = require('path');
+  // Use Function constructor to prevent static analysis by bundlers
+  const requireFunc = new Function('module', 'return require(module)');
+  const fs = requireFunc('fs');
+  const path = requireFunc('path');
 
   // Try multiple possible paths
   const possiblePaths = [

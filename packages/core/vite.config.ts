@@ -12,7 +12,7 @@ export default defineConfig({
       formats: ['es', 'umd'],
     },
     rollupOptions: {
-      external: [],
+      external: ['fs', 'path'],
       output: {
         globals: {},
         assetFileNames: assetInfo => {
