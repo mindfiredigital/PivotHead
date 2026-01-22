@@ -314,7 +314,7 @@ export class ChartService<
     let minValue = Infinity;
     let maxValue = -Infinity;
 
-    chartData.filteredRowValues.forEach((rowVal, rowIdx) => {
+    chartData.filteredRowValues.forEach((_rowVal, rowIdx) => {
       chartData.filteredColumnValues.forEach((colVal, colIdx) => {
         const value =
           chartData.datasets.find(d => d.label === colVal)?.data[rowIdx] || 0;
