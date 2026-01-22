@@ -211,3 +211,4 @@ export class BasicDemoComponent implements AfterViewInit {
     }
   }
 }
+// End of BasicDemoComponent
