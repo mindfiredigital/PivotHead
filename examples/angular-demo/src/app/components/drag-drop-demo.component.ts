@@ -217,3 +217,4 @@ export class DragDropDemoComponent {
     }
   }
 }
+// end of DragDropDemoComponent

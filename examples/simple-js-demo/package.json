@@ -5,6 +5,7 @@
   "dependencies": {
     "@assemblyscript/loader": "^0.27.33",
     "@mindfiredigital/pivothead": "workspace:*",
+    "@mindfiredigital/pivothead-analytics": "workspace:*",
     "jspdf": "^3.0.2",
     "jspdf-autotable": "^3.8.2"
   },
