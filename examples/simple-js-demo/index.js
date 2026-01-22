@@ -2191,41 +2191,6 @@ function addControlsHTML() {
       <span id="pageInfo">Processed Data - Page 1 of 1</span>
       <button id="nextPage">Next</button>
     </div>
-    <div class="chart-container">
-      <label for="chartType">Visualize as Chart:</label>
-      <select id="chartType">
-        <option value="none">-- Select Chart Type --</option>
-        <optgroup label="Basic Charts">
-          <option value="column">Column Chart</option>
-          <option value="bar">Bar Chart (Horizontal)</option>
-          <option value="line">Line Chart</option>
-          <option value="area">Area Chart</option>
-        </optgroup>
-        <optgroup label="Circular Charts">
-          <option value="pie">Pie Chart</option>
-          <option value="doughnut">Doughnut Chart</option>
-        </optgroup>
-        <optgroup label="Stacked Charts">
-          <option value="stackedColumn">Stacked Column Chart</option>
-          <option value="stackedBar">Stacked Bar Chart</option>
-          <option value="stackedArea">Stacked Area Chart</option>
-        </optgroup>
-        <optgroup label="Combo Charts">
-          <option value="comboBarLine">Combo: Bar + Line</option>
-          <option value="comboAreaLine">Combo: Area + Line</option>
-        </optgroup>
-        <optgroup label="Statistical Charts">
-          <option value="scatter">Scatter Plot</option>
-          <option value="histogram">Histogram</option>
-        </optgroup>
-        <optgroup label="Specialized Charts">
-          <option value="heatmap">Heatmap</option>
-          <option value="funnel">Funnel Chart</option>
-          <option value="sankey">Sankey Diagram</option>
-        </optgroup>
-      </select>
-      <button id="hideChart" style="display: none;">Hide Chart</button>
-    </div>
   `;
   const myTable = document.getElementById('myTable');
   if (myTable?.parentNode) {
@@ -2953,24 +2918,15 @@ function destroyChart() {
 
 // Show chart section
 function showChartSection() {
-  const chartSection = document.getElementById('chartSection');
-  const hideButton = document.getElementById('hideChart');
-  if (chartSection) chartSection.style.display = 'block';
-  if (hideButton) hideButton.style.display = 'inline-block';
-
   // Populate filter dropdowns
   populateChartFilters();
 }
 
-// Hide chart section
+// Reset chart to default state
 function hideChartSection() {
-  const chartSection = document.getElementById('chartSection');
-  const hideButton = document.getElementById('hideChart');
   const chartTypeSelect = document.getElementById('chartType');
-  if (chartSection) chartSection.style.display = 'none';
-  if (hideButton) hideButton.style.display = 'none';
-  if (chartTypeSelect) chartTypeSelect.value = 'none';
-  currentChartType = 'none';
+  if (chartTypeSelect) chartTypeSelect.value = 'column';
+  currentChartType = 'column';
 
   // Reset ChartService filter state
   if (chartService) {
@@ -4000,21 +3956,12 @@ function renderSankeyFallback(chartData) {
 
 // Main chart rendering dispatcher
 function renderChart(chartType) {
-  if (chartType === 'none') {
-    hideChartSection();
-    return;
+  if (!chartType) {
+    chartType = 'column';
   }
 
   // Store current chart type for filter re-renders
   currentChartType = chartType;
-
-  // Only populate filters on first render (when chart section is hidden)
-  const chartSection = document.getElementById('chartSection');
-  const isFirstRender = chartSection && chartSection.style.display === 'none';
-
-  if (isFirstRender) {
-    showChartSection();
-  }
 
   const chartData = getChartData();
   if (!chartData) {
@@ -4092,14 +4039,14 @@ function renderChart(chartType) {
       break;
     default:
       console.warn('Unknown chart type:', chartType);
-      hideChartSection();
+      // Default to column chart for unknown types
+      renderColumnChart(chartData);
   }
 }
 
 // Setup chart event listeners
 function setupChartEventListeners() {
   const chartTypeSelect = document.getElementById('chartType');
-  const hideChartButton = document.getElementById('hideChart');
   const applyFilterButton = document.getElementById('applyChartFilter');
   const resetFilterButton = document.getElementById('resetChartFilter');
 
@@ -4108,14 +4055,9 @@ function setupChartEventListeners() {
       // Reset ChartService filter state when switching chart types
       if (chartService) {
         chartService.resetFilters();
+        populateChartFilters();
       }
       renderChart(e.target.value);
-    });
-  }
-
-  if (hideChartButton) {
-    hideChartButton.addEventListener('click', () => {
-      hideChartSection();
     });
   }
 
@@ -4134,6 +4076,63 @@ function setupChartEventListeners() {
 
 // =====================================
 // END OF CHART VISUALIZATION MODULE
+// =====================================
+
+// =====================================
+// TAB NAVIGATION MODULE
+// =====================================
+
+// Track if chart has been rendered for the first time
+let analyticsTabInitialized = false;
+
+// Switch between tabs
+function switchTab(tabName) {
+  // Update all tab buttons (there's one set in each tab content)
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === tabName);
+  });
+
+  // Update tab content
+  document.querySelectorAll('.tab-content').forEach(content => {
+    content.classList.toggle('active', content.id === `${tabName}-tab`);
+  });
+
+  // If switching to analytics tab, initialize chart if not done yet
+  if (tabName === 'analytics' && !analyticsTabInitialized) {
+    initializeAnalyticsTab();
+  }
+}
+
+// Initialize analytics tab (called when first switching to it)
+function initializeAnalyticsTab() {
+  if (!chartService) {
+    console.error('ChartService not initialized');
+    return;
+  }
+
+  analyticsTabInitialized = true;
+
+  // Populate filter dropdowns
+  populateChartFilters();
+
+  // Render default chart (column chart)
+  const chartTypeSelect = document.getElementById('chartType');
+  if (chartTypeSelect) {
+    renderChart(chartTypeSelect.value || 'column');
+  }
+}
+
+// Setup tab event listeners
+function setupTabEventListeners() {
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      switchTab(btn.dataset.tab);
+    });
+  });
+}
+
+// =====================================
+// END OF TAB NAVIGATION MODULE
 // =====================================
 
 // FIXED: Initialize everything when the DOM is loaded
@@ -4205,6 +4204,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeFilters();
     setupEventListeners();
     setupChartEventListeners();
+    setupTabEventListeners();
 
     addEnhancedDragStyles();
 

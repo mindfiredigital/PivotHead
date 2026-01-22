@@ -11,12 +11,44 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
   </head>
   <body>
-    <div class="controls"></div>
-    <div id="myTable"></div>
-    <!-- Chart container -->
-    <div id="chartSection" style="display: none;">
-      <div id="chartHeader">
-        <h3 id="chartTitle">Chart Visualization</h3>
+    <!-- Table Tab Content -->
+    <div id="table-tab" class="tab-content active">
+      <div class="controls"></div>
+      <div id="myTable"></div>
+      <!-- Tab Navigation - Below table, right corner -->
+      <div class="tab-container">
+        <div class="tab-nav">
+          <button class="tab-btn active" data-tab="table">Table</button>
+          <button class="tab-btn" data-tab="analytics">Analytics</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analytics Tab Content -->
+    <div id="analytics-tab" class="tab-content">
+      <div id="chartSection">
+        <div id="chartHeader">
+          <h3 id="chartTitle">Chart Visualization</h3>
+          <div id="chartControls">
+            <div class="chart-type-selector">
+              <label for="chartType">Chart Type:</label>
+              <select id="chartType">
+                <option value="column">Column Chart</option>
+                <option value="bar">Bar Chart (Horizontal)</option>
+                <option value="line">Line Chart</option>
+                <option value="area">Area Chart</option>
+                <option value="pie">Pie Chart</option>
+                <option value="doughnut">Doughnut Chart</option>
+                <option value="stackedColumn">Stacked Column</option>
+                <option value="stackedBar">Stacked Bar</option>
+                <option value="stackedArea">Stacked Area</option>
+                <option value="scatter">Scatter Plot</option>
+                <option value="heatmap">Heatmap</option>
+                <option value="histogram">Histogram</option>
+              </select>
+            </div>
+          </div>
+        </div>
         <div id="chartFilters">
           <div class="chart-filter-group">
             <label for="chartMeasureSelect">Measure:</label>
@@ -44,9 +76,16 @@
           <button id="applyChartFilter" class="chart-filter-btn">Apply Filter</button>
           <button id="resetChartFilter" class="chart-filter-btn reset">Reset</button>
         </div>
+        <div id="chartContainer">
+          <canvas id="pivotChart"></canvas>
+        </div>
       </div>
-      <div id="chartContainer">
-        <canvas id="pivotChart"></canvas>
+      <!-- Tab Navigation - Below chart, right corner -->
+      <div class="tab-container">
+        <div class="tab-nav">
+          <button class="tab-btn" data-tab="table">Table</button>
+          <button class="tab-btn active" data-tab="analytics">Analytics</button>
+        </div>
       </div>
     </div>
     <script type="module" src="./index.js"></script>
