@@ -163,6 +163,14 @@ export class PivotHeadElement extends HTMLElement {
     return this._pagination;
   }
 
+  /**
+   * Get the underlying PivotEngine instance for advanced operations
+   * like chart visualization with the analytics package
+   */
+  get pivotEngine(): EnhancedPivotEngine<PivotDataRecord> | undefined {
+    return this.engine;
+  }
+
   private handleEngineStateChange(
     state: PivotTableState<PivotDataRecord>
   ): void {

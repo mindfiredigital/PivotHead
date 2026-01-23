@@ -51,18 +51,10 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@mindfiredigital/pivothead": "workspace:*"
-  },
-  "peerDependencies": {
-    "chart.js": "^4.0.0"
-  },
-  "peerDependenciesMeta": {
-    "chart.js": {
-      "optional": false
-    }
+    "@mindfiredigital/pivothead": "workspace:*",
+    "chart.js": "^4.4.3"
   },
   "devDependencies": {
-    "chart.js": "^4.4.3",
     "rimraf": "^5.0.0",
     "tsup": "^7.2.0",
     "typescript": "^5.0.0"
