@@ -128,6 +128,7 @@ import PivotHead from '@mindfiredigital/pivothead-vue';
 - **Pagination**: Automatic pagination with configurable page sizes
 - **Export**: Excel, PDF, and HTML export options
 - **View Modes**: Switch between raw and processed data views
+- **Analytics Tab**: In-depth data analysis with charts and insights
 
 ### Event Handlers
 
@@ -172,6 +173,18 @@ import PivotHead from '@mindfiredigital/pivothead-vue';
 - **Custom Sorting**: Implement sorting logic for any field
 - **State Management**: Full control over UI state and data stores
 - **Responsive Design**: Custom responsive table layouts
+
+## 📈 Analytics Tab
+
+The **Analytics Tab** provides powerful data visualization and insights directly within the pivot table. It allows users to explore the data graphically, identify trends, and gain a deeper understanding of the dataset.
+
+### Key Features
+
+- **Chart Integration**: Visualize pivot data with interactive charts (e.g., bar, line, pie charts).
+- **Dynamic Updates**: Charts automatically update as the pivot table data changes.
+- **Customizable Dashboards**: Arrange and configure charts to create custom analytics dashboards.
+- **Statistical Analysis**: View key statistical metrics and summaries of the data.
+- **Exportable Visuals**: Export charts and dashboards to share with others.
 
 ## 📁 Project Structure
 
