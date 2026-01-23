@@ -1,7 +1,7 @@
 <template>
   <div class="container">
-    <h1>🚀 PivotHead Vue Example</h1>
-    
+    <h1>PivotHead Vue Example</h1>
+
     <!-- Mode switcher -->
     <div class="mode-switcher">
       <button
@@ -86,12 +86,51 @@
       </div>
     </div>
 
-    <!-- Data Visualization Section -->
-    <div class="chart-controls">
-      <h2>Data Visualization</h2>
-      <p class="chart-description">
-        Visualize your pivot table data with various chart types. Select a chart type and configure filters to customize your visualization.
-      </p>
+    <!-- TABLE VIEW -->
+    <div v-if="currentView === 'table'">
+      <!-- Default Mode -->
+      <div v-if="currentMode === 'default'">
+        <div class="description">
+          <p><strong>Default Mode</strong> provides a complete, full-featured pivot table with all built-in controls and UI elements out of the box.</p>
+          <p>This example demonstrates the Vue wrapper with sample sales data, including interactive filtering, sorting, and data manipulation.</p>
+        </div>
+
+        <PivotHead
+          ref="pivotRef"
+          mode="default"
+          :data="salesData"
+          :options="pivotOptions"
+          @state-change="handleStateChange"
+          @view-mode-change="handleViewModeChange"
+          @pagination-change="handlePaginationChange"
+          @chart-rendered="handleChartRendered"
+          class="pivot-container"
+        />
+      </div>
+
+      <!-- Minimal Mode -->
+      <div v-else-if="currentMode === 'minimal'">
+        <div class="description">
+          <p><strong>Minimal Mode</strong> provides slot-based customization where you can build your own UI while leveraging the core pivot engine.</p>
+          <p>This example demonstrates custom table rendering, sorting, filtering, pagination, and drill-down functionality.</p>
+        </div>
+
+        <MinimalMode
+          :data="salesData"
+          :options="pivotOptions"
+          class="pivot-container"
+        />
+      </div>
+    </div>
+
+    <!-- ANALYTICS VIEW -->
+    <div v-else-if="currentView === 'analytics'" class="analytics-view">
+      <div class="analytics-header">
+        <h2>Data Visualization & Analytics</h2>
+        <p class="analytics-description">
+          Visualize your pivot table data with various chart types. Select a chart type and configure filters to customize your visualization.
+        </p>
+      </div>
 
       <div class="chart-config">
         <!-- Chart Type Selector -->
@@ -192,40 +231,33 @@
           </div>
         </div>
       </div>
+
+      <!-- Chart Display Area -->
+      <div class="chart-display-area">
+        <PivotHead
+          ref="pivotRef"
+          mode="default"
+          :data="salesData"
+          :options="pivotOptions"
+          @state-change="handleStateChange"
+          @view-mode-change="handleViewModeChange"
+          @pagination-change="handlePaginationChange"
+          @chart-rendered="handleChartRendered"
+          class="pivot-container"
+        />
+      </div>
     </div>
 
-    <!-- Default Mode -->
-    <div v-if="currentMode === 'default'">
-      <div class="description">
-        <p><strong>Default Mode</strong> provides a complete, full-featured pivot table with all built-in controls and UI elements out of the box.</p>
-        <p>This example demonstrates the Vue wrapper with sample sales data, including interactive filtering, sorting, and data manipulation.</p>
-      </div>
-
-      <PivotHead
-        ref="pivotRef"
-        mode="default"
-        :data="salesData"
-        :options="pivotOptions"
-        @state-change="handleStateChange"
-        @view-mode-change="handleViewModeChange"
-        @pagination-change="handlePaginationChange"
-        @chart-rendered="handleChartRendered"
-        class="pivot-container"
-      />
-    </div>
-    
-    <!-- Minimal Mode -->
-    <div v-else-if="currentMode === 'minimal'">
-      <div class="description">
-        <p><strong>Minimal Mode</strong> provides slot-based customization where you can build your own UI while leveraging the core pivot engine.</p>
-        <p>This example demonstrates custom table rendering, sorting, filtering, pagination, and drill-down functionality.</p>
-      </div>
-
-      <MinimalMode
-        :data="salesData"
-        :options="pivotOptions"
-        class="pivot-container"
-      />
+    <!-- Floating Toggle Button -->
+    <div class="floating-toggle-container">
+      <button
+        @click="toggleView"
+        class="floating-toggle-btn"
+        :class="{ 'analytics-active': currentView === 'analytics' }"
+      >
+        <span class="toggle-icon">{{ currentView === 'table' ? '&#128202;' : '&#128203;' }}</span>
+        <span class="toggle-text">{{ currentView === 'table' ? 'Analytics' : 'Table' }}</span>
+      </button>
     </div>
   </div>
 </template>
@@ -246,6 +278,7 @@ const pivotRef = ref()
 
 // Reactive state
 const currentMode = ref<'default' | 'minimal'>('default')
+const currentView = ref<'table' | 'analytics'>('table')
 const statusMessage = ref('Ready')
 const currentViewMode = ref<'raw' | 'processed'>('processed')
 const isUploading = ref(false)
@@ -399,6 +432,19 @@ const toggleViewMode = () => {
   if (pivotRef.value) {
     const newMode = currentViewMode.value === 'raw' ? 'processed' : 'raw'
     pivotRef.value.setViewMode(newMode)
+  }
+}
+
+// Toggle between Table and Analytics view
+const toggleView = () => {
+  currentView.value = currentView.value === 'table' ? 'analytics' : 'table'
+  statusMessage.value = `Switched to ${currentView.value === 'table' ? 'Table' : 'Analytics'} view`
+
+  // Initialize chart service when switching to analytics
+  if (currentView.value === 'analytics') {
+    nextTick(() => {
+      setTimeout(initChartService, 500)
+    })
   }
 }
 
@@ -1126,5 +1172,126 @@ onMounted(() => {
 .hide-btn:hover {
   background: #c82333;
   border-color: #bd2130;
+}
+
+/* Analytics View */
+.analytics-view {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.analytics-header {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  color: white;
+}
+
+.analytics-header h2 {
+  margin: 0 0 8px 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.analytics-description {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 1rem;
+}
+
+.analytics-view .chart-config {
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.chart-display-area {
+  margin-top: 24px;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Floating Toggle Button */
+.floating-toggle-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+}
+
+.floating-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
+  transition: all 0.3s ease;
+}
+
+.floating-toggle-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.5);
+}
+
+.floating-toggle-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(0, 123, 255, 0.4);
+}
+
+.floating-toggle-btn.analytics-active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.floating-toggle-btn.analytics-active:hover {
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+.toggle-icon {
+  font-size: 1.2rem;
+}
+
+.toggle-text {
+  font-size: 0.95rem;
+}
+
+/* Responsive adjustments for floating button */
+@media (max-width: 768px) {
+  .floating-toggle-container {
+    bottom: 16px;
+    right: 16px;
+  }
+
+  .floating-toggle-btn {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+
+  .toggle-icon {
+    font-size: 1.1rem;
+  }
 }
 </style>
