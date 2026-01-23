@@ -1,10 +1,10 @@
 # PivotHead Vue Example
 
-A comprehensive Vue 3 example demonstrating both **Default** and **Minimal** modes of the PivotHead Vue wrapper component. This example showcases the full functionality of PivotHead in a Vue application with TypeScript support.
+A comprehensive Vue 3 example demonstrating both **Default** and **Minimal** modes of the PivotHead Vue wrapper component, along with a powerful **Analytics** view for data visualization. This example showcases the full functionality of PivotHead in a Vue application with TypeScript support.
 
 ## 🚀 Features
 
-### Default Mode
+### Default Mode (Table View)
 
 - **Complete out-of-the-box solution** with all built-in controls
 - Interactive pivot table with sample sales data
@@ -14,7 +14,7 @@ A comprehensive Vue 3 example demonstrating both **Default** and **Minimal** mod
 - State management and event handling
 - Professional UI with modern styling
 
-### Minimal Mode
+### Minimal Mode (Table View)
 
 - **Slot-based customization** for building custom UI
 - Custom table rendering with drag-and-drop support
@@ -24,20 +24,34 @@ A comprehensive Vue 3 example demonstrating both **Default** and **Minimal** mod
 - Raw and processed data view modes
 - Full control over table appearance and behavior
 
+### Analytics View (Charts Only)
+
+- **Dedicated chart visualization** - no table, just charts
+- **16 chart types** including bar, line, pie, scatter, heatmap, and more
+- **Interactive filters** for measures, rows, columns, and limits
+- **Direct Chart.js rendering** for optimal performance
+- **Floating toggle button** to switch between Table and Analytics views
+
 ## 📋 Dependencies
 
-The example is completely dependent on the **PivotHead Vue wrapper** (`@mindfiredigital/pivothead-vue`) for all pivot functionality, which in turn depends on:
+The example uses the following PivotHead packages:
 
+- **@mindfiredigital/pivothead-vue**: Vue wrapper for pivot table functionality
+- **@mindfiredigital/pivothead-analytics**: Analytics and charting module (includes Chart.js)
 - **@mindfiredigital/pivothead-web-component**: The underlying web component implementation
-- **@mindfiredigital/pivothead**: The core pivot engine (referenced as workspace dependency)
+- **@mindfiredigital/pivothead**: The core pivot engine
 
 ### Dependency Chain
 
 ```
 vue-example
 ├── @mindfiredigital/pivothead-vue (Vue wrapper)
-    ├── @mindfiredigital/pivothead-web-component (Web component layer)
-        └── @mindfiredigital/pivothead (Core engine)
+│   ├── @mindfiredigital/pivothead-web-component (Web component layer)
+│   │   └── @mindfiredigital/pivothead (Core engine)
+│   └── ...
+└── @mindfiredigital/pivothead-analytics (Charts & Analytics)
+    ├── @mindfiredigital/pivothead (Core engine)
+    └── chart.js (Bundled - no separate install needed)
 ```
 
 The Vue wrapper provides:
@@ -48,6 +62,13 @@ The Vue wrapper provides:
 - Template refs for accessing web component methods
 - Slot support for minimal mode customization
 - All three modes: default, minimal, and none
+
+The Analytics package provides:
+
+- ChartService for transforming pivot data to chart format
+- Chart.js included (no separate installation required)
+- Support for 16 chart types
+- Filter configuration for customizing visualizations
 
 ## 🛠️ Installation & Setup
 
@@ -128,6 +149,7 @@ import PivotHead from '@mindfiredigital/pivothead-vue';
 - **Pagination**: Automatic pagination with configurable page sizes
 - **Export**: Excel, PDF, and HTML export options
 - **View Modes**: Switch between raw and processed data views
+- **Analytics Tab**: In-depth data analysis with charts and insights
 
 ### Event Handlers
 
@@ -173,11 +195,76 @@ import PivotHead from '@mindfiredigital/pivothead-vue';
 - **State Management**: Full control over UI state and data stores
 - **Responsive Design**: Custom responsive table layouts
 
+## 📈 Analytics View
+
+The **Analytics View** provides a dedicated chart-only visualization of your pivot data. Switch between Table and Analytics views using the floating toggle button in the bottom right corner.
+
+### Key Features
+
+- **Chart-Only Display**: Clean visualization without table clutter
+- **16 Chart Types**: Comprehensive chart options organized by category
+- **Interactive Filters**: Filter by measure, rows, columns, and limit results
+- **Direct Chart.js Rendering**: Charts render directly on canvas for optimal performance
+- **Floating Toggle Button**: Easy switching between Table and Analytics views
+
+### Supported Chart Types
+
+| Category    | Charts                                    |
+| ----------- | ----------------------------------------- |
+| Basic       | Column, Bar, Line, Area                   |
+| Circular    | Pie, Doughnut                             |
+| Stacked     | Stacked Column, Stacked Bar, Stacked Area |
+| Combo       | Bar + Line, Area + Line                   |
+| Statistical | Scatter, Histogram                        |
+| Specialized | Heatmap, Funnel, Sankey                   |
+
+### How It Works
+
+1. Click the **Analytics** button (bottom right) to switch to Analytics view
+2. Select a **Chart Type** from the dropdown
+3. Configure **Filters** (measure, rows, columns, limit)
+4. Click **Apply & Render Chart** to visualize
+5. Click the **Table** button to return to table view
+
+### Code Example
+
+```typescript
+import {
+  ChartService,
+  Chart,
+  registerables,
+} from '@mindfiredigital/pivothead-analytics';
+
+// Register Chart.js components
+Chart.register(...registerables);
+
+// Initialize chart service with pivot engine
+const chartService = new ChartService(pivotEngine);
+
+// Set filters
+chartService.setFilters({
+  selectedMeasure: 'price',
+  selectedRows: ['USA', 'Canada'],
+  limit: 10,
+});
+
+// Get chart data and render
+const chartData = chartService.getChartData();
+new Chart(canvas, {
+  type: 'bar',
+  data: chartData,
+  options: { responsive: true },
+});
+```
+
 ## 📁 Project Structure
 
 ```
 src/
-├── App.vue                    # Main application with mode switching
+├── App.vue                    # Main application with view/mode switching
+│                              # - Table View (Default/Minimal modes)
+│                              # - Analytics View (Charts only)
+│                              # - Floating toggle button
 ├── main.ts                    # Vue app initialization
 ├── components/
 │   ├── MinimalMode.vue        # Minimal mode controller
@@ -186,6 +273,42 @@ src/
 │   ├── DrillDownModal.vue    # Modal for detailed data view
 │   └── ...                   # Additional components
 └── types/                    # TypeScript type definitions
+```
+
+### App.vue Structure
+
+- **Hidden PivotHead**: Always in DOM to maintain engine for ChartService
+- **Table View**: Shows Default or Minimal mode pivot table
+- **Analytics View**: Shows chart configuration and canvas for Chart.js
+- **Floating Toggle**: Fixed button in bottom right corner
+
+## 🔘 Floating Toggle Button
+
+A floating action button in the bottom right corner allows users to switch between Table and Analytics views.
+
+### Features
+
+- **Fixed Position**: Always visible at bottom: 24px, right: 24px
+- **Dynamic Icon**: Shows chart icon in Table view, table icon in Analytics view
+- **Gradient Styling**: Blue gradient for Table view, purple gradient for Analytics view
+- **Hover Effects**: Lift animation and enhanced shadow on hover
+- **Responsive**: Adjusts size on mobile devices
+
+### Styling
+
+```css
+.floating-toggle-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  border-radius: 50px;
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
+}
+
+.floating-toggle-btn.analytics-active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
 ```
 
 ## 🎮 Usage Examples
@@ -347,5 +470,6 @@ This example is part of the PivotHead project and follows the same licensing ter
 
 - [PivotHead Core Package](../../packages/core/)
 - [PivotHead Vue Wrapper](../../packages/vue/)
+- [PivotHead Analytics Package](../../packages/analytics/)
 - [Other Examples](../)
 - [Documentation](../../docs/)
