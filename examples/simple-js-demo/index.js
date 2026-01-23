@@ -16,7 +16,14 @@ import {
   ConnectService,
   FieldService,
 } from '@mindfiredigital/pivothead';
-import { ChartService } from '@mindfiredigital/pivothead-analytics';
+import {
+  ChartService,
+  Chart,
+  registerables,
+} from '@mindfiredigital/pivothead-analytics';
+
+// Register Chart.js components (Chart.js is bundled with the analytics package)
+Chart.register(...registerables);
 import { sampleData, config } from './config/config.js';
 import { VirtualScroller } from './services/VirtualScroller.js';
 
