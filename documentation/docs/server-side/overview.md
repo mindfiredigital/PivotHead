@@ -393,16 +393,7 @@ const data = fs.readFileSync('800mb-file.csv', 'utf-8'); //  May crash
 
 ### 4. Clean Up Resources
 
-```javascript
-// Clean up uploaded files
-fs.unlinkSync(req.file.path);
-
-// Unload WASM on shutdown
-process.on('SIGTERM', () => {
-  wasm.unload();
-  process.exit(0);
-});
-```
+````
 
 ---
 
@@ -419,7 +410,7 @@ const upload = multer({
     fileSize: 2 * 1024 * 1024 * 1024, // 2GB max
   },
 });
-```
+````
 
 ### Sanitize Delimiters
 
