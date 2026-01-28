@@ -28,7 +28,31 @@ These can be set as **HTML attributes** (using kebab-case, e.g., `data-url`) or 
 | `pagination`       | `pagination`        | `Pagination` | Sets the pagination configuration.                  |
 | `virtualScrolling` | `virtual-scrolling` | `boolean`    | Enables virtual scrolling for large datasets.       |
 
+---
+
+You can call these methods on the DOM element instance (for example, `document.querySelector('pivot-head').refresh()`).
+
 ## **Events**
+
+| Method               | Parameters                                        | Returns           | Description                                    |
+| -------------------- | ------------------------------------------------- | ----------------- | ---------------------------------------------- |
+| `getState()`         | –                                                 | `PivotTableState` | Gets the current component state.              |
+| `refresh()`          | –                                                 | `void`            | Refreshes the pivot engine.                    |
+| `sort()`             | `field: string`, `direction: 'asc' \| 'desc'`     | `void`            | Sorts the data by a specified field.           |
+| `addFilter()`        | `field: string`, `operator: string`, `value: any` | `void`            | Adds a filter to the data.                     |
+| `clearFilters()`     | –                                                 | `void`            | Removes all active filters.                    |
+| `setPageSize()`      | `size: number`                                    | `void`            | Sets the number of items per page.             |
+| `nextPage()`         | –                                                 | `void`            | Navigates to the next page.                    |
+| `previousPage()`     | –                                                 | `void`            | Navigates to the previous page.                |
+| `exportToPDF()`      | `fileName?: string`                               | `void`            | Exports the current view as a PDF.             |
+| `exportToExcel()`    | `fileName?: string`                               | `void`            | Exports the current view as an Excel file.     |
+| `exportToHTML()`     | `fileName?: string`                               | `void`            | Exports the current view as an HTML file.      |
+| `print()`            | –                                                 | `void`            | Opens the browser’s print dialog.              |
+| `setViewMode()`      | `mode: 'processed' \| 'raw'`                      | `void`            | Switches between raw and processed data views. |
+| `getRawData()`       | –                                                 | `object[]`        | Gets the original, unfiltered dataset.         |
+| `getProcessedData()` | –                                                 | `object`          | Gets the processed pivot data.                 |
+
+---
 
 You can listen for the following events on the DOM element (for example, `pivot.addEventListener('stateChange', ...)`).
 
