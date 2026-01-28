@@ -19,14 +19,6 @@ sidebar_label: Vue
 | `style`            | `Record<string, string> \| string` | `undefined` | Inline styles                                |
 | `virtualScrolling` | `boolean`                          | `false`     | Enables virtual scrolling for large datasets |
 
-### Events
-
-| Event                | Payload                          | Description                      |
-| -------------------- | -------------------------------- | -------------------------------- |
-| `@state-change`      | `PivotTableState`                | Emitted when pivot state changes |
-| `@view-mode-change`  | `{ mode: 'raw' \| 'processed' }` | Emitted when view mode changes   |
-| `@pagination-change` | `PaginationConfig`               | Emitted when pagination changes  |
-
 ### Template Ref Methods
 
 Access these methods through template refs:
