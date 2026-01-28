@@ -383,4 +383,3 @@ const DEFAULT_CHART_COLORS = [
 ## See Also
 
 - [Pivot Charts Tutorial](/docs/tutorials/pivot-charts) - Interactive examples
-- [Chart.js Documentation](https://www.chartjs.org/docs/latest/)
