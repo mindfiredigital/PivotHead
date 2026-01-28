@@ -99,13 +99,7 @@ new Chart(canvas, {
 
 ---
 
-#### getComboChartData()
-
-Returns data for combination charts (bar + line, area + line).
-
-```typescript
-getComboChartData(): ChartData
-```
+#
 
 **Returns:** `ChartData` - Data with datasets configured for mixed chart types
 
