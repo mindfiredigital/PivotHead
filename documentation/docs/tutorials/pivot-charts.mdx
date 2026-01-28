@@ -380,48 +380,7 @@ function PivotChart({ data, config, chartType = 'bar' }) {
 ### Vue
 
 ```vue
-<template>
-  <canvas ref="chartCanvas"></canvas>
-</template>
 
-<script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from 'vue';
-import { PivotEngine } from '@mindfiredigital/pivothead';
-import { ChartService, Chart, registerables } from '@mindfiredigital/pivothead-analytics';
-
-Chart.register(...registerables);
-
-const props = defineProps<{
-  data: any[];
-  config: any;
-  chartType?: string;
-}>();
-
-const chartCanvas = ref<HTMLCanvasElement>();
-let chartInstance: Chart | null = null;
-
-const renderChart = () => {
-  if (!chartCanvas.value) return;
-
-  const engine = new PivotEngine(props.data, props.config);
-  const chartService = new ChartService(engine);
-  const chartData = chartService.getDataForChartType(props.chartType || 'bar');
-
-  if (chartInstance) {
-    chartInstance.destroy();
-  }
-
-  chartInstance = new Chart(chartCanvas.value, {
-    type: props.chartType === 'column' ? 'bar' : props.chartType,
-    data: chartData,
-    options: { responsive: true }
-  });
-};
-
-onMounted(renderChart);
-watch(() => [props.data, props.config, props.chartType], renderChart);
-onUnmounted(() => chartInstance?.destroy());
-</script>
 ```
 
 ---
