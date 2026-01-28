@@ -55,13 +55,7 @@ const chartData = chartService.getChartData();
 
 ---
 
-#### getAggregatedChartData()
-
-Returns aggregated data suitable for pie and doughnut charts.
-
-```typescript
-getAggregatedChartData(): ChartData
-```
+````
 
 **Returns:** `ChartData` - Aggregated data with single dataset
 
@@ -70,7 +64,7 @@ getAggregatedChartData(): ChartData
 ```typescript
 const pieData = chartService.getAggregatedChartData();
 new Chart(canvas, { type: 'pie', data: pieData });
-```
+````
 
 ---
 
