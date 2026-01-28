@@ -145,15 +145,11 @@ const sidebars = {
             'tutorials/vue/setup-for-user-project',
           ],
         },
-        // 'tutorials/virtual-scrolling',
-        // {
-        //   type: 'category',
-        //   label: 'Angular',
-        //   items: [
-        //     'tutorials/angular/angular-sample-project',
-        //     'tutorials/angular/angular-setup-for-user-project',
-        //   ],
-        // },
+        {
+          type: 'doc',
+          id: 'tutorials/pivot-charts',
+          label: 'Pivot Charts',
+        },
       ],
     },
     {
@@ -180,6 +176,7 @@ const sidebars = {
             'reference/api-reference/react-api-reference',
             'reference/api-reference/angular-api-reference',
             'reference/api-reference/vue-api-reference',
+            'reference/api-reference/analytics-api-reference',
           ],
         },
       ],

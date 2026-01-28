@@ -1,0 +1,550 @@
+---
+id: pivot-charts
+title: Pivot Charts
+sidebar_label: Pivot Charts
+description: Transform your pivot table data into beautiful, interactive visualizations with PivotHead Analytics
+keywords: [pivot charts, data visualization, chart.js, analytics, bar chart, pie chart, line chart]
+---
+
+import InteractiveChartDemo from '@site/src/components/PivotCharts/InteractiveChartDemo';
+import FrameworkSwitcher from '@site/src/components/PivotCharts/FrameworkSwitcher';
+
+# Pivot Charts
+
+Transform your pivot table data into stunning visualizations. PivotHead Analytics provides 13+ chart types out of the box, with Chart.js included - no additional dependencies required.
+
+
+
+## Interactive Chart Explorer
+
+Click on any chart type below to see a live preview and get the implementation code.
+
+
+
+---
+
+## Choose Your Framework
+
+PivotHead works seamlessly with all major frameworks. Select yours to see framework-specific implementation:
+
+<FrameworkSwitcher />
+
+---
+
+## Quick Start
+
+### Installation
+
+```bash
+npm install @mindfiredigital/pivothead-analytics
+```
+
+This package includes everything you need:
+- `@mindfiredigital/pivothead` (core pivot engine)
+- `chart.js` (rendering library)
+
+### Basic Setup
+
+```typescript
+import { PivotEngine } from '@mindfiredigital/pivothead';
+import {
+  ChartService,
+  Chart,
+  registerables,
+} from '@mindfiredigital/pivothead-analytics';
+
+// Register Chart.js components (once per app)
+Chart.register(...registerables);
+
+// Your data
+const salesData = [
+  { region: 'North', product: 'Laptops', revenue: 45000 },
+  { region: 'North', product: 'Phones', revenue: 32000 },
+  { region: 'South', product: 'Laptops', revenue: 38000 },
+  { region: 'South', product: 'Phones', revenue: 41000 },
+  { region: 'East', product: 'Laptops', revenue: 52000 },
+  { region: 'East', product: 'Phones', revenue: 28000 },
+];
+
+// Configure pivot
+const config = {
+  rows: [{ uniqueName: 'region', caption: 'Region' }],
+  columns: [{ uniqueName: 'product', caption: 'Product' }],
+  measures: [
+    { uniqueName: 'revenue', caption: 'Total Revenue', aggregation: 'sum' }
+  ],
+};
+
+// Create engine and chart service
+const engine = new PivotEngine(salesData, config);
+const chartService = new ChartService(engine);
+
+// Render a chart
+const canvas = document.getElementById('myChart') as HTMLCanvasElement;
+const chartData = chartService.getChartData();
+
+new Chart(canvas, {
+  type: 'bar',
+  data: chartData,
+  options: {
+    responsive: true,
+    plugins: {
+      title: { display: true, text: 'Revenue by Region' }
+    }
+  }
+});
+```
+
+---
+
+## Chart Categories
+
+### Basic Charts
+
+Perfect for simple comparisons and trend analysis.
+
+| Chart | Best For | Method |
+|-------|----------|--------|
+| Column | Comparing values across categories | `getChartData()` |
+| Bar | Categories with long labels | `getChartData()` + `indexAxis: 'y'` |
+| Line | Trends over time | `getChartData()` |
+| Area | Volume and magnitude changes | `getChartData()` + `fill: true` |
+
+### Circular Charts
+
+Ideal for showing proportions and percentages.
+
+| Chart | Best For | Method |
+|-------|----------|--------|
+| Pie | Part-to-whole (3-7 categories) | `getAggregatedChartData()` |
+| Doughnut | Same as pie with center metric | `getAggregatedChartData()` |
+
+### Stacked Charts
+
+Show composition and totals together.
+
+| Chart | Best For | Method |
+|-------|----------|--------|
+| Stacked Column | Part-to-whole over time | `getStackedChartData()` |
+| Stacked Bar | Horizontal composition | `getStackedChartData()` |
+| Stacked Area | Cumulative trends | `getStackedChartData()` |
+
+### Combo Charts
+
+Combine multiple visualization types.
+
+| Chart | Best For | Method |
+|-------|----------|--------|
+| Bar + Line | Volume vs rate (e.g., sales vs growth) | `getComboChartData()` |
+| Area + Line | Trends with overlay | `getComboChartData()` |
+
+### Statistical Charts
+
+For data analysis and distributions.
+
+| Chart | Best For | Method |
+|-------|----------|--------|
+| Scatter | Correlations between variables | `getScatterData()` |
+| Histogram | Data distribution | `getHistogramData()` |
+| Heatmap | 2D value patterns | `getHeatmapData()` |
+
+---
+
+## Working with Filters
+
+Control what data appears in your charts.
+
+```typescript
+// Set filters
+chartService.setFilters({
+  selectedMeasure: 'revenue',      // Which measure to display
+  selectedRows: ['North', 'South'], // Filter by row values
+  selectedColumns: ['Laptops'],     // Filter by column values
+  limit: 5                          // Top N items (0 = all)
+});
+
+// Get filtered chart data
+const filteredData = chartService.getChartData();
+
+// Get available filter options (for building filter UI)
+const options = chartService.getAvailableFilterOptions();
+// Returns: { measures, rows, columns }
+
+// Reset filters
+chartService.resetFilters();
+```
+
+### Building a Filter UI
+
+```tsx
+function ChartWithFilters({ chartService }) {
+  const options = chartService.getAvailableFilterOptions();
+  const [measure, setMeasure] = useState(options.measures[0].uniqueName);
+
+  const handleMeasureChange = (newMeasure) => {
+    setMeasure(newMeasure);
+    chartService.setFilters({ selectedMeasure: newMeasure });
+    // Re-render chart with new data
+  };
+
+  return (
+    <div>
+      <select value={measure} onChange={(e) => handleMeasureChange(e.target.value)}>
+        {options.measures.map(m => (
+          <option key={m.uniqueName} value={m.uniqueName}>
+            {m.caption}
+          </option>
+        ))}
+      </select>
+      <canvas id="chart" />
+    </div>
+  );
+}
+```
+
+---
+
+## Dynamic Chart Switching
+
+Let users switch between chart types on the fly.
+
+```typescript
+import { ChartType } from '@mindfiredigital/pivothead-analytics';
+
+let currentChart: Chart | null = null;
+
+function renderChart(type: ChartType) {
+  // Get data for this chart type
+  const data = chartService.getDataForChartType(type);
+
+  // Destroy previous chart if exists
+  if (currentChart) {
+    currentChart.destroy();
+  }
+
+  // Map PivotHead types to Chart.js types
+  const chartJsType = {
+    column: 'bar',
+    bar: 'bar',
+    line: 'line',
+    area: 'line',
+    pie: 'pie',
+    doughnut: 'doughnut',
+    stackedColumn: 'bar',
+    stackedBar: 'bar',
+    scatter: 'scatter',
+  }[type] || 'bar';
+
+  // Create new chart
+  currentChart = new Chart(canvas, {
+    type: chartJsType,
+    data: data,
+    options: getOptionsForType(type)
+  });
+}
+
+function getOptionsForType(type: ChartType) {
+  const baseOptions = { responsive: true };
+
+  switch (type) {
+    case 'bar':
+      return { ...baseOptions, indexAxis: 'y' };
+    case 'stackedColumn':
+    case 'stackedBar':
+      return {
+        ...baseOptions,
+        scales: { x: { stacked: true }, y: { stacked: true } }
+      };
+    case 'area':
+      return baseOptions; // fill: true is set in dataset
+    default:
+      return baseOptions;
+  }
+}
+```
+
+---
+
+## Custom Styling
+
+### Custom Color Palette
+
+```typescript
+import { DEFAULT_CHART_COLORS } from '@mindfiredigital/pivothead-analytics';
+
+// Use your brand colors
+const brandColors = [
+  'rgba(99, 102, 241, 0.8)',  // Indigo
+  'rgba(236, 72, 153, 0.8)',  // Pink
+  'rgba(34, 197, 94, 0.8)',   // Green
+  'rgba(251, 146, 60, 0.8)',  // Orange
+  'rgba(139, 92, 246, 0.8)',  // Purple
+];
+
+const chartData = chartService.getChartData();
+chartData.datasets.forEach((ds, i) => {
+  ds.backgroundColor = brandColors[i % brandColors.length];
+  ds.borderColor = brandColors[i % brandColors.length].replace('0.8', '1');
+});
+```
+
+### Chart.js Customization
+
+Full access to Chart.js options:
+
+```typescript
+new Chart(canvas, {
+  type: 'bar',
+  data: chartData,
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: {
+      duration: 1000,
+      easing: 'easeOutQuart'
+    },
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          usePointStyle: true,
+          padding: 20
+        }
+      },
+      title: {
+        display: true,
+        text: 'Sales Performance',
+        font: { size: 18, weight: 'bold' }
+      },
+      tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        padding: 12,
+        cornerRadius: 8
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: { color: 'rgba(0, 0, 0, 0.05)' }
+      }
+    }
+  }
+});
+```
+
+---
+
+## Framework Integration
+
+### React
+
+```tsx
+import { useEffect, useRef, useState } from 'react';
+import { PivotEngine } from '@mindfiredigital/pivothead';
+import { ChartService, Chart, registerables } from '@mindfiredigital/pivothead-analytics';
+
+Chart.register(...registerables);
+
+function PivotChart({ data, config, chartType = 'bar' }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const chartRef = useRef<Chart | null>(null);
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+
+    const engine = new PivotEngine(data, config);
+    const chartService = new ChartService(engine);
+    const chartData = chartService.getDataForChartType(chartType);
+
+    // Destroy previous chart
+    if (chartRef.current) {
+      chartRef.current.destroy();
+    }
+
+    // Create new chart
+    chartRef.current = new Chart(canvasRef.current, {
+      type: chartType === 'column' ? 'bar' : chartType,
+      data: chartData,
+      options: { responsive: true }
+    });
+
+    return () => {
+      chartRef.current?.destroy();
+    };
+  }, [data, config, chartType]);
+
+  return <canvas ref={canvasRef} />;
+}
+```
+
+### Vue
+
+```vue
+<template>
+  <canvas ref="chartCanvas"></canvas>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { PivotEngine } from '@mindfiredigital/pivothead';
+import { ChartService, Chart, registerables } from '@mindfiredigital/pivothead-analytics';
+
+Chart.register(...registerables);
+
+const props = defineProps<{
+  data: any[];
+  config: any;
+  chartType?: string;
+}>();
+
+const chartCanvas = ref<HTMLCanvasElement>();
+let chartInstance: Chart | null = null;
+
+const renderChart = () => {
+  if (!chartCanvas.value) return;
+
+  const engine = new PivotEngine(props.data, props.config);
+  const chartService = new ChartService(engine);
+  const chartData = chartService.getDataForChartType(props.chartType || 'bar');
+
+  if (chartInstance) {
+    chartInstance.destroy();
+  }
+
+  chartInstance = new Chart(chartCanvas.value, {
+    type: props.chartType === 'column' ? 'bar' : props.chartType,
+    data: chartData,
+    options: { responsive: true }
+  });
+};
+
+onMounted(renderChart);
+watch(() => [props.data, props.config, props.chartType], renderChart);
+onUnmounted(() => chartInstance?.destroy());
+</script>
+```
+
+---
+
+## API Reference
+
+### ChartService Methods
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `getChartData()` | `ChartData` | Standard chart data (bar, line, column, area) |
+| `getAggregatedChartData()` | `ChartData` | Aggregated data for pie/doughnut |
+| `getStackedChartData()` | `ChartData` | Data for stacked charts |
+| `getComboChartData()` | `ChartData` | Data for combo charts |
+| `getScatterData()` | `ScatterChartData` | Scatter plot data |
+| `getHistogramData(config?, bins?)` | `HistogramChartData` | Histogram with bins |
+| `getHeatmapData()` | `HeatmapChartData` | Heatmap cells |
+| `getDataForChartType(type)` | `ChartData` | Universal method for any type |
+| `setFilters(config)` | `void` | Apply filters |
+| `getFilters()` | `ChartFilterConfig` | Get current filters |
+| `resetFilters()` | `void` | Reset all filters |
+| `getAvailableFilterOptions()` | `object` | Get filter options |
+
+### Types
+
+```typescript
+type ChartType =
+  | 'column' | 'bar' | 'line' | 'area'
+  | 'pie' | 'doughnut'
+  | 'stackedColumn' | 'stackedBar' | 'stackedArea'
+  | 'comboBarLine' | 'comboAreaLine'
+  | 'scatter' | 'histogram' | 'heatmap'
+  | 'funnel' | 'sankey';
+
+interface ChartFilterConfig {
+  selectedMeasure?: string;
+  selectedRows?: string[];
+  selectedColumns?: string[];
+  limit?: number;
+}
+```
+
+---
+
+## Next Steps
+
+- [Core API Reference](/docs/tutorial-basics/core/api-reference) - Full PivotEngine documentation
+- [React Integration](/docs/tutorials/react/react-sample-project) - Complete React example
+- [Vue Integration](/docs/tutorials/vue/vue-sample-project) - Complete Vue example
+
+export const FeatureStyles = () => (
+  <style>{`
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+    .feature-card {
+      background: var(--ifm-color-emphasis-100);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+    .feature-icon {
+      font-size: 2rem;
+      margin-bottom: 0.75rem;
+    }
+    .feature-card h4 {
+      margin: 0 0 0.5rem 0;
+      color: var(--ifm-heading-color);
+    }
+    .feature-card p {
+      margin: 0;
+      font-size: 0.875rem;
+      color: var(--ifm-font-color-secondary);
+    }
+    .chart-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+    .gallery-item {
+      background: var(--ifm-color-emphasis-100);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .gallery-item:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+    }
+    .gallery-item img {
+      width: 100%;
+      height: 180px;
+      object-fit: contain;
+      background: white;
+      padding: 1rem;
+    }
+    .gallery-caption {
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .gallery-caption strong {
+      color: var(--ifm-heading-color);
+      font-size: 1rem;
+    }
+    .gallery-caption span {
+      color: var(--ifm-font-color-secondary);
+      font-size: 0.85rem;
+    }
+    [data-theme="dark"] .gallery-item img {
+      background: #1a1a1a;
+    }
+  `}</style>
+);
+
+<FeatureStyles />

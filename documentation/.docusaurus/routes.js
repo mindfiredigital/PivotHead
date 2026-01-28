@@ -3,65 +3,21 @@ import ComponentCreator from '@docusaurus/ComponentCreator';
 
 export default [
   {
-    path: '/PivotHead/__docusaurus/debug',
-    component: ComponentCreator('/PivotHead/__docusaurus/debug', 'aa4'),
-    exact: true,
-  },
-  {
-    path: '/PivotHead/__docusaurus/debug/config',
-    component: ComponentCreator('/PivotHead/__docusaurus/debug/config', '251'),
-    exact: true,
-  },
-  {
-    path: '/PivotHead/__docusaurus/debug/content',
-    component: ComponentCreator('/PivotHead/__docusaurus/debug/content', '0aa'),
-    exact: true,
-  },
-  {
-    path: '/PivotHead/__docusaurus/debug/globalData',
-    component: ComponentCreator(
-      '/PivotHead/__docusaurus/debug/globalData',
-      '6ba'
-    ),
-    exact: true,
-  },
-  {
-    path: '/PivotHead/__docusaurus/debug/metadata',
-    component: ComponentCreator(
-      '/PivotHead/__docusaurus/debug/metadata',
-      'a8d'
-    ),
-    exact: true,
-  },
-  {
-    path: '/PivotHead/__docusaurus/debug/registry',
-    component: ComponentCreator(
-      '/PivotHead/__docusaurus/debug/registry',
-      'f54'
-    ),
-    exact: true,
-  },
-  {
-    path: '/PivotHead/__docusaurus/debug/routes',
-    component: ComponentCreator('/PivotHead/__docusaurus/debug/routes', '9ce'),
-    exact: true,
-  },
-  {
     path: '/PivotHead/markdown-page',
     component: ComponentCreator('/PivotHead/markdown-page', '9e2'),
     exact: true,
   },
   {
     path: '/PivotHead/docs',
-    component: ComponentCreator('/PivotHead/docs', '42e'),
+    component: ComponentCreator('/PivotHead/docs', '841'),
     routes: [
       {
         path: '/PivotHead/docs',
-        component: ComponentCreator('/PivotHead/docs', 'c70'),
+        component: ComponentCreator('/PivotHead/docs', '898'),
         routes: [
           {
             path: '/PivotHead/docs',
-            component: ComponentCreator('/PivotHead/docs', '6fa'),
+            component: ComponentCreator('/PivotHead/docs', '1c4'),
             routes: [
               {
                 path: '/PivotHead/docs/contributors/',
@@ -166,6 +122,15 @@ export default [
                 component: ComponentCreator(
                   '/PivotHead/docs/introduction',
                   'db5'
+                ),
+                exact: true,
+                sidebar: 'tutorialSidebar',
+              },
+              {
+                path: '/PivotHead/docs/reference/api-reference/analytics-api-reference',
+                component: ComponentCreator(
+                  '/PivotHead/docs/reference/api-reference/analytics-api-reference',
+                  'a73'
                 ),
                 exact: true,
                 sidebar: 'tutorialSidebar',
@@ -347,6 +312,15 @@ export default [
                 component: ComponentCreator(
                   '/PivotHead/docs/tutorials/core-webcomponent/setup-for-user-project',
                   '83d'
+                ),
+                exact: true,
+                sidebar: 'tutorialSidebar',
+              },
+              {
+                path: '/PivotHead/docs/tutorials/pivot-charts',
+                component: ComponentCreator(
+                  '/PivotHead/docs/tutorials/pivot-charts',
+                  '4f8'
                 ),
                 exact: true,
                 sidebar: 'tutorialSidebar',
