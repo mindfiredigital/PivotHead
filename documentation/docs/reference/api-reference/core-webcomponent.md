@@ -51,16 +51,3 @@ You can call these methods on the DOM element instance (for example, `document.q
 | `getProcessedData()` | –                                                 | `object`          | Gets the processed pivot data.                 |
 
 ---
-
-## **Events**
-
-You can listen for the following events on the DOM element (for example, `pivot.addEventListener('stateChange', ...)`).
-
-| Event          | Detail Type       | Description                                         |
-| -------------- | ----------------- | --------------------------------------------------- |
-| `stateChange`  | `PivotTableState` | Fired whenever the internal state changes.          |
-| `filterChange` | `FilterState`     | Fired when filters are added, removed, or modified. |
-| `sortChange`   | `SortState`       | Fired when sorting is applied.                      |
-| `pageChange`   | `PaginationState` | Fired when the page changes.                        |
-
----
