@@ -359,11 +359,28 @@ interface ChartConfig {
 
 ---
 
-```
+## Color Palette
+
+````
+Default colors used for chart datasets:
+
+```typescript
+const DEFAULT_CHART_COLORS = [
+  'rgba(54, 162, 235, 0.8)', // Blue
+  'rgba(255, 99, 132, 0.8)', // Red
+  'rgba(75, 192, 192, 0.8)', // Teal
+  'rgba(255, 206, 86, 0.8)', // Yellow
+  'rgba(153, 102, 255, 0.8)', // Purple
+  'rgba(255, 159, 64, 0.8)', // Orange
+  'rgba(46, 204, 113, 0.8)', // Green
+  'rgba(231, 76, 60, 0.8)', // Dark Red
+  'rgba(52, 73, 94, 0.8)', // Dark Blue
+  'rgba(241, 196, 15, 0.8)', // Gold
+];
 
 ---
 
 ## See Also
 
 - [Pivot Charts Tutorial](/docs/tutorials/pivot-charts) - Interactive examples
-```
+````
