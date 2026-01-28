@@ -66,13 +66,6 @@ const exportData = () => {
 - `setDimensions(dimensions: Dimension[])` - Update dimensions
 - `setGroupConfig(config: GroupConfig)` - Update grouping
 
-#### Formatting
-
-- `formatValue(value: unknown, field: string)` - Format a value
-- `updateFieldFormatting(field: string, format: FormatOptions)` - Update field formatting
-- `getFieldAlignment(field: string)` - Get field text alignment
-- `showFormatPopup()` - Show formatting popup
-
 #### Pagination
 
 - `getPagination()` - Get pagination state
