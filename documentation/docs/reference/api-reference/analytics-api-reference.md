@@ -338,20 +338,6 @@ interface ChartConfig {
 - `Chart` - Chart.js constructor
 - `registerables` - Chart.js components to register
 
-### Types
-
-- `ChartType`
-- `ChartFilterConfig`
-- `ChartConfig`
-- `ChartData`
-- `ChartDataset`
-- `ScatterChartData`
-- `HeatmapChartData`
-- `HistogramChartData`
-- `SankeyChartData`
-- `ChartConfiguration`
-- `ChartOptions`
-
 ### Constants
 
 - `DEFAULT_CHART_COLORS` - Default color palette (10 colors)
