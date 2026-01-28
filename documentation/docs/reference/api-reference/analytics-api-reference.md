@@ -340,6 +340,19 @@ interface ChartConfig {
 
 ### Constants
 
+### Types
+
+- `ChartType`
+- `ChartFilterConfig`
+- `ChartConfig`
+- `ChartData`
+- `ChartDataset`
+- `ScatterChartData`
+- `HeatmapChartData`
+- `HistogramChartData`
+- `SankeyChartData`
+- `ChartConfiguration`
+- `ChartOptions`
 - `DEFAULT_CHART_COLORS` - Default color palette (10 colors)
 - `DEFAULT_CHART_BORDER_COLORS` - Default border colors
 
