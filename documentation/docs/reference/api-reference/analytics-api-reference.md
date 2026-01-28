@@ -6,7 +6,19 @@ description: Complete API reference for PivotHead Analytics charting library
 keywords: [api, analytics, charts, chartservice, visualization]
 ---
 
+# Analytics API Reference
+
 ---
+
+Complete API reference for `@mindfiredigital/pivothead-analytics` package.
+
+## Installation
+
+```bash
+npm install @mindfiredigital/pivothead-analytics
+```
+
+This package bundles Chart.js - no additional installation required.
 
 ## ChartService
 
