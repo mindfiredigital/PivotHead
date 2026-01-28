@@ -13,6 +13,8 @@ This allows developers to easily integrate **headless pivot table** functionalit
 
 ## **Properties / Attributes**
 
+## **Methods**
+
 These can be set as **HTML attributes** (using kebab-case, e.g., `data-url`) or as **JavaScript properties** (using camelCase, e.g., `pivot.dataUrl`).
 
 | Property           | Attribute           | Type         | Description                                         |
@@ -28,9 +30,9 @@ These can be set as **HTML attributes** (using kebab-case, e.g., `data-url`) or 
 
 ---
 
-## **Methods**
-
 You can call these methods on the DOM element instance (for example, `document.querySelector('pivot-head').refresh()`).
+
+## **Events**
 
 | Method               | Parameters                                        | Returns           | Description                                    |
 | -------------------- | ------------------------------------------------- | ----------------- | ---------------------------------------------- |
@@ -51,8 +53,6 @@ You can call these methods on the DOM element instance (for example, `document.q
 | `getProcessedData()` | –                                                 | `object`          | Gets the processed pivot data.                 |
 
 ---
-
-## **Events**
 
 You can listen for the following events on the DOM element (for example, `pivot.addEventListener('stateChange', ...)`).
 

@@ -1,0 +1,310 @@
+.framework-switcher {
+  margin: 2rem 0;
+}
+
+/* Framework Tabs */
+.framework-tabs {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.framework-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.25rem 2rem;
+  background: var(--ifm-color-emphasis-100);
+  border: 2px solid transparent;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.framework-tab:hover {
+  background: var(--ifm-background-color);
+  border-color: var(--ifm-color-emphasis-300);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.framework-tab.active {
+  background: var(--ifm-background-color);
+  border-color: var(--fw-color);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 0 0 1px var(--fw-color);
+}
+
+.framework-tab-logo {
+  width: 48px;
+  height: 48px;
+  color: var(--ifm-font-color-secondary);
+  transition: all 0.3s ease;
+}
+
+.framework-tab:hover .framework-tab-logo,
+.framework-tab.active .framework-tab-logo {
+  color: var(--fw-color);
+  transform: scale(1.1);
+}
+
+.framework-tab-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ifm-font-color-base);
+  transition: color 0.3s ease;
+}
+
+.framework-tab.active .framework-tab-name {
+  color: var(--fw-color);
+}
+
+.framework-logo-svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Framework Content */
+.framework-content {
+  background: var(--ifm-color-emphasis-100);
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.framework-header {
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, var(--ifm-background-color) 0%, var(--ifm-color-emphasis-100) 100%);
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.framework-title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.framework-logo-large {
+  width: 56px;
+  height: 56px;
+  color: var(--fw-color);
+  flex-shrink: 0;
+}
+
+.framework-title h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--ifm-heading-color);
+}
+
+.framework-title p {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.9rem;
+  color: var(--ifm-font-color-secondary);
+  max-width: 400px;
+}
+
+.framework-install {
+  background: var(--ifm-color-emphasis-200);
+  padding: 0.75rem 1.25rem;
+  border-radius: 10px;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.85rem;
+  color: var(--ifm-font-color-base);
+  border: 1px solid var(--ifm-color-emphasis-300);
+}
+
+.framework-install code {
+  background: transparent;
+  padding: 0;
+}
+
+/* Code Section */
+.framework-code-section {
+  background: #1e1e1e;
+}
+
+[data-theme="light"] .framework-code-section {
+  background: #282c34;
+}
+
+.code-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1.25rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.code-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.copy-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--fw-color);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.copy-button:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.framework-code {
+  margin: 0;
+  padding: 1.5rem;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.8rem;
+  line-height: 1.7;
+  color: #d4d4d4;
+  overflow-x: auto;
+  max-height: 450px;
+}
+
+.framework-code code {
+  background: transparent;
+  padding: 0;
+}
+
+/* Feature badges */
+.framework-features {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.framework-feature-badge {
+  padding: 0.25rem 0.75rem;
+  background: var(--fw-color);
+  color: #000;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* Dark theme */
+[data-theme="dark"] .framework-tab {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .framework-tab:hover,
+[data-theme="dark"] .framework-tab.active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .framework-content {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .framework-header {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.3) 0%, rgba(255, 255, 255, 0.03) 100%);
+}
+
+[data-theme="dark"] .framework-install {
+  background: rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .framework-tabs {
+    gap: 0.75rem;
+  }
+
+  .framework-tab {
+    padding: 1rem 1.25rem;
+    min-width: 100px;
+  }
+
+  .framework-tab-logo {
+    width: 40px;
+    height: 40px;
+  }
+
+  .framework-tab-name {
+    font-size: 0.8rem;
+  }
+
+  .framework-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.25rem;
+  }
+
+  .framework-title {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .framework-logo-large {
+    width: 48px;
+    height: 48px;
+  }
+
+  .framework-title h3 {
+    font-size: 1.25rem;
+  }
+
+  .framework-install {
+    width: 100%;
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 500px) {
+  .framework-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+
+  .framework-tab {
+    min-width: unset;
+    padding: 0.875rem;
+  }
+
+  .framework-tab-logo {
+    width: 32px;
+    height: 32px;
+  }
+}

@@ -70,6 +70,11 @@
               "sidebar": "tutorialSidebar"
             },
             {
+              "id": "reference/api-reference/analytics-api-reference",
+              "path": "/PivotHead/docs/reference/api-reference/analytics-api-reference",
+              "sidebar": "tutorialSidebar"
+            },
+            {
               "id": "reference/api-reference/angular-api-reference",
               "path": "/PivotHead/docs/reference/api-reference/angular-api-reference",
               "sidebar": "tutorialSidebar"
@@ -164,6 +169,11 @@
             {
               "id": "tutorials/core-webcomponent/setup-for-user-project",
               "path": "/PivotHead/docs/tutorials/core-webcomponent/setup-for-user-project",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "tutorials/pivot-charts",
+              "path": "/PivotHead/docs/tutorials/pivot-charts",
               "sidebar": "tutorialSidebar"
             },
             {

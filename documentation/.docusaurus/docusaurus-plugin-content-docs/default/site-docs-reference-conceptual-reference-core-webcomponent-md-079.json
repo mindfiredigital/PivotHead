@@ -18,8 +18,8 @@
   },
   "sidebar": "tutorialSidebar",
   "previous": {
-    "title": "setup-for-user-project",
-    "permalink": "/PivotHead/docs/tutorials/vue/setup-for-user-project"
+    "title": "Pivot Charts",
+    "permalink": "/PivotHead/docs/tutorials/pivot-charts"
   },
   "next": {
     "title": "WebAssembly & Performance",

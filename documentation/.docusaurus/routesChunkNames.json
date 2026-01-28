@@ -49,17 +49,17 @@
     },
     "content": "content---pivot-head-markdown-page-393-f56"
   },
-  "/PivotHead/docs-42e": {
+  "/PivotHead/docs-841": {
     "__comp": "__comp---theme-docs-root-5-e-9-0b6",
     "__context": {
       "plugin": "plugin---pivot-head-docsaba-41e"
     }
   },
-  "/PivotHead/docs-c70": {
+  "/PivotHead/docs-898": {
     "__comp": "__comp---theme-doc-version-roota-7-b-5de",
     "__props": "__props---pivot-head-docs-162-87b"
   },
-  "/PivotHead/docs-6fa": {
+  "/PivotHead/docs-1c4": {
     "__comp": "__comp---theme-doc-roota-94-67a"
   },
   "/PivotHead/docs/contributors/-f21": {
@@ -109,6 +109,10 @@
   "/PivotHead/docs/introduction-db5": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---pivot-head-docs-introductiona-09-d41"
+  },
+  "/PivotHead/docs/reference/api-reference/analytics-api-reference-a73": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-reference-api-reference-analytics-api-reference-4-ca-a94"
   },
   "/PivotHead/docs/reference/api-reference/angular-api-reference-618": {
     "__comp": "__comp---theme-doc-item-178-a40",
@@ -193,6 +197,10 @@
   "/PivotHead/docs/tutorials/core-webcomponent/setup-for-user-project-83d": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---pivot-head-docs-tutorials-core-webcomponent-setup-for-user-projectf-9-c-bc6"
+  },
+  "/PivotHead/docs/tutorials/pivot-charts-4f8": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---pivot-head-docs-tutorials-pivot-charts-268-01a"
   },
   "/PivotHead/docs/tutorials/react/react-sample-project-1f6": {
     "__comp": "__comp---theme-doc-item-178-a40",

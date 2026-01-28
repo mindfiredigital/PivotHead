@@ -19,8 +19,8 @@
   },
   "sidebar": "tutorialSidebar",
   "previous": {
-    "title": "Vue",
-    "permalink": "/PivotHead/docs/reference/api-reference/vue-api-reference"
+    "title": "Analytics",
+    "permalink": "/PivotHead/docs/reference/api-reference/analytics-api-reference"
   },
   "next": {
     "title": "Contributors",

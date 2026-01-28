@@ -121,6 +121,13 @@
               ],
               "collapsed": true,
               "collapsible": true
+            },
+            {
+              "type": "link",
+              "label": "Pivot Charts",
+              "href": "/PivotHead/docs/tutorials/pivot-charts",
+              "docId": "tutorials/pivot-charts",
+              "unlisted": false
             }
           ],
           "collapsed": true,
@@ -210,6 +217,13 @@
                   "label": "Vue",
                   "href": "/PivotHead/docs/reference/api-reference/vue-api-reference",
                   "docId": "reference/api-reference/vue-api-reference",
+                  "unlisted": false
+                },
+                {
+                  "type": "link",
+                  "label": "Analytics",
+                  "href": "/PivotHead/docs/reference/api-reference/analytics-api-reference",
+                  "docId": "reference/api-reference/analytics-api-reference",
                   "unlisted": false
                 }
               ],
@@ -351,6 +365,12 @@
         "description": "An introduction to the first truly headless pivot table library for JavaScript.",
         "sidebar": "tutorialSidebar"
       },
+      "reference/api-reference/analytics-api-reference": {
+        "id": "reference/api-reference/analytics-api-reference",
+        "title": "Analytics API Reference",
+        "description": "Complete API reference for PivotHead Analytics charting library",
+        "sidebar": "tutorialSidebar"
+      },
       "reference/api-reference/angular-api-reference": {
         "id": "reference/api-reference/angular-api-reference",
         "title": "Angular API Reference",
@@ -467,6 +487,12 @@
         "id": "tutorials/core-webcomponent/setup-for-user-project",
         "title": "setup-for-user-project",
         "description": "Overview",
+        "sidebar": "tutorialSidebar"
+      },
+      "tutorials/pivot-charts": {
+        "id": "tutorials/pivot-charts",
+        "title": "Pivot Charts",
+        "description": "Transform your pivot table data into beautiful, interactive visualizations with PivotHead Analytics",
         "sidebar": "tutorialSidebar"
       },
       "tutorials/react/react-sample-project": {
