@@ -78,10 +78,6 @@ new Chart(canvas, { type: 'pie', data: pieData });
 
 Returns data formatted for stacked charts.
 
-```typescript
-getStackedChartData(): ChartData
-```
-
 **Returns:** `ChartData` - Data with multiple datasets for stacking
 
 **Example:**
