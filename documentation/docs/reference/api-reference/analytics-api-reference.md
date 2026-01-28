@@ -252,7 +252,84 @@ getAvailableFilterOptions(): {
 
 ---
 
+## Types
+
 ### Classes
+
+### ChartType
+
+```typescript
+type ChartType =
+  | 'column' // Vertical bar chart
+  | 'bar' // Horizontal bar chart
+  | 'line' // Line chart
+  | 'area' // Area chart (filled line)
+  | 'pie' // Pie chart
+  | 'doughnut' // Doughnut chart
+  | 'stackedColumn' // Stacked vertical bars
+  | 'stackedBar' // Stacked horizontal bars
+  | 'stackedArea' // Stacked area chart
+  | 'comboBarLine' // Combined bar and line
+  | 'comboAreaLine' // Combined area and line
+  | 'scatter' // Scatter plot
+  | 'histogram' // Histogram
+  | 'heatmap' // Heat map
+  | 'funnel' // Funnel chart
+  | 'sankey'; // Sankey diagram
+```
+
+### ChartData
+
+```typescript
+interface ChartData {
+  labels: string[];
+  datasets: ChartDataset[];
+  rowFieldName: string;
+  columnFieldName: string;
+  measures: Array<{ uniqueName: string; caption: string }>;
+  selectedMeasure: { uniqueName: string; caption: string };
+  allRowValues: string[];
+  allColumnValues: string[];
+  filteredRowValues: string[];
+  filteredColumnValues: string[];
+}
+```
+
+### ChartDataset
+
+```typescript
+interface ChartDataset {
+  label: string;
+  data: number[];
+  backgroundColor?: string | string[];
+  borderColor?: string | string[];
+  borderWidth?: number;
+  fill?: boolean;
+  tension?: number;
+  type?: string;
+  order?: number;
+}
+```
+
+### ChartConfig
+
+```typescript
+interface ChartConfig {
+  type: ChartType;
+  filters?: ChartFilterConfig;
+  title?: string;
+  showLegend?: boolean;
+  legendPosition?: 'top' | 'bottom' | 'left' | 'right';
+  animated?: boolean;
+  colors?: string[];
+  height?: number;
+  width?: number | 'auto';
+}
+```
+
+---
+
+## Exports
 
 - `ChartService` - Main service for data transformation
 
