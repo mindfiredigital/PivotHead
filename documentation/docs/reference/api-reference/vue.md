@@ -46,6 +46,13 @@ const exportData = () => {
 </script>
 ```
 
+#### Core Methods
+
+- `getState()` - Get current pivot state
+- `refresh()` - Refresh the pivot table
+- `getData()` - Get raw input data
+- `getProcessedData()` - Get processed pivot data
+
 #### Filtering & Sorting
 
 - `sort(field: string, direction: 'asc' | 'desc')` - Sort by field
