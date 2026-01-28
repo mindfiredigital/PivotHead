@@ -366,15 +366,6 @@ Try: Web Workers
 Result: Still fast, just not as fast as WASM
 ```
 
-**Compatibility:**
-
-- Works in **all browsers**
-- Automatic degradation
-- No errors or crashes
-- Always functional
-
----
-
 ### **5. Progress Tracking**
 
 Real-time feedback during file processing:
