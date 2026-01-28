@@ -396,13 +396,13 @@ const data = fs.readFileSync('800mb-file.csv', 'utf-8'); //  May crash
 ```javascript
 // Clean up uploaded files
 fs.unlinkSync(req.file.path);
-```
 
 // Unload WASM on shutdown
 process.on('SIGTERM', () => {
-wasm.unload();
-process.exit(0);
+  wasm.unload();
+  process.exit(0);
 });
+```
 
 ---
 
