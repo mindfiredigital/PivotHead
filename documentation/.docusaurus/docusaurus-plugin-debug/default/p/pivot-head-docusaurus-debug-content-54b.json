@@ -351,6 +351,15 @@
                     "chartservice",
                     "visualization"
                   ]
+                },
+                "sidebar": "tutorialSidebar",
+                "previous": {
+                  "title": "Vue",
+                  "permalink": "/PivotHead/docs/reference/api-reference/vue-api-reference"
+                },
+                "next": {
+                  "title": "Troubleshooting",
+                  "permalink": "/PivotHead/docs/tutorial-basics/troubleshooting"
                 }
               },
               {
@@ -461,8 +470,8 @@
                   "permalink": "/PivotHead/docs/reference/api-reference/angular-api-reference"
                 },
                 "next": {
-                  "title": "Troubleshooting",
-                  "permalink": "/PivotHead/docs/tutorial-basics/troubleshooting"
+                  "title": "Analytics",
+                  "permalink": "/PivotHead/docs/reference/api-reference/analytics-api-reference"
                 }
               },
               {
@@ -513,8 +522,8 @@
                 },
                 "sidebar": "tutorialSidebar",
                 "previous": {
-                  "title": "setup-for-user-project",
-                  "permalink": "/PivotHead/docs/tutorials/vue/setup-for-user-project"
+                  "title": "Pivot Charts",
+                  "permalink": "/PivotHead/docs/tutorials/pivot-charts"
                 },
                 "next": {
                   "title": "WebAssembly & Performance",
@@ -715,8 +724,8 @@
                 },
                 "sidebar": "tutorialSidebar",
                 "previous": {
-                  "title": "Vue",
-                  "permalink": "/PivotHead/docs/reference/api-reference/vue-api-reference"
+                  "title": "Analytics",
+                  "permalink": "/PivotHead/docs/reference/api-reference/analytics-api-reference"
                 },
                 "next": {
                   "title": "Contributors",
@@ -887,6 +896,15 @@
                     "pie chart",
                     "line chart"
                   ]
+                },
+                "sidebar": "tutorialSidebar",
+                "previous": {
+                  "title": "setup-for-user-project",
+                  "permalink": "/PivotHead/docs/tutorials/vue/setup-for-user-project"
+                },
+                "next": {
+                  "title": "Core Web Component",
+                  "permalink": "/PivotHead/docs/reference/conceptual-reference/core-webcomponent-conceptual-reference"
                 }
               },
               {
@@ -980,8 +998,8 @@
                   "permalink": "/PivotHead/docs/tutorials/vue/vue-sample-project"
                 },
                 "next": {
-                  "title": "Core Web Component",
-                  "permalink": "/PivotHead/docs/reference/conceptual-reference/core-webcomponent-conceptual-reference"
+                  "title": "Pivot Charts",
+                  "permalink": "/PivotHead/docs/tutorials/pivot-charts"
                 }
               },
               {
@@ -1105,6 +1123,12 @@
                       ],
                       "collapsed": true,
                       "collapsible": true
+                    },
+                    {
+                      "type": "doc",
+                      "id": "tutorials/pivot-charts",
+                      "label": "Pivot Charts",
+                      "translatable": true
                     }
                   ],
                   "collapsed": true,
@@ -1162,6 +1186,10 @@
                         {
                           "type": "doc",
                           "id": "reference/api-reference/vue-api-reference"
+                        },
+                        {
+                          "type": "doc",
+                          "id": "reference/api-reference/analytics-api-reference"
                         }
                       ],
                       "collapsed": true,
