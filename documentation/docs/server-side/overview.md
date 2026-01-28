@@ -421,15 +421,6 @@ const upload = multer({
 });
 ```
 
-### Sanitize Delimiters
-
-```javascript
-function sanitizeDelimiter(delimiter) {
-  const allowed = [',', ';', '\t', '|'];
-  return allowed.includes(delimiter) ? delimiter : ',';
-}
-```
-
 ### Handle Errors Gracefully
 
 ```javascript
