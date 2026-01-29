@@ -662,6 +662,505 @@ function FlashingTableVisual() {
   );
 }
 
+// Charts Visualization Section Component
+function ChartsVisualizationSection() {
+  const { colorMode } = useColorMode();
+
+  const chartTypes = [
+    {
+      name: 'Bar Charts',
+      description:
+        'Compare data across categories with animated bar visualizations',
+    },
+    {
+      name: 'Line Charts',
+      description: 'Track trends over time with smooth animated line graphs',
+    },
+    {
+      name: 'Pie Charts',
+      description:
+        'Visualize proportions and distributions with dynamic pie segments',
+    },
+    {
+      name: 'Area Charts',
+      description:
+        'Display cumulative data with beautifully filled area visualizations',
+    },
+  ];
+
+  return (
+    <div
+      className={clsx(
+        styles.section,
+        colorMode === 'dark' ? 'bg-slate-950' : 'bg-white'
+      )}
+    >
+      <div className="container">
+        <div
+          className={clsx(
+            'text-center mb-12',
+            'transition-all duration-1000',
+            'opacity-100 translate-y-0'
+          )}
+        >
+          <div className="inline-flex items-center justify-center mb-4">
+            <BarChartIcon />
+            <span
+              className={clsx(
+                'ml-2 text-sm font-semibold uppercase tracking-wider',
+                colorMode === 'dark' ? 'text-red-400' : 'text-red-600'
+              )}
+            >
+              Data Visualization
+            </span>
+          </div>
+          <h2
+            className={clsx(
+              'text-4xl font-bold mb-4',
+              colorMode === 'dark' ? 'text-white' : 'text-slate-900'
+            )}
+          >
+            Beautiful Charts & Graphs
+          </h2>
+          <p
+            className={clsx(
+              'text-xl max-w-3xl mx-auto',
+              colorMode === 'dark' ? 'text-slate-300' : 'text-slate-600'
+            )}
+          >
+            Transform your pivot data into stunning visualizations. PivotHead
+            supports multiple chart types with smooth animations and full
+            customization.
+          </p>
+        </div>
+
+        {/* Chart Types Grid - 4 Animated Cards */}
+        <div
+          className={clsx(
+            'grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto',
+            'transition-all duration-1000 delay-200',
+            'opacity-100 translate-y-0'
+          )}
+        >
+          {/* Bar Chart Card */}
+          <div
+            className={clsx(
+              styles.chartCard,
+              colorMode === 'dark' ? styles.chartCardDark : ''
+            )}
+          >
+            <div
+              className={clsx(
+                styles.chartIconWrapperLarge,
+                styles.chartIconAnimate
+              )}
+            >
+              <svg viewBox="0 0 120 100" className={styles.chartIconLarge}>
+                {/* Grid lines */}
+                <line
+                  x1="15"
+                  y1="85"
+                  x2="110"
+                  y2="85"
+                  stroke={colorMode === 'dark' ? '#334155' : '#e2e8f0'}
+                  strokeWidth="1"
+                />
+                {/* Animated bars */}
+                <rect
+                  x="20"
+                  y="55"
+                  width="16"
+                  height="30"
+                  rx="2"
+                  fill="#ef4444"
+                  className={styles.animatedBar}
+                  style={{ animationDelay: '0s' }}
+                />
+                <rect
+                  x="42"
+                  y="35"
+                  width="16"
+                  height="50"
+                  rx="2"
+                  fill="#f97316"
+                  className={styles.animatedBar}
+                  style={{ animationDelay: '0.1s' }}
+                />
+                <rect
+                  x="64"
+                  y="25"
+                  width="16"
+                  height="60"
+                  rx="2"
+                  fill="#eab308"
+                  className={styles.animatedBar}
+                  style={{ animationDelay: '0.2s' }}
+                />
+                <rect
+                  x="86"
+                  y="45"
+                  width="16"
+                  height="40"
+                  rx="2"
+                  fill="#22c55e"
+                  className={styles.animatedBar}
+                  style={{ animationDelay: '0.3s' }}
+                />
+              </svg>
+            </div>
+            <h3
+              className={clsx(
+                'text-lg font-semibold mb-2 text-center',
+                colorMode === 'dark' ? 'text-white' : 'text-slate-900'
+              )}
+            >
+              {chartTypes[0].name}
+            </h3>
+            <p
+              className={clsx(
+                'text-sm text-center',
+                colorMode === 'dark' ? 'text-slate-400' : 'text-slate-600'
+              )}
+            >
+              {chartTypes[0].description}
+            </p>
+          </div>
+
+          {/* Line Chart Card */}
+          <div
+            className={clsx(
+              styles.chartCard,
+              colorMode === 'dark' ? styles.chartCardDark : ''
+            )}
+          >
+            <div
+              className={clsx(
+                styles.chartIconWrapperLarge,
+                styles.chartIconAnimate
+              )}
+            >
+              <svg viewBox="0 0 120 100" className={styles.chartIconLarge}>
+                <defs>
+                  <linearGradient
+                    id="cardLineGradient"
+                    x1="0%"
+                    y1="0%"
+                    x2="0%"
+                    y2="100%"
+                  >
+                    <stop offset="0%" stopColor="#ef4444" stopOpacity="0.3" />
+                    <stop
+                      offset="100%"
+                      stopColor="#ef4444"
+                      stopOpacity="0.02"
+                    />
+                  </linearGradient>
+                </defs>
+                {/* Grid line */}
+                <line
+                  x1="15"
+                  y1="85"
+                  x2="110"
+                  y2="85"
+                  stroke={colorMode === 'dark' ? '#334155' : '#e2e8f0'}
+                  strokeWidth="1"
+                />
+                {/* Area fill */}
+                <path
+                  d="M15,65 L35,45 L55,55 L75,30 L95,40 L110,25 L110,85 L15,85 Z"
+                  fill="url(#cardLineGradient)"
+                  className={styles.animatedAreaFill}
+                />
+                {/* Main line */}
+                <polyline
+                  points="15,65 35,45 55,55 75,30 95,40 110,25"
+                  fill="none"
+                  stroke="#ef4444"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className={styles.animatedLine}
+                />
+                {/* Data points */}
+                <circle
+                  cx="15"
+                  cy="65"
+                  r="5"
+                  fill={colorMode === 'dark' ? '#1e293b' : 'white'}
+                  stroke="#ef4444"
+                  strokeWidth="2"
+                  className={styles.animatedDot}
+                  style={{ animationDelay: '0.6s' }}
+                />
+                <circle
+                  cx="35"
+                  cy="45"
+                  r="5"
+                  fill={colorMode === 'dark' ? '#1e293b' : 'white'}
+                  stroke="#ef4444"
+                  strokeWidth="2"
+                  className={styles.animatedDot}
+                  style={{ animationDelay: '0.7s' }}
+                />
+                <circle
+                  cx="55"
+                  cy="55"
+                  r="5"
+                  fill={colorMode === 'dark' ? '#1e293b' : 'white'}
+                  stroke="#ef4444"
+                  strokeWidth="2"
+                  className={styles.animatedDot}
+                  style={{ animationDelay: '0.8s' }}
+                />
+                <circle
+                  cx="75"
+                  cy="30"
+                  r="5"
+                  fill={colorMode === 'dark' ? '#1e293b' : 'white'}
+                  stroke="#ef4444"
+                  strokeWidth="2"
+                  className={styles.animatedDot}
+                  style={{ animationDelay: '0.9s' }}
+                />
+                <circle
+                  cx="95"
+                  cy="40"
+                  r="5"
+                  fill={colorMode === 'dark' ? '#1e293b' : 'white'}
+                  stroke="#ef4444"
+                  strokeWidth="2"
+                  className={styles.animatedDot}
+                  style={{ animationDelay: '1.0s' }}
+                />
+                <circle
+                  cx="110"
+                  cy="25"
+                  r="5"
+                  fill={colorMode === 'dark' ? '#1e293b' : 'white'}
+                  stroke="#ef4444"
+                  strokeWidth="2"
+                  className={styles.animatedDot}
+                  style={{ animationDelay: '1.1s' }}
+                />
+              </svg>
+            </div>
+            <h3
+              className={clsx(
+                'text-lg font-semibold mb-2 text-center',
+                colorMode === 'dark' ? 'text-white' : 'text-slate-900'
+              )}
+            >
+              {chartTypes[1].name}
+            </h3>
+            <p
+              className={clsx(
+                'text-sm text-center',
+                colorMode === 'dark' ? 'text-slate-400' : 'text-slate-600'
+              )}
+            >
+              {chartTypes[1].description}
+            </p>
+          </div>
+
+          {/* Pie Chart Card */}
+          <div
+            className={clsx(
+              styles.chartCard,
+              colorMode === 'dark' ? styles.chartCardDark : ''
+            )}
+          >
+            <div
+              className={clsx(
+                styles.chartIconWrapperLarge,
+                styles.chartIconAnimate
+              )}
+            >
+              <svg viewBox="0 0 120 100" className={styles.chartIconLarge}>
+                <g transform="translate(60, 50)">
+                  {/* Pie segments */}
+                  <circle
+                    r="35"
+                    fill="none"
+                    stroke="#ef4444"
+                    strokeWidth="18"
+                    strokeDasharray="55 220"
+                    strokeDashoffset="0"
+                    className={styles.animatedPieSegment}
+                    style={{ animationDelay: '0s' }}
+                  />
+                  <circle
+                    r="35"
+                    fill="none"
+                    stroke="#f97316"
+                    strokeWidth="18"
+                    strokeDasharray="44 220"
+                    strokeDashoffset="-55"
+                    className={styles.animatedPieSegment}
+                    style={{ animationDelay: '0.1s' }}
+                  />
+                  <circle
+                    r="35"
+                    fill="none"
+                    stroke="#eab308"
+                    strokeWidth="18"
+                    strokeDasharray="33 220"
+                    strokeDashoffset="-99"
+                    className={styles.animatedPieSegment}
+                    style={{ animationDelay: '0.2s' }}
+                  />
+                  <circle
+                    r="35"
+                    fill="none"
+                    stroke="#22c55e"
+                    strokeWidth="18"
+                    strokeDasharray="44 220"
+                    strokeDashoffset="-132"
+                    className={styles.animatedPieSegment}
+                    style={{ animationDelay: '0.3s' }}
+                  />
+                  <circle
+                    r="35"
+                    fill="none"
+                    stroke="#3b82f6"
+                    strokeWidth="18"
+                    strokeDasharray="44 220"
+                    strokeDashoffset="-176"
+                    className={styles.animatedPieSegment}
+                    style={{ animationDelay: '0.4s' }}
+                  />
+                  {/* Center circle */}
+                  <circle
+                    r="18"
+                    fill={colorMode === 'dark' ? '#1e293b' : 'white'}
+                    className={styles.animatedPieCenter}
+                  />
+                </g>
+              </svg>
+            </div>
+            <h3
+              className={clsx(
+                'text-lg font-semibold mb-2 text-center',
+                colorMode === 'dark' ? 'text-white' : 'text-slate-900'
+              )}
+            >
+              {chartTypes[2].name}
+            </h3>
+            <p
+              className={clsx(
+                'text-sm text-center',
+                colorMode === 'dark' ? 'text-slate-400' : 'text-slate-600'
+              )}
+            >
+              {chartTypes[2].description}
+            </p>
+          </div>
+
+          {/* Area Chart Card */}
+          <div
+            className={clsx(
+              styles.chartCard,
+              colorMode === 'dark' ? styles.chartCardDark : ''
+            )}
+          >
+            <div
+              className={clsx(
+                styles.chartIconWrapperLarge,
+                styles.chartIconAnimate
+              )}
+            >
+              <svg viewBox="0 0 120 100" className={styles.chartIconLarge}>
+                <defs>
+                  <linearGradient
+                    id="cardAreaGradient1"
+                    x1="0%"
+                    y1="0%"
+                    x2="0%"
+                    y2="100%"
+                  >
+                    <stop offset="0%" stopColor="#ef4444" stopOpacity="0.6" />
+                    <stop offset="100%" stopColor="#ef4444" stopOpacity="0.1" />
+                  </linearGradient>
+                  <linearGradient
+                    id="cardAreaGradient2"
+                    x1="0%"
+                    y1="0%"
+                    x2="0%"
+                    y2="100%"
+                  >
+                    <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.5" />
+                    <stop
+                      offset="100%"
+                      stopColor="#3b82f6"
+                      stopOpacity="0.05"
+                    />
+                  </linearGradient>
+                </defs>
+                {/* Grid line */}
+                <line
+                  x1="15"
+                  y1="85"
+                  x2="110"
+                  y2="85"
+                  stroke={colorMode === 'dark' ? '#334155' : '#e2e8f0'}
+                  strokeWidth="1"
+                />
+                {/* Blue area (back) */}
+                <path
+                  d="M15,60 Q40,40 60,50 T105,30 L105,85 L15,85 Z"
+                  fill="url(#cardAreaGradient2)"
+                  className={styles.animatedAreaPath}
+                  style={{ animationDelay: '0.2s' }}
+                />
+                <path
+                  d="M15,60 Q40,40 60,50 T105,30"
+                  fill="none"
+                  stroke="#3b82f6"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  className={styles.animatedAreaLine}
+                  style={{ animationDelay: '0.4s' }}
+                />
+                {/* Red area (front) */}
+                <path
+                  d="M15,75 Q40,55 60,65 T105,45 L105,85 L15,85 Z"
+                  fill="url(#cardAreaGradient1)"
+                  className={styles.animatedAreaPath}
+                  style={{ animationDelay: '0s' }}
+                />
+                <path
+                  d="M15,75 Q40,55 60,65 T105,45"
+                  fill="none"
+                  stroke="#ef4444"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  className={styles.animatedAreaLine}
+                  style={{ animationDelay: '0.2s' }}
+                />
+              </svg>
+            </div>
+            <h3
+              className={clsx(
+                'text-lg font-semibold mb-2 text-center',
+                colorMode === 'dark' ? 'text-white' : 'text-slate-900'
+              )}
+            >
+              {chartTypes[3].name}
+            </h3>
+            <p
+              className={clsx(
+                'text-sm text-center',
+                colorMode === 'dark' ? 'text-slate-400' : 'text-slate-600'
+              )}
+            >
+              {chartTypes[3].description}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // WASM Performance Showcase Component
 function WasmPerformanceShowcase() {
   const { colorMode } = useColorMode();
@@ -1264,6 +1763,7 @@ export default function Home() {
         <main>
           <HeroSection />
           <WasmPerformanceShowcase />
+          <ChartsVisualizationSection />
           {/* <section
             className="relative rounded-t-3xl border border-border/60 backdrop-blur overflow-hidden
         bg-[linear-gradient(to_bottom_right,_color-mix(in_oklab,var(--background),_transparent_30%),_color-mix(in_oklab,var(--background),_transparent_10%))]

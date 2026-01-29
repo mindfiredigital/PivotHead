@@ -40,11 +40,11 @@ The Vue wrapper acts as an intelligent bridge that handles:
 
 ### Basic Installation
 
+### With Dependencies
+
 ```bash
 npm install @mindfiredigital/pivothead-vue
 ```
-
-### With Dependencies
 
 ```bash
 npm install @mindfiredigital/pivothead-vue vue@^3.0.0

@@ -327,6 +327,42 @@
                 }
               },
               {
+                "id": "reference/api-reference/analytics-api-reference",
+                "title": "Analytics API Reference",
+                "description": "Complete API reference for PivotHead Analytics charting library",
+                "source": "@site/docs/reference/api-reference/analytics-api-reference.md",
+                "sourceDirName": "reference/api-reference",
+                "slug": "/reference/api-reference/analytics-api-reference",
+                "permalink": "/PivotHead/docs/reference/api-reference/analytics-api-reference",
+                "draft": false,
+                "unlisted": false,
+                "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/reference/api-reference/analytics-api-reference.md",
+                "tags": [],
+                "version": "current",
+                "frontMatter": {
+                  "id": "analytics-api-reference",
+                  "title": "Analytics API Reference",
+                  "sidebar_label": "Analytics",
+                  "description": "Complete API reference for PivotHead Analytics charting library",
+                  "keywords": [
+                    "api",
+                    "analytics",
+                    "charts",
+                    "chartservice",
+                    "visualization"
+                  ]
+                },
+                "sidebar": "tutorialSidebar",
+                "previous": {
+                  "title": "Vue",
+                  "permalink": "/PivotHead/docs/reference/api-reference/vue-api-reference"
+                },
+                "next": {
+                  "title": "Troubleshooting",
+                  "permalink": "/PivotHead/docs/tutorial-basics/troubleshooting"
+                }
+              },
+              {
                 "id": "reference/api-reference/angular-api-reference",
                 "title": "Angular API Reference",
                 "description": "Complete API documentation for @mindfiredigital/pivothead-angular.",
@@ -434,8 +470,8 @@
                   "permalink": "/PivotHead/docs/reference/api-reference/angular-api-reference"
                 },
                 "next": {
-                  "title": "Troubleshooting",
-                  "permalink": "/PivotHead/docs/tutorial-basics/troubleshooting"
+                  "title": "Analytics",
+                  "permalink": "/PivotHead/docs/reference/api-reference/analytics-api-reference"
                 }
               },
               {
@@ -486,8 +522,8 @@
                 },
                 "sidebar": "tutorialSidebar",
                 "previous": {
-                  "title": "setup-for-user-project",
-                  "permalink": "/PivotHead/docs/tutorials/vue/setup-for-user-project"
+                  "title": "Pivot Charts",
+                  "permalink": "/PivotHead/docs/tutorials/pivot-charts"
                 },
                 "next": {
                   "title": "WebAssembly & Performance",
@@ -688,8 +724,8 @@
                 },
                 "sidebar": "tutorialSidebar",
                 "previous": {
-                  "title": "Vue",
-                  "permalink": "/PivotHead/docs/reference/api-reference/vue-api-reference"
+                  "title": "Analytics",
+                  "permalink": "/PivotHead/docs/reference/api-reference/analytics-api-reference"
                 },
                 "next": {
                   "title": "Contributors",
@@ -834,6 +870,44 @@
                 }
               },
               {
+                "id": "tutorials/pivot-charts",
+                "title": "Pivot Charts",
+                "description": "Transform your pivot table data into beautiful, interactive visualizations with PivotHead Analytics",
+                "source": "@site/docs/tutorials/pivot-charts.mdx",
+                "sourceDirName": "tutorials",
+                "slug": "/tutorials/pivot-charts",
+                "permalink": "/PivotHead/docs/tutorials/pivot-charts",
+                "draft": false,
+                "unlisted": false,
+                "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorials/pivot-charts.mdx",
+                "tags": [],
+                "version": "current",
+                "frontMatter": {
+                  "id": "pivot-charts",
+                  "title": "Pivot Charts",
+                  "sidebar_label": "Pivot Charts",
+                  "description": "Transform your pivot table data into beautiful, interactive visualizations with PivotHead Analytics",
+                  "keywords": [
+                    "pivot charts",
+                    "data visualization",
+                    "chart.js",
+                    "analytics",
+                    "bar chart",
+                    "pie chart",
+                    "line chart"
+                  ]
+                },
+                "sidebar": "tutorialSidebar",
+                "previous": {
+                  "title": "setup-for-user-project",
+                  "permalink": "/PivotHead/docs/tutorials/vue/setup-for-user-project"
+                },
+                "next": {
+                  "title": "Core Web Component",
+                  "permalink": "/PivotHead/docs/reference/conceptual-reference/core-webcomponent-conceptual-reference"
+                }
+              },
+              {
                 "id": "tutorials/react/react-sample-project",
                 "title": "Sample Project",
                 "description": "Let's build a simple React application to demonstrate how to use the @pivothead/react package to create a headless pivot table.",
@@ -924,8 +998,8 @@
                   "permalink": "/PivotHead/docs/tutorials/vue/vue-sample-project"
                 },
                 "next": {
-                  "title": "Core Web Component",
-                  "permalink": "/PivotHead/docs/reference/conceptual-reference/core-webcomponent-conceptual-reference"
+                  "title": "Pivot Charts",
+                  "permalink": "/PivotHead/docs/tutorials/pivot-charts"
                 }
               },
               {
@@ -1049,6 +1123,12 @@
                       ],
                       "collapsed": true,
                       "collapsible": true
+                    },
+                    {
+                      "type": "doc",
+                      "id": "tutorials/pivot-charts",
+                      "label": "Pivot Charts",
+                      "translatable": true
                     }
                   ],
                   "collapsed": true,
@@ -1106,6 +1186,10 @@
                         {
                           "type": "doc",
                           "id": "reference/api-reference/vue-api-reference"
+                        },
+                        {
+                          "type": "doc",
+                          "id": "reference/api-reference/analytics-api-reference"
                         }
                       ],
                       "collapsed": true,

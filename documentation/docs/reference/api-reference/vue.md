@@ -21,13 +21,13 @@ sidebar_label: Vue
 
 ### Events
 
+### Template Ref Methods
+
 | Event                | Payload                          | Description                      |
 | -------------------- | -------------------------------- | -------------------------------- |
 | `@state-change`      | `PivotTableState`                | Emitted when pivot state changes |
 | `@view-mode-change`  | `{ mode: 'raw' \| 'processed' }` | Emitted when view mode changes   |
 | `@pagination-change` | `PaginationConfig`               | Emitted when pagination changes  |
-
-### Template Ref Methods
 
 Access these methods through template refs:
 
@@ -68,12 +68,12 @@ const exportData = () => {
 
 #### Formatting
 
+#### Pagination
+
 - `formatValue(value: unknown, field: string)` - Format a value
 - `updateFieldFormatting(field: string, format: FormatOptions)` - Update field formatting
 - `getFieldAlignment(field: string)` - Get field text alignment
 - `showFormatPopup()` - Show formatting popup
-
-#### Pagination
 
 - `getPagination()` - Get pagination state
 - `previousPage()` - Go to previous page
