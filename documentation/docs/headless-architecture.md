@@ -128,6 +128,12 @@ test('calculates correct sum', () => {
 });
 ```
 
+// Test your UI separately
+test('renders table correctly', () => {
+render(<YourCustomTable data={mockData} />);
+// Your component tests
+});
+
 ## **Real-World Example: Custom Dashboard**
 
 Here's how you might use PivotHead's headless architecture to build a custom analytics dashboard:
