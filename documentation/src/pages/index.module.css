@@ -7,9 +7,7 @@
   background-color: #f8fafc; /* slate-50 */
 }
 
-[data-theme="dark"] .page {
-  background-color: #0f172a; /* slate-900 */
-}
+
 
 /* Header Styles */
 .header {
