@@ -56,7 +56,11 @@ const data = [
   { continent: 'EU', country: 'Germany', sales: 1100 },
 ];
 
-
+const config = {
+  rows: ['continent'],
+  columns: ['country'],
+  measures: ['sales'],
+};
 
 const pivotTable = usePivotTable(data, config);
 </script>
