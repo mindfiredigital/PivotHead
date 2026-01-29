@@ -126,12 +126,6 @@ test('calculates correct sum', () => {
   const engine = new PivotEngine(data);
   expect(engine.getAggregation('sum', 'sales')).toBe(1000);
 });
-
-// Test your UI separately
-test('renders table correctly', () => {
-  render(<YourCustomTable data={mockData} />);
-  // Your component tests
-});
 ```
 
 ## **Real-World Example: Custom Dashboard**
