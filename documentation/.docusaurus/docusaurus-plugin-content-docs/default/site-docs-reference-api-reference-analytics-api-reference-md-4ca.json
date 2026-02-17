@@ -1,7 +1,7 @@
 {
   "id": "reference/api-reference/analytics-api-reference",
   "title": "Analytics API Reference",
-  "description": "Complete API reference for PivotHead Analytics charting library",
+  "description": "Complete API reference for PivotHead Analytics - data visualization and charting for pivot tables",
   "source": "@site/docs/reference/api-reference/analytics-api-reference.md",
   "sourceDirName": "reference/api-reference",
   "slug": "/reference/api-reference/analytics-api-reference",
@@ -15,8 +15,17 @@
     "id": "analytics-api-reference",
     "title": "Analytics API Reference",
     "sidebar_label": "Analytics",
-    "description": "Complete API reference for PivotHead Analytics charting library",
-    "keywords": ["api", "analytics", "charts", "chartservice", "visualization"]
+    "description": "Complete API reference for PivotHead Analytics - data visualization and charting for pivot tables",
+    "keywords": [
+      "api",
+      "analytics",
+      "charts",
+      "visualization",
+      "pivothead",
+      "echarts",
+      "plotly",
+      "d3"
+    ]
   },
   "sidebar": "tutorialSidebar",
   "previous": {

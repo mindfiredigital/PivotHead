@@ -22,43 +22,97 @@
     <!-- Analytics Tab Content -->
     <div id="analytics-tab" class="tab-content">
       <div id="chartSection">
-        <div id="chartHeader">
-          <h3 id="chartTitle">Chart Visualization</h3>
-          <div id="chartControls">
-            <div class="chart-type-selector">
-              <label for="chartType">Chart Type:</label>
+        <!-- Top toolbar -->
+        <div id="analyticsToolbar">
+          <div class="toolbar-left">
+            <h3 id="chartTitle">Analytics</h3>
+          </div>
+          <div class="toolbar-right">
+            <button id="autoDetectBtn" class="analytics-btn primary">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              Auto Detect
+            </button>
+            <button id="showRecommendationsBtn" class="analytics-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              Recommendations
+            </button>
+            <div class="toolbar-divider"></div>
+            <div class="toolbar-select-group">
+              <label for="chartType">Chart</label>
               <select id="chartType">
-                <option value="column">Column Chart</option>
-                <option value="bar">Bar Chart (Horizontal)</option>
-                <option value="line">Line Chart</option>
-                <option value="area">Area Chart</option>
-                <option value="pie">Pie Chart</option>
-                <option value="doughnut">Doughnut Chart</option>
-                <option value="stackedColumn">Stacked Column</option>
-                <option value="stackedBar">Stacked Bar</option>
-                <option value="stackedArea">Stacked Area</option>
-                <option value="scatter">Scatter Plot</option>
-                <option value="heatmap">Heatmap</option>
-                <option value="histogram">Histogram</option>
+                <optgroup label="Basic">
+                  <option value="column">Column</option>
+                  <option value="bar">Bar</option>
+                  <option value="line">Line</option>
+                  <option value="area">Area</option>
+                </optgroup>
+                <optgroup label="Part-of-Whole">
+                  <option value="pie">Pie</option>
+                  <option value="doughnut">Doughnut</option>
+                  <option value="funnel">Funnel</option>
+                </optgroup>
+                <optgroup label="Stacked">
+                  <option value="stackedColumn">Stacked Column</option>
+                  <option value="stackedBar">Stacked Bar</option>
+                  <option value="stackedArea">Stacked Area</option>
+                </optgroup>
+                <optgroup label="Advanced">
+                  <option value="comboBarLine">Combo (Bar + Line)</option>
+                  <option value="scatter">Scatter</option>
+                  <option value="heatmap">Heatmap</option>
+                  <option value="histogram">Histogram</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="toolbar-select-group">
+              <label for="colorPalette">Palette</label>
+              <select id="colorPalette">
+                <optgroup label="Categorical">
+                  <option value="tableau10">Tableau 10</option>
+                  <option value="colorBlind">Color Blind Friendly</option>
+                  <option value="categorical">Categorical</option>
+                  <option value="pastel">Pastel</option>
+                  <option value="vibrant">Vibrant</option>
+                  <option value="default">Default</option>
+                </optgroup>
+                <optgroup label="Sequential">
+                  <option value="sequentialBlues">Blues</option>
+                  <option value="sequentialGreens">Greens</option>
+                  <option value="sequentialReds">Reds</option>
+                </optgroup>
+                <optgroup label="Diverging">
+                  <option value="divergingRedBlue">Red-Blue</option>
+                </optgroup>
               </select>
             </div>
           </div>
         </div>
+
+        <!-- Recommendations Panel (hidden by default) -->
+        <div id="recommendationsPanel" class="recommendations-panel" style="display: none;">
+          <div class="recommendations-header">
+            <h4>Chart Recommendations</h4>
+            <button id="closeRecommendations" class="recommendations-close" aria-label="Close">&times;</button>
+          </div>
+          <div id="recommendationsList"></div>
+        </div>
+
+        <!-- Filters row -->
         <div id="chartFilters">
           <div class="chart-filter-group">
-            <label for="chartMeasureSelect">Measure:</label>
+            <label for="chartMeasureSelect">Measure</label>
             <select id="chartMeasureSelect"></select>
           </div>
           <div class="chart-filter-group">
-            <label for="chartRowsSelect">Show Rows:</label>
+            <label for="chartRowsSelect">Rows</label>
             <select id="chartRowsSelect" multiple></select>
           </div>
           <div class="chart-filter-group">
-            <label for="chartColumnsSelect">Show Categories:</label>
+            <label for="chartColumnsSelect">Categories</label>
             <select id="chartColumnsSelect" multiple></select>
           </div>
           <div class="chart-filter-group">
-            <label for="chartLimitSelect">Limit Items:</label>
+            <label for="chartLimitSelect">Limit</label>
             <select id="chartLimitSelect">
               <option value="0">All</option>
               <option value="3">Top 3</option>
@@ -68,11 +122,32 @@
               <option value="20">Top 20</option>
             </select>
           </div>
-          <button id="applyChartFilter" class="chart-filter-btn">Apply Filter</button>
-          <button id="resetChartFilter" class="chart-filter-btn reset">Reset</button>
+          <div class="chart-filter-actions">
+            <button id="applyChartFilter" class="chart-filter-btn">Apply</button>
+            <button id="resetChartFilter" class="chart-filter-btn reset">Reset</button>
+          </div>
         </div>
+
+        <!-- Chart canvas area -->
         <div id="chartContainer">
           <canvas id="pivotChart"></canvas>
+        </div>
+
+        <!-- Export bar -->
+        <div id="exportControls">
+          <span class="export-label">Export</span>
+          <button id="exportPng" class="export-btn">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            PNG
+          </button>
+          <button id="exportCsv" class="export-btn">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            CSV
+          </button>
+          <button id="exportJson" class="export-btn">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            JSON
+          </button>
         </div>
       </div>
       <!-- Tab Navigation - Below chart, right corner -->

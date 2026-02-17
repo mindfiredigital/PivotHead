@@ -22,7 +22,8 @@ export type ChartType =
   | 'histogram'
   | 'heatmap'
   | 'funnel'
-  | 'sankey';
+  | 'sankey'
+  | 'treemap';
 
 /**
  * Chart filter configuration
@@ -84,6 +85,12 @@ export interface ChartDataset {
   type?: string;
   /** Rendering order */
   order?: number;
+  /** Whether to draw a connecting line (required for line datasets in mixed charts) */
+  showLine?: boolean;
+  /** Point radius for line/scatter datasets */
+  pointRadius?: number;
+  /** Point background color */
+  pointBackgroundColor?: string;
 }
 
 /**
@@ -199,6 +206,39 @@ export interface HistogramChartData extends Omit<ChartData, 'datasets'> {
   binCounts: number[];
   /** Number of bins */
   numBins: number;
+}
+
+/**
+ * Treemap node structure
+ */
+export interface TreemapNode {
+  /** Node name/label */
+  name: string;
+  /** Node value (for leaf nodes) or sum of children (for parent nodes) */
+  value: number;
+  /** Child nodes (undefined for leaf nodes) */
+  children?: TreemapNode[];
+  /** Optional color for this node */
+  color?: string;
+  /** Path from root to this node */
+  path?: string[];
+}
+
+/**
+ * Treemap specific chart data
+ */
+export interface TreemapChartData extends Omit<
+  ChartData,
+  'datasets' | 'labels'
+> {
+  /** Hierarchical tree structure */
+  tree: TreemapNode[];
+  /** Total value across all nodes */
+  totalValue: number;
+  /** Hierarchy field names (e.g., ['region', 'country', 'city']) */
+  hierarchyFields: string[];
+  /** Maximum depth of the tree */
+  maxDepth: number;
 }
 
 /**

@@ -1,0 +1,19 @@
+{
+  "name": "analytics-demo",
+  "version": "1.0.0",
+  "description": "Comprehensive demo for @mindfiredigital/pivothead-analytics RFC features",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@mindfiredigital/pivothead": "workspace:*",
+    "@mindfiredigital/pivothead-analytics": "workspace:*",
+    "chart.js": "^4.4.1"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}

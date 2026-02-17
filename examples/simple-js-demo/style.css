@@ -179,113 +179,297 @@ tr[draggable='true'] {
   text-align: center !important;
 }
 
-/* Chart Visualization Styles */
-.chart-container {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  margin: 10px 0;
-  padding: 10px;
-  background-color: #f8f9fa;
-  border-radius: 4px;
-  flex-wrap: wrap;
-}
-
-.chart-container label {
-  font-weight: 600;
-  color: #333;
-}
-
-.chart-container select {
-  min-width: 200px;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background-color: #fff;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.chart-container select:focus {
-  outline: none;
-  border-color: #4CAF50;
-  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
-}
+/* ============================================
+   Analytics Tab Styles
+   ============================================ */
 
 #chartSection {
-  margin: 80px;
-  padding: 20px;
+  margin: 24px;
+  margin-top: 80px;
+  padding: 0;
   background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
-/* Chart Controls */
-#chartControls {
+/* --- Toolbar --- */
+#analyticsToolbar {
   display: flex;
   align-items: center;
-  gap: 15px;
-}
-
-.chart-type-selector {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.chart-type-selector label {
-  font-size: 14px;
-  font-weight: 500;
-  color: #5f6368;
-}
-
-.chart-type-selector select {
-  padding: 8px 12px;
-  border: 1px solid #dadce0;
-  border-radius: 4px;
-  background-color: #fff;
-  font-size: 14px;
-  color: #202124;
-  cursor: pointer;
-  min-width: 180px;
-}
-
-.chart-type-selector select:focus {
-  outline: none;
-  border-color: #1a73e8;
-  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
-}
-
-/* Chart Header with Title and Controls */
-#chartHeader {
-  display: flex;
   justify-content: space-between;
+  gap: 12px;
+  padding: 14px 20px;
+  background: linear-gradient(to bottom, #fafbfc, #f4f5f7);
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.toolbar-left {
+  display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin-bottom: 15px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #e8eaed;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 #chartTitle {
   margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #202124;
-  flex: 0 0 auto;
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.01em;
 }
 
-/* Chart Filters Panel */
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 24px;
+  background-color: #d1d5db;
+  margin: 0 4px;
+}
+
+.toolbar-select-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toolbar-select-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.toolbar-select-group select {
+  padding: 6px 28px 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background-color: #fff;
+  font-size: 13px;
+  color: #374151;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%236B7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.toolbar-select-group select:hover {
+  border-color: #9ca3af;
+}
+
+.toolbar-select-group select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+/* Option group styling */
+#chartType optgroup,
+#colorPalette optgroup {
+  font-weight: 600;
+  font-size: 12px;
+  color: #6b7280;
+  background-color: #f9fafb;
+}
+
+#chartType option,
+#colorPalette option {
+  font-weight: 400;
+  color: #374151;
+  padding: 4px 8px;
+}
+
+/* --- Analytics Buttons --- */
+.analytics-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background-color: #fff;
+  color: #374151;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.analytics-btn:hover {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+  color: #111827;
+}
+
+.analytics-btn:active {
+  background-color: #e5e7eb;
+}
+
+.analytics-btn.primary {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  color: #fff;
+}
+
+.analytics-btn.primary:hover {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+.analytics-btn.primary:active {
+  background-color: #1d4ed8;
+}
+
+.analytics-btn svg {
+  flex-shrink: 0;
+}
+
+/* --- Recommendations Panel --- */
+.recommendations-panel {
+  margin: 16px 20px 0;
+  background-color: #f0f7ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 16px;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.recommendations-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.recommendations-panel h4 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e40af;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.recommendations-close {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  color: #6b7280;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+
+.recommendations-close:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+  color: #111827;
+}
+
+#recommendationsList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.recommendation-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.recommendation-item:hover {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+  box-shadow: 0 1px 3px rgba(59, 130, 246, 0.1);
+}
+
+.recommendation-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.recommendation-type {
+  font-weight: 600;
+  font-size: 13px;
+  color: #111827;
+  text-transform: capitalize;
+}
+
+.recommendation-reason {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.recommendation-score {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.score-bar {
+  width: 56px;
+  height: 5px;
+  background-color: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.score-fill {
+  height: 100%;
+  background-color: #3b82f6;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.score-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: #3b82f6;
+  min-width: 32px;
+  text-align: right;
+}
+
+/* --- Chart Filters --- */
 #chartFilters {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
   align-items: flex-end;
-  padding: 15px;
-  margin-bottom: 15px;
-  background-color: #f8f9fa;
-  border-radius: 6px;
+  padding: 12px 20px;
+  margin: 0;
+  background-color: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .chart-filter-group {
@@ -297,88 +481,103 @@ tr[draggable='true'] {
 .chart-filter-group label {
   font-size: 11px;
   font-weight: 600;
-  color: #5f6368;
+  color: #6b7280;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.04em;
 }
 
 .chart-filter-group select {
-  padding: 6px 10px;
-  border: 1px solid #dadce0;
-  border-radius: 4px;
+  padding: 6px 28px 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
   background-color: #fff;
   font-size: 13px;
-  color: #202124;
+  color: #374151;
   cursor: pointer;
   min-width: 120px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%236B7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.chart-filter-group select:hover {
+  border-color: #9ca3af;
 }
 
 .chart-filter-group select:focus {
   outline: none;
-  border-color: #1a73e8;
-  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
-}
-
-.chart-filter-group select:hover {
-  border-color: #5f6368;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
 /* Multi-select dropdowns */
 .chart-filter-group select[multiple] {
-  min-height: 60px;
-  max-height: 100px;
+  min-height: 56px;
+  max-height: 90px;
   padding: 4px;
+  appearance: auto;
+  background-image: none;
 }
 
 .chart-filter-group select[multiple] option {
-  padding: 4px 8px;
-  border-radius: 2px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-size: 12px;
 }
 
 .chart-filter-group select[multiple] option:checked {
-  background: linear-gradient(0deg, #e8f0fe 0%, #e8f0fe 100%);
-  color: #1a73e8;
+  background: linear-gradient(0deg, #dbeafe 0%, #dbeafe 100%);
+  color: #1d4ed8;
 }
 
-/* Chart Filter Buttons */
+.chart-filter-actions {
+  display: flex;
+  gap: 6px;
+  align-items: flex-end;
+}
+
+/* Filter Buttons */
 .chart-filter-btn {
-  padding: 8px 16px;
+  padding: 7px 16px;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s, box-shadow 0.2s;
+  transition: all 0.15s ease;
 }
 
 .chart-filter-btn:not(.reset) {
-  background-color: #1a73e8;
+  background-color: #3b82f6;
   color: #fff;
 }
 
 .chart-filter-btn:not(.reset):hover {
-  background-color: #1557b0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  background-color: #2563eb;
 }
 
 .chart-filter-btn.reset {
-  background-color: #f1f3f4;
-  color: #5f6368;
-  border: 1px solid #dadce0;
+  background-color: #fff;
+  color: #6b7280;
+  border: 1px solid #d1d5db;
 }
 
 .chart-filter-btn.reset:hover {
-  background-color: #e8eaed;
-  color: #202124;
+  background-color: #f3f4f6;
+  color: #374151;
 }
 
+/* --- Chart Container --- */
 #chartContainer {
   position: relative;
   width: 100%;
-  height: 450px;
+  height: 480px;
   min-height: 400px;
-  max-height: 600px;
+  max-height: 640px;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 #chartContainer canvas {
@@ -386,56 +585,55 @@ tr[draggable='true'] {
   height: 100% !important;
 }
 
-/* Responsive chart adjustments */
-@media (max-width: 992px) {
-  #chartHeader {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  #chartFilters {
-    justify-content: flex-start;
-  }
-
-  #chartTitle {
-    text-align: center;
-  }
+/* --- Export Controls --- */
+#exportControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background-color: #f9fafb;
+  border-top: 1px solid #e5e7eb;
 }
 
-@media (max-width: 768px) {
-  #chartContainer {
-    height: 350px;
-    min-height: 300px;
-  }
-
-  .chart-container {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .chart-container select {
-    width: 100%;
-  }
-
-  #chartFilters {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .chart-filter-group {
-    width: 100%;
-  }
-
-  .chart-filter-group select {
-    width: 100%;
-  }
-
-  .chart-filter-btn {
-    width: 100%;
-  }
+.export-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-right: 4px;
 }
 
-/* Heatmap table styles */
+.export-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 5px;
+  background-color: #fff;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.export-btn:hover {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  color: #fff;
+}
+
+.export-btn:active {
+  background-color: #2563eb;
+}
+
+.export-btn svg {
+  flex-shrink: 0;
+}
+
+/* --- Heatmap table --- */
 .heatmap-table {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   font-size: 13px;
@@ -450,30 +648,105 @@ tr[draggable='true'] {
   opacity: 0.9;
 }
 
-/* Hide chart button styling */
-#hideChart {
-  background-color: #dc3545;
-  color: white;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.2s;
+/* --- Responsive --- */
+@media (max-width: 992px) {
+  #analyticsToolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .toolbar-right {
+    justify-content: flex-start;
+  }
+
+  .toolbar-divider {
+    display: none;
+  }
+
+  #chartFilters {
+    gap: 10px;
+  }
 }
 
-#hideChart:hover {
-  background-color: #c82333;
-}
+@media (max-width: 768px) {
+  #chartSection {
+    margin: 12px;
+    border-radius: 8px;
+  }
 
-/* Chart type dropdown option group styling */
-#chartType optgroup {
-  font-weight: 600;
-  color: #333;
-  background-color: #f0f0f0;
-}
+  #analyticsToolbar {
+    padding: 12px 14px;
+  }
 
-#chartType option {
-  padding: 8px;
-  font-weight: normal;
+  .toolbar-right {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbar-select-group {
+    width: 100%;
+  }
+
+  .toolbar-select-group select {
+    flex: 1;
+  }
+
+  #chartContainer {
+    height: 320px;
+    min-height: 280px;
+    padding: 12px;
+  }
+
+  #chartFilters {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 12px 14px;
+  }
+
+  .chart-filter-group {
+    width: 100%;
+  }
+
+  .chart-filter-group select {
+    width: 100%;
+  }
+
+  .chart-filter-actions {
+    width: 100%;
+  }
+
+  .chart-filter-btn {
+    flex: 1;
+  }
+
+  .analytics-btn {
+    justify-content: center;
+    padding: 9px 14px;
+  }
+
+  .recommendation-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .recommendation-score {
+    width: 100%;
+  }
+
+  .score-bar {
+    flex: 1;
+  }
+
+  #exportControls {
+    flex-wrap: wrap;
+    padding: 10px 14px;
+  }
+
+  .export-btn {
+    flex: 1;
+    min-width: 60px;
+    justify-content: center;
+  }
 }

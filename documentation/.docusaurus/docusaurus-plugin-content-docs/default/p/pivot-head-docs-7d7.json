@@ -368,7 +368,7 @@
       "reference/api-reference/analytics-api-reference": {
         "id": "reference/api-reference/analytics-api-reference",
         "title": "Analytics API Reference",
-        "description": "Complete API reference for PivotHead Analytics charting library",
+        "description": "Complete API reference for PivotHead Analytics - data visualization and charting for pivot tables",
         "sidebar": "tutorialSidebar"
       },
       "reference/api-reference/angular-api-reference": {
