@@ -19,11 +19,13 @@
     "keywords": [
       "pivot charts",
       "data visualization",
-      "chart.js",
       "analytics",
       "bar chart",
       "pie chart",
-      "line chart"
+      "line chart",
+      "echarts",
+      "plotly",
+      "d3"
     ]
   },
   "sidebar": "tutorialSidebar",

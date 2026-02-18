@@ -529,3 +529,85 @@ We welcome contributions from the community. If you'd like to contribute to the 
 Copyright (c) Mindfire Digital llp. All rights reserved.
 
 Licensed under the MIT license.
+
+---
+
+Conversation compacted (ctrl+o for history)
+
+⎿  Read package.json (76 lines)  
+ ⎿  Read src/index.ts (153 lines)  
+ ⎿  Read src/core/ChartEngine.ts (490 lines)  
+ ⎿  Read src/utils/index.ts (33 lines)  
+ ⎿  Read src/utils/Formatters.ts (353 lines)
+
+● I'll run the build to verify Phase 2 compiles correctly.
+
+● Bash(pnpm run build)  
+ ⎿  > @mindfiredigital/pivothead-analytics@1.0.0 build /home/sanghamitrad/Documents/open-source/pivot-tablesrc/PivotHead/packages/analytics  
+ > rimraf dist && tsup src/index.ts --format esm,cjs --dts  
+ … +14 lines (ctrl+o to expand)
+
+● Phase 2 build completed successfully. Here's the summary of Phase 2 implementation:
+
+Phase 2 Complete ✓
+
+Features Implemented:
+
+1. Treemap Data Transformer (ChartService.ts)
+
+
+    - getTreemapData() method for hierarchical data transformation
+    - TreemapNode and TreemapChartData types added to types.ts
+
+2. Export Utilities (utils/Exporters.ts)
+
+
+    - PNG export (canvas toBlob)
+    - SVG export (manual SVG generation from canvas)
+    - PDF export (using optional jspdf peer dependency)
+    - CSV export (data to comma-separated values)
+    - JSON export (structured data export)
+    - ChartExporter class with static methods
+    - Convenience functions: exportChart(), getChartBlob()
+
+3. Value Formatters (utils/Formatters.ts)
+
+
+    - ValueFormatter class with methods:
+        - format(), formatNumber(), formatCurrency()
+      - formatPercent(), formatCompact(), formatDate()
+      - formatTime(), formatBytes(), formatDuration()
+    - Quick format functions: formatNumber, formatCurrency, formatPercent, formatCompact
+    - createFormatter() factory function
+
+4. ChartEngine Export Methods
+
+
+    - exportChart(), exportAsPng(), exportAsSvg()
+    - exportAsPdf(), exportAsCsv(), exportAsJson()
+    - getChartBlob() for custom handling
+
+5. Package Updates
+
+
+    - jspdf added as optional peer dependency
+    - New keywords for discoverability
+
+
+Build Output:
+
+- ESM: dist/index.js (64.48 KB)
+- CJS: dist/index.cjs (66.94 KB)
+- Types: dist/index.d.ts (40.98 KB)  
+
+
+Would you like me to continue with Phase 3 (additional chart library renderers, drill-down interactions, performance optimization)?
+
+The example expects config to have everything: { type: 'pie', container:
+'...', style: {...} } so you can pass it directly to render()
+
+- The example also shows a preview URL field (like a thumbnail image) — your
+  system doesn't have that
+  today's goal:
+  modify the config file with type style and container
+  improvise the colur palette to render the correct colur for the combo charts and scatter charts
