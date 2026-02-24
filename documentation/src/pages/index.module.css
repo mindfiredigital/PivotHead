@@ -1538,3 +1538,609 @@
 .animate-shimmer {
   animation: shimmer 2s infinite linear;
 }
+
+/* ========================================
+   CHARTS VISUALIZATION SECTION STYLES
+   ======================================== */
+
+/* Chart Card Styles */
+.chartCard {
+  position: relative;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background: white;
+  border: 2px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.chartCard::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0) 0%, rgba(239, 68, 68, 0.05) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.chartCard:hover {
+  transform: translateY(-4px);
+  border-color: #fca5a5;
+  box-shadow: 0 10px 30px rgba(239, 68, 68, 0.15);
+}
+
+.chartCard:hover::before {
+  opacity: 1;
+}
+
+.chartCardActive {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1), 0 10px 30px rgba(239, 68, 68, 0.2);
+}
+
+.chartCardActive::before {
+  opacity: 1;
+}
+
+.chartCardDark {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.chartCardDark:hover {
+  border-color: #f87171;
+  box-shadow: 0 10px 30px rgba(239, 68, 68, 0.25);
+}
+
+.chartCardDark.chartCardActive {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2), 0 10px 30px rgba(239, 68, 68, 0.3);
+}
+
+/* Chart Icon Wrapper */
+.chartIconWrapper {
+  width: 80px;
+  height: 60px;
+  margin: 0 auto 1rem;
+  position: relative;
+}
+
+.chartIcon {
+  width: 100%;
+  height: 100%;
+}
+
+/* Large Chart Icon Wrapper for Cards */
+.chartIconWrapperLarge {
+  width: 100%;
+  height: 120px;
+  margin: 0 auto 1rem;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chartIconLarge {
+  width: 100%;
+  height: 100%;
+  max-width: 180px;
+}
+
+/* Bar Chart Animation */
+.chartBar {
+  fill: #ef4444;
+  transform-origin: bottom;
+  transform: scaleY(0);
+  opacity: 0;
+}
+
+.chartIconAnimate .chartBar {
+  animation: barGrow 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes barGrow {
+  0% {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+/* Line Chart Animation */
+.chartLine {
+  stroke: #ef4444;
+  stroke-dasharray: 200;
+  stroke-dashoffset: 200;
+}
+
+.chartIconAnimate .chartLine {
+  animation: drawLine 1s ease-out forwards;
+}
+
+@keyframes drawLine {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.chartDot {
+  fill: #ef4444;
+  transform: scale(0);
+  opacity: 0;
+}
+
+.chartIconAnimate .chartDot {
+  animation: dotPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes dotPop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Pie Chart Animation */
+.pieSegment1 {
+  stroke: #ef4444;
+  stroke-dasharray: 70 188;
+  stroke-dashoffset: 0;
+  transform-origin: center;
+  animation: pieRotate 3s linear infinite;
+}
+
+.pieSegment2 {
+  stroke: #f87171;
+  stroke-dasharray: 50 188;
+  stroke-dashoffset: -70;
+  transform-origin: center;
+  animation: pieRotate 3s linear infinite reverse;
+}
+
+.pieSegment3 {
+  stroke: #fca5a5;
+  stroke-dasharray: 68 188;
+  stroke-dashoffset: -120;
+  transform-origin: center;
+  animation: pieRotate 4s linear infinite;
+}
+
+@keyframes pieRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Area Chart Animation */
+.areaPath {
+  opacity: 0;
+  transform-origin: bottom;
+  transform: scaleY(0);
+}
+
+.chartIconAnimate .areaPath {
+  animation: areaGrow 0.8s ease-out forwards;
+}
+
+@keyframes areaGrow {
+  0% {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+.areaLine {
+  stroke: #ef4444;
+  stroke-dasharray: 200;
+  stroke-dashoffset: 200;
+}
+
+.chartIconAnimate .areaLine {
+  animation: drawLine 1s ease-out 0.3s forwards;
+}
+
+/* Chart Preview Container */
+.chartPreviewContainer {
+  background: white;
+  border-radius: 1rem;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.chartPreviewDark {
+  background: #0f172a;
+  border-color: #334155;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.chartPreviewHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.chartPreviewDark .chartPreviewHeader {
+  background: #1e293b;
+  border-bottom-color: #334155;
+}
+
+.chartPreviewDots {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.chartPreviewDots span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.dotRed {
+  background: #ef4444;
+}
+
+.dotYellow {
+  background: #eab308;
+}
+
+.dotGreen {
+  background: #22c55e;
+}
+
+.chartPreviewContent {
+  padding: 2rem;
+}
+
+.previewChart {
+  width: 100%;
+  height: auto;
+}
+
+/* Preview Bar Animation */
+.previewBar {
+  fill: #ef4444;
+  opacity: 0;
+  transform-origin: bottom;
+  transform: scaleY(0);
+}
+
+.previewBarAnimate {
+  animation: previewBarGrow 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes previewBarGrow {
+  0% {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+  60% {
+    opacity: 1;
+    transform: scaleY(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+/* Preview Dot Animation */
+.previewDot {
+  fill: #3b82f6;
+  opacity: 0;
+  transform: scale(0);
+}
+
+.previewDotAnimate {
+  animation: previewDotPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes previewDotPop {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Preview Line Animation */
+.previewLine {
+  stroke: #3b82f6;
+  stroke-dasharray: 500;
+  stroke-dashoffset: 500;
+  opacity: 0;
+}
+
+.previewLineAnimate {
+  animation: previewLineDraw 1.5s ease-out 0.8s forwards;
+}
+
+@keyframes previewLineDraw {
+  0% {
+    stroke-dashoffset: 500;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+/* Hover effects for chart preview bars */
+.previewBar {
+  transition: filter 0.2s ease;
+}
+
+.previewChart:hover .previewBar {
+  filter: brightness(1.1);
+}
+
+.previewChart:hover .previewDot {
+  filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.5));
+}
+
+/* ========================================
+   ANIMATED CHART CARD STYLES
+   ======================================== */
+
+/* ---- BAR CHART ANIMATIONS ---- */
+@keyframes barWave {
+  0%, 100% {
+    transform: scaleY(0.6);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+.animatedBar {
+  transform-origin: bottom;
+  animation: barWave 1.8s ease-in-out infinite;
+}
+
+/* Staggered delays for wave effect */
+.animatedBar:nth-child(2) { animation-delay: 0s; }
+.animatedBar:nth-child(3) { animation-delay: 0.15s; }
+.animatedBar:nth-child(4) { animation-delay: 0.3s; }
+.animatedBar:nth-child(5) { animation-delay: 0.45s; }
+
+/* ---- LINE CHART ANIMATIONS ---- */
+@keyframes lineFlow {
+  0% {
+    stroke-dashoffset: 300;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes lineGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 2px rgba(239, 68, 68, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.6));
+  }
+}
+
+.animatedLine {
+  stroke-dasharray: 10 5;
+  animation: lineFlow 2s linear infinite, lineGlow 2s ease-in-out infinite;
+}
+
+@keyframes dotPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+}
+
+.animatedDot {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: dotPulse 1.5s ease-in-out infinite;
+}
+
+/* Staggered pulse for dots */
+.animatedDot:nth-child(5) { animation-delay: 0s; }
+.animatedDot:nth-child(6) { animation-delay: 0.2s; }
+.animatedDot:nth-child(7) { animation-delay: 0.4s; }
+.animatedDot:nth-child(8) { animation-delay: 0.6s; }
+.animatedDot:nth-child(9) { animation-delay: 0.8s; }
+.animatedDot:nth-child(10) { animation-delay: 1s; }
+
+/* Animated Area Fill for Line Chart */
+@keyframes areaFillPulse {
+  0%, 100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.animatedAreaFill {
+  animation: areaFillPulse 2s ease-in-out infinite;
+}
+
+/* ---- PIE CHART ANIMATIONS ---- */
+@keyframes pieRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pieCenterPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+/* Pie segments rotate around center (0,0 in the g element) */
+.animatedPieSegment {
+  transform-origin: 0px 0px;
+  animation: pieRotate 10s linear infinite;
+}
+
+/* Center circle pulses subtly */
+.animatedPieCenter {
+  transform-origin: 0px 0px;
+  animation: pieCenterPulse 2.5s ease-in-out infinite;
+}
+
+/* ---- AREA CHART ANIMATIONS ---- */
+@keyframes areaBreath {
+  0%, 100% {
+    transform: scaleY(1) translateY(0);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scaleY(1.03) translateY(-2px);
+    opacity: 1;
+  }
+}
+
+@keyframes areaLineGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 2px rgba(239, 68, 68, 0.2));
+    stroke-dashoffset: 0;
+  }
+  50% {
+    filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.5));
+  }
+  100% {
+    stroke-dashoffset: -20;
+  }
+}
+
+.animatedAreaPath {
+  transform-origin: bottom;
+  animation: areaBreath 3s ease-in-out infinite;
+}
+
+/* Stagger the two area layers */
+.animatedAreaPath:nth-child(2) { animation-delay: 0s; }
+.animatedAreaPath:nth-child(5) { animation-delay: 0.5s; }
+
+.animatedAreaLine {
+  stroke-dasharray: 8 4;
+  animation: areaLineGlow 2.5s ease-in-out infinite;
+}
+
+/* Stagger the two line layers */
+.animatedAreaLine:nth-child(3) { animation-delay: 0.3s; }
+.animatedAreaLine:nth-child(6) { animation-delay: 0s; }
+
+/* Animation trigger when in view */
+.chartIconAnimate .animatedBar,
+.chartIconAnimate .animatedLine,
+.chartIconAnimate .animatedAreaFill,
+.chartIconAnimate .animatedDot,
+.chartIconAnimate .animatedPieSegment,
+.chartIconAnimate .animatedPieCenter,
+.chartIconAnimate .animatedAreaPath,
+.chartIconAnimate .animatedAreaLine {
+  animation-play-state: running;
+}
+
+/* Hover effects for chart card elements */
+.chartCard .animatedBar {
+  transition: filter 0.3s ease;
+}
+
+.chartCard:hover .animatedBar {
+  filter: brightness(1.15) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.chartCard .animatedDot {
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.chartCard:hover .animatedDot {
+  filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.6));
+}
+
+.chartCard .animatedLine {
+  transition: filter 0.3s ease;
+}
+
+.chartCard:hover .animatedLine {
+  filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.4));
+}
+
+.chartCard .animatedPieSegment {
+  transition: filter 0.3s ease;
+}
+
+.chartCard:hover .animatedPieSegment {
+  filter: brightness(1.1) drop-shadow(0 0 4px rgba(0, 0, 0, 0.15));
+}
+
+.chartCard .animatedAreaPath {
+  transition: filter 0.3s ease;
+}
+
+.chartCard:hover .animatedAreaPath {
+  filter: brightness(1.1);
+}
+
+.chartCard .animatedAreaLine {
+  transition: filter 0.3s ease;
+}
+
+.chartCard:hover .animatedAreaLine {
+  filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.4));
+}
+
+/* Responsive adjustments for charts section */
+@media (max-width: 768px) {
+  .chartCard {
+    padding: 1rem;
+  }
+
+  .chartIconWrapper {
+    width: 60px;
+    height: 45px;
+  }
+
+  .chartPreviewContent {
+    padding: 1rem;
+  }
+}

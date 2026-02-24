@@ -1,0 +1,39 @@
+{
+  "id": "reference/api-reference/analytics-api-reference",
+  "title": "Analytics API Reference",
+  "description": "Complete API reference for PivotHead Analytics - data visualization and charting for pivot tables",
+  "source": "@site/docs/reference/api-reference/analytics-api-reference.md",
+  "sourceDirName": "reference/api-reference",
+  "slug": "/reference/api-reference/analytics-api-reference",
+  "permalink": "/PivotHead/docs/reference/api-reference/analytics-api-reference",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/reference/api-reference/analytics-api-reference.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "analytics-api-reference",
+    "title": "Analytics API Reference",
+    "sidebar_label": "Analytics",
+    "description": "Complete API reference for PivotHead Analytics - data visualization and charting for pivot tables",
+    "keywords": [
+      "api",
+      "analytics",
+      "charts",
+      "visualization",
+      "pivothead",
+      "echarts",
+      "plotly",
+      "d3"
+    ]
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Vue",
+    "permalink": "/PivotHead/docs/reference/api-reference/vue-api-reference"
+  },
+  "next": {
+    "title": "Troubleshooting",
+    "permalink": "/PivotHead/docs/tutorial-basics/troubleshooting"
+  }
+}

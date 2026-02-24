@@ -284,7 +284,7 @@ export const options = {
   groupConfig: {
     rowFields: ['product'],
     columnFields: ['region'],
-    grouper: (item, fields) => fields.map(field => item[field]).join(' - '),
+    grouper: (item, fields) => fields.map(field => item[field]).join('|'),
   },
   formatting: {
     sales: {

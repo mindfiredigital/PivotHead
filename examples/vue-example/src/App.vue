@@ -1,7 +1,7 @@
 <template>
   <div class="container">
-    <h1>🚀 PivotHead Vue Example</h1>
-    
+    <h1>PivotHead Vue Example</h1>
+
     <!-- Mode switcher -->
     <div class="mode-switcher">
       <button
@@ -86,12 +86,62 @@
       </div>
     </div>
 
-    <!-- Data Visualization Section -->
-    <div class="chart-controls">
-      <h2>Data Visualization</h2>
-      <p class="chart-description">
-        Visualize your pivot table data with various chart types. Select a chart type and configure filters to customize your visualization.
-      </p>
+    <!-- Hidden PivotHead to maintain engine for ChartService (always in DOM) -->
+    <div class="hidden-pivot">
+      <PivotHead
+        ref="pivotRef"
+        mode="default"
+        :data="salesData"
+        :options="pivotOptions"
+        @state-change="handleStateChange"
+        class="pivot-container"
+      />
+    </div>
+
+    <!-- TABLE VIEW -->
+    <div v-if="currentView === 'table'">
+      <!-- Default Mode -->
+      <div v-if="currentMode === 'default'">
+        <div class="description">
+          <p><strong>Default Mode</strong> provides a complete, full-featured pivot table with all built-in controls and UI elements out of the box.</p>
+          <p>This example demonstrates the Vue wrapper with sample sales data, including interactive filtering, sorting, and data manipulation.</p>
+        </div>
+
+        <PivotHead
+          mode="default"
+          :data="salesData"
+          :options="pivotOptions"
+          @state-change="handleStateChange"
+          @view-mode-change="handleViewModeChange"
+          @pagination-change="handlePaginationChange"
+          @chart-rendered="handleChartRendered"
+          class="pivot-container"
+        />
+      </div>
+
+      <!-- Minimal Mode -->
+      <div v-else-if="currentMode === 'minimal'">
+        <div class="description">
+          <p><strong>Minimal Mode</strong> provides slot-based customization where you can build your own UI while leveraging the core pivot engine.</p>
+          <p>This example demonstrates custom table rendering, sorting, filtering, pagination, and drill-down functionality.</p>
+        </div>
+
+        <MinimalMode
+          :data="salesData"
+          :options="pivotOptions"
+          class="pivot-container"
+        />
+      </div>
+    </div>
+
+    <!-- ANALYTICS VIEW -->
+    <div v-else-if="currentView === 'analytics'" class="analytics-view">
+      <div class="analytics-header">
+        <h2>Data Visualization & Analytics</h2>
+        <p class="analytics-description">
+          Visualize your pivot table data with various chart types. Select a chart type and configure filters to customize your visualization.
+        </p>
+      </div>
 
       <div class="chart-config">
         <!-- Chart Type Selector -->
@@ -192,40 +242,29 @@
           </div>
         </div>
       </div>
+
+      <!-- Chart Display Area -->
+      <div class="chart-display-area">
+        <div v-if="chartType === 'none'" class="chart-placeholder">
+          <div class="placeholder-icon">&#128202;</div>
+          <p>Select a chart type above to visualize your data</p>
+        </div>
+        <div v-else class="chart-canvas-container">
+          <canvas ref="chartCanvasRef" id="analyticsChart"></canvas>
+        </div>
+      </div>
     </div>
 
-    <!-- Default Mode -->
-    <div v-if="currentMode === 'default'">
-      <div class="description">
-        <p><strong>Default Mode</strong> provides a complete, full-featured pivot table with all built-in controls and UI elements out of the box.</p>
-        <p>This example demonstrates the Vue wrapper with sample sales data, including interactive filtering, sorting, and data manipulation.</p>
-      </div>
-
-      <PivotHead
-        ref="pivotRef"
-        mode="default"
-        :data="salesData"
-        :options="pivotOptions"
-        @state-change="handleStateChange"
-        @view-mode-change="handleViewModeChange"
-        @pagination-change="handlePaginationChange"
-        @chart-rendered="handleChartRendered"
-        class="pivot-container"
-      />
-    </div>
-    
-    <!-- Minimal Mode -->
-    <div v-else-if="currentMode === 'minimal'">
-      <div class="description">
-        <p><strong>Minimal Mode</strong> provides slot-based customization where you can build your own UI while leveraging the core pivot engine.</p>
-        <p>This example demonstrates custom table rendering, sorting, filtering, pagination, and drill-down functionality.</p>
-      </div>
-
-      <MinimalMode
-        :data="salesData"
-        :options="pivotOptions"
-        class="pivot-container"
-      />
+    <!-- Floating Toggle Button -->
+    <div class="floating-toggle-container">
+      <button
+        @click="toggleView"
+        class="floating-toggle-btn"
+        :class="{ 'analytics-active': currentView === 'analytics' }"
+      >
+        <span class="toggle-icon">{{ currentView === 'table' ? '&#128202;' : '&#128203;' }}</span>
+        <span class="toggle-text">{{ currentView === 'table' ? 'Analytics' : 'Table' }}</span>
+      </button>
     </div>
   </div>
 </template>
@@ -238,14 +277,19 @@ import MinimalMode from './components/MinimalMode.vue'
 import type { PivotDataRecord, PivotOptions, PaginationConfig, FileConnectionResult } from '@mindfiredigital/pivothead-vue'
 import { ChartService } from '@mindfiredigital/pivothead-analytics'
 import type { ChartType, ChartFilterConfig } from '@mindfiredigital/pivothead-analytics'
+import { Chart, registerables } from 'chart.js'
 
-// Chart.js is loaded in main.ts to ensure it's available before the web component
+// Register Chart.js components
+Chart.register(...registerables)
 
 // Component refs
 const pivotRef = ref()
+const chartCanvasRef = ref<HTMLCanvasElement | null>(null)
+const chartInstance = ref<Chart | null>(null)
 
 // Reactive state
 const currentMode = ref<'default' | 'minimal'>('default')
+const currentView = ref<'table' | 'analytics'>('table')
 const statusMessage = ref('Ready')
 const currentViewMode = ref<'raw' | 'processed'>('processed')
 const isUploading = ref(false)
@@ -399,6 +443,19 @@ const toggleViewMode = () => {
   if (pivotRef.value) {
     const newMode = currentViewMode.value === 'raw' ? 'processed' : 'raw'
     pivotRef.value.setViewMode(newMode)
+  }
+}
+
+// Toggle between Table and Analytics view
+const toggleView = () => {
+  currentView.value = currentView.value === 'table' ? 'analytics' : 'table'
+  statusMessage.value = `Switched to ${currentView.value === 'table' ? 'Table' : 'Analytics'} view`
+
+  // Initialize chart service when switching to analytics
+  if (currentView.value === 'analytics') {
+    nextTick(() => {
+      setTimeout(initChartService, 500)
+    })
   }
 }
 
@@ -577,10 +634,10 @@ const handleChartTypeChange = (event: Event) => {
 }
 
 const applyChartFilters = () => {
-  console.log('applyChartFilters called', { chartType: chartType.value, pivotRef: pivotRef.value })
+  console.log('applyChartFilters called', { chartType: chartType.value })
 
-  if (!pivotRef.value || chartType.value === 'none') {
-    console.warn('Cannot render chart: pivotRef or chartType not available')
+  if (!chartServiceRef.value || chartType.value === 'none') {
+    console.warn('Cannot render chart: chartService or chartType not available')
     return
   }
 
@@ -594,26 +651,123 @@ const applyChartFilters = () => {
 
     console.log('Chart filters:', filters)
 
-    // Set filters on the chart service (local)
-    if (chartServiceRef.value) {
-      chartServiceRef.value.setFilters(filters)
-    }
+    // Set filters on the chart service
+    chartServiceRef.value.setFilters(filters)
 
-    // Set filters on the web component
-    console.log('Setting chart filters on web component...')
-    pivotRef.value.setChartFilters(filters)
-
-    // Render the chart
-    console.log('Rendering chart:', chartType.value)
-    pivotRef.value.renderChart(chartType.value as ChartType)
+    // Render chart directly using Chart.js
+    nextTick(() => {
+      renderChartDirectly()
+    })
 
     showChart.value = true
     statusMessage.value = `Chart rendered: ${chartType.value}`
-    console.log('Chart render complete')
   } catch (error) {
     console.error('Failed to render chart:', error)
     statusMessage.value = `Failed to render chart: ${error}`
   }
+}
+
+// Map chart types to Chart.js types
+const getChartJsType = (type: ChartType): string => {
+  const typeMap: Record<string, string> = {
+    column: 'bar',
+    bar: 'bar',
+    line: 'line',
+    area: 'line',
+    pie: 'pie',
+    doughnut: 'doughnut',
+    stackedColumn: 'bar',
+    stackedBar: 'bar',
+    stackedArea: 'line',
+    comboBarLine: 'bar',
+    comboAreaLine: 'line',
+    scatter: 'scatter',
+    histogram: 'bar',
+    heatmap: 'bar',
+    funnel: 'bar',
+    sankey: 'bar'
+  }
+  return typeMap[type] || 'bar'
+}
+
+// Render chart directly using Chart.js
+const renderChartDirectly = () => {
+  if (!chartCanvasRef.value || !chartServiceRef.value) {
+    console.warn('Canvas or ChartService not available')
+    return
+  }
+
+  // Destroy existing chart instance
+  if (chartInstance.value) {
+    chartInstance.value.destroy()
+    chartInstance.value = null
+  }
+
+  const ctx = chartCanvasRef.value.getContext('2d')
+  if (!ctx) return
+
+  const type = chartType.value as ChartType
+  let chartData: any
+  let chartOptions: any = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top' as const,
+      },
+      title: {
+        display: true,
+        text: `${type.charAt(0).toUpperCase() + type.slice(1)} Chart`,
+        font: { size: 16 }
+      }
+    }
+  }
+
+  // Get appropriate data based on chart type
+  if (type === 'pie' || type === 'doughnut') {
+    chartData = chartServiceRef.value.getAggregatedChartData()
+  } else if (type === 'scatter') {
+    chartData = chartServiceRef.value.getScatterData()
+  } else if (type === 'heatmap') {
+    chartData = chartServiceRef.value.getHeatmapData()
+  } else if (type === 'histogram') {
+    chartData = chartServiceRef.value.getHistogramData({}, 10)
+  } else if (type.startsWith('stacked')) {
+    chartData = chartServiceRef.value.getStackedChartData()
+    chartOptions.scales = {
+      x: { stacked: true },
+      y: { stacked: true }
+    }
+  } else if (type.startsWith('combo')) {
+    chartData = chartServiceRef.value.getComboChartData()
+  } else {
+    chartData = chartServiceRef.value.getChartData()
+  }
+
+  // Configure for area charts
+  if (type === 'area' || type === 'stackedArea') {
+    if (chartData.datasets) {
+      chartData.datasets = chartData.datasets.map((ds: any) => ({
+        ...ds,
+        fill: true
+      }))
+    }
+  }
+
+  // Configure bar orientation
+  if (type === 'bar' || type === 'stackedBar') {
+    chartOptions.indexAxis = 'y'
+  }
+
+  const chartJsType = getChartJsType(type)
+
+  chartInstance.value = new Chart(ctx, {
+    type: chartJsType as any,
+    data: chartData,
+    options: chartOptions
+  })
+
+  console.log('Chart rendered directly with Chart.js')
 }
 
 const resetChartFilters = () => {
@@ -628,8 +782,10 @@ const resetChartFilters = () => {
 }
 
 const hideChart = () => {
-  if (pivotRef.value) {
-    pivotRef.value.hideChart()
+  // Destroy chart instance
+  if (chartInstance.value) {
+    chartInstance.value.destroy()
+    chartInstance.value = null
   }
   showChart.value = false
   chartType.value = 'none'
@@ -685,6 +841,14 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.hidden-pivot {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .pivot-container {
   margin: 20px 0;
   border: 1px solid #dee2e6;
@@ -1126,5 +1290,159 @@ onMounted(() => {
 .hide-btn:hover {
   background: #c82333;
   border-color: #bd2130;
+}
+
+/* Analytics View */
+.analytics-view {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.analytics-header {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  color: white;
+}
+
+.analytics-header h2 {
+  margin: 0 0 8px 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.analytics-description {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 1rem;
+}
+
+.analytics-view .chart-config {
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.chart-display-area {
+  margin-top: 24px;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  min-height: 400px;
+}
+
+.chart-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 350px;
+  color: #6c757d;
+  text-align: center;
+}
+
+.placeholder-icon {
+  font-size: 4rem;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.chart-placeholder p {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.chart-canvas-container {
+  position: relative;
+  height: 450px;
+  width: 100%;
+}
+
+.chart-canvas-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Floating Toggle Button */
+.floating-toggle-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+}
+
+.floating-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
+  transition: all 0.3s ease;
+}
+
+.floating-toggle-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.5);
+}
+
+.floating-toggle-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(0, 123, 255, 0.4);
+}
+
+.floating-toggle-btn.analytics-active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.floating-toggle-btn.analytics-active:hover {
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+.toggle-icon {
+  font-size: 1.2rem;
+}
+
+.toggle-text {
+  font-size: 0.95rem;
+}
+
+/* Responsive adjustments for floating button */
+@media (max-width: 768px) {
+  .floating-toggle-container {
+    bottom: 16px;
+    right: 16px;
+  }
+
+  .floating-toggle-btn {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+
+  .toggle-icon {
+    font-size: 1.1rem;
+  }
 }
 </style>

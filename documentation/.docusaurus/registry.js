@@ -219,6 +219,17 @@ export default {
     '@site/docs/introduction.md',
     require.resolveWeak('@site/docs/introduction.md'),
   ],
+  'content---pivot-head-docs-reference-api-reference-analytics-api-reference-4-ca-a94':
+    [
+      () =>
+        import(
+          /* webpackChunkName: "content---pivot-head-docs-reference-api-reference-analytics-api-reference-4-ca-a94" */ '@site/docs/reference/api-reference/analytics-api-reference.md'
+        ),
+      '@site/docs/reference/api-reference/analytics-api-reference.md',
+      require.resolveWeak(
+        '@site/docs/reference/api-reference/analytics-api-reference.md'
+      ),
+    ],
   'content---pivot-head-docs-reference-api-reference-angular-api-reference-257-544':
     [
       () =>
@@ -414,6 +425,14 @@ export default {
         '@site/docs/tutorials/core-webcomponent/setup-for-user-project.md'
       ),
     ],
+  'content---pivot-head-docs-tutorials-pivot-charts-268-01a': [
+    () =>
+      import(
+        /* webpackChunkName: "content---pivot-head-docs-tutorials-pivot-charts-268-01a" */ '@site/docs/tutorials/pivot-charts.mdx'
+      ),
+    '@site/docs/tutorials/pivot-charts.mdx',
+    require.resolveWeak('@site/docs/tutorials/pivot-charts.mdx'),
+  ],
   'content---pivot-head-docs-tutorials-react-react-sample-project-93-c-8a2': [
     () =>
       import(

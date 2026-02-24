@@ -16,7 +16,21 @@ import {
   ConnectService,
   FieldService,
 } from '@mindfiredigital/pivothead';
-import { ChartService } from '@mindfiredigital/pivothead-analytics';
+import {
+  // Core Engine
+  ChartEngine,
+  ChartService,
+  // Color Management
+  ColorManager,
+  ColorPalettes,
+  getAvailablePalettes,
+  // Chart.js (for direct use if needed)
+  Chart,
+  registerables,
+} from '@mindfiredigital/pivothead-analytics';
+
+// Register Chart.js components (Chart.js is bundled with the analytics package)
+Chart.register(...registerables);
 import { sampleData, config } from './config/config.js';
 import { VirtualScroller } from './services/VirtualScroller.js';
 
@@ -25,6 +39,30 @@ export let pivotEngine;
 
 // ChartService instance for chart visualization
 let chartService = null;
+
+// ChartEngine instance for new analytics package features
+let chartEngine = null;
+
+// ColorManager instance for color palette management
+let colorManager = null;
+
+// Current selected color palette
+let currentPalette = 'tableau10';
+
+// Function to update the color palette
+function updateColorPalette(newPalette) {
+  currentPalette = newPalette;
+  if (colorManager) {
+    colorManager.setPalette(newPalette);
+  }
+  if (chartEngine) {
+    // Update the ChartEngine's color manager directly
+    chartEngine.getColorManager().setPalette(newPalette);
+    // Re-render the current chart to apply new colors
+    renderChart(currentChartType);
+  }
+  console.log('Color palette updated to:', newPalette);
+}
 
 // Virtual Scroller instance for large datasets
 let virtualScroller = null;
@@ -1719,8 +1757,17 @@ export function formatTable(newConfig) {
       data: pivotEngine.getState().rawData,
     });
 
-    // Re-initialize ChartService with the new engine
-    chartService = new ChartService(pivotEngine);
+    // Re-initialize ChartEngine with the new engine
+    if (chartEngine) {
+      chartEngine.dispose();
+    }
+    chartEngine = new ChartEngine(pivotEngine, {
+      library: 'chartjs',
+      defaultStyle: {
+        colorScheme: currentPalette,
+      },
+    });
+    chartService = chartEngine.getChartService();
 
     pivotEngine.setPagination({
       currentPage: 1,
@@ -2327,6 +2374,27 @@ export async function handleFileConnection(fileType) {
       // Rebuild filter UI to reflect newly imported fields
       initializeFilters();
 
+      // Re-initialize ChartEngine with the updated pivotEngine data
+      if (chartEngine) {
+        chartEngine.dispose();
+      }
+      chartEngine = new ChartEngine(pivotEngine, {
+        library: 'chartjs',
+        defaultStyle: {
+          colorScheme: currentPalette,
+        },
+      });
+      chartService = chartEngine.getChartService();
+
+      // Reset analytics tab so it re-initializes with the new data
+      analyticsTabInitialized = false;
+
+      // If currently on analytics tab, re-initialize it immediately
+      const analyticsTab = document.getElementById('analytics-tab');
+      if (analyticsTab && analyticsTab.classList.contains('active')) {
+        initializeAnalyticsTab();
+      }
+
       // Show success notification
       showImportNotification(result, true);
 
@@ -2633,39 +2701,23 @@ export function onSectionItemDrop(droppedFields) {
 
 // =====================================
 // CHART VISUALIZATION MODULE
-// Uses ChartService from @mindfiredigital/pivothead
+// Uses ChartEngine from @mindfiredigital/pivothead-analytics
 // =====================================
 
-// Store the current chart instance for cleanup
-let currentChart = null;
-let currentChartType = 'none';
-
-// Color palette for charts (imported from ChartService defaults)
-const chartColors = [
-  'rgba(54, 162, 235, 0.8)', // Blue
-  'rgba(255, 99, 132, 0.8)', // Red
-  'rgba(75, 192, 192, 0.8)', // Teal
-  'rgba(255, 206, 86, 0.8)', // Yellow
-  'rgba(153, 102, 255, 0.8)', // Purple
-  'rgba(255, 159, 64, 0.8)', // Orange
-  'rgba(46, 204, 113, 0.8)', // Green
-  'rgba(231, 76, 60, 0.8)', // Dark Red
-  'rgba(52, 73, 94, 0.8)', // Dark Blue
-  'rgba(241, 196, 15, 0.8)', // Gold
-];
-
-const chartBorderColors = chartColors.map(c => c.replace('0.8)', '1)'));
+// Store the current chart type for reference
+let currentChartType = 'column';
 
 // Get all available chart data (unfiltered) for populating filter options
-// Now uses ChartService.getAvailableFilterOptions()
+// Now uses ChartEngine's ChartService internally
 function getAllChartData() {
-  if (!chartService) {
-    console.error('ChartService not initialized');
+  if (!chartEngine) {
+    console.error('ChartEngine not initialized');
     return null;
   }
 
   try {
-    const filterOptions = chartService.getAvailableFilterOptions();
+    const chartServiceInternal = chartEngine.getChartService();
+    const filterOptions = chartServiceInternal.getAvailableFilterOptions();
     const rowFieldName = pivotEngine.getRowFieldName();
     const columnFieldName = pivotEngine.getColumnFieldName();
 
@@ -2683,7 +2735,7 @@ function getAllChartData() {
 }
 
 // Populate chart filter dropdowns
-// Now uses ChartService for filter state management
+// Now uses ChartEngine's ChartService for filter state management
 function populateChartFilters() {
   const allData = getAllChartData();
   if (!allData) return;
@@ -2691,8 +2743,9 @@ function populateChartFilters() {
   const { rowValues, columnValues, measures, rowFieldName, columnFieldName } =
     allData;
 
-  // Get current filter state from ChartService
-  const currentFilters = chartService.getFilters();
+  // Get current filter state from ChartService (via ChartEngine)
+  const chartServiceInternal = chartEngine.getChartService();
+  const currentFilters = chartServiceInternal.getFilters();
 
   // Populate measure dropdown
   const measureSelect = document.getElementById('chartMeasureSelect');
@@ -2706,7 +2759,9 @@ function populateChartFilters() {
 
     // Set default selected measure if not already set
     if (!currentFilters.selectedMeasure && measures.length > 0) {
-      chartService.setFilters({ selectedMeasure: measures[0].uniqueName });
+      chartServiceInternal.setFilters({
+        selectedMeasure: measures[0].uniqueName,
+      });
     }
   }
 
@@ -2722,7 +2777,7 @@ function populateChartFilters() {
       !currentFilters.selectedRows ||
       currentFilters.selectedRows.length === 0
     ) {
-      chartService.setFilters({ selectedRows: [...rowValues] });
+      chartServiceInternal.setFilters({ selectedRows: [...rowValues] });
     }
   }
 
@@ -2738,7 +2793,7 @@ function populateChartFilters() {
       !currentFilters.selectedColumns ||
       currentFilters.selectedColumns.length === 0
     ) {
-      chartService.setFilters({ selectedColumns: [...columnValues] });
+      chartServiceInternal.setFilters({ selectedColumns: [...columnValues] });
     }
   }
 
@@ -2769,12 +2824,13 @@ function getChartFilterSelections() {
 }
 
 // Apply chart filters
-// Now uses ChartService.setFilters()
+// Now uses ChartEngine's ChartService.setFilters()
 function applyChartFilters() {
   const filterSelections = getChartFilterSelections();
 
-  // Update ChartService filters
-  chartService.setFilters(filterSelections);
+  // Update ChartService filters via ChartEngine
+  const chartServiceInternal = chartEngine.getChartService();
+  chartServiceInternal.setFilters(filterSelections);
 
   // Re-render the current chart with new filters
   if (currentChartType && currentChartType !== 'none') {
@@ -2783,18 +2839,19 @@ function applyChartFilters() {
 }
 
 // Reset chart filters to defaults
-// Now uses ChartService.resetFilters()
+// Now uses ChartEngine's ChartService.resetFilters()
 function resetChartFilters() {
   const allData = getAllChartData();
   if (!allData) return;
 
   const { rowValues, columnValues, measures } = allData;
 
-  // Reset ChartService filters
-  chartService.resetFilters();
+  // Reset ChartService filters via ChartEngine
+  const chartServiceInternal = chartEngine.getChartService();
+  chartServiceInternal.resetFilters();
 
   // Set defaults
-  chartService.setFilters({
+  chartServiceInternal.setFilters({
     selectedMeasure: measures.length > 0 ? measures[0].uniqueName : null,
     selectedRows: [...rowValues],
     selectedColumns: [...columnValues],
@@ -2829,90 +2886,10 @@ function resetChartFilters() {
   }
 }
 
-// Get processed data from pivot engine for charts (with filters applied)
-// Now uses ChartService.getChartData() for data retrieval
-function getChartData() {
-  if (!chartService) {
-    console.error('ChartService not initialized');
-    return null;
-  }
-
-  try {
-    // Get chart data from ChartService (already filtered based on chartService filters)
-    const chartData = chartService.getChartData();
-
-    if (!chartData) {
-      console.error('No chart data available from ChartService');
-      return null;
-    }
-
-    const {
-      labels, // row values (filtered)
-      datasets, // Chart.js format datasets
-      rowFieldName,
-      columnFieldName,
-      measures,
-      selectedMeasure,
-      filteredRowValues,
-      filteredColumnValues,
-    } = chartData;
-
-    // Build dataMatrix for backward compatibility with specialized charts
-    // The dataMatrix format is: { [row]: { [col]: { [measureName]: value } } }
-    const dataMatrix = {};
-    const rowValues = filteredRowValues || labels;
-    const columnValues = filteredColumnValues || datasets.map(d => d.label);
-
-    // Reconstruct dataMatrix from datasets
-    rowValues.forEach((rowVal, rowIdx) => {
-      dataMatrix[rowVal] = {};
-      columnValues.forEach((colVal, colIdx) => {
-        dataMatrix[rowVal][colVal] = {};
-        // Get value from the dataset (datasets are organized by column)
-        const dataset = datasets[colIdx];
-        if (dataset && dataset.data) {
-          dataMatrix[rowVal][colVal][selectedMeasure.uniqueName] =
-            dataset.data[rowIdx] || 0;
-        }
-      });
-    });
-
-    // Convert measures format for backward compatibility
-    const measuresFormatted = measures.map(m => ({
-      uniqueName: m.uniqueName,
-      caption: m.caption || m.uniqueName,
-      aggregation: 'sum', // default
-    }));
-
-    // Find full measure config
-    const selectedMeasureFormatted =
-      measuresFormatted.find(
-        m => m.uniqueName === selectedMeasure.uniqueName
-      ) || measuresFormatted[0];
-
-    return {
-      rowValues,
-      columnValues,
-      measures: measuresFormatted,
-      selectedMeasure: selectedMeasureFormatted,
-      dataMatrix,
-      rowFieldName: rowFieldName || '',
-      columnFieldName: columnFieldName || '',
-      // Also include the raw ChartService output for direct use
-      datasets,
-      labels,
-    };
-  } catch (error) {
-    console.error('Error getting chart data from ChartService:', error);
-    return null;
-  }
-}
-
-// Destroy existing chart
+// Destroy existing chart using ChartEngine
 function destroyChart() {
-  if (currentChart) {
-    currentChart.destroy();
-    currentChart = null;
+  if (chartEngine) {
+    chartEngine.destroyChart('#chartContainer');
   }
 }
 
@@ -2928,1034 +2905,174 @@ function hideChartSection() {
   if (chartTypeSelect) chartTypeSelect.value = 'column';
   currentChartType = 'column';
 
-  // Reset ChartService filter state
-  if (chartService) {
-    chartService.resetFilters();
+  // Reset ChartService filter state via ChartEngine
+  if (chartEngine) {
+    const chartServiceInternal = chartEngine.getChartService();
+    chartServiceInternal.resetFilters();
   }
 
   destroyChart();
 }
 
-// Render Column Chart (Vertical Bar)
-function renderColumnChart(chartData) {
-  const { rowValues, columnValues, measures, selectedMeasure, dataMatrix } =
-    chartData;
-  const ctx = document.getElementById('pivotChart').getContext('2d');
+// Get chart title based on type and current filters
+function getChartTitle(chartType) {
+  const allData = getAllChartData();
+  const measureName = allData?.measures?.[0]?.caption || 'Value';
+  const chartTypeLabel =
+    chartType.charAt(0).toUpperCase() +
+    chartType.slice(1).replace(/([A-Z])/g, ' $1');
 
-  // Use selected measure or default to first
-  const measure = selectedMeasure || measures[0];
-  const datasets = columnValues.map((colVal, idx) => ({
-    label: colVal,
-    data: rowValues.map(
-      rowVal => dataMatrix[rowVal][colVal][measure.uniqueName]
-    ),
-    backgroundColor: chartColors[idx % chartColors.length],
-    borderColor: chartBorderColors[idx % chartBorderColors.length],
-    borderWidth: 1,
-  }));
+  const chartServiceInternal = chartEngine?.getChartService();
+  const currentFilters = chartServiceInternal?.getFilters() || { limit: 0 };
+  const limitText =
+    currentFilters.limit > 0 ? ` (Top ${currentFilters.limit})` : '';
 
-  destroyChart();
-  currentChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: rowValues,
-      datasets,
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        title: {
-          display: true,
-          text: `${measure.caption} by ${chartData.rowFieldName}`,
-          font: { size: 16 },
-        },
-        legend: { position: 'top' },
-      },
-      scales: {
-        y: { beginAtZero: true },
-      },
-    },
-  });
+  return `${measureName} - ${chartTypeLabel} Chart${limitText}`;
 }
 
-// Render Bar Chart (Horizontal)
-function renderBarChart(chartData) {
-  const { rowValues, columnValues, measures, selectedMeasure, dataMatrix } =
-    chartData;
-  const ctx = document.getElementById('pivotChart').getContext('2d');
-
-  const measure = selectedMeasure || measures[0];
-  const datasets = columnValues.map((colVal, idx) => ({
-    label: colVal,
-    data: rowValues.map(
-      rowVal => dataMatrix[rowVal][colVal][measure.uniqueName]
-    ),
-    backgroundColor: chartColors[idx % chartColors.length],
-    borderColor: chartBorderColors[idx % chartBorderColors.length],
-    borderWidth: 1,
-  }));
-
-  destroyChart();
-  currentChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: rowValues,
-      datasets,
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        title: {
-          display: true,
-          text: `${measure.caption} by ${chartData.rowFieldName}`,
-          font: { size: 16 },
-        },
-        legend: { position: 'top' },
-      },
-      scales: {
-        x: { beginAtZero: true },
-      },
-    },
-  });
-}
-
-// Render Line Chart
-function renderLineChart(chartData) {
-  const { rowValues, columnValues, measures, selectedMeasure, dataMatrix } =
-    chartData;
-  const ctx = document.getElementById('pivotChart').getContext('2d');
-
-  const measure = selectedMeasure || measures[0];
-  const datasets = columnValues.map((colVal, idx) => ({
-    label: colVal,
-    data: rowValues.map(
-      rowVal => dataMatrix[rowVal][colVal][measure.uniqueName]
-    ),
-    borderColor: chartBorderColors[idx % chartBorderColors.length],
-    backgroundColor: chartColors[idx % chartColors.length],
-    fill: false,
-    tension: 0.1,
-  }));
-
-  destroyChart();
-  currentChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: rowValues,
-      datasets,
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        title: {
-          display: true,
-          text: `${measure.caption} by ${chartData.rowFieldName}`,
-          font: { size: 16 },
-        },
-        legend: { position: 'top' },
-      },
-      scales: {
-        y: { beginAtZero: true },
-      },
-    },
-  });
-}
-
-// Render Area Chart
-function renderAreaChart(chartData) {
-  const { rowValues, columnValues, measures, selectedMeasure, dataMatrix } =
-    chartData;
-  const ctx = document.getElementById('pivotChart').getContext('2d');
-
-  const measure = selectedMeasure || measures[0];
-  const datasets = columnValues.map((colVal, idx) => ({
-    label: colVal,
-    data: rowValues.map(
-      rowVal => dataMatrix[rowVal][colVal][measure.uniqueName]
-    ),
-    borderColor: chartBorderColors[idx % chartBorderColors.length],
-    backgroundColor: chartColors[idx % chartColors.length].replace(
-      '0.8)',
-      '0.4)'
-    ),
-    fill: true,
-    tension: 0.1,
-  }));
-
-  destroyChart();
-  currentChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: rowValues,
-      datasets,
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        title: {
-          display: true,
-          text: `${measure.caption} by ${chartData.rowFieldName}`,
-          font: { size: 16 },
-        },
-        legend: { position: 'top' },
-      },
-      scales: {
-        y: { beginAtZero: true },
-      },
-    },
-  });
-}
-
-// Render Pie Chart
-function renderPieChart(chartData) {
-  const { rowValues, columnValues, measures, selectedMeasure, dataMatrix } =
-    chartData;
-  const ctx = document.getElementById('pivotChart').getContext('2d');
-
-  const measure = selectedMeasure || measures[0];
-  // Aggregate data by row
-  const aggregatedData = rowValues.map(rowVal => {
-    let total = 0;
-    columnValues.forEach(colVal => {
-      total += dataMatrix[rowVal][colVal][measure.uniqueName] || 0;
-    });
-    return total;
-  });
-
-  destroyChart();
-  currentChart = new Chart(ctx, {
-    type: 'pie',
-    data: {
-      labels: rowValues,
-      datasets: [
-        {
-          data: aggregatedData,
-          backgroundColor: chartColors.slice(0, rowValues.length),
-          borderColor: chartBorderColors.slice(0, rowValues.length),
-          borderWidth: 2,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        title: {
-          display: true,
-          text: `${measure.caption} Distribution by ${chartData.rowFieldName}`,
-          font: { size: 16 },
-        },
-        legend: { position: 'right' },
-      },
-    },
-  });
-}
-
-// Render Doughnut Chart
-function renderDoughnutChart(chartData) {
-  const { rowValues, columnValues, measures, selectedMeasure, dataMatrix } =
-    chartData;
-  const ctx = document.getElementById('pivotChart').getContext('2d');
-
-  const measure = selectedMeasure || measures[0];
-  const aggregatedData = rowValues.map(rowVal => {
-    let total = 0;
-    columnValues.forEach(colVal => {
-      total += dataMatrix[rowVal][colVal][measure.uniqueName] || 0;
-    });
-    return total;
-  });
-
-  destroyChart();
-  currentChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: rowValues,
-      datasets: [
-        {
-          data: aggregatedData,
-          backgroundColor: chartColors.slice(0, rowValues.length),
-          borderColor: chartBorderColors.slice(0, rowValues.length),
-          borderWidth: 2,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        title: {
-          display: true,
-          text: `${measure.caption} Distribution by ${chartData.rowFieldName}`,
-          font: { size: 16 },
-        },
-        legend: { position: 'right' },
-      },
-    },
-  });
-}
-
-// Render Stacked Column Chart
-function renderStackedColumnChart(chartData) {
-  const { rowValues, columnValues, measures, selectedMeasure, dataMatrix } =
-    chartData;
-  const ctx = document.getElementById('pivotChart').getContext('2d');
-
-  const measure = selectedMeasure || measures[0];
-  const datasets = columnValues.map((colVal, idx) => ({
-    label: colVal,
-    data: rowValues.map(
-      rowVal => dataMatrix[rowVal][colVal][measure.uniqueName]
-    ),
-    backgroundColor: chartColors[idx % chartColors.length],
-    borderColor: chartBorderColors[idx % chartBorderColors.length],
-    borderWidth: 1,
-  }));
-
-  destroyChart();
-  currentChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: rowValues,
-      datasets,
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        title: {
-          display: true,
-          text: `${measure.caption} by ${chartData.rowFieldName} (Stacked)`,
-          font: { size: 16 },
-        },
-        legend: { position: 'top' },
-      },
-      scales: {
-        x: { stacked: true },
-        y: { stacked: true, beginAtZero: true },
-      },
-    },
-  });
-}
-
-// Render Stacked Bar Chart (Horizontal)
-function renderStackedBarChart(chartData) {
-  const { rowValues, columnValues, measures, selectedMeasure, dataMatrix } =
-    chartData;
-  const ctx = document.getElementById('pivotChart').getContext('2d');
-
-  const measure = selectedMeasure || measures[0];
-  const datasets = columnValues.map((colVal, idx) => ({
-    label: colVal,
-    data: rowValues.map(
-      rowVal => dataMatrix[rowVal][colVal][measure.uniqueName]
-    ),
-    backgroundColor: chartColors[idx % chartColors.length],
-    borderColor: chartBorderColors[idx % chartBorderColors.length],
-    borderWidth: 1,
-  }));
-
-  destroyChart();
-  currentChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: rowValues,
-      datasets,
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        title: {
-          display: true,
-          text: `${measure.caption} by ${chartData.rowFieldName} (Stacked)`,
-          font: { size: 16 },
-        },
-        legend: { position: 'top' },
-      },
-      scales: {
-        x: { stacked: true, beginAtZero: true },
-        y: { stacked: true },
-      },
-    },
-  });
-}
-
-// Render Stacked Area Chart
-function renderStackedAreaChart(chartData) {
-  const { rowValues, columnValues, measures, selectedMeasure, dataMatrix } =
-    chartData;
-  const ctx = document.getElementById('pivotChart').getContext('2d');
-
-  const measure = selectedMeasure || measures[0];
-  const datasets = columnValues.map((colVal, idx) => ({
-    label: colVal,
-    data: rowValues.map(
-      rowVal => dataMatrix[rowVal][colVal][measure.uniqueName]
-    ),
-    borderColor: chartBorderColors[idx % chartBorderColors.length],
-    backgroundColor: chartColors[idx % chartColors.length].replace(
-      '0.8)',
-      '0.6)'
-    ),
-    fill: true,
-    tension: 0.1,
-  }));
-
-  destroyChart();
-  currentChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: rowValues,
-      datasets,
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        title: {
-          display: true,
-          text: `${measure.caption} by ${chartData.rowFieldName} (Stacked Area)`,
-          font: { size: 16 },
-        },
-        legend: { position: 'top' },
-      },
-      scales: {
-        y: { stacked: true, beginAtZero: true },
-      },
-    },
-  });
-}
-
-// Render Combo Bar + Line Chart
-function renderComboBarLineChart(chartData) {
-  const { rowValues, columnValues, measures, selectedMeasure, dataMatrix } =
-    chartData;
-  const ctx = document.getElementById('pivotChart').getContext('2d');
-
-  // Use selected measure for bars, second for line (if available)
-  const barMeasure = selectedMeasure || measures[0];
-  const lineMeasure = measures[1] || barMeasure;
-
-  const datasets = [];
-
-  // Bar datasets for each column
-  columnValues.forEach((colVal, idx) => {
-    datasets.push({
-      type: 'bar',
-      label: `${colVal} (${barMeasure.caption})`,
-      data: rowValues.map(
-        rowVal => dataMatrix[rowVal][colVal][barMeasure.uniqueName]
-      ),
-      backgroundColor: chartColors[idx % chartColors.length],
-      borderColor: chartBorderColors[idx % chartBorderColors.length],
-      borderWidth: 1,
-      order: 2,
-    });
-  });
-
-  // Line dataset showing totals or second measure
-  const lineData = rowValues.map(rowVal => {
-    let total = 0;
-    columnValues.forEach(colVal => {
-      total += dataMatrix[rowVal][colVal][lineMeasure.uniqueName] || 0;
-    });
-    return total;
-  });
-
-  datasets.push({
-    type: 'line',
-    label: `Total ${lineMeasure.caption}`,
-    data: lineData,
-    borderColor: 'rgba(0, 0, 0, 0.8)',
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
-    borderWidth: 3,
-    fill: false,
-    tension: 0.1,
-    order: 1,
-  });
-
-  destroyChart();
-  currentChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: rowValues,
-      datasets,
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        title: {
-          display: true,
-          text: `${barMeasure.caption} Comparison with Trend Line`,
-          font: { size: 16 },
-        },
-        legend: { position: 'top' },
-      },
-      scales: {
-        y: { beginAtZero: true },
-      },
-    },
-  });
-}
-
-// Render Combo Area + Line Chart
-function renderComboAreaLineChart(chartData) {
-  const { rowValues, columnValues, measures, selectedMeasure, dataMatrix } =
-    chartData;
-  const ctx = document.getElementById('pivotChart').getContext('2d');
-
-  const measure = selectedMeasure || measures[0];
-  const datasets = [];
-
-  // Area datasets for each column
-  columnValues.forEach((colVal, idx) => {
-    datasets.push({
-      type: 'line',
-      label: colVal,
-      data: rowValues.map(
-        rowVal => dataMatrix[rowVal][colVal][measure.uniqueName]
-      ),
-      borderColor: chartBorderColors[idx % chartBorderColors.length],
-      backgroundColor: chartColors[idx % chartColors.length].replace(
-        '0.8)',
-        '0.3)'
-      ),
-      fill: true,
-      tension: 0.1,
-      order: 2,
-    });
-  });
-
-  // Add total trend line
-  const trendData = rowValues.map(rowVal => {
-    let total = 0;
-    columnValues.forEach(colVal => {
-      total += dataMatrix[rowVal][colVal][measure.uniqueName] || 0;
-    });
-    return total;
-  });
-
-  datasets.push({
-    type: 'line',
-    label: 'Total',
-    data: trendData,
-    borderColor: 'rgba(0, 0, 0, 0.9)',
-    backgroundColor: 'transparent',
-    borderWidth: 3,
-    borderDash: [5, 5],
-    fill: false,
-    tension: 0.1,
-    order: 1,
-  });
-
-  destroyChart();
-  currentChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: rowValues,
-      datasets,
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        title: {
-          display: true,
-          text: `${measure.caption} Area Chart with Trend`,
-          font: { size: 16 },
-        },
-        legend: { position: 'top' },
-      },
-      scales: {
-        y: { beginAtZero: true },
-      },
-    },
-  });
-}
-
-// Render Scatter Plot
-function renderScatterChart(chartData) {
-  const { rowValues, columnValues, measures, selectedMeasure, dataMatrix } =
-    chartData;
-  const ctx = document.getElementById('pivotChart').getContext('2d');
-
-  // Use selected measure as X, second measure as Y (or same if only one)
-  const xMeasure = selectedMeasure || measures[0];
-  const yMeasure = measures[1] || xMeasure;
-
-  const datasets = columnValues.map((colVal, idx) => {
-    const points = rowValues.map(rowVal => ({
-      x: dataMatrix[rowVal][colVal][xMeasure.uniqueName] || 0,
-      y: dataMatrix[rowVal][colVal][yMeasure.uniqueName] || 0,
-      label: rowVal,
-    }));
-
-    return {
-      label: colVal,
-      data: points,
-      backgroundColor: chartColors[idx % chartColors.length],
-      borderColor: chartBorderColors[idx % chartBorderColors.length],
-      pointRadius: 8,
-      pointHoverRadius: 12,
-    };
-  });
-
-  destroyChart();
-  currentChart = new Chart(ctx, {
-    type: 'scatter',
-    data: { datasets },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        title: {
-          display: true,
-          text: `${xMeasure.caption} vs ${yMeasure.caption}`,
-          font: { size: 16 },
-        },
-        legend: { position: 'top' },
-        tooltip: {
-          callbacks: {
-            label: context => {
-              const point = context.raw;
-              return `${context.dataset.label}: (${point.x.toFixed(2)}, ${point.y.toFixed(2)})`;
-            },
-          },
-        },
-      },
-      scales: {
-        x: {
-          title: { display: true, text: xMeasure.caption },
-          beginAtZero: true,
-        },
-        y: {
-          title: { display: true, text: yMeasure.caption },
-          beginAtZero: true,
-        },
-      },
-    },
-  });
-}
-
-// Render Histogram
-function renderHistogramChart(chartData) {
-  const { rowValues, columnValues, measures, selectedMeasure, dataMatrix } =
-    chartData;
-  const ctx = document.getElementById('pivotChart').getContext('2d');
-
-  const measure = selectedMeasure || measures[0];
-
-  // Collect all values for histogram
-  const allValues = [];
-  rowValues.forEach(rowVal => {
-    columnValues.forEach(colVal => {
-      const val = dataMatrix[rowVal][colVal][measure.uniqueName];
-      if (val > 0) allValues.push(val);
-    });
-  });
-
-  // Create histogram bins
-  const numBins = Math.min(10, Math.ceil(Math.sqrt(allValues.length)));
-  const minVal = Math.min(...allValues);
-  const maxVal = Math.max(...allValues);
-  const binWidth = (maxVal - minVal) / numBins || 1;
-
-  const bins = Array(numBins).fill(0);
-  const binLabels = [];
-
-  for (let i = 0; i < numBins; i++) {
-    const binStart = minVal + i * binWidth;
-    const binEnd = binStart + binWidth;
-    binLabels.push(`${binStart.toFixed(0)}-${binEnd.toFixed(0)}`);
-
-    allValues.forEach(val => {
-      if (
-        val >= binStart &&
-        (val < binEnd || (i === numBins - 1 && val === maxVal))
-      ) {
-        bins[i]++;
-      }
-    });
+// Get chart recommendations from ChartEngine
+function getChartRecommendations() {
+  if (!chartEngine) {
+    console.error('ChartEngine not initialized');
+    return [];
   }
-
-  destroyChart();
-  currentChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: binLabels,
-      datasets: [
-        {
-          label: `Distribution of ${measure.caption}`,
-          data: bins,
-          backgroundColor: 'rgba(54, 162, 235, 0.7)',
-          borderColor: 'rgba(54, 162, 235, 1)',
-          borderWidth: 1,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        title: {
-          display: true,
-          text: `Histogram: ${measure.caption} Distribution`,
-          font: { size: 16 },
-        },
-        legend: { display: false },
-      },
-      scales: {
-        x: { title: { display: true, text: measure.caption } },
-        y: { title: { display: true, text: 'Frequency' }, beginAtZero: true },
-      },
-    },
-  });
+  return chartEngine.recommend();
 }
 
-// Render Heatmap
-function renderHeatmapChart(chartData) {
-  const { rowValues, columnValues, measures, selectedMeasure, dataMatrix } =
-    chartData;
-  const ctx = document.getElementById('pivotChart').getContext('2d');
-
-  const measure = selectedMeasure || measures[0];
-
-  // Check if matrix chart type is available
-  if (typeof Chart.controllers.matrix === 'undefined') {
-    // Fallback to a simulated heatmap using bar chart
-    renderHeatmapFallback(chartData);
+// Auto-detect and render the best chart type
+function autoDetectChart() {
+  if (!chartEngine) {
+    console.error('ChartEngine not initialized');
     return;
   }
 
-  // Build matrix data
-  const data = [];
-  let maxVal = 0;
+  const recommendations = getChartRecommendations();
+  if (recommendations.length > 0) {
+    const bestType = recommendations[0].type;
+    const chartTypeSelect = document.getElementById('chartType');
+    if (chartTypeSelect) {
+      chartTypeSelect.value = bestType;
+    }
+    renderChart(bestType);
 
-  rowValues.forEach((rowVal, rowIdx) => {
-    columnValues.forEach((colVal, colIdx) => {
-      const val = dataMatrix[rowVal][colVal][measure.uniqueName] || 0;
-      maxVal = Math.max(maxVal, val);
-      data.push({
-        x: colIdx,
-        y: rowIdx,
-        v: val,
-      });
-    });
-  });
-
-  destroyChart();
-  currentChart = new Chart(ctx, {
-    type: 'matrix',
-    data: {
-      datasets: [
-        {
-          label: measure.caption,
-          data,
-          backgroundColor: context => {
-            const value = context.dataset.data[context.dataIndex]?.v || 0;
-            const alpha = maxVal > 0 ? value / maxVal : 0;
-            return `rgba(54, 162, 235, ${0.2 + alpha * 0.8})`;
-          },
-          borderColor: 'rgba(54, 162, 235, 1)',
-          borderWidth: 1,
-          width: ({ chart }) =>
-            (chart.chartArea?.width || 400) / columnValues.length - 2,
-          height: ({ chart }) =>
-            (chart.chartArea?.height || 300) / rowValues.length - 2,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        title: {
-          display: true,
-          text: `Heatmap: ${measure.caption}`,
-          font: { size: 16 },
-        },
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            title: () => '',
-            label: context => {
-              const v = context.dataset.data[context.dataIndex];
-              return `${rowValues[v.y]} / ${columnValues[v.x]}: ${v.v.toFixed(2)}`;
-            },
-          },
-        },
-      },
-      scales: {
-        x: {
-          type: 'category',
-          labels: columnValues,
-          offset: true,
-          ticks: { display: true },
-          grid: { display: false },
-        },
-        y: {
-          type: 'category',
-          labels: rowValues,
-          offset: true,
-          ticks: { display: true },
-          grid: { display: false },
-        },
-      },
-    },
-  });
-}
-
-// Heatmap fallback using colored table representation
-function renderHeatmapFallback(chartData) {
-  const {
-    rowValues,
-    columnValues,
-    measures,
-    selectedMeasure,
-    dataMatrix,
-    rowFieldName,
-    columnFieldName,
-  } = chartData;
-  const measure = selectedMeasure || measures[0];
-
-  // Find max value for color scaling
-  let maxVal = 0;
-  rowValues.forEach(rowVal => {
-    columnValues.forEach(colVal => {
-      const val = dataMatrix[rowVal][colVal][measure.uniqueName] || 0;
-      maxVal = Math.max(maxVal, val);
-    });
-  });
-
-  // Create heatmap as HTML table
-  const chartSection = document.getElementById('chartSection');
-  const chartContainer = document.getElementById('chartContainer');
-
-  let html = `
-    <div style="padding: 20px;">
-      <h3 style="margin-bottom: 15px; text-align: center;">Heatmap: ${measure.caption}</h3>
-      <table class="heatmap-table" style="border-collapse: collapse; width: 100%;">
-        <thead>
-          <tr>
-            <th style="padding: 8px; border: 1px solid #ddd; background: #f5f5f5;">${rowFieldName}/${columnFieldName}</th>
-            ${columnValues.map(col => `<th style="padding: 8px; border: 1px solid #ddd; background: #f5f5f5;">${col}</th>`).join('')}
-          </tr>
-        </thead>
-        <tbody>
-  `;
-
-  rowValues.forEach(rowVal => {
-    html += `<tr><td style="padding: 8px; border: 1px solid #ddd; background: #f5f5f5; font-weight: bold;">${rowVal}</td>`;
-    columnValues.forEach(colVal => {
-      const val = dataMatrix[rowVal][colVal][measure.uniqueName] || 0;
-      const intensity = maxVal > 0 ? val / maxVal : 0;
-      const bgColor = `rgba(54, 162, 235, ${0.1 + intensity * 0.9})`;
-      const textColor = intensity > 0.5 ? '#fff' : '#333';
-      html += `<td style="padding: 8px; border: 1px solid #ddd; background: ${bgColor}; color: ${textColor}; text-align: center;">${val.toFixed(2)}</td>`;
-    });
-    html += '</tr>';
-  });
-
-  html += '</tbody></table></div>';
-
-  chartContainer.innerHTML = html;
-  destroyChart();
-}
-
-// Render Funnel Chart
-function renderFunnelChart(chartData) {
-  const { rowValues, columnValues, measures, selectedMeasure, dataMatrix } =
-    chartData;
-  const ctx = document.getElementById('pivotChart').getContext('2d');
-
-  const measure = selectedMeasure || measures[0];
-
-  // Aggregate and sort data descending for funnel effect
-  const aggregatedData = rowValues
-    .map(rowVal => {
-      let total = 0;
-      columnValues.forEach(colVal => {
-        total += dataMatrix[rowVal][colVal][measure.uniqueName] || 0;
-      });
-      return { label: rowVal, value: total };
-    })
-    .sort((a, b) => b.value - a.value);
-
-  const labels = aggregatedData.map(d => d.label);
-  const values = aggregatedData.map(d => d.value);
-
-  // Create funnel-like appearance with horizontal bar
-  destroyChart();
-  currentChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [
-        {
-          label: measure.caption,
-          data: values,
-          backgroundColor: values.map(
-            (_, idx) => chartColors[idx % chartColors.length]
-          ),
-          borderColor: values.map(
-            (_, idx) => chartBorderColors[idx % chartBorderColors.length]
-          ),
-          borderWidth: 1,
-          barPercentage: values.map((v, idx) => 1 - idx * 0.15),
-        },
-      ],
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        title: {
-          display: true,
-          text: `Funnel: ${measure.caption} by ${chartData.rowFieldName}`,
-          font: { size: 16 },
-        },
-        legend: { display: false },
-      },
-      scales: {
-        x: { beginAtZero: true },
-        y: { reverse: false },
-      },
-    },
-  });
-}
-
-// Render Sankey Diagram
-function renderSankeyChart(chartData) {
-  const { rowValues, columnValues, measures, selectedMeasure, dataMatrix } =
-    chartData;
-  const ctx = document.getElementById('pivotChart').getContext('2d');
-
-  // Check if sankey chart type is available
-  if (typeof Chart.controllers.sankey === 'undefined') {
-    renderSankeyFallback(chartData);
-    return;
+    // Update title to show it was auto-detected
+    const chartTitle = document.getElementById('chartTitle');
+    if (chartTitle) {
+      chartTitle.textContent = `${getChartTitle(bestType)} (Auto-detected)`;
+    }
   }
-
-  const measure = selectedMeasure || measures[0];
-
-  // Build sankey data: flows from rows to columns
-  const flows = [];
-  rowValues.forEach(rowVal => {
-    columnValues.forEach(colVal => {
-      const val = dataMatrix[rowVal][colVal][measure.uniqueName];
-      if (val > 0) {
-        flows.push({
-          from: rowVal,
-          to: colVal,
-          flow: val,
-        });
-      }
-    });
-  });
-
-  destroyChart();
-  currentChart = new Chart(ctx, {
-    type: 'sankey',
-    data: {
-      datasets: [
-        {
-          label: measure.caption,
-          data: flows,
-          colorFrom: c =>
-            chartColors[
-              rowValues.indexOf(c.dataset.data[c.dataIndex].from) %
-                chartColors.length
-            ],
-          colorTo: c =>
-            chartColors[
-              (columnValues.indexOf(c.dataset.data[c.dataIndex].to) + 5) %
-                chartColors.length
-            ],
-          colorMode: 'gradient',
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        title: {
-          display: true,
-          text: `Sankey: ${chartData.rowFieldName} → ${chartData.columnFieldName}`,
-          font: { size: 16 },
-        },
-      },
-    },
-  });
 }
 
-// Sankey fallback visualization
-function renderSankeyFallback(chartData) {
-  const {
-    rowValues,
-    columnValues,
-    measures,
-    selectedMeasure,
-    dataMatrix,
-    rowFieldName,
-    columnFieldName,
-  } = chartData;
-  const measure = selectedMeasure || measures[0];
+// Show recommendations panel
+function showRecommendationsPanel() {
+  const panel = document.getElementById('recommendationsPanel');
+  const list = document.getElementById('recommendationsList');
 
-  const chartContainer = document.getElementById('chartContainer');
+  if (!panel || !list) return;
 
-  let html = `
-    <div style="padding: 20px;">
-      <h3 style="margin-bottom: 15px; text-align: center;">Flow Diagram: ${rowFieldName} → ${columnFieldName}</h3>
-      <div style="display: flex; justify-content: space-around; align-items: flex-start; gap: 20px;">
-        <div style="flex: 1;">
-          <h4 style="text-align: center; margin-bottom: 10px;">${rowFieldName}</h4>
-          ${rowValues
-            .map((rowVal, idx) => {
-              let total = 0;
-              columnValues.forEach(colVal => {
-                total += dataMatrix[rowVal][colVal][measure.uniqueName] || 0;
-              });
-              return `<div style="padding: 10px; margin: 5px; background: ${chartColors[idx % chartColors.length]}; border-radius: 4px; text-align: center; color: #fff;">
-              <strong>${rowVal}</strong><br>$${total.toFixed(2)}
-            </div>`;
-            })
-            .join('')}
+  const recommendations = getChartRecommendations();
+
+  list.innerHTML = recommendations
+    .map(
+      rec => `
+    <div class="recommendation-item" data-type="${rec.type}">
+      <div class="recommendation-info">
+        <span class="recommendation-type">${rec.type.replace(/([A-Z])/g, ' $1').trim()}</span>
+        <span class="recommendation-reason">${rec.reason}</span>
+      </div>
+      <div class="recommendation-score">
+        <div class="score-bar">
+          <div class="score-fill" style="width: ${rec.score * 100}%"></div>
         </div>
-        <div style="flex: 0 0 60px; display: flex; align-items: center; justify-content: center; font-size: 40px; color: #666;">→</div>
-        <div style="flex: 1;">
-          <h4 style="text-align: center; margin-bottom: 10px;">${columnFieldName}</h4>
-          ${columnValues
-            .map((colVal, idx) => {
-              let total = 0;
-              rowValues.forEach(rowVal => {
-                total += dataMatrix[rowVal][colVal][measure.uniqueName] || 0;
-              });
-              return `<div style="padding: 10px; margin: 5px; background: ${chartColors[(idx + 5) % chartColors.length]}; border-radius: 4px; text-align: center; color: #fff;">
-              <strong>${colVal}</strong><br>$${total.toFixed(2)}
-            </div>`;
-            })
-            .join('')}
-        </div>
+        <span class="score-text">${Math.round(rec.score * 100)}%</span>
       </div>
     </div>
-  `;
+  `
+    )
+    .join('');
 
-  chartContainer.innerHTML = html;
-  destroyChart();
+  // Add click handlers to recommendations
+  list.querySelectorAll('.recommendation-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const type = item.dataset.type;
+      const chartTypeSelect = document.getElementById('chartType');
+      if (chartTypeSelect) {
+        chartTypeSelect.value = type;
+      }
+      renderChart(type);
+      panel.style.display = 'none';
+    });
+  });
+
+  panel.style.display = 'block';
 }
 
-// Main chart rendering dispatcher
+// Hide recommendations panel
+function hideRecommendationsPanel() {
+  const panel = document.getElementById('recommendationsPanel');
+  if (panel) {
+    panel.style.display = 'none';
+  }
+}
+
+// Export chart as PNG
+async function exportChartAsPng() {
+  if (!chartEngine) {
+    console.error('ChartEngine not initialized');
+    return;
+  }
+  try {
+    await chartEngine.exportAsPng(
+      '#chartContainer',
+      `pivot-chart-${Date.now()}`
+    );
+  } catch (error) {
+    console.error('Error exporting PNG:', error);
+    alert('Could not export chart as PNG. Please try again.');
+  }
+}
+
+// Export chart as CSV
+async function exportChartAsCsv() {
+  if (!chartEngine) {
+    console.error('ChartEngine not initialized');
+    return;
+  }
+  try {
+    await chartEngine.exportAsCsv(
+      '#chartContainer',
+      `pivot-chart-data-${Date.now()}`
+    );
+  } catch (error) {
+    console.error('Error exporting CSV:', error);
+    alert('Could not export chart as CSV. Please try again.');
+  }
+}
+
+// Export chart as JSON
+async function exportChartAsJson() {
+  if (!chartEngine) {
+    console.error('ChartEngine not initialized');
+    return;
+  }
+  try {
+    await chartEngine.exportAsJson(
+      '#chartContainer',
+      `pivot-chart-data-${Date.now()}`
+    );
+  } catch (error) {
+    console.error('Error exporting JSON:', error);
+    alert('Could not export chart as JSON. Please try again.');
+  }
+}
+
+// Main chart rendering dispatcher - Now uses ChartEngine
 function renderChart(chartType) {
+  if (!chartEngine) {
+    console.error('ChartEngine not initialized');
+    return;
+  }
+
   if (!chartType) {
     chartType = 'column';
   }
@@ -3963,113 +3080,139 @@ function renderChart(chartType) {
   // Store current chart type for filter re-renders
   currentChartType = chartType;
 
-  const chartData = getChartData();
-  if (!chartData) {
-    alert(
-      'No data available for chart visualization. Please ensure you have processed data.'
-    );
-    return;
-  }
+  // Destroy previous chart
+  destroyChart();
 
-  // Update chart title with filter info
-  const chartTitle = document.getElementById('chartTitle');
-  if (chartTitle && chartData.selectedMeasure) {
-    const currentFilters = chartService
-      ? chartService.getFilters()
-      : { limit: 0 };
-    const limitText =
-      currentFilters.limit > 0 ? ` (Top ${currentFilters.limit})` : '';
-    chartTitle.textContent = `${chartData.selectedMeasure.caption} - ${chartType.charAt(0).toUpperCase() + chartType.slice(1)} Chart${limitText}`;
-  }
-
-  // Reset chart container if it has custom HTML content
+  // Reset chart container to ensure canvas is present
   const chartContainer = document.getElementById('chartContainer');
   if (!chartContainer.querySelector('canvas')) {
     chartContainer.innerHTML = '<canvas id="pivotChart"></canvas>';
   }
 
-  switch (chartType) {
-    case 'column':
-      renderColumnChart(chartData);
-      break;
-    case 'bar':
-      renderBarChart(chartData);
-      break;
-    case 'line':
-      renderLineChart(chartData);
-      break;
-    case 'area':
-      renderAreaChart(chartData);
-      break;
-    case 'pie':
-      renderPieChart(chartData);
-      break;
-    case 'doughnut':
-      renderDoughnutChart(chartData);
-      break;
-    case 'stackedColumn':
-      renderStackedColumnChart(chartData);
-      break;
-    case 'stackedBar':
-      renderStackedBarChart(chartData);
-      break;
-    case 'stackedArea':
-      renderStackedAreaChart(chartData);
-      break;
-    case 'comboBarLine':
-      renderComboBarLineChart(chartData);
-      break;
-    case 'comboAreaLine':
-      renderComboAreaLineChart(chartData);
-      break;
-    case 'scatter':
-      renderScatterChart(chartData);
-      break;
-    case 'histogram':
-      renderHistogramChart(chartData);
-      break;
-    case 'heatmap':
-      renderHeatmapChart(chartData);
-      break;
-    case 'funnel':
-      renderFunnelChart(chartData);
-      break;
-    case 'sankey':
-      renderSankeyChart(chartData);
-      break;
-    default:
-      console.warn('Unknown chart type:', chartType);
-      // Default to column chart for unknown types
-      renderColumnChart(chartData);
+  try {
+    // Get the current color palette colors
+    const colors = colorManager ? colorManager.getColors(10) : undefined;
+
+    // Render chart using ChartEngine
+    chartEngine.render({
+      type: chartType,
+      container: '#chartContainer',
+      style: {
+        title: getChartTitle(chartType),
+        colorScheme: currentPalette,
+        colors: colors,
+      },
+    });
+
+    // Update chart title display
+    const chartTitle = document.getElementById('chartTitle');
+    if (chartTitle) {
+      chartTitle.textContent = getChartTitle(chartType);
+    }
+
+    console.log(`Rendered ${chartType} chart using ChartEngine`);
+  } catch (error) {
+    console.error('Error rendering chart:', error);
+    // Show error message to user
+    chartContainer.innerHTML = `
+      <div style="display: flex; align-items: center; justify-content: center; height: 400px; color: #666;">
+        <div style="text-align: center;">
+          <p>Unable to render ${chartType} chart.</p>
+          <p style="font-size: 12px;">Error: ${error.message}</p>
+        </div>
+      </div>
+    `;
   }
 }
 
-// Setup chart event listeners
+// Setup chart event listeners with new analytics features
 function setupChartEventListeners() {
   const chartTypeSelect = document.getElementById('chartType');
   const applyFilterButton = document.getElementById('applyChartFilter');
   const resetFilterButton = document.getElementById('resetChartFilter');
+  const autoDetectBtn = document.getElementById('autoDetectBtn');
+  const showRecommendationsBtn = document.getElementById(
+    'showRecommendationsBtn'
+  );
+  const closeRecommendationsBtn = document.getElementById(
+    'closeRecommendations'
+  );
+  const colorPaletteSelect = document.getElementById('colorPalette');
+  const exportPngBtn = document.getElementById('exportPng');
+  const exportCsvBtn = document.getElementById('exportCsv');
+  const exportJsonBtn = document.getElementById('exportJson');
 
+  // Chart type change
   if (chartTypeSelect) {
     chartTypeSelect.addEventListener('change', e => {
       // Reset ChartService filter state when switching chart types
-      if (chartService) {
-        chartService.resetFilters();
+      if (chartEngine) {
+        const chartServiceInternal = chartEngine.getChartService();
+        chartServiceInternal.resetFilters();
         populateChartFilters();
       }
       renderChart(e.target.value);
     });
   }
 
+  // Apply filters
   if (applyFilterButton) {
     applyFilterButton.addEventListener('click', () => {
       applyChartFilters();
     });
   }
 
+  // Reset filters
   if (resetFilterButton) {
     resetFilterButton.addEventListener('click', () => {
       resetChartFilters();
+    });
+  }
+
+  // Auto-detect best chart
+  if (autoDetectBtn) {
+    autoDetectBtn.addEventListener('click', () => {
+      autoDetectChart();
+    });
+  }
+
+  // Show recommendations
+  if (showRecommendationsBtn) {
+    showRecommendationsBtn.addEventListener('click', () => {
+      showRecommendationsPanel();
+    });
+  }
+
+  // Close recommendations
+  if (closeRecommendationsBtn) {
+    closeRecommendationsBtn.addEventListener('click', () => {
+      hideRecommendationsPanel();
+    });
+  }
+
+  // Color palette change
+  if (colorPaletteSelect) {
+    colorPaletteSelect.addEventListener('change', e => {
+      updateColorPalette(e.target.value);
+    });
+  }
+
+  // Export buttons
+  if (exportPngBtn) {
+    exportPngBtn.addEventListener('click', () => {
+      exportChartAsPng();
+    });
+  }
+
+  if (exportCsvBtn) {
+    exportCsvBtn.addEventListener('click', () => {
+      exportChartAsCsv();
+    });
+  }
+
+  if (exportJsonBtn) {
+    exportJsonBtn.addEventListener('click', () => {
+      exportChartAsJson();
     });
   }
 }
@@ -4097,22 +3240,29 @@ function switchTab(tabName) {
     content.classList.toggle('active', content.id === `${tabName}-tab`);
   });
 
-  // If switching to analytics tab, initialize chart if not done yet
-  if (tabName === 'analytics' && !analyticsTabInitialized) {
+  // If switching to analytics tab, initialize or re-initialize with current data
+  if (tabName === 'analytics') {
     initializeAnalyticsTab();
   }
 }
 
-// Initialize analytics tab (called when first switching to it)
+// Initialize analytics tab (called when first switching to it, or after data changes)
 function initializeAnalyticsTab() {
-  if (!chartService) {
-    console.error('ChartService not initialized');
+  if (!chartEngine) {
+    console.error('ChartEngine not initialized');
     return;
   }
 
+  // Destroy any existing chart before re-initializing
+  destroyChart();
+
   analyticsTabInitialized = true;
 
-  // Populate filter dropdowns
+  // Reset ChartService filters so they pick up new data fields
+  const chartServiceInternal = chartEngine.getChartService();
+  chartServiceInternal.resetFilters();
+
+  // Populate filter dropdowns with current pivot data
   populateChartFilters();
 
   // Render default chart (column chart)
@@ -4120,6 +3270,8 @@ function initializeAnalyticsTab() {
   if (chartTypeSelect) {
     renderChart(chartTypeSelect.value || 'column');
   }
+
+  console.log('Analytics tab initialized with ChartEngine');
 }
 
 // Setup tab event listeners
@@ -4169,8 +3321,19 @@ document.addEventListener('DOMContentLoaded', () => {
       data: sampleData, // Initialize with the full dataset
     });
 
-    // Create ChartService instance for chart visualization
-    chartService = new ChartService(pivotEngine);
+    // Create ChartEngine instance for chart visualization (uses ChartService internally)
+    chartEngine = new ChartEngine(pivotEngine, {
+      library: 'chartjs',
+      defaultStyle: {
+        colorScheme: currentPalette,
+      },
+    });
+
+    // Create ColorManager for color palette management
+    colorManager = new ColorManager(currentPalette);
+
+    // Keep chartService reference for backward compatibility (get from chartEngine)
+    chartService = chartEngine.getChartService();
 
     pivotEngine.setPagination({
       currentPage: 1,

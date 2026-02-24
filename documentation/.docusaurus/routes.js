@@ -53,15 +53,15 @@ export default [
   },
   {
     path: '/PivotHead/docs',
-    component: ComponentCreator('/PivotHead/docs', '42e'),
+    component: ComponentCreator('/PivotHead/docs', '841'),
     routes: [
       {
         path: '/PivotHead/docs',
-        component: ComponentCreator('/PivotHead/docs', 'c70'),
+        component: ComponentCreator('/PivotHead/docs', '898'),
         routes: [
           {
             path: '/PivotHead/docs',
-            component: ComponentCreator('/PivotHead/docs', '6fa'),
+            component: ComponentCreator('/PivotHead/docs', '1c4'),
             routes: [
               {
                 path: '/PivotHead/docs/contributors/',
@@ -166,6 +166,15 @@ export default [
                 component: ComponentCreator(
                   '/PivotHead/docs/introduction',
                   'db5'
+                ),
+                exact: true,
+                sidebar: 'tutorialSidebar',
+              },
+              {
+                path: '/PivotHead/docs/reference/api-reference/analytics-api-reference',
+                component: ComponentCreator(
+                  '/PivotHead/docs/reference/api-reference/analytics-api-reference',
+                  'a73'
                 ),
                 exact: true,
                 sidebar: 'tutorialSidebar',
@@ -347,6 +356,15 @@ export default [
                 component: ComponentCreator(
                   '/PivotHead/docs/tutorials/core-webcomponent/setup-for-user-project',
                   '83d'
+                ),
+                exact: true,
+                sidebar: 'tutorialSidebar',
+              },
+              {
+                path: '/PivotHead/docs/tutorials/pivot-charts',
+                component: ComponentCreator(
+                  '/PivotHead/docs/tutorials/pivot-charts',
+                  '4f8'
                 ),
                 exact: true,
                 sidebar: 'tutorialSidebar',

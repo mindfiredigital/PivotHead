@@ -1,0 +1,40 @@
+{
+  "id": "tutorials/pivot-charts",
+  "title": "Pivot Charts",
+  "description": "Transform your pivot table data into beautiful, interactive visualizations with PivotHead Analytics",
+  "source": "@site/docs/tutorials/pivot-charts.mdx",
+  "sourceDirName": "tutorials",
+  "slug": "/tutorials/pivot-charts",
+  "permalink": "/PivotHead/docs/tutorials/pivot-charts",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorials/pivot-charts.mdx",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "pivot-charts",
+    "title": "Pivot Charts",
+    "sidebar_label": "Pivot Charts",
+    "description": "Transform your pivot table data into beautiful, interactive visualizations with PivotHead Analytics",
+    "keywords": [
+      "pivot charts",
+      "data visualization",
+      "analytics",
+      "bar chart",
+      "pie chart",
+      "line chart",
+      "echarts",
+      "plotly",
+      "d3"
+    ]
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "setup-for-user-project",
+    "permalink": "/PivotHead/docs/tutorials/vue/setup-for-user-project"
+  },
+  "next": {
+    "title": "Core Web Component",
+    "permalink": "/PivotHead/docs/reference/conceptual-reference/core-webcomponent-conceptual-reference"
+  }
+}

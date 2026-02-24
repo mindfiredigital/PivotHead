@@ -18,6 +18,8 @@ import type {
   SankeyChartData,
   SankeyFlow,
   HistogramChartData,
+  TreemapChartData,
+  TreemapNode,
 } from './types';
 
 /**
@@ -38,10 +40,19 @@ export class ChartService<
 > {
   private engine: PivotEngine<T>;
   private filterConfig: ChartFilterConfig;
+  private customColors: string[] | null = null;
 
   constructor(engine: PivotEngine<T>) {
     this.engine = engine;
     this.filterConfig = { ...DEFAULT_FILTER_CONFIG };
+  }
+
+  /**
+   * Set custom colors for chart datasets (overrides default hardcoded colors)
+   * @param colors - Array of color strings, or null to reset to defaults
+   */
+  setColors(colors: string[] | null): void {
+    this.customColors = colors;
   }
 
   /**
@@ -412,19 +423,6 @@ export class ChartService<
   }
 
   /**
-   * Get stacked chart data (adds stacked property to datasets)
-   */
-  getStackedChartData(config?: Partial<ChartConfig>): ChartData {
-    const chartData = this.getChartData(config);
-    return {
-      ...chartData,
-      datasets: chartData.datasets.map(dataset => ({
-        ...dataset,
-      })),
-    };
-  }
-
-  /**
    * Get combo chart data (bar + line)
    */
   getComboChartData(config?: Partial<ChartConfig>): ChartData {
@@ -446,13 +444,17 @@ export class ChartService<
     }));
 
     // Add line dataset for totals
+    // showLine is required in Chart.js v4 for line datasets in mixed (bar) charts
     const lineDataset: ChartDataset = {
       label: `Total ${chartData.selectedMeasure.caption}`,
       data: totalData,
       type: 'line',
       borderColor: 'rgba(0, 0, 0, 0.8)',
       backgroundColor: 'rgba(0, 0, 0, 0.1)',
+      pointBackgroundColor: 'rgba(0, 0, 0, 0.8)',
       borderWidth: 3,
+      pointRadius: 4,
+      showLine: true,
       fill: false,
       tension: 0.1,
       order: 1,
@@ -461,6 +463,153 @@ export class ChartService<
     return {
       ...chartData,
       datasets: [...barDatasets, lineDataset],
+    };
+  }
+
+  /**
+   * Get treemap data for hierarchical visualization
+   * Transforms pivot data into a nested tree structure
+   */
+  getTreemapData(config?: Partial<ChartConfig>): TreemapChartData {
+    const state = this.engine.getState();
+    const rows = state.rows || [];
+    const rawData = state.rawData || [];
+    const measures = state.measures || [];
+
+    const filters = { ...this.filterConfig, ...config?.filters };
+    const selectedMeasure =
+      measures.find(m => m.uniqueName === filters.selectedMeasure) ||
+      measures[0];
+
+    if (rows.length === 0) {
+      // No row dimensions, return flat structure
+      return this.createEmptyTreemapData(measures, selectedMeasure);
+    }
+
+    // Build hierarchical tree from row dimensions
+    const tree: TreemapNode[] = [];
+    const nodeMap = new Map<string, TreemapNode>();
+    const hierarchyFields = rows.map(r => r.uniqueName);
+
+    rawData.forEach((item: Record<string, unknown>) => {
+      let currentLevel = tree;
+      let pathKey = '';
+      const path: string[] = [];
+
+      // Traverse each row dimension level
+      rows.forEach((row, depth) => {
+        const fieldValue = String(item[row.uniqueName] ?? 'Unknown');
+        pathKey += `/${fieldValue}`;
+        path.push(fieldValue);
+
+        let node = nodeMap.get(pathKey);
+        if (!node) {
+          node = {
+            name: fieldValue,
+            value: 0,
+            children: depth < rows.length - 1 ? [] : undefined,
+            path: [...path],
+            color: this.getColor(currentLevel.length),
+          };
+          nodeMap.set(pathKey, node);
+          currentLevel.push(node);
+        }
+
+        // Add value at leaf level
+        if (depth === rows.length - 1 && selectedMeasure) {
+          const measureValue = Number(item[selectedMeasure.uniqueName]) || 0;
+          node.value += measureValue;
+        }
+
+        if (node.children) {
+          currentLevel = node.children;
+        }
+      });
+    });
+
+    // Propagate values up the tree (parent = sum of children)
+    const propagateValues = (nodes: TreemapNode[]): number => {
+      return nodes.reduce((sum, node) => {
+        if (node.children && node.children.length > 0) {
+          node.value = propagateValues(node.children);
+        }
+        return sum + node.value;
+      }, 0);
+    };
+
+    const totalValue = propagateValues(tree);
+
+    // Apply limit filter if set
+    if (filters.limit && filters.limit > 0 && tree.length > filters.limit) {
+      // Sort by value and take top N
+      tree.sort((a, b) => b.value - a.value);
+      tree.splice(filters.limit);
+    }
+
+    // Calculate max depth
+    const calculateMaxDepth = (nodes: TreemapNode[], depth: number): number => {
+      let maxDepth = depth;
+      nodes.forEach(node => {
+        if (node.children && node.children.length > 0) {
+          maxDepth = Math.max(
+            maxDepth,
+            calculateMaxDepth(node.children, depth + 1)
+          );
+        }
+      });
+      return maxDepth;
+    };
+
+    const maxDepth = calculateMaxDepth(tree, 1);
+
+    return {
+      tree,
+      totalValue,
+      hierarchyFields,
+      maxDepth,
+      rowFieldName: hierarchyFields.join(' > '),
+      columnFieldName: '',
+      measures: measures.map(m => ({
+        uniqueName: m.uniqueName,
+        caption: m.caption || m.uniqueName,
+      })),
+      selectedMeasure: {
+        uniqueName: selectedMeasure?.uniqueName || '',
+        caption: selectedMeasure?.caption || selectedMeasure?.uniqueName || '',
+      },
+      allRowValues: [],
+      allColumnValues: [],
+      filteredRowValues: [],
+      filteredColumnValues: [],
+    };
+  }
+
+  /**
+   * Create empty treemap data when no dimensions are configured
+   */
+  private createEmptyTreemapData(
+    measures: Array<{ uniqueName: string; caption?: string }>,
+    selectedMeasure?: { uniqueName: string; caption?: string }
+  ): TreemapChartData {
+    return {
+      tree: [],
+      totalValue: 0,
+      hierarchyFields: [],
+      maxDepth: 0,
+      rowFieldName: '',
+      columnFieldName: '',
+      measures: measures.map(m => ({
+        uniqueName: m.uniqueName,
+        caption: m.caption || m.uniqueName,
+      })),
+      selectedMeasure: {
+        uniqueName: selectedMeasure?.uniqueName || '',
+        caption: selectedMeasure?.caption || selectedMeasure?.uniqueName || '',
+      },
+      allRowValues: [],
+      allColumnValues: [],
+      filteredRowValues: [],
+      filteredColumnValues: [],
     };
   }
 
@@ -475,6 +624,7 @@ export class ChartService<
     | ScatterChartData
     | HeatmapChartData
     | SankeyChartData
+    | TreemapChartData
     | HistogramChartData {
     switch (chartType) {
       case 'pie':
@@ -497,11 +647,14 @@ export class ChartService<
       case 'stackedColumn':
       case 'stackedBar':
       case 'stackedArea':
-        return this.getStackedChartData(config);
+        return this.getChartData(config);
 
       case 'comboBarLine':
       case 'comboAreaLine':
         return this.getComboChartData(config);
+
+      case 'treemap':
+        return this.getTreemapData(config);
 
       case 'column':
       case 'bar':
@@ -513,9 +666,12 @@ export class ChartService<
   }
 
   /**
-   * Get color from default palette
+   * Get color from current palette (custom colors if set, otherwise defaults)
    */
   private getColor(index: number): string {
+    if (this.customColors && this.customColors.length > 0) {
+      return this.customColors[index % this.customColors.length];
+    }
     const colors = [
       'rgba(54, 162, 235, 0.8)',
       'rgba(255, 99, 132, 0.8)',
@@ -532,9 +688,13 @@ export class ChartService<
   }
 
   /**
-   * Get border color from default palette
+   * Get border color from current palette
    */
   private getBorderColor(index: number): string {
-    return this.getColor(index).replace('0.8)', '1)');
+    const color = this.getColor(index);
+    if (color.startsWith('rgba')) {
+      return color.replace(/[\d.]+\)$/, '1)');
+    }
+    return color;
   }
 }

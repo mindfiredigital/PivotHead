@@ -423,14 +423,14 @@ const upload = multer({
 
 ### Sanitize Delimiters
 
+### Handle Errors Gracefully
+
 ```javascript
 function sanitizeDelimiter(delimiter) {
   const allowed = [',', ';', '\t', '|'];
   return allowed.includes(delimiter) ? delimiter : ',';
 }
 ```
-
-### Handle Errors Gracefully
 
 ```javascript
 const result = wasm.parseCSVChunk(csvData, { delimiter: ',' });
