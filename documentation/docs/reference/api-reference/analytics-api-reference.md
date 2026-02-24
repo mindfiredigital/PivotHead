@@ -2,14 +2,24 @@
 id: analytics-api-reference
 title: Analytics API Reference
 sidebar_label: Analytics
-description: Complete API reference for PivotHead Analytics - data visualization and charting for pivot tables
+description: Complete API reference for PivotHead Analytics — data visualization and charting for pivot tables
 keywords:
-  [api, analytics, charts, visualization, pivothead, echarts, plotly, d3]
+  [
+    api,
+    analytics,
+    charts,
+    visualization,
+    pivothead,
+    chart.js,
+    echarts,
+    plotly,
+    d3,
+  ]
 ---
 
 # Analytics API Reference
 
-Complete API reference for `@mindfiredigital/pivothead-analytics`.
+Complete reference for `@mindfiredigital/pivothead-analytics`.
 
 ---
 
@@ -19,13 +29,26 @@ Complete API reference for `@mindfiredigital/pivothead-analytics`.
 npm install @mindfiredigital/pivothead-analytics
 ```
 
-No additional charting library installation is required — everything is bundled and ready to use out of the box.
+This package does **not** bundle a charting library. You must install one separately:
+
+```bash
+npm install chart.js          # Chart.js (recommended, most common)
+npm install echarts            # Apache ECharts
+npm install plotly.js-dist     # Plotly.js
+npm install d3                 # D3.js
+```
+
+After install, a setup prompt runs automatically to help you pick the library. You can skip it with:
+
+```bash
+PIVOTHEAD_SKIP_SETUP=true npm install @mindfiredigital/pivothead-analytics
+```
 
 ---
 
 ## ChartEngine
 
-The primary way to create charts from your pivot data. Handles rendering, recommendations, exporting, and lifecycle management.
+`ChartEngine` is the main class. It takes a `PivotEngine` instance and renders charts.
 
 ### Constructor
 
@@ -34,42 +57,53 @@ import { ChartEngine } from '@mindfiredigital/pivothead-analytics';
 import { PivotEngine } from '@mindfiredigital/pivothead';
 
 const engine = new PivotEngine(data, config);
+
+const chartEngine = new ChartEngine(engine);
+// or with options:
 const chartEngine = new ChartEngine(engine, {
   library: 'chartjs', // 'chartjs' | 'echarts' | 'plotly' | 'd3'
   defaultStyle: {
     colorScheme: 'tableau10',
     animated: true,
+    showLegend: true,
+  },
+  defaultFormat: {
+    valueFormat: 'currency',
+    currency: 'USD',
   },
 });
 ```
 
-#### Options
+#### ChartEngineOptions
 
-| Option          | Type                                         | Default     | Description                           |
-| --------------- | -------------------------------------------- | ----------- | ------------------------------------- |
-| `library`       | `'chartjs' \| 'echarts' \| 'plotly' \| 'd3'` | `'chartjs'` | Rendering library to use              |
-| `defaultStyle`  | `StyleConfig`                                | —           | Default styling for all charts        |
-| `defaultFormat` | `FormatConfig`                               | —           | Default value formatting              |
-| `performance`   | `PerformanceConfig`                          | —           | Performance tuning for large datasets |
+| Option          | Type                                         | Default       | Description                               |
+| --------------- | -------------------------------------------- | ------------- | ----------------------------------------- |
+| `library`       | `'chartjs' \| 'echarts' \| 'plotly' \| 'd3'` | auto-detected | Rendering library to use                  |
+| `defaultStyle`  | `StyleConfig`                                | —             | Default style applied to every chart      |
+| `defaultFormat` | `FormatConfig`                               | —             | Default value formatting for every chart  |
+| `performance`   | `PerformanceConfig`                          | —             | Data sampling settings for large datasets |
+
+If `library` is not set, ChartEngine auto-detects by checking the `PIVOTHEAD_LIBRARY` env var, browser globals, and installed packages.
 
 ---
 
-### Rendering Methods
+## Rendering methods
 
-#### `render(config)`
+### `render(config)`
 
-Renders a chart with full configuration control.
+Full control render. Use this when you need specific type, style, or interactions.
 
 ```typescript
-const chart = chartEngine.render({
-  container: '#my-chart',
-  type: 'column',
+chartEngine.render({
+  container: '#my-chart', // CSS selector or HTMLElement
+  type: 'column', // see ChartType below
   style: {
     title: 'Revenue by Region',
     showLegend: true,
     legendPosition: 'bottom',
     showGrid: true,
     animated: true,
+    colorScheme: 'vibrant',
   },
   format: {
     valueFormat: 'currency',
@@ -77,25 +111,25 @@ const chart = chartEngine.render({
   },
   interactions: {
     hover: true,
-    click: data => console.log('Clicked:', data),
+    click: data => console.log('Clicked:', data.rowValue, data.value),
   },
 });
 ```
 
-#### `auto(config)`
+### `auto(config)`
 
-Automatically detects the best chart type for your data and renders it.
+Auto-detects the best chart type from your data structure and renders it.
 
 ```typescript
-const chart = chartEngine.auto({
+chartEngine.auto({
   container: '#my-chart',
   style: { title: 'Sales Overview' },
 });
 ```
 
-#### Convenience Methods
+### Convenience methods
 
-One-liner methods for each chart type:
+One-liner shorthand for every chart type:
 
 ```typescript
 chartEngine.column({ container: '#chart' });
@@ -110,79 +144,77 @@ chartEngine.scatter({ container: '#chart' });
 chartEngine.heatmap({ container: '#chart' });
 chartEngine.histogram({ container: '#chart' });
 chartEngine.funnel({ container: '#chart' });
-chartEngine.combo({ container: '#chart' });
+chartEngine.combo({ container: '#chart' }); // bar + line combo
 ```
+
+All accept the same `Omit<ChartEngineConfig, 'type'>` options as `render()`.
 
 ---
 
-### Smart Recommendations
+## Recommendations
 
-The engine analyzes your pivot table structure and data to recommend the best chart types.
+The engine analyses your pivot structure and returns ranked chart type suggestions.
 
-#### `recommend()`
+### `recommend()`
 
-Returns all chart recommendations sorted by confidence score.
+Returns all recommendations sorted by confidence score.
 
 ```typescript
 const recommendations = chartEngine.recommend();
 
 recommendations.forEach(rec => {
-  console.log(`${rec.type}: ${rec.score * 100}% — ${rec.reason}`);
+  console.log(`${rec.type}: ${Math.round(rec.score * 100)}% — ${rec.reason}`);
 });
-// Example output:
-// "line: 96% — Time dimension detected - line chart shows trends over time"
-// "area: 90% — Area chart emphasizes volume changes over time"
-// "column: 85% — Column chart effectively compares 12 categories"
+// e.g. "line: 96% — Time dimension detected, line chart shows trends over time"
 ```
 
-#### `getBestRecommendation()`
+### `getBestRecommendation()`
 
 Returns the single highest-scored recommendation.
 
 ```typescript
 const best = chartEngine.getBestRecommendation();
-console.log(best.type); // e.g., 'line'
-console.log(best.reason); // e.g., 'Time dimension detected...'
+console.log(best.type); // e.g. 'line'
+console.log(best.reason); // e.g. 'Time dimension detected...'
 ```
 
-#### `renderRecommendation(recommendation, container, overrides?)`
+### `renderRecommendation(recommendation, container, overrides?)`
 
 Renders a chart directly from a recommendation object.
 
 ```typescript
-const recommendations = chartEngine.recommend();
-const chart = chartEngine.renderRecommendation(
-  recommendations[0],
-  '#my-chart',
-  { style: { animated: true } } // optional overrides
-);
+const recs = chartEngine.recommend();
+chartEngine.renderRecommendation(recs[0], '#my-chart');
+
+// With optional style overrides:
+chartEngine.renderRecommendation(recs[0], '#my-chart', {
+  style: { animated: true },
+});
 ```
 
-#### `ChartRecommendation` Object
+#### ChartRecommendation object
 
-Each recommendation includes:
-
-| Field     | Type        | Description                                          |
-| --------- | ----------- | ---------------------------------------------------- |
-| `type`    | `ChartType` | Recommended chart type                               |
-| `score`   | `number`    | Confidence score (0.0 – 1.0)                         |
-| `reason`  | `string`    | Human-readable explanation                           |
-| `preview` | `string`    | Text description of the expected chart               |
-| `config`  | `object`    | Pre-built config you can pass directly to `render()` |
+| Field     | Type        | Description                                   |
+| --------- | ----------- | --------------------------------------------- |
+| `type`    | `ChartType` | Recommended chart type                        |
+| `score`   | `number`    | Confidence (0.0 – 1.0)                        |
+| `reason`  | `string`    | Human-readable explanation                    |
+| `preview` | `string`    | Text summary of the expected chart            |
+| `config`  | `object`    | Pre-built config, pass directly to `render()` |
 
 ---
 
-### Chart Lifecycle
+## Chart lifecycle
 
-#### `updateChart(container)`
+### `updateChart(container)`
 
-Updates a specific chart (e.g., after pivot data changes).
+Re-fetches data from PivotEngine and updates one chart.
 
 ```typescript
 chartEngine.updateChart('#my-chart');
 ```
 
-#### `updateAllCharts()`
+### `updateAllCharts()`
 
 Updates every active chart.
 
@@ -190,43 +222,47 @@ Updates every active chart.
 chartEngine.updateAllCharts();
 ```
 
-#### `destroyChart(container)`
+### `destroyChart(container)`
 
-Destroys a specific chart and frees its resources.
+Destroys one chart and frees its resources.
 
 ```typescript
 chartEngine.destroyChart('#my-chart');
 ```
 
-#### `destroyAll()`
+### `destroyAll()`
 
 Destroys all active charts.
 
-#### `dispose()`
+```typescript
+chartEngine.destroyAll();
+```
 
-Cleans up the entire ChartEngine instance.
+### `dispose()`
+
+Destroys all charts **and** unsubscribes from the PivotEngine. Call this when you remove the chart from your UI.
+
+```typescript
+chartEngine.dispose();
+```
 
 ---
 
-### Export
+## Export
 
-Export charts in multiple formats.
+### Quick export methods
 
 ```typescript
-// Image exports
-await chartEngine.exportAsPng('#my-chart', 'sales-chart');
-await chartEngine.exportAsSvg('#my-chart', 'sales-chart');
-await chartEngine.exportAsPdf('#my-chart', 'sales-report');
-
-// Data exports
-await chartEngine.exportAsCsv('#my-chart', 'chart-data');
-await chartEngine.exportAsJson('#my-chart', 'chart-data');
-
-// Get blob without downloading
-const blob = await chartEngine.getChartBlob('#my-chart', 'png');
+await chartEngine.exportAsPng('#my-chart', 'filename');
+await chartEngine.exportAsSvg('#my-chart', 'filename');
+await chartEngine.exportAsPdf('#my-chart', 'filename'); // requires jspdf peer dep
+await chartEngine.exportAsCsv('#my-chart', 'filename');
+await chartEngine.exportAsJson('#my-chart', 'filename');
 ```
 
-#### Export Options
+### `exportChart(container, options)`
+
+Full control export.
 
 ```typescript
 await chartEngine.exportChart('#my-chart', {
@@ -236,131 +272,107 @@ await chartEngine.exportChart('#my-chart', {
   height: 800,
   quality: 0.95,
   backgroundColor: '#ffffff',
-  includeHeaders: true, // for CSV
-  prettyPrint: true, // for JSON
+  includeHeaders: true, // CSV only
+  prettyPrint: true, // JSON only
 });
 ```
 
----
+### `getChartBlob(container, format)`
 
-### Accessors
-
-| Method                  | Returns         | Description                         |
-| ----------------------- | --------------- | ----------------------------------- |
-| `getChartService()`     | `ChartService`  | Access the underlying data service  |
-| `getChartDetector()`    | `ChartDetector` | Access the recommendation engine    |
-| `getColorManager()`     | `ColorManager`  | Access the color palette manager    |
-| `getChart(container)`   | `ChartInstance` | Get a specific active chart         |
-| `getActiveContainers()` | `string[]`      | List all active chart container IDs |
-
----
-
-## Standalone Recommendations
-
-Use `ChartRecommender` to get chart recommendations without a `PivotEngine` — useful for any raw dataset.
+Returns a `Blob` without triggering a download.
 
 ```typescript
-import {
-  ChartRecommender,
-  recommendCharts,
-  getBestChartType,
-} from '@mindfiredigital/pivothead-analytics';
-
-const data = [
-  { region: 'North', sales: 45000 },
-  { region: 'South', sales: 38000 },
-  // ...
-];
-
-const fields = {
-  rows: ['region'],
-  columns: [],
-  measures: ['sales'],
-};
-
-// Get all recommendations
-const recommendations = recommendCharts(data, fields);
-
-// Get just the best chart type
-const bestType = getBestChartType(data, fields); // e.g., 'pie'
-
-// Full control via class
-const profile = ChartRecommender.profileData(data, fields);
-const recs = ChartRecommender.recommend(profile);
+const blob = await chartEngine.getChartBlob('#my-chart', 'png');
+// upload via FormData, send in email, etc.
 ```
 
 ---
 
-## Rendering Libraries
+## Accessors
 
-PivotHead Analytics supports multiple rendering libraries. Choose the one that best fits your project.
+| Method                  | Returns                      | Description                           |
+| ----------------------- | ---------------------------- | ------------------------------------- |
+| `getChartService()`     | `ChartService`               | Access the data service for filtering |
+| `getChartDetector()`    | `ChartDetector`              | Access the recommendation engine      |
+| `getColorManager()`     | `ColorManager`               | Access the colour palette manager     |
+| `getChart(container)`   | `ChartInstance \| undefined` | Get a specific active chart           |
+| `getActiveContainers()` | `string[]`                   | List all active chart container IDs   |
 
-| Library        | Value       | Strengths                                                      |
-| -------------- | ----------- | -------------------------------------------------------------- |
-| Default        | `'chartjs'` | Lightweight, great for standard charts, bundled by default     |
-| Apache ECharts | `'echarts'` | Rich interactivity, large chart variety, strong for dashboards |
-| Plotly         | `'plotly'`  | Scientific charts, 3D support, built-in export                 |
-| D3             | `'d3'`      | Maximum flexibility, fully customizable visualizations         |
+---
 
-### Switching Libraries
+## Data filtering (ChartService)
+
+Use `getChartService()` to filter what data the chart displays.
 
 ```typescript
-// At initialization
-const chartEngine = new ChartEngine(engine, { library: 'echarts' });
+const chartService = chartEngine.getChartService();
 
-// Or per-chart
-chartEngine.render({
-  container: '#chart',
-  type: 'line',
-  library: 'plotly',
+// Apply filters
+chartService.setFilters({
+  selectedMeasure: 'revenue',
+  selectedRows: ['North', 'South'],
+  selectedColumns: ['Laptops'],
+  limit: 10, // top N items
 });
-```
 
-> **Note:** When using ECharts, Plotly, or D3, make sure the respective library is installed in your project (`echarts`, `plotly.js-dist`, or `d3`).
+// Re-render all charts to reflect new filters
+chartEngine.updateAllCharts();
+
+// Get all available filter values (use to build dropdowns)
+const options = chartService.getAvailableFilterOptions();
+// options.measures → [{ uniqueName: 'revenue', caption: 'Revenue' }, ...]
+// options.rows     → ['North', 'South', 'East', 'West']
+// options.columns  → ['Laptops', 'Phones', 'Tablets']
+
+// Read current filters
+const current = chartService.getFilters();
+
+// Clear all filters
+chartService.resetFilters();
+```
 
 ---
 
-## Color Palettes
+## Colour palettes
 
-### Built-in Palettes
+### Built-in palettes
 
-PivotHead Analytics comes with 15+ color palettes:
+| Name                   | Description                               |
+| ---------------------- | ----------------------------------------- |
+| `tableau10`            | Professional, distinct (default)          |
+| `colorBlind`           | Accessible for colour vision deficiencies |
+| `categorical`          | Classic categorical colours               |
+| `pastel`               | Soft, muted tones                         |
+| `vibrant`              | Bold, high-saturation                     |
+| `sequentialBlues`      | Single-hue blue gradient                  |
+| `sequentialGreens`     | Single-hue green gradient                 |
+| `sequentialReds`       | Single-hue red gradient                   |
+| `sequentialOranges`    | Single-hue orange gradient                |
+| `sequentialPurples`    | Single-hue purple gradient                |
+| `divergingRedBlue`     | Diverging scale with centre point         |
+| `divergingRedGreen`    | Positive/negative diverging scale         |
+| `divergingPurpleGreen` | Alternative diverging scale               |
 
-| Palette             | Description                               |
-| ------------------- | ----------------------------------------- |
-| `tableau10`         | Professional, visually distinct (default) |
-| `colorBlind`        | Accessible for color vision deficiencies  |
-| `categorical`       | Classic categorical colors                |
-| `pastel`            | Soft, muted tones                         |
-| `vibrant`           | Bold, high-saturation colors              |
-| `sequentialBlues`   | Single-hue blue gradient                  |
-| `sequentialGreens`  | Single-hue green gradient                 |
-| `sequentialReds`    | Single-hue red gradient                   |
-| `divergingRedBlue`  | Diverging scale with center point         |
-| `divergingRedGreen` | Positive/negative diverging scale         |
-
-### Using Palettes
+### Using palettes
 
 ```typescript
-// Set globally via ChartEngine
+// Set globally
 const chartEngine = new ChartEngine(engine, {
   defaultStyle: { colorScheme: 'colorBlind' },
 });
 
-// Or per-chart
+// Or per chart
 chartEngine.render({
   container: '#chart',
   type: 'pie',
   style: { colorScheme: 'vibrant' },
 });
 
-// Custom colors
+// Custom hex colours
 chartEngine.render({
   container: '#chart',
   type: 'column',
-  style: {
-    colors: ['#6366f1', '#ec4899', '#22c55e', '#fb923c'],
-  },
+  style: { colors: ['#6366f1', '#ec4899', '#22c55e', '#fb923c'] },
 });
 ```
 
@@ -373,23 +385,22 @@ import {
 } from '@mindfiredigital/pivothead-analytics';
 
 const colors = new ColorManager('tableau10');
-colors.getColor(0); // first color
-colors.getColors(5); // array of 5 colors
-colors.getColorWithAlpha(0, 0.5); // color with transparency
-colors.getGradient(0, 4, 10); // 10-step gradient between two colors
-colors.setPalette('vibrant'); // switch palette
+colors.getColor(0); // first colour in the palette
+colors.getColors(5); // array of 5 colours
+colors.getColorWithAlpha(0, 0.5); // colour with transparency
+colors.getGradient(0, 4, 10); // 10-step gradient between two colours
+colors.setPalette('vibrant'); // switch to a different palette
 
-const palettes = getAvailablePalettes(); // list all palette names
+getAvailablePalettes(); // returns list of all palette names
 ```
 
 ---
 
-## Value Formatting
+## Value formatting
 
-Format chart values as currency, percentages, compact notation, and more.
+### Via chart config
 
 ```typescript
-// Via ChartEngine config
 chartEngine.render({
   container: '#chart',
   type: 'column',
@@ -402,8 +413,11 @@ chartEngine.render({
     suffix: '',
   },
 });
+```
 
-// Standalone formatter
+### Standalone format functions
+
+```typescript
 import {
   formatNumber,
   formatCurrency,
@@ -417,7 +431,7 @@ formatPercent(0.856); // "85.6%"
 formatCompact(1500000); // "1.5M"
 ```
 
-### ValueFormatter Class
+### ValueFormatter class
 
 ```typescript
 import { ValueFormatter } from '@mindfiredigital/pivothead-analytics';
@@ -430,37 +444,7 @@ formatter.formatDuration(125000); // "2m 5s"
 
 ---
 
-## Data Filtering
-
-Control what data appears in your charts.
-
-```typescript
-const chartService = chartEngine.getChartService();
-
-// Apply filters
-chartService.setFilters({
-  selectedMeasure: 'revenue',
-  selectedRows: ['North', 'South'],
-  selectedColumns: ['Laptops'],
-  limit: 10, // Top 10 items
-});
-
-// Get available filter options (for building filter UIs)
-const options = chartService.getAvailableFilterOptions();
-// { measures: [...], rows: [...], columns: [...] }
-
-// Check current filters
-const current = chartService.getFilters();
-
-// Reset to defaults
-chartService.resetFilters();
-```
-
----
-
-## Interactions
-
-### Click Events
+## Click interactions
 
 ```typescript
 chartEngine.render({
@@ -478,36 +462,92 @@ chartEngine.render({
 });
 ```
 
-### Drill-Down
+---
 
-Navigate through hierarchical data levels interactively.
+## Rendering libraries
+
+### Selecting a library
 
 ```typescript
+// At construction (applies to all charts)
+const chartEngine = new ChartEngine(engine, { library: 'echarts' });
+
+// Per-chart override
 chartEngine.render({
   container: '#chart',
-  type: 'column',
-  interactions: {
-    drillDown: {
-      enabled: true,
-      levels: ['region', 'country', 'city'],
-      onDrill: (level, path) => {
-        console.log(`Drilled into: ${level.value}`);
-      },
-      onDrillUp: path => {
-        console.log('Drilled up');
-      },
-    },
-  },
+  type: 'line',
+  library: 'plotly',
 });
+```
+
+### Library comparison
+
+| Library        | Value       | Best for                          |
+| -------------- | ----------- | --------------------------------- |
+| Chart.js       | `'chartjs'` | Standard charts, lightweight apps |
+| Apache ECharts | `'echarts'` | Rich interactivity, dashboards    |
+| Plotly         | `'plotly'`  | Scientific charts, 3D             |
+| D3             | `'d3'`      | Fully custom visualisations       |
+
+> Make sure the corresponding npm package is installed before using a library other than the default.
+
+---
+
+## Standalone recommendations (without PivotEngine)
+
+Use `ChartRecommender` to get chart suggestions from any raw dataset:
+
+```typescript
+import {
+  ChartRecommender,
+  recommendCharts,
+  getBestChartType,
+} from '@mindfiredigital/pivothead-analytics';
+
+const data = [
+  { region: 'North', sales: 45000 },
+  { region: 'South', sales: 38000 },
+];
+
+const fields = {
+  rows: ['region'],
+  columns: [],
+  measures: ['sales'],
+};
+
+// All recommendations
+const recs = recommendCharts(data, fields);
+
+// Just the best type
+const bestType = getBestChartType(data, fields); // e.g. 'pie'
+
+// Full class API
+const profile = ChartRecommender.profileData(data, fields);
+const allRecs = ChartRecommender.recommend(profile);
 ```
 
 ---
 
-## Performance
+## Progressive rendering (large datasets)
 
-Handle large datasets with built-in sampling and progressive rendering.
+For datasets with many rows, render in chunks with a progress callback:
 
-### Data Sampling
+```typescript
+import { renderProgressively } from '@mindfiredigital/pivothead-analytics';
+
+await renderProgressively(chartEngine, {
+  container: '#chart',
+  type: 'line',
+  chunkSize: 1000,
+  onProgress: percent => {
+    progressBar.style.width = `${percent}%`;
+  },
+});
+```
+
+### Data sampling
+
+Reduce data points while preserving visual accuracy:
 
 ```typescript
 const chartEngine = new ChartEngine(engine, {
@@ -519,33 +559,18 @@ const chartEngine = new ChartEngine(engine, {
 });
 ```
 
-| Sampling Method | Best For                                  |
-| --------------- | ----------------------------------------- |
-| `random`        | General purpose                           |
-| `stratified`    | Preserving distribution across categories |
-| `systematic`    | Evenly spaced selection                   |
-| `lttb`          | Time series (preserves visual shape)      |
-
-### Progressive Rendering
-
-```typescript
-import { renderProgressively } from '@mindfiredigital/pivothead-analytics';
-
-await renderProgressively(chartEngine, {
-  container: '#chart',
-  type: 'line',
-  chunkSize: 1000,
-  onProgress: percent => {
-    console.log(`Rendering: ${percent}%`);
-  },
-});
-```
+| Method       | Best for                             |
+| ------------ | ------------------------------------ |
+| `random`     | General purpose                      |
+| `stratified` | Preserving category distribution     |
+| `systematic` | Evenly spaced selection              |
+| `lttb`       | Time series (preserves visual shape) |
 
 ---
 
-## Fluent Chart API
+## Fluent builder API
 
-An alternative object-oriented API for building charts step by step.
+An alternative step-by-step API for building charts. Useful for conditional or dynamic config.
 
 ```typescript
 import {
@@ -554,26 +579,23 @@ import {
   pieChart,
 } from '@mindfiredigital/pivothead-analytics';
 
-// Build a bar chart fluently
 const chart = barChart(engine)
   .container('#chart')
-  .title('Sales by Region')
+  .title('Revenue by Region')
   .palette('vibrant')
   .legend(true, 'bottom')
   .grid(true)
   .animate(true)
   .build();
-
-// Other chart builders
-lineChart(engine).container('#line').title('Trends').build();
-pieChart(engine).container('#pie').title('Share').build();
 ```
 
-Available builders: `barChart`, `columnChart`, `horizontalBarChart`, `lineChart`, `areaChart`, `stackedAreaChart`, `stackedBarChart`, `pieChart`, `doughnutChart`, `scatterChart`, `heatmapChart`, `treemapChart`, `comboChart`, `barLineChart`, `areaLineChart`, `bubbleChart`.
+Available builders: `barChart`, `columnChart`, `horizontalBarChart`, `lineChart`, `areaChart`,
+`stackedAreaChart`, `stackedBarChart`, `pieChart`, `doughnutChart`, `scatterChart`,
+`heatmapChart`, `treemapChart`, `comboChart`, `barLineChart`, `areaLineChart`, `bubbleChart`.
 
 ---
 
-## Types
+## Types reference
 
 ### ChartType
 
@@ -651,14 +673,12 @@ interface ChartEngineConfig {
   style?: StyleConfig;
   format?: FormatConfig;
   interactions?: InteractionConfig;
-  export?: ExportConfig;
-  data?: DataConfig;
 }
 ```
 
 ### ChartInstance
 
-The object returned by all render methods.
+Object returned by all render methods.
 
 ```typescript
 interface ChartInstance {
@@ -671,6 +691,6 @@ interface ChartInstance {
 
 ---
 
-## See Also
+## See also
 
 - [Pivot Charts Tutorial](/docs/tutorials/pivot-charts) — Step-by-step guide with examples
