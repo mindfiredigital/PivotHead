@@ -1,5 +1,35 @@
 # @mindfiredigital/pivothead
 
+## 1.13.0
+
+### Minor Changes
+
+- Release from Dev (#268)
+
+## 1.12.0
+
+### Minor Changes
+
+- Release from Dev (#262)
+
+## 1.11.0
+
+### Minor Changes
+
+- Release (#253)
+
+## 1.10.0
+
+### Minor Changes
+
+- Release from Dev (#245)
+
+## 1.9.0
+
+### Minor Changes
+
+- Release (#242)
+
 ## 1.8.2
 
 ### Patch Changes

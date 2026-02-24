@@ -1,6 +1,6 @@
 {
   "name": "@mindfiredigital/pivothead-analytics",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "private": false,
   "type": "module",
   "description": "Data visualization and analytics module for PivotHead - provides chart rendering capabilities with Chart.js integration",

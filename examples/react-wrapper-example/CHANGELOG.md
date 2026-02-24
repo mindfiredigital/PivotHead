@@ -1,5 +1,45 @@
 # react-wrapper-example
 
+## 0.0.13
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.13.0
+  - @mindfiredigital/pivothead-web-component@1.0.7
+
+## 0.0.12
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.12.0
+  - @mindfiredigital/pivothead-web-component@1.0.6
+
+## 0.0.11
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.11.0
+  - @mindfiredigital/pivothead-web-component@1.0.5
+
+## 0.0.10
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.10.0
+  - @mindfiredigital/pivothead-web-component@1.0.4
+
+## 0.0.9
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.9.0
+  - @mindfiredigital/pivothead-web-component@1.0.3
+
 ## 0.0.8
 
 ### Patch Changes
