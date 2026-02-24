@@ -1,6 +1,7 @@
 {
   "name": "analytics-demo",
   "version": "1.0.0",
+  "private": true,
   "description": "Comprehensive demo for @mindfiredigital/pivothead-analytics RFC features",
   "type": "module",
   "scripts": {
