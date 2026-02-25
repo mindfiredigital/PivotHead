@@ -329,7 +329,7 @@
               {
                 "id": "reference/api-reference/analytics-api-reference",
                 "title": "Analytics API Reference",
-                "description": "Complete API reference for PivotHead Analytics - data visualization and charting for pivot tables",
+                "description": "Complete API reference for PivotHead Analytics — data visualization and charting for pivot tables",
                 "source": "@site/docs/reference/api-reference/analytics-api-reference.md",
                 "sourceDirName": "reference/api-reference",
                 "slug": "/reference/api-reference/analytics-api-reference",
@@ -343,13 +343,14 @@
                   "id": "analytics-api-reference",
                   "title": "Analytics API Reference",
                   "sidebar_label": "Analytics",
-                  "description": "Complete API reference for PivotHead Analytics - data visualization and charting for pivot tables",
+                  "description": "Complete API reference for PivotHead Analytics — data visualization and charting for pivot tables",
                   "keywords": [
                     "api",
                     "analytics",
                     "charts",
                     "visualization",
                     "pivothead",
+                    "chart.js",
                     "echarts",
                     "plotly",
                     "d3"
@@ -874,8 +875,8 @@
               },
               {
                 "id": "tutorials/pivot-charts",
-                "title": "Pivot Charts",
-                "description": "Transform your pivot table data into beautiful, interactive visualizations with PivotHead Analytics",
+                "title": "Pivot Charts Tutorial",
+                "description": "Step-by-step guide to adding charts to your pivot table with PivotHead Analytics",
                 "source": "@site/docs/tutorials/pivot-charts.mdx",
                 "sourceDirName": "tutorials",
                 "slug": "/tutorials/pivot-charts",
@@ -887,16 +888,14 @@
                 "version": "current",
                 "frontMatter": {
                   "id": "pivot-charts",
-                  "title": "Pivot Charts",
+                  "title": "Pivot Charts Tutorial",
                   "sidebar_label": "Pivot Charts",
-                  "description": "Transform your pivot table data into beautiful, interactive visualizations with PivotHead Analytics",
+                  "description": "Step-by-step guide to adding charts to your pivot table with PivotHead Analytics",
                   "keywords": [
                     "pivot charts",
                     "data visualization",
                     "analytics",
-                    "bar chart",
-                    "pie chart",
-                    "line chart",
+                    "chart.js",
                     "echarts",
                     "plotly",
                     "d3"

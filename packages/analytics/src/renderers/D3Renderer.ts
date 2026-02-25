@@ -93,7 +93,10 @@ interface D3Static {
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
 // Dynamically get D3
-function getD3(): D3Static {
+/* eslint-disable @typescript-eslint/no-explicit-any */
+function getD3(injected?: any): D3Static {
+  if (injected) return injected as D3Static;
+
   // Check for global d3
   const globalD3 = (globalThis as Record<string, unknown>).d3 as
     | D3Static
@@ -117,7 +120,10 @@ function getD3(): D3Static {
 class D3InstanceWrapper implements ChartInstance {
   private svg: D3Selection | null = null;
 
-  constructor(private container: HTMLElement) {}
+  constructor(
+    private container: HTMLElement,
+    private d3: D3Static
+  ) {}
 
   setSvg(svg: D3Selection): void {
     this.svg = svg;
@@ -128,15 +134,13 @@ class D3InstanceWrapper implements ChartInstance {
     // For now, trigger a full re-render by storing callback
     if (this.svg && data) {
       // Clear and let the main render handle it
-      const d3 = getD3();
-      d3.select(this.container).selectAll('*').remove();
+      this.d3.select(this.container).selectAll('*').remove();
     }
   }
 
   destroy(): void {
     if (this.container) {
-      const d3 = getD3();
-      d3.select(this.container).selectAll('*').remove();
+      this.d3.select(this.container).selectAll('*').remove();
     }
   }
 
@@ -161,9 +165,14 @@ class D3InstanceWrapper implements ChartInstance {
 export class D3Renderer extends BaseChartRenderer {
   private colorManager: ColorManager;
 
-  constructor() {
+  constructor(private injectedD3?: any) {
     super();
     this.colorManager = new ColorManager('tableau10');
+  }
+
+  /** Resolve d3 once and reuse — avoids repeated require/global lookups */
+  private lib(): D3Static {
+    return getD3(this.injectedD3);
   }
 
   /**
@@ -174,7 +183,7 @@ export class D3Renderer extends BaseChartRenderer {
     data: unknown,
     options: ChartRenderOptions
   ): ChartInstance {
-    const d3 = getD3();
+    const d3 = this.lib();
     const containerEl = this.getContainer(container);
 
     // Clear container
@@ -248,7 +257,7 @@ export class D3Renderer extends BaseChartRenderer {
         this.renderBar(svg, data, options, width, height);
     }
 
-    const instance = new D3InstanceWrapper(containerEl);
+    const instance = new D3InstanceWrapper(containerEl, this.lib());
     instance.setSvg(svg);
     return instance;
   }
@@ -281,7 +290,7 @@ export class D3Renderer extends BaseChartRenderer {
     width: number,
     height: number
   ): void {
-    const d3 = getD3();
+    const d3 = this.lib();
     const chartData = data as {
       labels?: string[];
       datasets?: Array<{ label?: string; data?: number[] }>;
@@ -470,7 +479,7 @@ export class D3Renderer extends BaseChartRenderer {
     width: number,
     height: number
   ): void {
-    const d3 = getD3();
+    const d3 = this.lib();
     const chartData = data as {
       labels?: string[];
       datasets?: Array<{ label?: string; data?: number[] }>;
@@ -620,7 +629,7 @@ export class D3Renderer extends BaseChartRenderer {
     width: number,
     height: number
   ): void {
-    const d3 = getD3();
+    const d3 = this.lib();
     const chartData = data as {
       labels?: string[];
       datasets?: Array<{ data?: number[] }>;
@@ -721,7 +730,7 @@ export class D3Renderer extends BaseChartRenderer {
     width: number,
     height: number
   ): void {
-    const d3 = getD3();
+    const d3 = this.lib();
     const chartData = data as {
       datasets?: Array<{
         label?: string;
@@ -841,7 +850,7 @@ export class D3Renderer extends BaseChartRenderer {
     width: number,
     height: number
   ): void {
-    const d3 = getD3();
+    const d3 = this.lib();
     const chartData = data as {
       labels?: string[];
       datasets?: Array<{ label?: string; data?: number[] }>;
@@ -1001,7 +1010,7 @@ export class D3Renderer extends BaseChartRenderer {
     width: number,
     height: number
   ): void {
-    const d3 = getD3();
+    const d3 = this.lib();
     const chartData = data as {
       tree?: Array<{ name: string; value: number; children?: unknown[] }>;
       labels?: string[];

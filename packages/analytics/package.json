@@ -3,7 +3,7 @@
   "version": "1.0.3",
   "private": false,
   "type": "module",
-  "description": "Data visualization and analytics module for PivotHead - provides chart rendering capabilities with Chart.js integration",
+  "description": "Data visualization and analytics module for PivotHead - supports Chart.js, ECharts, Plotly, and D3 (install your preferred library separately)",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -15,7 +15,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "postinstall.mjs"
   ],
   "author": "Mindfiredigital",
   "license": "MIT",
@@ -57,20 +58,21 @@
     "build": "rimraf dist && tsup src/index.ts --format esm,cjs --dts",
     "dev": "tsup src/index.ts --watch --format esm,cjs --dts",
     "clean": "rimraf dist",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "postinstall": "node ./postinstall.mjs"
   },
   "dependencies": {
-    "@mindfiredigital/pivothead": "workspace:*",
-    "chart.js": "^4.4.3"
+    "@mindfiredigital/pivothead": "workspace:*"
   },
   "peerDependencies": {
-    "jspdf": "^2.5.0",
+    "chart.js": "^4.4.3",
     "echarts": "^5.5.0",
     "plotly.js-dist": "^2.30.0",
-    "d3": "^7.9.0"
+    "d3": "^7.9.0",
+    "jspdf": "^2.5.0"
   },
   "peerDependenciesMeta": {
-    "jspdf": {
+    "chart.js": {
       "optional": true
     },
     "echarts": {
@@ -81,9 +83,13 @@
     },
     "d3": {
       "optional": true
+    },
+    "jspdf": {
+      "optional": true
     }
   },
   "devDependencies": {
+    "chart.js": "^4.4.3",
     "jspdf": "^2.5.0",
     "rimraf": "^5.0.0",
     "tsup": "^7.2.0",

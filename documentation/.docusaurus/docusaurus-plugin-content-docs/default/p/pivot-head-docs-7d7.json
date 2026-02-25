@@ -368,7 +368,7 @@
       "reference/api-reference/analytics-api-reference": {
         "id": "reference/api-reference/analytics-api-reference",
         "title": "Analytics API Reference",
-        "description": "Complete API reference for PivotHead Analytics - data visualization and charting for pivot tables",
+        "description": "Complete API reference for PivotHead Analytics — data visualization and charting for pivot tables",
         "sidebar": "tutorialSidebar"
       },
       "reference/api-reference/angular-api-reference": {
@@ -491,8 +491,8 @@
       },
       "tutorials/pivot-charts": {
         "id": "tutorials/pivot-charts",
-        "title": "Pivot Charts",
-        "description": "Transform your pivot table data into beautiful, interactive visualizations with PivotHead Analytics",
+        "title": "Pivot Charts Tutorial",
+        "description": "Step-by-step guide to adding charts to your pivot table with PivotHead Analytics",
         "sidebar": "tutorialSidebar"
       },
       "tutorials/react/react-sample-project": {

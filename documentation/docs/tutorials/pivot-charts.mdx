@@ -1,92 +1,144 @@
 ---
 id: pivot-charts
-title: Pivot Charts
+title: Pivot Charts Tutorial
 sidebar_label: Pivot Charts
-description: Transform your pivot table data into beautiful, interactive visualizations with PivotHead Analytics
-keywords: [pivot charts, data visualization, analytics, bar chart, pie chart, line chart, echarts, plotly, d3]
+description: Step-by-step guide to adding charts to your pivot table with PivotHead Analytics
+keywords: [pivot charts, data visualization, analytics, chart.js, echarts, plotly, d3]
 ---
 
-import InteractiveChartDemo from '@site/src/components/PivotCharts/InteractiveChartDemo';
-import FrameworkSwitcher from '@site/src/components/PivotCharts/FrameworkSwitcher';
+# Pivot Charts Tutorial
 
-# Pivot Charts
-
-Transform your pivot table data into stunning visualizations. PivotHead Analytics gives you 17 chart types, smart chart recommendations, multi-library rendering support, and powerful export options — all with minimal setup.
-
-## What You Get
-
-- **17 chart types** — from basic bar/line to heatmaps, treemaps, funnels, and sankey diagrams
-- **Smart recommendations** — the engine analyzes your data and suggests the best chart automatically
-- **4 rendering libraries** — use the default renderer, or switch to ECharts, Plotly, or D3 for specialized needs
-- **Export anywhere** — download charts as PNG, SVG, PDF, or export data as CSV/JSON
-- **15+ color palettes** — including accessibility-friendly options for color vision deficiencies
-- **Built-in filtering** — filter by measure, rows, columns, or show only top N items
-- **Interactive drill-down** — click through hierarchical data levels (e.g., Region > Country > City)
-- **Large dataset support** — intelligent data sampling and progressive rendering for 100k+ rows
-- **Value formatting** — currency, percentages, compact notation, locale-aware formatting
+This guide shows you how to turn your pivot table data into charts using `@mindfiredigital/pivothead-analytics`. By the end you will have a working chart in your project.
 
 ---
 
-## Interactive Chart Explorer
-
-Click on any chart type below to see a live preview and get the implementation code.
-
-<InteractiveChartDemo />
-
----
-
-## Choose Your Framework
-
-PivotHead works seamlessly with all major frameworks. Select yours to see framework-specific implementation:
-
-<FrameworkSwitcher />
-
----
-
-## Quick Start
-
-### 1. Install
+## Step 1 — Install the package
 
 ```bash
 npm install @mindfiredigital/pivothead-analytics
 ```
 
-This single install gives you everything — the core PivotEngine and the analytics/charting layer. No extra dependencies needed.
+### What happens after install
 
-### 2. Create a Chart in 5 Lines
+The package runs a **postinstall setup prompt** automatically in your terminal:
+
+```
+  ┌──────────────────────────────────────────────────────┐
+  │   @mindfiredigital/pivothead-analytics  Setup        │
+  └──────────────────────────────────────────────────────┘
+
+  Which charting library would you like to install?
+
+  [1] Chart.js           Lightweight, easy to use, browser-first charting
+  [2] Apache ECharts     Feature-rich, interactive charts for complex data
+  [3] Plotly.js          Scientific & statistical charts, great for data science
+  [4] D3.js              Maximum flexibility with custom SVG-based rendering
+
+  Enter number(s) separated by commas (e.g. 1 or 1,3),
+  or press Enter to skip and install manually later.
+
+  >
+```
+
+Type a number and press Enter. The script:
+- **Detects your package manager** (npm / pnpm / yarn / bun) automatically
+- **Installs the chosen library** for you — no separate install command needed
+- **Writes `.pivothead-analytics.json`** to your project root so `ChartEngine` knows which library to use at runtime
+- Handles **monorepo workspace roots** automatically (adds `-w` / `-W` flag when needed)
+
+You only need **one** library. Chart.js is the best starting point.
+
+| # | Library | Best for |
+|---|---------|----------|
+| 1 | **Chart.js** (recommended) | Standard charts, lightweight apps |
+| 2 | **Apache ECharts** | Feature-rich interactive dashboards |
+| 3 | **Plotly** | Scientific / statistical / 3D charts |
+| 4 | **D3** | Fully custom SVG-based charts |
+
+### CI / non-interactive environments
+
+In CI pipelines or any environment without an interactive terminal, the prompt is skipped automatically. Install your chosen library manually and set the `PIVOTHEAD_LIBRARY` environment variable so `ChartEngine` can detect it at runtime:
+
+```bash
+# Install the library
+npm install chart.js
+
+# Tell ChartEngine which one to use (add to your .env or CI environment)
+PIVOTHEAD_LIBRARY=chartjs
+```
+
+Valid values: `chartjs` · `echarts` · `plotly` · `d3`
+
+To suppress the prompt entirely in any environment:
+
+```bash
+PIVOTHEAD_SKIP_SETUP=true npm install @mindfiredigital/pivothead-analytics
+```
+
+### Monorepo projects
+
+If you are in a **pnpm / yarn / npm workspaces** monorepo, the postinstall detects it and passes the correct workspace flag (`-w` / `-W`) when installing the charting library. No extra configuration needed.
+
+If you install from a workspace package rather than the root, run the install from that package's directory or target it explicitly:
+
+```bash
+# pnpm
+pnpm add @mindfiredigital/pivothead-analytics chart.js --filter my-app
+
+# yarn
+yarn workspace my-app add @mindfiredigital/pivothead-analytics chart.js
+```
+
+### The `.pivothead-analytics.json` file
+
+After a successful interactive install, a config file is written to your project root:
+
+```json
+{
+  "library": "chartjs",
+  "installedLibraries": ["chartjs"],
+  "generatedAt": "2025-01-01T00:00:00.000Z"
+}
+```
+
+`ChartEngine` reads this file at startup to auto-detect which renderer to use. You can:
+- **Commit it** — keeps the choice in version control so teammates don't need to re-run setup
+- **Gitignore it** — teammates will be prompted on their first install instead
+
+If you skipped the prompt and installed manually, create this file yourself or rely on the `PIVOTHEAD_LIBRARY` env var instead.
+
+---
+
+## Step 2 — Prepare your data and PivotEngine
+
+`ChartEngine` reads data from a `PivotEngine`. Set yours up first:
 
 ```typescript
 import { PivotEngine } from '@mindfiredigital/pivothead';
-import { ChartEngine } from '@mindfiredigital/pivothead-analytics';
 
-// Your data
-const salesData = [
+const data = [
   { region: 'North', product: 'Laptops', revenue: 45000 },
-  { region: 'North', product: 'Phones', revenue: 32000 },
+  { region: 'North', product: 'Phones',  revenue: 32000 },
   { region: 'South', product: 'Laptops', revenue: 38000 },
-  { region: 'South', product: 'Phones', revenue: 41000 },
-  { region: 'East', product: 'Laptops', revenue: 52000 },
-  { region: 'East', product: 'Phones', revenue: 28000 },
+  { region: 'South', product: 'Phones',  revenue: 41000 },
+  { region: 'East',  product: 'Laptops', revenue: 52000 },
+  { region: 'East',  product: 'Phones',  revenue: 28000 },
 ];
 
-// Configure your pivot
 const config = {
-  rows: [{ uniqueName: 'region', caption: 'Region' }],
-  columns: [{ uniqueName: 'product', caption: 'Product' }],
-  measures: [
-    { uniqueName: 'revenue', caption: 'Total Revenue', aggregation: 'sum' },
-  ],
+  rows:     [{ uniqueName: 'region',  caption: 'Region' }],
+  columns:  [{ uniqueName: 'product', caption: 'Product' }],
+  measures: [{ uniqueName: 'revenue', caption: 'Revenue', aggregation: 'sum' }],
 };
 
-// Create engine and render
-const engine = new PivotEngine(salesData, config);
-const chartEngine = new ChartEngine(engine);
-
-// That's it — auto-detect the best chart and render
-chartEngine.auto({ container: '#myChart' });
+const engine = new PivotEngine(data, config);
 ```
 
-Add a container element to your HTML:
+---
+
+## Step 3 — Add a container element
+
+Add a `<div>` where the chart will be drawn. Give it a fixed size.
 
 ```html
 <div id="myChart" style="width: 600px; height: 400px;"></div>
@@ -94,361 +146,131 @@ Add a container element to your HTML:
 
 ---
 
-## Chart Types at a Glance
+## Step 4 — Create ChartEngine and render
 
-### Basic Charts
+Import your charting library **and pass it directly** to `ChartEngine`. This is required in any bundler-based project (Vite, webpack, etc.) because bundlers use ES modules — `require()` is not available at runtime.
 
-Simple comparisons and trend analysis.
+```typescript
+import { Chart, registerables } from 'chart.js';
+import { ChartEngine } from '@mindfiredigital/pivothead-analytics';
 
-| Chart | Type Value | Best For |
-|-------|-----------|----------|
-| Column | `'column'` | Comparing values across categories |
-| Bar | `'bar'` | Categories with long labels (horizontal) |
-| Line | `'line'` | Trends over time |
-| Area | `'area'` | Emphasizing volume and magnitude |
+// Required: register all Chart.js components
+Chart.register(...registerables);
 
-### Circular Charts
+// Pass the Chart object in — this is the key step
+const chartEngine = new ChartEngine(engine, { chartInstance: Chart });
 
-Show proportions and part-to-whole relationships.
+// Render a column chart
+chartEngine.column({
+  container: '#myChart',
+  style: { title: 'Revenue by Region' },
+});
+```
 
-| Chart | Type Value | Best For |
-|-------|-----------|----------|
-| Pie | `'pie'` | Part-to-whole (3–7 categories) |
-| Doughnut | `'doughnut'` | Same as pie, with space for center metric |
-
-### Stacked Charts
-
-Composition and totals together.
-
-| Chart | Type Value | Best For |
-|-------|-----------|----------|
-| Stacked Column | `'stackedColumn'` | Part-to-whole over categories |
-| Stacked Bar | `'stackedBar'` | Horizontal stacked composition |
-| Stacked Area | `'stackedArea'` | Cumulative trends over time |
-
-### Combo Charts
-
-Overlay multiple visualization types on one chart.
-
-| Chart | Type Value | Best For |
-|-------|-----------|----------|
-| Bar + Line | `'comboBarLine'` | Volume vs. rate (e.g., sales vs. growth %) |
-| Area + Line | `'comboAreaLine'` | Magnitude with trend overlay |
-
-### Statistical & Advanced Charts
-
-For deeper data analysis.
-
-| Chart | Type Value | Best For |
-|-------|-----------|----------|
-| Scatter | `'scatter'` | Correlation between two measures |
-| Histogram | `'histogram'` | Frequency distribution of values |
-| Heatmap | `'heatmap'` | 2D patterns across row/column matrix |
-| Funnel | `'funnel'` | Stage-based progression (e.g., sales pipeline) |
-| Treemap | `'treemap'` | Hierarchical data with proportional sizing |
-| Sankey | `'sankey'` | Flow between categories |
+That's it — your chart is on screen.
 
 ---
 
-## Rendering with Different Chart Types
+## Step 5 — Pick a specific chart type
 
-### Using Convenience Methods
-
-The simplest way — one method per chart type:
+Replace `column` with any of these convenience methods:
 
 ```typescript
-chartEngine.column({ container: '#chart', style: { title: 'Sales by Region' } });
-chartEngine.pie({ container: '#chart', style: { title: 'Market Share' } });
-chartEngine.line({ container: '#chart', style: { title: 'Monthly Trend' } });
-chartEngine.heatmap({ container: '#chart', style: { title: 'Performance Matrix' } });
-```
-
-### Using `render()` with Full Config
-
-For more control over styling, formatting, and interactions:
-
-```typescript
-const chart = chartEngine.render({
-  container: '#chart',
-  type: 'column',
-  style: {
-    title: 'Revenue by Region',
-    subtitle: 'Q1 2025',
-    showLegend: true,
-    legendPosition: 'bottom',
-    showGrid: true,
-    animated: true,
-    colorScheme: 'vibrant',
-  },
-  format: {
-    valueFormat: 'currency',
-    currency: 'USD',
-    locale: 'en-US',
-  },
-  interactions: {
-    hover: true,
-    click: (data) => {
-      alert(`${data.rowValue}: ${data.value}`);
-    },
-  },
-});
-```
-
-### Switching Chart Types Dynamically
-
-Let users pick their preferred chart type:
-
-```typescript
-function switchChart(newType) {
-  chartEngine.destroyChart('#chart');
-  chartEngine.render({
-    container: '#chart',
-    type: newType,
-    style: { title: `${newType} Chart`, animated: true },
-  });
-}
-
-// Wire up to a dropdown
-document.getElementById('chartType').addEventListener('change', (e) => {
-  switchChart(e.target.value);
-});
+chartEngine.column({ container: '#chart' });       // vertical bars
+chartEngine.bar({ container: '#chart' });          // horizontal bars
+chartEngine.line({ container: '#chart' });         // line chart
+chartEngine.area({ container: '#chart' });         // area chart
+chartEngine.pie({ container: '#chart' });          // pie chart
+chartEngine.doughnut({ container: '#chart' });     // doughnut chart
+chartEngine.scatter({ container: '#chart' });      // scatter plot
+chartEngine.heatmap({ container: '#chart' });      // heatmap grid
+chartEngine.stackedColumn({ container: '#chart' }); // stacked columns
+chartEngine.stackedBar({ container: '#chart' });   // stacked bars
+chartEngine.histogram({ container: '#chart' });    // frequency histogram
+chartEngine.funnel({ container: '#chart' });       // funnel stages
+chartEngine.combo({ container: '#chart' });        // bar + line combo
 ```
 
 ---
 
-## Smart Chart Recommendations
+## Let the engine pick the best chart automatically
 
-PivotHead analyzes your data structure — dimensions, measures, cardinality, time fields, hierarchies — and recommends the best chart types with confidence scores.
-
-### Let the Engine Decide
+Not sure which chart fits your data? Use `auto()`:
 
 ```typescript
-// Auto-detect and render the best chart
 chartEngine.auto({
-  container: '#chart',
-  style: { title: 'Auto-detected Chart' },
+  container: '#myChart',
+  style: { title: 'Auto-selected Chart' },
 });
 ```
 
-### Get Recommendations and Let Users Choose
+The engine checks your data structure (dimensions, measures, cardinality) and picks the most suitable chart type.
+
+To see the recommendations before rendering:
 
 ```typescript
 const recommendations = chartEngine.recommend();
 
-// Show recommendations in your UI
+// Each recommendation has: type, score (0–1), reason
 recommendations.forEach(rec => {
-  console.log(`${rec.type} (${Math.round(rec.score * 100)}%): ${rec.reason}`);
+  console.log(`${rec.type}: ${Math.round(rec.score * 100)}% — ${rec.reason}`);
 });
 
-// Render a specific recommendation
-chartEngine.renderRecommendation(recommendations[0], '#chart');
-```
-
-### What Gets Detected
-
-The recommendation engine checks for:
-- **Time dimensions** — field names like "date", "month", "year" AND actual date values in your data
-- **Category count** — fewer categories suggest pie/doughnut, many suggest bar charts
-- **Matrix size** — large row x column grids favor heatmaps
-- **Funnel patterns** — stage-like fields with decreasing values
-- **Hierarchies** — multiple row dimensions suggest treemaps
-- **Continuous numeric data** — many unique values suggest histograms
-- **Multiple measures** — suggest combo or scatter charts
-
----
-
-## Choosing a Rendering Library
-
-PivotHead Analytics supports four rendering libraries. The default works great for most cases, but you can switch for specialized needs.
-
-| Library | Install | Best For |
-|---------|---------|----------|
-| Default | Bundled — nothing to install | Standard charts, lightweight apps |
-| [Apache ECharts](https://echarts.apache.org/) | `npm install echarts` | Rich interactivity, dashboards, large datasets |
-| [Plotly](https://plotly.com/javascript/) | `npm install plotly.js-dist` | Scientific visualization, 3D charts |
-| [D3](https://d3js.org/) | `npm install d3` | Maximum customization, custom visualizations |
-
-### Using a Different Library
-
-```typescript
-// Set globally
-const chartEngine = new ChartEngine(engine, { library: 'echarts' });
-
-// Or per-chart
-chartEngine.render({
-  container: '#chart',
-  type: 'line',
-  library: 'plotly',
-});
+// Render the top recommendation
+chartEngine.renderRecommendation(recommendations[0], '#myChart');
 ```
 
 ---
 
-## Filtering Chart Data
+## Styling your chart
 
-Control exactly what data your chart displays.
-
-```typescript
-const chartService = chartEngine.getChartService();
-
-// Show only specific regions, top 5
-chartService.setFilters({
-  selectedMeasure: 'revenue',
-  selectedRows: ['North', 'South', 'East'],
-  limit: 5,
-});
-
-// Re-render to reflect filters
-chartEngine.updateAllCharts();
-
-// Build a filter UI dynamically
-const options = chartService.getAvailableFilterOptions();
-// options.measures → [{ uniqueName: 'revenue', caption: 'Total Revenue' }, ...]
-// options.rows → ['North', 'South', 'East', 'West']
-// options.columns → ['Laptops', 'Phones', 'Tablets']
-
-// Reset everything
-chartService.resetFilters();
-```
-
----
-
-## Styling and Color Palettes
-
-### Built-in Palettes
+Pass a `style` object to any render call:
 
 ```typescript
-// Use a built-in palette
-chartEngine.render({
-  container: '#chart',
-  type: 'pie',
-  style: { colorScheme: 'colorBlind' },  // Accessibility-friendly
-});
-```
-
-Available palettes: `tableau10` (default), `colorBlind`, `categorical`, `pastel`, `vibrant`, `sequentialBlues`, `sequentialGreens`, `sequentialReds`, `sequentialOranges`, `sequentialPurples`, `divergingRedBlue`, `divergingRedGreen`, `divergingPurpleGreen`.
-
-### Custom Colors
-
-```typescript
-chartEngine.render({
-  container: '#chart',
-  type: 'column',
+chartEngine.column({
+  container: '#myChart',
   style: {
-    colors: ['#6366f1', '#ec4899', '#22c55e', '#fb923c', '#8b5cf6'],
+    title: 'Revenue by Region',
+    subtitle: 'Q1 2025',
+    showLegend: true,
+    legendPosition: 'bottom',  // 'top' | 'bottom' | 'left' | 'right'
+    showGrid: true,
+    animated: true,
+    colorScheme: 'vibrant',    // see colour palette list below
+  },
+});
+```
+
+### Available colour palettes
+
+`tableau10` (default) · `colorBlind` · `categorical` · `pastel` · `vibrant` ·
+`sequentialBlues` · `sequentialGreens` · `sequentialReds` · `sequentialOranges` · `sequentialPurples` ·
+`divergingRedBlue` · `divergingRedGreen` · `divergingPurpleGreen`
+
+Use `colorBlind` when accessibility matters.
+
+### Custom colours
+
+```typescript
+chartEngine.column({
+  container: '#myChart',
+  style: {
+    colors: ['#6366f1', '#ec4899', '#22c55e', '#fb923c'],
   },
 });
 ```
 
 ---
 
-## Exporting Charts
+## Format values
 
-### Quick Exports
-
-```typescript
-await chartEngine.exportAsPng('#chart', 'sales-report');
-await chartEngine.exportAsSvg('#chart', 'sales-vector');
-await chartEngine.exportAsPdf('#chart', 'sales-document');
-await chartEngine.exportAsCsv('#chart', 'sales-data');
-await chartEngine.exportAsJson('#chart', 'sales-raw');
-```
-
-### Custom Export Settings
+Display numbers as currency, percentages, or compact notation:
 
 ```typescript
-await chartEngine.exportChart('#chart', {
-  format: 'png',
-  filename: 'quarterly-report',
-  width: 1920,
-  height: 1080,
-  quality: 0.95,
-  backgroundColor: '#ffffff',
-});
-```
-
-### Get a Blob (for Uploads, Emails, etc.)
-
-```typescript
-const blob = await chartEngine.getChartBlob('#chart', 'png');
-// Use with FormData, send via API, etc.
-```
-
----
-
-## Interactive Drill-Down
-
-Navigate through data hierarchies by clicking on chart elements.
-
-```typescript
-chartEngine.render({
-  container: '#chart',
-  type: 'column',
-  interactions: {
-    drillDown: {
-      enabled: true,
-      levels: ['region', 'country', 'city'],
-      onDrill: (level, path) => {
-        console.log(`Now viewing: ${path.map(p => p.value).join(' > ')}`);
-      },
-      onDrillUp: (path) => {
-        console.log('Navigated back up');
-      },
-    },
-  },
-});
-```
-
----
-
-## Handling Large Datasets
-
-PivotHead Analytics can handle datasets with hundreds of thousands of rows using built-in performance features.
-
-### Data Sampling
-
-Automatically reduce data points while preserving visual accuracy:
-
-```typescript
-const chartEngine = new ChartEngine(engine, {
-  performance: {
-    maxDataPoints: 5000,
-    samplingMethod: 'lttb',  // Best for time series
-    enableSampling: true,
-  },
-});
-```
-
-### Progressive Rendering
-
-Render charts incrementally with a progress indicator:
-
-```typescript
-import { renderProgressively } from '@mindfiredigital/pivothead-analytics';
-
-await renderProgressively(chartEngine, {
-  container: '#chart',
-  type: 'line',
-  chunkSize: 1000,
-  onProgress: (percent) => {
-    progressBar.style.width = `${percent}%`;
-  },
-});
-```
-
----
-
-## Value Formatting
-
-Display chart values in the format your users expect.
-
-```typescript
-// Via chart config
-chartEngine.render({
-  container: '#chart',
-  type: 'column',
+chartEngine.column({
+  container: '#myChart',
   format: {
-    valueFormat: 'currency',
+    valueFormat: 'currency',  // 'number' | 'currency' | 'percent' | 'compact'
     currency: 'USD',
     locale: 'en-US',
     decimals: 0,
@@ -456,77 +278,147 @@ chartEngine.render({
 });
 ```
 
-### Standalone Formatters
+---
+
+## Filter what the chart shows
 
 ```typescript
-import { formatCurrency, formatPercent, formatCompact } from '@mindfiredigital/pivothead-analytics';
+const chartService = chartEngine.getChartService();
 
-formatCurrency(45000, 'USD');    // "$45,000.00"
-formatPercent(0.156);            // "15.6%"
-formatCompact(2500000);          // "2.5M"
+// Show only specific rows, limit to top 5
+chartService.setFilters({
+  selectedMeasure: 'revenue',
+  selectedRows: ['North', 'South'],
+  limit: 5,
+});
+
+// Refresh the chart to reflect the new filters
+chartEngine.updateAllCharts();
+
+// Get available options (useful for building filter dropdowns)
+const options = chartService.getAvailableFilterOptions();
+// options.measures → [{ uniqueName: 'revenue', caption: 'Revenue' }]
+// options.rows     → ['North', 'South', 'East']
+// options.columns  → ['Laptops', 'Phones']
+
+// Remove all filters
+chartService.resetFilters();
 ```
 
 ---
 
-## Fluent Builder API
+## Switching chart types on the fly
 
-An alternative way to build charts step by step, useful for dynamic or conditional configuration:
+Destroy the old chart, then render a new one in the same container:
 
 ```typescript
-import { barChart, pieChart, lineChart } from '@mindfiredigital/pivothead-analytics';
+function switchChart(newType) {
+  chartEngine.destroyChart('#myChart');
+  chartEngine.render({
+    container: '#myChart',
+    type: newType,
+    style: { title: 'Sales Overview', animated: true },
+  });
+}
 
-const chart = barChart(engine)
-  .container('#chart')
-  .title('Revenue by Region')
-  .palette('vibrant')
-  .legend(true, 'bottom')
-  .grid(true)
-  .animate(true)
-  .build();
+document.getElementById('chartType').addEventListener('change', e => {
+  switchChart(e.target.value);
+});
 ```
 
 ---
 
-## Complete Example
-
-Putting it all together — a dashboard with recommendations, filtering, and export:
+## Exporting charts
 
 ```typescript
+// Download as image or document
+await chartEngine.exportAsPng('#myChart', 'sales-report');
+await chartEngine.exportAsSvg('#myChart', 'sales-vector');
+await chartEngine.exportAsPdf('#myChart', 'sales-document');
+
+// Download the underlying data
+await chartEngine.exportAsCsv('#myChart', 'chart-data');
+await chartEngine.exportAsJson('#myChart', 'chart-data');
+
+// Get a Blob to upload or email
+const blob = await chartEngine.getChartBlob('#myChart', 'png');
+```
+
+---
+
+## Using a different rendering library
+
+Import your chosen library and pass it as the matching instance option:
+
+```typescript
+// ECharts
+import * as echarts from 'echarts';
+const chartEngine = new ChartEngine(engine, { echartsInstance: echarts });
+
+// Plotly
+import Plotly from 'plotly.js-dist';
+const chartEngine = new ChartEngine(engine, { plotlyInstance: Plotly });
+
+// D3
+import * as d3 from 'd3';
+const chartEngine = new ChartEngine(engine, { d3Instance: d3 });
+```
+
+---
+
+## Cleanup
+
+Always dispose the engine when you are done (e.g., on page navigation):
+
+```typescript
+chartEngine.dispose();
+```
+
+This destroys all active charts and unsubscribes from PivotEngine updates.
+
+---
+
+## Complete working example
+
+```typescript
+import { Chart, registerables } from 'chart.js';
 import { PivotEngine } from '@mindfiredigital/pivothead';
 import { ChartEngine } from '@mindfiredigital/pivothead-analytics';
 
-// Setup
-const engine = new PivotEngine(salesData, pivotConfig);
+// 1. Register Chart.js components
+Chart.register(...registerables);
+
+// 2. Data + pivot config
+const data = [
+  { region: 'North', product: 'Laptops', revenue: 45000 },
+  { region: 'South', product: 'Laptops', revenue: 38000 },
+  { region: 'East',  product: 'Phones',  revenue: 28000 },
+];
+
+const engine = new PivotEngine(data, {
+  rows:     [{ uniqueName: 'region',  caption: 'Region' }],
+  columns:  [{ uniqueName: 'product', caption: 'Product' }],
+  measures: [{ uniqueName: 'revenue', caption: 'Revenue', aggregation: 'sum' }],
+});
+
+// 3. Chart engine — pass chartInstance so it works in any bundler (Vite, webpack, etc.)
 const chartEngine = new ChartEngine(engine, {
-  defaultStyle: {
-    colorScheme: 'tableau10',
-    animated: true,
-    showLegend: true,
-  },
-  defaultFormat: {
-    valueFormat: 'currency',
-    currency: 'USD',
-  },
+  chartInstance: Chart,
+  defaultStyle:  { colorScheme: 'tableau10', animated: true, showLegend: true },
+  defaultFormat: { valueFormat: 'currency', currency: 'USD' },
 });
 
-// 1. Get recommendations
-const recommendations = chartEngine.recommend();
-console.log('Best chart:', recommendations[0].type, recommendations[0].reason);
+// 3. Get recommendations and render the best one
+const best = chartEngine.getBestRecommendation();
+console.log('Rendering:', best.type, '—', best.reason);
+chartEngine.renderRecommendation(best, '#mainChart');
 
-// 2. Render the best chart
-chartEngine.renderRecommendation(recommendations[0], '#main-chart');
-
-// 3. Apply filters
-const chartService = chartEngine.getChartService();
-chartService.setFilters({ limit: 10 });
-chartEngine.updateAllCharts();
-
-// 4. Export
+// 4. Export on button click
 document.getElementById('exportBtn').addEventListener('click', async () => {
-  await chartEngine.exportAsPng('#main-chart', 'dashboard-export');
+  await chartEngine.exportAsPng('#mainChart', 'dashboard');
 });
 
-// 5. Cleanup when done
+// 5. Cleanup
 window.addEventListener('beforeunload', () => {
   chartEngine.dispose();
 });
@@ -534,84 +426,7 @@ window.addEventListener('beforeunload', () => {
 
 ---
 
-## Next Steps
+## Next steps
 
-- [Analytics API Reference](/docs/reference/api-reference/analytics-api-reference) — Full API details and type definitions
+- [Analytics API Reference](/docs/reference/api-reference/analytics-api-reference) — Full method signatures and types
 - [Core Concepts](/docs/tutorial-basics/core/core-concepts) — Understanding PivotEngine configuration
-
-export const FeatureStyles = () => (
-  <style>{`
-    .feature-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1.5rem;
-      margin: 2rem 0;
-    }
-    .feature-card {
-      background: var(--ifm-color-emphasis-100);
-      border-radius: 12px;
-      padding: 1.5rem;
-      text-align: center;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .feature-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-    }
-    .feature-icon {
-      font-size: 2rem;
-      margin-bottom: 0.75rem;
-    }
-    .feature-card h4 {
-      margin: 0 0 0.5rem 0;
-      color: var(--ifm-heading-color);
-    }
-    .feature-card p {
-      margin: 0;
-      font-size: 0.875rem;
-      color: var(--ifm-font-color-secondary);
-    }
-    .chart-gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1.5rem;
-      margin: 2rem 0;
-    }
-    .gallery-item {
-      background: var(--ifm-color-emphasis-100);
-      border-radius: 12px;
-      overflow: hidden;
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-    .gallery-item:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 12px 32px rgba(0,0,0,0.15);
-    }
-    .gallery-item img {
-      width: 100%;
-      height: 180px;
-      object-fit: contain;
-      background: white;
-      padding: 1rem;
-    }
-    .gallery-caption {
-      padding: 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-    .gallery-caption strong {
-      color: var(--ifm-heading-color);
-      font-size: 1rem;
-    }
-    .gallery-caption span {
-      color: var(--ifm-font-color-secondary);
-      font-size: 0.85rem;
-    }
-    [data-theme="dark"] .gallery-item img {
-      background: #1a1a1a;
-    }
-  `}</style>
-);
-
-<FeatureStyles />
