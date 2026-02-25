@@ -103,7 +103,9 @@ interface PlotlyStatic {
 }
 
 // Dynamically get Plotly
-function getPlotly(): PlotlyStatic {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getPlotly(injected?: any): PlotlyStatic {
+  if (injected) return injected as PlotlyStatic;
   // Check for global Plotly
   const globalPlotly = (globalThis as Record<string, unknown>).Plotly as
     | PlotlyStatic
@@ -135,7 +137,10 @@ class PlotlyInstanceWrapper implements ChartInstance {
   private traces: PlotlyTrace[] = [];
   private layout: PlotlyLayout = {};
 
-  constructor(private container: HTMLElement) {}
+  constructor(
+    private container: HTMLElement,
+    private plotly: PlotlyStatic
+  ) {}
 
   setData(traces: PlotlyTrace[], layout: PlotlyLayout): void {
     this.traces = traces;
@@ -143,7 +148,7 @@ class PlotlyInstanceWrapper implements ChartInstance {
   }
 
   update(data?: unknown): void {
-    const Plotly = getPlotly();
+    const Plotly = this.plotly;
 
     if (data && typeof data === 'object') {
       const chartData = data as {
@@ -172,13 +177,11 @@ class PlotlyInstanceWrapper implements ChartInstance {
   }
 
   destroy(): void {
-    const Plotly = getPlotly();
-    Plotly.purge(this.container);
+    this.plotly.purge(this.container);
   }
 
   resize(): void {
-    const Plotly = getPlotly();
-    Plotly.Plots.resize(this.container);
+    this.plotly.Plots.resize(this.container);
   }
 
   getCanvas(): HTMLCanvasElement | null {
@@ -197,7 +200,8 @@ class PlotlyInstanceWrapper implements ChartInstance {
 export class PlotlyRenderer extends BaseChartRenderer {
   private colorManager: ColorManager;
 
-  constructor() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  constructor(private injectedPlotly?: any) {
     super();
     this.colorManager = new ColorManager('tableau10');
   }
@@ -210,7 +214,7 @@ export class PlotlyRenderer extends BaseChartRenderer {
     data: unknown,
     options: ChartRenderOptions
   ): ChartInstance {
-    const Plotly = getPlotly();
+    const Plotly = getPlotly(this.injectedPlotly);
     const containerEl = this.getContainer(container);
 
     // Clear container
@@ -281,7 +285,7 @@ export class PlotlyRenderer extends BaseChartRenderer {
       });
     }
 
-    const instance = new PlotlyInstanceWrapper(containerEl);
+    const instance = new PlotlyInstanceWrapper(containerEl, Plotly);
     instance.setData(traces, layout);
     return instance;
   }

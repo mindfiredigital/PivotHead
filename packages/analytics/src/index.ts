@@ -4,32 +4,27 @@
  * Data visualization and analytics module for PivotHead
  * Provides chart rendering capabilities with multiple library support
  *
- * This package includes Chart.js - no need to install it separately!
+ * No charting library is bundled. Install the one you want to use:
  *
- * @example Basic Usage (Legacy - still supported)
+ *   npm install chart.js          # Chart.js  (default)
+ *   npm install echarts            # Apache ECharts
+ *   npm install plotly.js-dist     # Plotly.js
+ *   npm install d3                 # D3.js
+ *
+ * ChartEngine auto-detects the installed library. You can also set the
+ * PIVOTHEAD_LIBRARY env var (chartjs | echarts | plotly | d3).
+ *
+ * @example Basic Usage (Legacy ChartService — Chart.js must be installed)
  * ```typescript
- * import {
- *   ChartService,
- *   Chart,
- *   registerables
- * } from '@mindfiredigital/pivothead-analytics';
+ * import { ChartService } from '@mindfiredigital/pivothead-analytics';
+ * import { Chart, registerables } from 'chart.js';         // install chart.js separately
  * import { PivotEngine } from '@mindfiredigital/pivothead';
  *
- * // Register Chart.js components
  * Chart.register(...registerables);
- *
- * // Initialize with PivotEngine
  * const chartService = new ChartService(engine);
+ * const chartData    = chartService.getChartData();
  *
- * // Get chart data
- * const chartData = chartService.getChartData();
- *
- * // Render chart
- * new Chart(ctx, {
- *   type: 'bar',
- *   data: chartData,
- *   options: { responsive: true }
- * });
+ * new Chart(ctx, { type: 'bar', data: chartData, options: { responsive: true } });
  * ```
  *
  * @example New ChartEngine API (Recommended)
@@ -232,6 +227,6 @@ export type {
   PerformanceConfig,
 } from './types/index';
 
-// ==================== Chart.js Re-exports (Backward Compatible) ====================
-export { Chart, registerables } from 'chart.js';
-export type { ChartConfiguration, ChartOptions } from 'chart.js';
+// NOTE: Chart.js re-exports removed — chart.js is now an optional peer dependency.
+// Import directly from 'chart.js' if you need Chart or registerables:
+//   import { Chart, registerables } from 'chart.js';

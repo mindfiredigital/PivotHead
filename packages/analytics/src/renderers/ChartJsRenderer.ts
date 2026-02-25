@@ -3,11 +3,11 @@
  * Implements ChartRenderer interface for Chart.js library
  */
 
-import {
-  Chart,
-  registerables,
-  type ChartConfiguration,
-  type ChartType as ChartJsType,
+// Type-only imports — erased at build time, so chart.js is NOT a runtime dependency
+import type {
+  Chart as ChartJs,
+  ChartConfiguration,
+  ChartType as ChartJsType,
 } from 'chart.js';
 import { BaseChartRenderer } from './BaseChartRenderer';
 import type {
@@ -19,18 +19,56 @@ import type { HeatmapChartData, HistogramChartData, ChartData } from '../types';
 import { ColorManager } from '../utils/ColorPalettes';
 import type { ColorPaletteName } from '../utils/ColorPalettes';
 
-// Register all Chart.js components
-Chart.register(...registerables);
+// ─── Lazy Chart.js loader ────────────────────────────────────────────────────
+// Chart.js is an optional peer dependency. We load it on first use so the
+// package can be imported without chart.js installed (other renderers work fine).
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ChartJsLib = { Chart: any; registerables: any[] };
+
+let _chartJsCache: ChartJsLib | null = null;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getChartJs(injected?: any): ChartJsLib {
+  // Injected instance (from ChartEngine options) — highest priority
+  if (injected) return { Chart: injected, registerables: [] };
+
+  if (_chartJsCache) return _chartJsCache;
+
+  // UMD / CDN global
+  const globalChart = (globalThis as Record<string, unknown>)['Chart'];
+  if (globalChart) {
+    _chartJsCache = { Chart: globalChart, registerables: [] };
+    return _chartJsCache;
+  }
+
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const lib = require('chart.js') as ChartJsLib;
+    lib.Chart.register(...lib.registerables);
+    _chartJsCache = lib;
+    return _chartJsCache;
+  } catch {
+    throw new Error(
+      'Chart.js not found.\n' +
+        'Install it with one of:\n' +
+        '  npm install chart.js\n' +
+        '  pnpm add chart.js\n' +
+        '  yarn add chart.js\n' +
+        'Or choose a different renderer: echarts, plotly.js-dist, d3'
+    );
+  }
+}
 
 /**
  * Chart.js specific instance wrapper
  */
 class ChartJsInstance implements ChartInstance {
-  constructor(private chart: Chart) {}
+  constructor(private chart: ChartJs) {}
 
   update(data?: unknown): void {
     if (data && typeof data === 'object' && data !== null) {
-      this.chart.data = data as Chart['data'];
+      this.chart.data = data as ChartJs['data'];
     }
     this.chart.update();
   }
@@ -47,7 +85,7 @@ class ChartJsInstance implements ChartInstance {
     return this.chart.canvas;
   }
 
-  getChartJsInstance(): Chart {
+  getChartJsInstance(): ChartJs {
     return this.chart;
   }
 }
@@ -826,7 +864,8 @@ class CanvasHistogramInstance implements ChartInstance {
 export class ChartJsRenderer extends BaseChartRenderer {
   private colorManager: ColorManager;
 
-  constructor() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  constructor(private injectedChart?: any) {
     super();
     this.colorManager = new ColorManager('tableau10');
   }
@@ -943,7 +982,10 @@ export class ChartJsRenderer extends BaseChartRenderer {
       };
     }
 
-    const chart = new Chart(ctx, chartConfig);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const { Chart } = getChartJs(this.injectedChart);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    const chart = new Chart(ctx, chartConfig) as ChartJs;
     return new ChartJsInstance(chart);
   }
 

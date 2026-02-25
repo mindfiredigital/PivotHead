@@ -24,12 +24,11 @@ import {
   ColorManager,
   ColorPalettes,
   getAvailablePalettes,
-  // Chart.js (for direct use if needed)
-  Chart,
-  registerables,
 } from '@mindfiredigital/pivothead-analytics';
+// chart.js is now an optional peer dep — import directly from the library
+import { Chart, registerables } from 'chart.js';
 
-// Register Chart.js components (Chart.js is bundled with the analytics package)
+// Register Chart.js components
 Chart.register(...registerables);
 import { sampleData, config } from './config/config.js';
 import { VirtualScroller } from './services/VirtualScroller.js';
@@ -1762,7 +1761,7 @@ export function formatTable(newConfig) {
       chartEngine.dispose();
     }
     chartEngine = new ChartEngine(pivotEngine, {
-      library: 'chartjs',
+      chartInstance: Chart,
       defaultStyle: {
         colorScheme: currentPalette,
       },
@@ -2379,7 +2378,7 @@ export async function handleFileConnection(fileType) {
         chartEngine.dispose();
       }
       chartEngine = new ChartEngine(pivotEngine, {
-        library: 'chartjs',
+        chartInstance: Chart,
         defaultStyle: {
           colorScheme: currentPalette,
         },
@@ -3323,7 +3322,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Create ChartEngine instance for chart visualization (uses ChartService internally)
     chartEngine = new ChartEngine(pivotEngine, {
-      library: 'chartjs',
+      chartInstance: Chart,
       defaultStyle: {
         colorScheme: currentPalette,
       },

@@ -1066,15 +1066,14 @@ document.addEventListener('DOMContentLoaded', () => {
   initDrillDown();
   transformOriginalData = initTransformer();
   updateColorPalette();
-
-  console.log('Demo initialized successfully!');
-  console.log('Available features:');
-  console.log('- Multiple chart libraries (Chart.js, ECharts, Plotly, D3)');
-  console.log('- Fluent API chart classes');
-  console.log('- All chart types');
-  console.log('- Smart recommendations');
-  console.log('- Data sampling');
-  console.log('- Drill-down navigation');
-  console.log('- Data transformation');
-  console.log('- Color palettes');
 });
+console.log('Demo initialized successfully!');
+console.log('Available features:');
+console.log('- Multiple chart libraries (Chart.js, ECharts, Plotly, D3)');
+console.log('- Fluent API chart classes');
+console.log('- All chart types');
+console.log('- Smart recommendations');
+console.log('- Data sampling');
+console.log('- Drill-down navigation');
+console.log('- Data transformation');
+console.log('- Color palettes');

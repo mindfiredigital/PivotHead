@@ -1,7 +1,7 @@
 {
   "id": "tutorials/pivot-charts",
-  "title": "Pivot Charts",
-  "description": "Transform your pivot table data into beautiful, interactive visualizations with PivotHead Analytics",
+  "title": "Pivot Charts Tutorial",
+  "description": "Step-by-step guide to adding charts to your pivot table with PivotHead Analytics",
   "source": "@site/docs/tutorials/pivot-charts.mdx",
   "sourceDirName": "tutorials",
   "slug": "/tutorials/pivot-charts",
@@ -13,16 +13,14 @@
   "version": "current",
   "frontMatter": {
     "id": "pivot-charts",
-    "title": "Pivot Charts",
+    "title": "Pivot Charts Tutorial",
     "sidebar_label": "Pivot Charts",
-    "description": "Transform your pivot table data into beautiful, interactive visualizations with PivotHead Analytics",
+    "description": "Step-by-step guide to adding charts to your pivot table with PivotHead Analytics",
     "keywords": [
       "pivot charts",
       "data visualization",
       "analytics",
-      "bar chart",
-      "pie chart",
-      "line chart",
+      "chart.js",
       "echarts",
       "plotly",
       "d3"
