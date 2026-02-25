@@ -29,19 +29,60 @@ Complete reference for `@mindfiredigital/pivothead-analytics`.
 npm install @mindfiredigital/pivothead-analytics
 ```
 
-This package does **not** bundle a charting library. You must install one separately:
+This package does **not** bundle a charting library — you bring your own. There are two ways to set one up:
 
-```bash
-npm install chart.js          # Chart.js (recommended, most common)
-npm install echarts            # Apache ECharts
-npm install plotly.js-dist     # Plotly.js
-npm install d3                 # D3.js
+### Path A — Interactive (recommended for local development)
+
+After `npm install` completes, a setup prompt runs in your terminal automatically. Type a number to pick a library and the script installs it for you, detects your package manager, and writes `.pivothead-analytics.json` to your project root.
+
+```
+  [1] Chart.js           Lightweight, easy to use, browser-first charting
+  [2] Apache ECharts     Feature-rich, interactive charts for complex data
+  [3] Plotly.js          Scientific & statistical charts
+  [4] D3.js              Maximum flexibility with custom SVG-based rendering
+
+  > 1
+  Installing Chart.js via npm…
+  ✔  Done!
 ```
 
-After install, a setup prompt runs automatically to help you pick the library. You can skip it with:
+### Path B — Manual (CI, scripts, monorepos)
+
+Skip the prompt and install the library yourself:
 
 ```bash
+# Skip the prompt
 PIVOTHEAD_SKIP_SETUP=true npm install @mindfiredigital/pivothead-analytics
+
+# Install your chosen library
+npm install chart.js          # or: echarts | plotly.js-dist | d3
+
+# Set the env var so ChartEngine can detect it at runtime
+# Add to your .env file or CI environment variables
+PIVOTHEAD_LIBRARY=chartjs     # or: echarts | plotly | d3
+```
+
+### `.pivothead-analytics.json`
+
+The interactive setup writes this file to your project root:
+
+```json
+{
+  "library": "chartjs",
+  "installedLibraries": ["chartjs"],
+  "generatedAt": "2025-01-01T00:00:00.000Z"
+}
+```
+
+`ChartEngine` reads it at startup to auto-detect the renderer. Commit it to share the choice with your team, or gitignore it to let each developer be prompted on first install. If the file is absent, set `PIVOTHEAD_LIBRARY` instead.
+
+### Monorepo projects
+
+The postinstall script detects workspace roots (`pnpm-workspace.yaml`, `lerna.json`) and automatically adds `-w` / `-W` when installing the charting library. For package-level installs, target the package explicitly:
+
+```bash
+pnpm add @mindfiredigital/pivothead-analytics chart.js --filter my-app
+yarn workspace my-app add @mindfiredigital/pivothead-analytics chart.js
 ```
 
 ---
@@ -52,16 +93,47 @@ PIVOTHEAD_SKIP_SETUP=true npm install @mindfiredigital/pivothead-analytics
 
 ### Constructor
 
+In any bundler-based project (Vite, webpack, React, Vue, Angular, etc.) you must import your charting library and **pass the instance directly**. Bundlers use ES modules — `require()` is not available at runtime, so ChartEngine cannot load the library itself.
+
+**Chart.js (most common)**
+
 ```typescript
-import { ChartEngine } from '@mindfiredigital/pivothead-analytics';
+import { Chart, registerables } from 'chart.js';
 import { PivotEngine } from '@mindfiredigital/pivothead';
+import { ChartEngine } from '@mindfiredigital/pivothead-analytics';
+
+Chart.register(...registerables); // required by Chart.js
 
 const engine = new PivotEngine(data, config);
+const chartEngine = new ChartEngine(engine, { chartInstance: Chart });
+```
 
-const chartEngine = new ChartEngine(engine);
-// or with options:
+**ECharts**
+
+```typescript
+import * as echarts from 'echarts';
+const chartEngine = new ChartEngine(engine, { echartsInstance: echarts });
+```
+
+**Plotly**
+
+```typescript
+import Plotly from 'plotly.js-dist';
+const chartEngine = new ChartEngine(engine, { plotlyInstance: Plotly });
+```
+
+**D3**
+
+```typescript
+import * as d3 from 'd3';
+const chartEngine = new ChartEngine(engine, { d3Instance: d3 });
+```
+
+You can also pass default style and format options:
+
+```typescript
 const chartEngine = new ChartEngine(engine, {
-  library: 'chartjs', // 'chartjs' | 'echarts' | 'plotly' | 'd3'
+  chartInstance: Chart,
   defaultStyle: {
     colorScheme: 'tableau10',
     animated: true,
@@ -76,14 +148,15 @@ const chartEngine = new ChartEngine(engine, {
 
 #### ChartEngineOptions
 
-| Option          | Type                                         | Default       | Description                               |
-| --------------- | -------------------------------------------- | ------------- | ----------------------------------------- |
-| `library`       | `'chartjs' \| 'echarts' \| 'plotly' \| 'd3'` | auto-detected | Rendering library to use                  |
-| `defaultStyle`  | `StyleConfig`                                | —             | Default style applied to every chart      |
-| `defaultFormat` | `FormatConfig`                               | —             | Default value formatting for every chart  |
-| `performance`   | `PerformanceConfig`                          | —             | Data sampling settings for large datasets |
-
-If `library` is not set, ChartEngine auto-detects by checking the `PIVOTHEAD_LIBRARY` env var, browser globals, and installed packages.
+| Option            | Type                | Description                                           |
+| ----------------- | ------------------- | ----------------------------------------------------- |
+| `chartInstance`   | `Chart`             | Chart.js `Chart` class (required in bundler projects) |
+| `echartsInstance` | `echarts`           | ECharts module (required in bundler projects)         |
+| `plotlyInstance`  | `Plotly`            | Plotly module (required in bundler projects)          |
+| `d3Instance`      | `d3`                | D3 module (required in bundler projects)              |
+| `defaultStyle`    | `StyleConfig`       | Default style applied to every chart                  |
+| `defaultFormat`   | `FormatConfig`      | Default value formatting for every chart              |
+| `performance`     | `PerformanceConfig` | Data sampling settings for large datasets             |
 
 ---
 
@@ -468,28 +541,35 @@ chartEngine.render({
 
 ### Selecting a library
 
-```typescript
-// At construction (applies to all charts)
-const chartEngine = new ChartEngine(engine, { library: 'echarts' });
+Import the library and pass the instance at construction time:
 
-// Per-chart override
-chartEngine.render({
-  container: '#chart',
-  type: 'line',
-  library: 'plotly',
-});
+```typescript
+// Chart.js
+import { Chart, registerables } from 'chart.js';
+Chart.register(...registerables);
+const chartEngine = new ChartEngine(engine, { chartInstance: Chart });
+
+// ECharts
+import * as echarts from 'echarts';
+const chartEngine = new ChartEngine(engine, { echartsInstance: echarts });
+
+// Plotly
+import Plotly from 'plotly.js-dist';
+const chartEngine = new ChartEngine(engine, { plotlyInstance: Plotly });
+
+// D3
+import * as d3 from 'd3';
+const chartEngine = new ChartEngine(engine, { d3Instance: d3 });
 ```
 
 ### Library comparison
 
-| Library        | Value       | Best for                          |
-| -------------- | ----------- | --------------------------------- |
-| Chart.js       | `'chartjs'` | Standard charts, lightweight apps |
-| Apache ECharts | `'echarts'` | Rich interactivity, dashboards    |
-| Plotly         | `'plotly'`  | Scientific charts, 3D             |
-| D3             | `'d3'`      | Fully custom visualisations       |
-
-> Make sure the corresponding npm package is installed before using a library other than the default.
+| Library        | Instance option   | Install                      | Best for                          |
+| -------------- | ----------------- | ---------------------------- | --------------------------------- |
+| Chart.js       | `chartInstance`   | `npm install chart.js`       | Standard charts, lightweight apps |
+| Apache ECharts | `echartsInstance` | `npm install echarts`        | Rich interactivity, dashboards    |
+| Plotly         | `plotlyInstance`  | `npm install plotly.js-dist` | Scientific charts, 3D             |
+| D3             | `d3Instance`      | `npm install d3`             | Fully custom visualisations       |
 
 ---
 

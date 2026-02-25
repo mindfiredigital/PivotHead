@@ -33,7 +33,11 @@ interface EChartsStatic {
 }
 
 // Dynamically get ECharts
-function getECharts(): EChartsStatic {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getECharts(injected?: any): EChartsStatic {
+  // Injected instance (from ChartEngine options) — highest priority
+  if (injected) return injected as EChartsStatic;
+
   // Check for global echarts
   const globalECharts = (globalThis as Record<string, unknown>).echarts as
     | EChartsStatic
@@ -92,7 +96,8 @@ class EChartsInstanceWrapper implements ChartInstance {
 export class EChartsRenderer extends BaseChartRenderer {
   private colorManager: ColorManager;
 
-  constructor() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  constructor(private injectedECharts?: any) {
     super();
     this.colorManager = new ColorManager('tableau10');
   }
@@ -105,7 +110,7 @@ export class EChartsRenderer extends BaseChartRenderer {
     data: unknown,
     options: ChartRenderOptions
   ): ChartInstance {
-    const echarts = getECharts();
+    const echarts = getECharts(this.injectedECharts);
     const containerEl = this.getContainer(container);
 
     // Check for existing instance and dispose

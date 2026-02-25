@@ -18,16 +18,94 @@ This guide shows you how to turn your pivot table data into charts using `@mindf
 npm install @mindfiredigital/pivothead-analytics
 ```
 
-After install, a setup prompt will ask which charting library you want to use. Pick one and install it:
+### What happens after install
 
-| Library | Install command | Good for |
-|---------|----------------|----------|
-| Chart.js (recommended) | `npm install chart.js` | Standard charts, lightweight |
-| Apache ECharts | `npm install echarts` | Interactive dashboards |
-| Plotly | `npm install plotly.js-dist` | Scientific / 3D charts |
-| D3 | `npm install d3` | Fully custom charts |
+The package runs a **postinstall setup prompt** automatically in your terminal:
 
-You only need **one** of the above. Chart.js is the best starting point.
+```
+  ┌──────────────────────────────────────────────────────┐
+  │   @mindfiredigital/pivothead-analytics  Setup        │
+  └──────────────────────────────────────────────────────┘
+
+  Which charting library would you like to install?
+
+  [1] Chart.js           Lightweight, easy to use, browser-first charting
+  [2] Apache ECharts     Feature-rich, interactive charts for complex data
+  [3] Plotly.js          Scientific & statistical charts, great for data science
+  [4] D3.js              Maximum flexibility with custom SVG-based rendering
+
+  Enter number(s) separated by commas (e.g. 1 or 1,3),
+  or press Enter to skip and install manually later.
+
+  >
+```
+
+Type a number and press Enter. The script:
+- **Detects your package manager** (npm / pnpm / yarn / bun) automatically
+- **Installs the chosen library** for you — no separate install command needed
+- **Writes `.pivothead-analytics.json`** to your project root so `ChartEngine` knows which library to use at runtime
+- Handles **monorepo workspace roots** automatically (adds `-w` / `-W` flag when needed)
+
+You only need **one** library. Chart.js is the best starting point.
+
+| # | Library | Best for |
+|---|---------|----------|
+| 1 | **Chart.js** (recommended) | Standard charts, lightweight apps |
+| 2 | **Apache ECharts** | Feature-rich interactive dashboards |
+| 3 | **Plotly** | Scientific / statistical / 3D charts |
+| 4 | **D3** | Fully custom SVG-based charts |
+
+### CI / non-interactive environments
+
+In CI pipelines or any environment without an interactive terminal, the prompt is skipped automatically. Install your chosen library manually and set the `PIVOTHEAD_LIBRARY` environment variable so `ChartEngine` can detect it at runtime:
+
+```bash
+# Install the library
+npm install chart.js
+
+# Tell ChartEngine which one to use (add to your .env or CI environment)
+PIVOTHEAD_LIBRARY=chartjs
+```
+
+Valid values: `chartjs` · `echarts` · `plotly` · `d3`
+
+To suppress the prompt entirely in any environment:
+
+```bash
+PIVOTHEAD_SKIP_SETUP=true npm install @mindfiredigital/pivothead-analytics
+```
+
+### Monorepo projects
+
+If you are in a **pnpm / yarn / npm workspaces** monorepo, the postinstall detects it and passes the correct workspace flag (`-w` / `-W`) when installing the charting library. No extra configuration needed.
+
+If you install from a workspace package rather than the root, run the install from that package's directory or target it explicitly:
+
+```bash
+# pnpm
+pnpm add @mindfiredigital/pivothead-analytics chart.js --filter my-app
+
+# yarn
+yarn workspace my-app add @mindfiredigital/pivothead-analytics chart.js
+```
+
+### The `.pivothead-analytics.json` file
+
+After a successful interactive install, a config file is written to your project root:
+
+```json
+{
+  "library": "chartjs",
+  "installedLibraries": ["chartjs"],
+  "generatedAt": "2025-01-01T00:00:00.000Z"
+}
+```
+
+`ChartEngine` reads this file at startup to auto-detect which renderer to use. You can:
+- **Commit it** — keeps the choice in version control so teammates don't need to re-run setup
+- **Gitignore it** — teammates will be prompted on their first install instead
+
+If you skipped the prompt and installed manually, create this file yourself or rely on the `PIVOTHEAD_LIBRARY` env var instead.
 
 ---
 
@@ -70,10 +148,17 @@ Add a `<div>` where the chart will be drawn. Give it a fixed size.
 
 ## Step 4 — Create ChartEngine and render
 
+Import your charting library **and pass it directly** to `ChartEngine`. This is required in any bundler-based project (Vite, webpack, etc.) because bundlers use ES modules — `require()` is not available at runtime.
+
 ```typescript
+import { Chart, registerables } from 'chart.js';
 import { ChartEngine } from '@mindfiredigital/pivothead-analytics';
 
-const chartEngine = new ChartEngine(engine);
+// Required: register all Chart.js components
+Chart.register(...registerables);
+
+// Pass the Chart object in — this is the key step
+const chartEngine = new ChartEngine(engine, { chartInstance: Chart });
 
 // Render a column chart
 chartEngine.column({
@@ -263,18 +348,20 @@ const blob = await chartEngine.getChartBlob('#myChart', 'png');
 
 ## Using a different rendering library
 
-If you installed ECharts, Plotly, or D3, tell ChartEngine to use it:
+Import your chosen library and pass it as the matching instance option:
 
 ```typescript
-// At construction time (applies to all charts)
-const chartEngine = new ChartEngine(engine, { library: 'echarts' });
+// ECharts
+import * as echarts from 'echarts';
+const chartEngine = new ChartEngine(engine, { echartsInstance: echarts });
 
-// Or for a single chart
-chartEngine.render({
-  container: '#myChart',
-  type: 'line',
-  library: 'plotly',
-});
+// Plotly
+import Plotly from 'plotly.js-dist';
+const chartEngine = new ChartEngine(engine, { plotlyInstance: Plotly });
+
+// D3
+import * as d3 from 'd3';
+const chartEngine = new ChartEngine(engine, { d3Instance: d3 });
 ```
 
 ---
@@ -294,10 +381,14 @@ This destroys all active charts and unsubscribes from PivotEngine updates.
 ## Complete working example
 
 ```typescript
+import { Chart, registerables } from 'chart.js';
 import { PivotEngine } from '@mindfiredigital/pivothead';
 import { ChartEngine } from '@mindfiredigital/pivothead-analytics';
 
-// 1. Data + pivot config
+// 1. Register Chart.js components
+Chart.register(...registerables);
+
+// 2. Data + pivot config
 const data = [
   { region: 'North', product: 'Laptops', revenue: 45000 },
   { region: 'South', product: 'Laptops', revenue: 38000 },
@@ -310,8 +401,9 @@ const engine = new PivotEngine(data, {
   measures: [{ uniqueName: 'revenue', caption: 'Revenue', aggregation: 'sum' }],
 });
 
-// 2. Chart engine with defaults
+// 3. Chart engine — pass chartInstance so it works in any bundler (Vite, webpack, etc.)
 const chartEngine = new ChartEngine(engine, {
+  chartInstance: Chart,
   defaultStyle:  { colorScheme: 'tableau10', animated: true, showLegend: true },
   defaultFormat: { valueFormat: 'currency', currency: 'USD' },
 });

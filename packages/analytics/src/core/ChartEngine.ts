@@ -60,7 +60,19 @@ export class ChartEngine<
   ) {
     this.chartService = new ChartService(engine);
     this.detector = new ChartDetector(engine);
-    this.renderer = this.createRenderer(options?.library || 'chartjs');
+    // Auto-detect library from injected instances if library not explicitly set
+    const library =
+      options?.library ??
+      (options?.chartInstance
+        ? 'chartjs'
+        : options?.echartsInstance
+          ? 'echarts'
+          : options?.plotlyInstance
+            ? 'plotly'
+            : options?.d3Instance
+              ? 'd3'
+              : this.detectDefaultLibrary());
+    this.renderer = this.createRenderer(library, options);
     this.colorManager = new ColorManager(
       (options?.defaultStyle?.colorScheme as ColorPaletteName) || 'tableau10'
     );
@@ -72,20 +84,72 @@ export class ChartEngine<
   }
 
   /**
-   * Create a renderer instance for the specified library
+   * Detect the default charting library to use when none is specified.
+   *
+   * Priority order:
+   *  1. PIVOTHEAD_LIBRARY environment variable  (CI / explicit override)
+   *  2. Browser UMD globals                     (CDN / pre-loaded scripts)
+   *  3. require.resolve probe                   (Node.js / CJS bundler environments)
+   *  4. Fallback to 'chartjs'                   (renderer throws a friendly error if missing)
    */
-  private createRenderer(library: ChartLibrary): ChartRenderer {
+  private detectDefaultLibrary(): ChartLibrary {
+    const valid: ChartLibrary[] = ['chartjs', 'echarts', 'plotly', 'd3'];
+
+    // 1. Explicit env var (works in Node.js SSR and CI pipelines)
+    if (typeof process !== 'undefined' && process.env['PIVOTHEAD_LIBRARY']) {
+      const envLib = process.env['PIVOTHEAD_LIBRARY'] as ChartLibrary;
+      if (valid.includes(envLib)) return envLib;
+    }
+
+    // 2. Browser globals — detect UMD/CDN-loaded libraries
+    if (typeof window !== 'undefined') {
+      const w = window as unknown as Record<string, unknown>;
+      if (w['Chart']) return 'chartjs';
+      if (w['echarts']) return 'echarts';
+      if (w['Plotly']) return 'plotly';
+      if (w['d3']) return 'd3';
+    }
+
+    // 3. require.resolve probe — works in CJS output and bundler environments
+    const probe = (pkg: string): boolean => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any
+        (require as any).resolve(pkg);
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
+    if (probe('chart.js')) return 'chartjs';
+    if (probe('echarts')) return 'echarts';
+    if (probe('plotly.js-dist')) return 'plotly';
+    if (probe('d3')) return 'd3';
+
+    // 4. Fallback — the renderer will throw a descriptive error on first render
+    return 'chartjs';
+  }
+
+  /**
+   * Create a renderer instance for the specified library.
+   * Passes the injected library instance (if any) so the renderer never
+   * needs to call require() or read globalThis in browser/ESM environments.
+   */
+  private createRenderer(
+    library: ChartLibrary,
+    options?: ChartEngineOptions
+  ): ChartRenderer {
     switch (library) {
       case 'chartjs':
-        return new ChartJsRenderer();
+        return new ChartJsRenderer(options?.chartInstance);
       case 'echarts':
-        return new EChartsRenderer();
+        return new EChartsRenderer(options?.echartsInstance);
       case 'd3':
-        return new D3Renderer();
+        return new D3Renderer(options?.d3Instance);
       case 'plotly':
-        return new PlotlyRenderer();
+        return new PlotlyRenderer(options?.plotlyInstance);
       default:
-        return new ChartJsRenderer();
+        return new ChartJsRenderer(options?.chartInstance);
     }
   }
 

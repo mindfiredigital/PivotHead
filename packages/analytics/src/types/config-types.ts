@@ -338,9 +338,35 @@ export interface ChartRecommendation {
  */
 export interface ChartEngineOptions {
   /**
-   * Default chart rendering library
+   * Default chart rendering library.
+   * If omitted, ChartEngine auto-detects from injected instances,
+   * then from installed packages.
    */
   library?: ChartLibrary;
+
+  /**
+   * Pre-loaded library instances.
+   * Pass these when using a bundler (Vite, webpack, etc.) where require()
+   * is unavailable at runtime. The matching library is auto-detected from
+   * whichever instance you provide, so you don't need to set `library` too.
+   *
+   * @example
+   * import { Chart, registerables } from 'chart.js';
+   * Chart.register(...registerables);
+   * new ChartEngine(pivotEngine, { chartInstance: Chart });
+   *
+   * @example
+   * import * as echarts from 'echarts';
+   * new ChartEngine(pivotEngine, { echartsInstance: echarts });
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  chartInstance?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  echartsInstance?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  plotlyInstance?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  d3Instance?: any;
 
   /**
    * Default style configuration
