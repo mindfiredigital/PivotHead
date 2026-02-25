@@ -3,6 +3,7 @@
  * Comprehensive demonstration of all analytics features
  */
 
+import { Chart, registerables } from 'chart.js';
 import { PivotEngine } from '@mindfiredigital/pivothead';
 import {
   // Core
@@ -33,10 +34,6 @@ import {
   ColorManager,
   ColorPalettes,
   DataSampler,
-
-  // Chart.js
-  Chart,
-  registerables,
 
   // Constants
   DEFAULT_CHART_COLORS,
