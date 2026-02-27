@@ -48,6 +48,11 @@ import { CommonModule } from '@angular/common';
                 >Rendering Modes</a
               >
             </li>
+            <li>
+              <a routerLink="/analytics" routerLinkActive="active"
+                >Analytics &amp; Charts</a
+              >
+            </li>
           </ul>
         </nav>
 

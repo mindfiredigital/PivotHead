@@ -62,4 +62,12 @@ export const routes: Routes = [
       ),
     title: 'Rendering Modes Demo',
   },
+  {
+    path: 'analytics',
+    loadComponent: () =>
+      import('./components/analytics-demo.component').then(
+        m => m.AnalyticsDemoComponent
+      ),
+    title: 'Analytics & Charts',
+  },
 ];
