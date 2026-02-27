@@ -1,5 +1,12 @@
 # new-js-web-component
 
+## 0.0.10
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead-web-component@1.0.10
+
 ## 0.0.9
 
 ### Patch Changes
