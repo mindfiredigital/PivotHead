@@ -1,5 +1,14 @@
 # vue-example
 
+## 1.0.16
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead-analytics@1.0.6
+  - @mindfiredigital/pivothead-web-component@1.0.11
+  - @mindfiredigital/pivothead-vue@1.0.9
+
 ## 1.0.15
 
 ### Patch Changes
