@@ -1,6 +1,6 @@
 {
   "name": "@mindfiredigital/pivothead-analytics",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "private": false,
   "type": "module",
   "description": "Data visualization and analytics module for PivotHead - supports Chart.js, ECharts, Plotly, and D3 (install your preferred library separately)",

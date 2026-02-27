@@ -1,5 +1,12 @@
 # @mindfiredigital/pivothead-web-component
 
+## 1.0.10
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.16.0
+
 ## 1.0.9
 
 ### Patch Changes

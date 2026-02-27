@@ -1,6 +1,6 @@
 {
   "name": "@mindfiredigital/pivothead-angular",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "private": true,
   "main": "../../dist/angular/fesm2022/mindfiredigital-pivothead-angular.mjs",
   "module": "../../dist/angular/fesm2022/mindfiredigital-pivothead-angular.mjs",
