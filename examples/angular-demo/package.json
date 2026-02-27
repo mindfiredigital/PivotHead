@@ -21,6 +21,7 @@
     "@mindfiredigital/pivothead": "workspace:*",
     "@mindfiredigital/pivothead-web-component": "workspace:*",
     "@mindfiredigital/pivothead-angular": "workspace:*",
+    "@mindfiredigital/pivothead-analytics": "workspace:*",
     "chart.js": "^4.4.3",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
