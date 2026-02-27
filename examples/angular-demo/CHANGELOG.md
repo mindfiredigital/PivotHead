@@ -1,5 +1,15 @@
 # angular-demo
 
+## 0.0.7
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.17.0
+  - @mindfiredigital/pivothead-analytics@1.0.6
+  - @mindfiredigital/pivothead-web-component@1.0.11
+  - @mindfiredigital/pivothead-angular@0.1.7
+
 ## 0.0.6
 
 ### Patch Changes
