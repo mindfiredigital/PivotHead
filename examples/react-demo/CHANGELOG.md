@@ -1,5 +1,14 @@
 # react-demo
 
+## 0.0.22
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.17.0
+  - @mindfiredigital/pivothead-web-component@1.0.11
+  - @mindfiredigital/pivothead-react@1.0.11
+
 ## 0.0.21
 
 ### Patch Changes

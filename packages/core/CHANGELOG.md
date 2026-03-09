@@ -1,5 +1,11 @@
 # @mindfiredigital/pivothead
 
+## 1.17.0
+
+### Minor Changes
+
+- Relaese from Dev (#282)
+
 ## 1.16.0
 
 ### Minor Changes
