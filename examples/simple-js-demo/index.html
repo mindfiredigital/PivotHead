@@ -158,6 +158,29 @@
         </div>
       </div>
     </div>
+    <!-- LLM Assistant Panel -->
+    <div id="llm-panel">
+      <div id="llm-panel-header">
+        <span>AI Assistant (LLM)</span>
+        <button id="llm-toggle-btn" title="Toggle panel">▲</button>
+      </div>
+      <div id="llm-panel-body" style="display:none">
+        <div id="llm-capability-status">Checking WebGPU...</div>
+        <div id="llm-load-section">
+          <button id="llm-load-btn">Load LLM Model</button>
+        </div>
+        <div id="llm-progress-section" style="display:none">
+          <div id="llm-progress-track"><div id="llm-progress-fill"></div></div>
+          <div id="llm-progress-label"></div>
+        </div>
+        <div id="llm-messages-area"></div>
+        <div id="llm-input-section">
+          <input id="llm-query-input" type="text" placeholder="e.g. sort by price descending" disabled />
+          <button id="llm-send-btn" disabled>Send</button>
+        </div>
+      </div>
+    </div>
+
     <script type="module" src="./index.js"></script>
   </body>
 </html>

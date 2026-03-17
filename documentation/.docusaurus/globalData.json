@@ -85,6 +85,11 @@
               "sidebar": "tutorialSidebar"
             },
             {
+              "id": "reference/api-reference/llm-api-reference",
+              "path": "/PivotHead/docs/reference/api-reference/llm-api-reference",
+              "sidebar": "tutorialSidebar"
+            },
+            {
               "id": "reference/api-reference/react-api-reference",
               "path": "/PivotHead/docs/reference/api-reference/react-api-reference",
               "sidebar": "tutorialSidebar"
@@ -169,6 +174,11 @@
             {
               "id": "tutorials/core-webcomponent/setup-for-user-project",
               "path": "/PivotHead/docs/tutorials/core-webcomponent/setup-for-user-project",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "tutorials/llm-assistant",
+              "path": "/PivotHead/docs/tutorials/llm-assistant",
               "sidebar": "tutorialSidebar"
             },
             {

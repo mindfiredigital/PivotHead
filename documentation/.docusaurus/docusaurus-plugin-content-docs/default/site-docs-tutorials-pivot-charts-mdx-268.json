@@ -32,7 +32,7 @@
     "permalink": "/PivotHead/docs/tutorials/vue/setup-for-user-project"
   },
   "next": {
-    "title": "Core Web Component",
-    "permalink": "/PivotHead/docs/reference/conceptual-reference/core-webcomponent-conceptual-reference"
+    "title": "LLM Assistant",
+    "permalink": "/PivotHead/docs/tutorials/llm-assistant"
   }
 }

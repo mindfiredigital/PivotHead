@@ -53,15 +53,15 @@ export default [
   },
   {
     path: '/PivotHead/docs',
-    component: ComponentCreator('/PivotHead/docs', '841'),
+    component: ComponentCreator('/PivotHead/docs', '437'),
     routes: [
       {
         path: '/PivotHead/docs',
-        component: ComponentCreator('/PivotHead/docs', '898'),
+        component: ComponentCreator('/PivotHead/docs', '2e2'),
         routes: [
           {
             path: '/PivotHead/docs',
-            component: ComponentCreator('/PivotHead/docs', '1c4'),
+            component: ComponentCreator('/PivotHead/docs', '55b'),
             routes: [
               {
                 path: '/PivotHead/docs/contributors/',
@@ -193,6 +193,15 @@ export default [
                 component: ComponentCreator(
                   '/PivotHead/docs/reference/api-reference/core-webcomponent-api-reference',
                   '312'
+                ),
+                exact: true,
+                sidebar: 'tutorialSidebar',
+              },
+              {
+                path: '/PivotHead/docs/reference/api-reference/llm-api-reference',
+                component: ComponentCreator(
+                  '/PivotHead/docs/reference/api-reference/llm-api-reference',
+                  '3e0'
                 ),
                 exact: true,
                 sidebar: 'tutorialSidebar',
@@ -356,6 +365,15 @@ export default [
                 component: ComponentCreator(
                   '/PivotHead/docs/tutorials/core-webcomponent/setup-for-user-project',
                   '83d'
+                ),
+                exact: true,
+                sidebar: 'tutorialSidebar',
+              },
+              {
+                path: '/PivotHead/docs/tutorials/llm-assistant',
+                component: ComponentCreator(
+                  '/PivotHead/docs/tutorials/llm-assistant',
+                  '04e'
                 ),
                 exact: true,
                 sidebar: 'tutorialSidebar',
