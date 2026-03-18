@@ -11,6 +11,7 @@
 
 // Import statements - Make sure these paths are correct
 import { createHeader } from './header/header.js';
+import { initLLMPanel } from './llm/llm-panel.js';
 import {
   PivotEngine,
   ConnectService,
@@ -3372,6 +3373,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initial render
     renderTable();
+
+    // Initialize LLM assistant panel
+    initLLMPanel(() => pivotEngine);
 
     console.log(
       'Initialization completed successfully with sorting functionality'

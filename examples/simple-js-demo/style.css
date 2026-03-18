@@ -750,3 +750,170 @@ tr[draggable='true'] {
     justify-content: center;
   }
 }
+/* ===== LLM Assistant Panel ===== */
+#llm-panel {
+  position: fixed;
+  bottom: 0;
+  right: 24px;
+  width: 360px;
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.12);
+  z-index: 9999;
+  font-family: inherit;
+  font-size: 13px;
+}
+
+#llm-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: #1a73e8;
+  color: #fff;
+  border-radius: 8px 8px 0 0;
+  cursor: pointer;
+  user-select: none;
+}
+
+#llm-panel-header span {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+#llm-toggle-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0 4px;
+}
+
+#llm-panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  max-height: 400px;
+}
+
+#llm-capability-status {
+  font-size: 12px;
+  color: #5f6368;
+  padding: 4px 0;
+}
+
+#llm-load-section {
+  display: flex;
+}
+
+#llm-load-btn {
+  padding: 6px 14px;
+  background: #1a73e8;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+#llm-load-btn:disabled {
+  background: #bdc1c6;
+  cursor: not-allowed;
+}
+
+#llm-progress-track {
+  height: 6px;
+  background: #e8eaed;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+#llm-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: #1a73e8;
+  transition: width 0.3s ease;
+}
+
+#llm-progress-label {
+  font-size: 11px;
+  color: #5f6368;
+  margin-top: 4px;
+}
+
+#llm-messages-area {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-right: 2px;
+}
+
+.llm-msg {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.llm-msg-user {
+  background: #e8f0fe;
+  color: #1a73e8;
+  align-self: flex-end;
+  max-width: 85%;
+}
+
+.llm-msg-assistant {
+  background: #f1f3f4;
+  color: #202124;
+  align-self: flex-start;
+  max-width: 95%;
+}
+
+.llm-msg-error {
+  background: #fce8e6;
+  color: #c5221f;
+  align-self: flex-start;
+  max-width: 95%;
+}
+
+#llm-input-section {
+  display: flex;
+  gap: 6px;
+}
+
+#llm-query-input {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-size: 13px;
+  outline: none;
+}
+
+#llm-query-input:focus {
+  border-color: #1a73e8;
+}
+
+#llm-send-btn {
+  padding: 6px 12px;
+  background: #1a73e8;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+#llm-send-btn:disabled {
+  background: #bdc1c6;
+  cursor: not-allowed;
+}

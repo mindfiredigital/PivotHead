@@ -250,6 +250,17 @@ export default {
         '@site/docs/reference/api-reference/core-webcomponent.md'
       ),
     ],
+  'content---pivot-head-docs-reference-api-reference-llm-api-referencec-61-9db':
+    [
+      () =>
+        import(
+          /* webpackChunkName: "content---pivot-head-docs-reference-api-reference-llm-api-referencec-61-9db" */ '@site/docs/reference/api-reference/llm-api-reference.md'
+        ),
+      '@site/docs/reference/api-reference/llm-api-reference.md',
+      require.resolveWeak(
+        '@site/docs/reference/api-reference/llm-api-reference.md'
+      ),
+    ],
   'content---pivot-head-docs-reference-api-reference-react-api-referencece-6-0e8':
     [
       () =>
@@ -425,6 +436,14 @@ export default {
         '@site/docs/tutorials/core-webcomponent/setup-for-user-project.md'
       ),
     ],
+  'content---pivot-head-docs-tutorials-llm-assistantfeb-275': [
+    () =>
+      import(
+        /* webpackChunkName: "content---pivot-head-docs-tutorials-llm-assistantfeb-275" */ '@site/docs/tutorials/llm-assistant.md'
+      ),
+    '@site/docs/tutorials/llm-assistant.md',
+    require.resolveWeak('@site/docs/tutorials/llm-assistant.md'),
+  ],
   'content---pivot-head-docs-tutorials-pivot-charts-268-01a': [
     () =>
       import(

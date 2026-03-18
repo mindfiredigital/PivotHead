@@ -1,0 +1,67 @@
+{
+  "name": "@mindfiredigital/pivothead-llm",
+  "version": "1.0.0",
+  "private": false,
+  "type": "module",
+  "description": "In-browser LLM integration for PivotHead — natural-language control of pivot tables via WebLLM (no server required)",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "author": "Mindfiredigital",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mindfiredigital/PivotHead.git"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "keywords": [
+    "pivothead",
+    "llm",
+    "webllm",
+    "web-llm",
+    "in-browser-ai",
+    "pivot-table",
+    "natural-language",
+    "nlp",
+    "webgpu",
+    "mlc-ai",
+    "data-analysis",
+    "business-intelligence"
+  ],
+  "scripts": {
+    "build": "rimraf dist && tsup src/index.ts --format esm,cjs --dts",
+    "dev": "tsup src/index.ts --watch --format esm,cjs --dts",
+    "clean": "rimraf dist",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@mlc-ai/web-llm": "^0.2.73"
+  },
+  "peerDependencies": {
+    "@mindfiredigital/pivothead": "workspace:*",
+    "@mindfiredigital/pivothead-analytics": "workspace:*"
+  },
+  "peerDependenciesMeta": {
+    "@mindfiredigital/pivothead-analytics": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "rimraf": "^5.0.0",
+    "tsup": "^7.2.0",
+    "typescript": "^5.0.0"
+  }
+}

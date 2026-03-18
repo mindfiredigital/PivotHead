@@ -1,0 +1,41 @@
+{
+  "id": "tutorials/llm-assistant",
+  "title": "LLM Assistant",
+  "description": "Add a natural-language AI assistant to your PivotHead pivot table — runs entirely in the browser, no server required.",
+  "source": "@site/docs/tutorials/llm-assistant.md",
+  "sourceDirName": "tutorials",
+  "slug": "/tutorials/llm-assistant",
+  "permalink": "/PivotHead/docs/tutorials/llm-assistant",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorials/llm-assistant.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "llm-assistant",
+    "title": "LLM Assistant",
+    "sidebar_label": "LLM Assistant",
+    "description": "Add a natural-language AI assistant to your PivotHead pivot table — runs entirely in the browser, no server required.",
+    "keywords": [
+      "llm",
+      "ai",
+      "assistant",
+      "natural language",
+      "webgpu",
+      "webllm",
+      "in-browser",
+      "pivot table",
+      "pivothead",
+      "chatbot"
+    ]
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Pivot Charts",
+    "permalink": "/PivotHead/docs/tutorials/pivot-charts"
+  },
+  "next": {
+    "title": "Core Web Component",
+    "permalink": "/PivotHead/docs/reference/conceptual-reference/core-webcomponent-conceptual-reference"
+  }
+}
