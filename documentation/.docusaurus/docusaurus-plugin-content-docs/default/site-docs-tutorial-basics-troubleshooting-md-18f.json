@@ -19,8 +19,8 @@
   },
   "sidebar": "tutorialSidebar",
   "previous": {
-    "title": "Analytics",
-    "permalink": "/PivotHead/docs/reference/api-reference/analytics-api-reference"
+    "title": "LLM Assistant",
+    "permalink": "/PivotHead/docs/reference/api-reference/llm-api-reference"
   },
   "next": {
     "title": "Contributors",

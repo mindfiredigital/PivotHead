@@ -362,8 +362,8 @@
                   "permalink": "/PivotHead/docs/reference/api-reference/vue-api-reference"
                 },
                 "next": {
-                  "title": "Troubleshooting",
-                  "permalink": "/PivotHead/docs/tutorial-basics/troubleshooting"
+                  "title": "LLM Assistant",
+                  "permalink": "/PivotHead/docs/reference/api-reference/llm-api-reference"
                 }
               },
               {
@@ -420,6 +420,45 @@
                 "next": {
                   "title": "React",
                   "permalink": "/PivotHead/docs/reference/api-reference/react-api-reference"
+                }
+              },
+              {
+                "id": "reference/api-reference/llm-api-reference",
+                "title": "LLM API Reference",
+                "description": "Complete API reference for @mindfiredigital/pivothead-llm — natural-language AI assistant for pivot tables",
+                "source": "@site/docs/reference/api-reference/llm-api-reference.md",
+                "sourceDirName": "reference/api-reference",
+                "slug": "/reference/api-reference/llm-api-reference",
+                "permalink": "/PivotHead/docs/reference/api-reference/llm-api-reference",
+                "draft": false,
+                "unlisted": false,
+                "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/reference/api-reference/llm-api-reference.md",
+                "tags": [],
+                "version": "current",
+                "frontMatter": {
+                  "id": "llm-api-reference",
+                  "title": "LLM API Reference",
+                  "sidebar_label": "LLM Assistant",
+                  "description": "Complete API reference for @mindfiredigital/pivothead-llm — natural-language AI assistant for pivot tables",
+                  "keywords": [
+                    "api",
+                    "llm",
+                    "ai",
+                    "assistant",
+                    "webgpu",
+                    "webllm",
+                    "natural language",
+                    "pivothead"
+                  ]
+                },
+                "sidebar": "tutorialSidebar",
+                "previous": {
+                  "title": "Analytics",
+                  "permalink": "/PivotHead/docs/reference/api-reference/analytics-api-reference"
+                },
+                "next": {
+                  "title": "Troubleshooting",
+                  "permalink": "/PivotHead/docs/tutorial-basics/troubleshooting"
                 }
               },
               {
@@ -526,8 +565,8 @@
                 },
                 "sidebar": "tutorialSidebar",
                 "previous": {
-                  "title": "Pivot Charts",
-                  "permalink": "/PivotHead/docs/tutorials/pivot-charts"
+                  "title": "LLM Assistant",
+                  "permalink": "/PivotHead/docs/tutorials/llm-assistant"
                 },
                 "next": {
                   "title": "WebAssembly & Performance",
@@ -728,8 +767,8 @@
                 },
                 "sidebar": "tutorialSidebar",
                 "previous": {
-                  "title": "Analytics",
-                  "permalink": "/PivotHead/docs/reference/api-reference/analytics-api-reference"
+                  "title": "LLM Assistant",
+                  "permalink": "/PivotHead/docs/reference/api-reference/llm-api-reference"
                 },
                 "next": {
                   "title": "Contributors",
@@ -874,6 +913,47 @@
                 }
               },
               {
+                "id": "tutorials/llm-assistant",
+                "title": "LLM Assistant",
+                "description": "Add a natural-language AI assistant to your PivotHead pivot table — runs entirely in the browser, no server required.",
+                "source": "@site/docs/tutorials/llm-assistant.md",
+                "sourceDirName": "tutorials",
+                "slug": "/tutorials/llm-assistant",
+                "permalink": "/PivotHead/docs/tutorials/llm-assistant",
+                "draft": false,
+                "unlisted": false,
+                "editUrl": "https://github.com/mindfiredigital/PivotHead/tree/main/documentation/docs/tutorials/llm-assistant.md",
+                "tags": [],
+                "version": "current",
+                "frontMatter": {
+                  "id": "llm-assistant",
+                  "title": "LLM Assistant",
+                  "sidebar_label": "LLM Assistant",
+                  "description": "Add a natural-language AI assistant to your PivotHead pivot table — runs entirely in the browser, no server required.",
+                  "keywords": [
+                    "llm",
+                    "ai",
+                    "assistant",
+                    "natural language",
+                    "webgpu",
+                    "webllm",
+                    "in-browser",
+                    "pivot table",
+                    "pivothead",
+                    "chatbot"
+                  ]
+                },
+                "sidebar": "tutorialSidebar",
+                "previous": {
+                  "title": "Pivot Charts",
+                  "permalink": "/PivotHead/docs/tutorials/pivot-charts"
+                },
+                "next": {
+                  "title": "Core Web Component",
+                  "permalink": "/PivotHead/docs/reference/conceptual-reference/core-webcomponent-conceptual-reference"
+                }
+              },
+              {
                 "id": "tutorials/pivot-charts",
                 "title": "Pivot Charts Tutorial",
                 "description": "Step-by-step guide to adding charts to your pivot table with PivotHead Analytics",
@@ -907,8 +987,8 @@
                   "permalink": "/PivotHead/docs/tutorials/vue/setup-for-user-project"
                 },
                 "next": {
-                  "title": "Core Web Component",
-                  "permalink": "/PivotHead/docs/reference/conceptual-reference/core-webcomponent-conceptual-reference"
+                  "title": "LLM Assistant",
+                  "permalink": "/PivotHead/docs/tutorials/llm-assistant"
                 }
               },
               {
@@ -1133,6 +1213,12 @@
                       "id": "tutorials/pivot-charts",
                       "label": "Pivot Charts",
                       "translatable": true
+                    },
+                    {
+                      "type": "doc",
+                      "id": "tutorials/llm-assistant",
+                      "label": "LLM Assistant",
+                      "translatable": true
                     }
                   ],
                   "collapsed": true,
@@ -1194,6 +1280,10 @@
                         {
                           "type": "doc",
                           "id": "reference/api-reference/analytics-api-reference"
+                        },
+                        {
+                          "type": "doc",
+                          "id": "reference/api-reference/llm-api-reference"
                         }
                       ],
                       "collapsed": true,

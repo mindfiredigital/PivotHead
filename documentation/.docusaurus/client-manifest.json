@@ -65,7 +65,7 @@
     "1f391b9e": [1869, 9093, 6061],
     "1ff659d4": [5500],
     "2576e8ad": [4947],
-    "268ca2cc": [1869, 7883],
+    "268ca2cc": [7883],
     "393be207": [4134],
     "42f26196": [4563],
     "4cade86f": [5612],
@@ -94,6 +94,7 @@
     "bc27b32c": [8939],
     "c032008b": [143],
     "c4f5d8e4": [1869, 8459, 2634],
+    "c61bf366": [6300],
     "c9dad2b7": [8017],
     "ce662fef": [8922],
     "cecb2d38": [2287],
@@ -101,8 +102,9 @@
     "f3ee8136": [1290],
     "f747d7dd": [1869, 1070],
     "f9c50032": [6975],
+    "feb438f8": [1869, 1717],
     "styles": [
-      1070, 2634, 4214, 5354, 6061, 7016, 7883, 8401, 8459, 8682, 8792, 9048,
+      1070, 1717, 2634, 4214, 5354, 6061, 7016, 8401, 8459, 8682, 8792, 9048,
       9093, 1869
     ]
   },
@@ -191,9 +193,9 @@
     "1239": {
       "js": [
         {
-          "file": "assets/js/09321d92.beaf9bf2.js",
-          "hash": "a556f22c4b53c4de",
-          "publicPath": "/PivotHead/assets/js/09321d92.beaf9bf2.js"
+          "file": "assets/js/09321d92.e6ffe0fd.js",
+          "hash": "876a29558d563aa9",
+          "publicPath": "/PivotHead/assets/js/09321d92.e6ffe0fd.js"
         }
       ]
     },
@@ -203,6 +205,15 @@
           "file": "assets/js/f3ee8136.1e333522.js",
           "hash": "7622aa165273a323",
           "publicPath": "/PivotHead/assets/js/f3ee8136.1e333522.js"
+        }
+      ]
+    },
+    "1717": {
+      "js": [
+        {
+          "file": "assets/js/feb438f8.cb581bb1.js",
+          "hash": "c776b0a2f5faddf8",
+          "publicPath": "/PivotHead/assets/js/feb438f8.cb581bb1.js"
         }
       ]
     },
@@ -227,9 +238,9 @@
     "1869": {
       "css": [
         {
-          "file": "assets/css/styles.9f6b4e17.css",
-          "hash": "e50bafafc961da45",
-          "publicPath": "/PivotHead/assets/css/styles.9f6b4e17.css"
+          "file": "assets/css/styles.d1fceece.css",
+          "hash": "f3539d8cc8deec12",
+          "publicPath": "/PivotHead/assets/css/styles.d1fceece.css"
         }
       ]
     },
@@ -317,9 +328,9 @@
     "2634": {
       "js": [
         {
-          "file": "assets/js/c4f5d8e4.f3ded348.js",
-          "hash": "aa0fbbf255ff4929",
-          "publicPath": "/PivotHead/assets/js/c4f5d8e4.f3ded348.js"
+          "file": "assets/js/c4f5d8e4.a2973298.js",
+          "hash": "65ae1bc7e34d31fe",
+          "publicPath": "/PivotHead/assets/js/c4f5d8e4.a2973298.js"
         }
       ]
     },
@@ -335,9 +346,9 @@
     "2907": {
       "js": [
         {
-          "file": "assets/js/86010177.4d3054f4.js",
-          "hash": "87a78a27d8536399",
-          "publicPath": "/PivotHead/assets/js/86010177.4d3054f4.js"
+          "file": "assets/js/86010177.1b70115d.js",
+          "hash": "30d69590d513f769",
+          "publicPath": "/PivotHead/assets/js/86010177.1b70115d.js"
         }
       ]
     },
@@ -443,9 +454,9 @@
     "4374": {
       "js": [
         {
-          "file": "assets/js/ae316f43.5be77847.js",
-          "hash": "c9d37d829f448b64",
-          "publicPath": "/PivotHead/assets/js/ae316f43.5be77847.js"
+          "file": "assets/js/ae316f43.1c56b84e.js",
+          "hash": "228d11ebfbe9a042",
+          "publicPath": "/PivotHead/assets/js/ae316f43.1c56b84e.js"
         }
       ]
     },
@@ -479,9 +490,9 @@
     "4743": {
       "js": [
         {
-          "file": "assets/js/079a4878.3939ded5.js",
-          "hash": "062c2dc01630385c",
-          "publicPath": "/PivotHead/assets/js/079a4878.3939ded5.js"
+          "file": "assets/js/079a4878.9d490c11.js",
+          "hash": "6ebc88e63cff9ff5",
+          "publicPath": "/PivotHead/assets/js/079a4878.9d490c11.js"
         }
       ]
     },
@@ -515,9 +526,9 @@
     "5354": {
       "js": [
         {
-          "file": "assets/js/runtime~main.df481be0.js",
-          "hash": "bff74f7bed2fa521",
-          "publicPath": "/PivotHead/assets/js/runtime~main.df481be0.js"
+          "file": "assets/js/runtime~main.5ef1b93c.js",
+          "hash": "ba81e2ce33c12b19",
+          "publicPath": "/PivotHead/assets/js/runtime~main.5ef1b93c.js"
         }
       ]
     },
@@ -542,9 +553,9 @@
     "5612": {
       "js": [
         {
-          "file": "assets/js/4cade86f.3eee407c.js",
-          "hash": "5eb66acb0432917e",
-          "publicPath": "/PivotHead/assets/js/4cade86f.3eee407c.js"
+          "file": "assets/js/4cade86f.294c021c.js",
+          "hash": "b811b97ab9ec6f0b",
+          "publicPath": "/PivotHead/assets/js/4cade86f.294c021c.js"
         }
       ]
     },
@@ -605,9 +616,9 @@
     "6068": {
       "js": [
         {
-          "file": "assets/js/d9e2605b.ce0dbbd9.js",
-          "hash": "4e7ea8313464a645",
-          "publicPath": "/PivotHead/assets/js/d9e2605b.ce0dbbd9.js"
+          "file": "assets/js/d9e2605b.b1712c2b.js",
+          "hash": "3f5aaf53ff5e7bbb",
+          "publicPath": "/PivotHead/assets/js/d9e2605b.b1712c2b.js"
         }
       ]
     },
@@ -617,6 +628,15 @@
           "file": "assets/js/6241.1892ef90.js",
           "hash": "ed421984184fb11b",
           "publicPath": "/PivotHead/assets/js/6241.1892ef90.js"
+        }
+      ]
+    },
+    "6300": {
+      "js": [
+        {
+          "file": "assets/js/c61bf366.1df26979.js",
+          "hash": "d80e71b862e20fbf",
+          "publicPath": "/PivotHead/assets/js/c61bf366.1df26979.js"
         }
       ]
     },
@@ -659,9 +679,9 @@
     "6716": {
       "js": [
         {
-          "file": "assets/js/18f4eb3b.9a3e4a33.js",
-          "hash": "015b43144b21fc59",
-          "publicPath": "/PivotHead/assets/js/18f4eb3b.9a3e4a33.js"
+          "file": "assets/js/18f4eb3b.80bcd7b5.js",
+          "hash": "fe4e05e74620b393",
+          "publicPath": "/PivotHead/assets/js/18f4eb3b.80bcd7b5.js"
         }
       ]
     },
@@ -740,9 +760,9 @@
     "7883": {
       "js": [
         {
-          "file": "assets/js/268ca2cc.362de8ad.js",
-          "hash": "aeb06a4ba90fb56f",
-          "publicPath": "/PivotHead/assets/js/268ca2cc.362de8ad.js"
+          "file": "assets/js/268ca2cc.2bbb8ede.js",
+          "hash": "baca37463cabc382",
+          "publicPath": "/PivotHead/assets/js/268ca2cc.2bbb8ede.js"
         }
       ]
     },
@@ -875,9 +895,9 @@
     "8792": {
       "js": [
         {
-          "file": "assets/js/main.9ce2660b.js",
-          "hash": "4419b49b80aed7cf",
-          "publicPath": "/PivotHead/assets/js/main.9ce2660b.js"
+          "file": "assets/js/main.6dbdfb2e.js",
+          "hash": "499eebb7c2188906",
+          "publicPath": "/PivotHead/assets/js/main.6dbdfb2e.js"
         }
       ]
     },
@@ -893,9 +913,9 @@
     "8939": {
       "js": [
         {
-          "file": "assets/js/bc27b32c.9662a963.js",
-          "hash": "7b829424152ce266",
-          "publicPath": "/PivotHead/assets/js/bc27b32c.9662a963.js"
+          "file": "assets/js/bc27b32c.df87a48e.js",
+          "hash": "63ff91853e1e53f6",
+          "publicPath": "/PivotHead/assets/js/bc27b32c.df87a48e.js"
         }
       ]
     },
@@ -947,9 +967,9 @@
     "9482": {
       "js": [
         {
-          "file": "assets/js/162b762a.20335d66.js",
-          "hash": "2001fc227bdef30c",
-          "publicPath": "/PivotHead/assets/js/162b762a.20335d66.js"
+          "file": "assets/js/162b762a.38be9742.js",
+          "hash": "2cb24236cfccf854",
+          "publicPath": "/PivotHead/assets/js/162b762a.38be9742.js"
         }
       ]
     },

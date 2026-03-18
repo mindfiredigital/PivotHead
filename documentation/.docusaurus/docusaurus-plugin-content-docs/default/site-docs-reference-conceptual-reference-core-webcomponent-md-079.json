@@ -18,8 +18,8 @@
   },
   "sidebar": "tutorialSidebar",
   "previous": {
-    "title": "Pivot Charts",
-    "permalink": "/PivotHead/docs/tutorials/pivot-charts"
+    "title": "LLM Assistant",
+    "permalink": "/PivotHead/docs/tutorials/llm-assistant"
   },
   "next": {
     "title": "WebAssembly & Performance",

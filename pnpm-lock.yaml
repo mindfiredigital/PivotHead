@@ -99,6 +99,9 @@ importers:
       '@mindfiredigital/pivothead':
         specifier: workspace:*
         version: link:../../packages/core
+      '@mindfiredigital/pivothead-analytics':
+        specifier: workspace:*
+        version: link:../../packages/analytics
       '@mindfiredigital/pivothead-angular':
         specifier: workspace:*
         version: link:../../packages/angular
@@ -330,6 +333,9 @@ importers:
       '@mindfiredigital/pivothead-analytics':
         specifier: workspace:*
         version: link:../../packages/analytics
+      '@mindfiredigital/pivothead-llm':
+        specifier: workspace:*
+        version: link:../../packages/llm
       chart.js:
         specifier: ^4.4.3
         version: 4.4.3
@@ -502,6 +508,28 @@ importers:
       vitest:
         specifier: ^0.32.0
         version: 0.32.0(@vitest/ui@0.32.0)(jsdom@26.0.0)
+
+  packages/llm:
+    dependencies:
+      '@mindfiredigital/pivothead':
+        specifier: workspace:*
+        version: link:../core
+      '@mindfiredigital/pivothead-analytics':
+        specifier: workspace:*
+        version: link:../analytics
+      '@mlc-ai/web-llm':
+        specifier: ^0.2.73
+        version: 0.2.73
+    devDependencies:
+      rimraf:
+        specifier: ^5.0.0
+        version: 5.0.0
+      tsup:
+        specifier: ^7.2.0
+        version: 7.2.0(typescript@5.4.5)
+      typescript:
+        specifier: ~5.4.5
+        version: 5.4.5
 
   packages/react:
     dependencies:
@@ -4184,6 +4212,12 @@ packages:
   /@microsoft/tsdoc@0.16.0:
     resolution: {integrity: sha512-xgAyonlVVS+q7Vc7qLW0UrJU7rSFcETRWsqdXZtjzRU8dF+6CkozTK4V4y1LwOX7j8r/vHphjDeMeGI4tNGeGA==}
     dev: true
+
+  /@mlc-ai/web-llm@0.2.73:
+    resolution: {integrity: sha512-v9eS05aptZYNBhRZ7KEq5dr1kMESHvkdwru9tNY1oS1GDDEBjUt4Y/u06ejvP3qF4VatCakEezzJT3SkuMhDnQ==}
+    dependencies:
+      loglevel: 1.9.2
+    dev: false
 
   /@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.3:
     resolution: {integrity: sha512-QZHtlVgbAdy2zAqNA9Gu1UpIuI8Xvsd1v8ic6B2pZmeFnFcMWiPLfWXh7TVw4eGEZ/C9TH281KwhVoeQUKbyjw==}
@@ -8904,6 +8938,7 @@ packages:
 
   /glob@10.5.0:
     resolution: {integrity: sha512-DfXN8DfhJ7NH3Oe7cFmu3NCu1wKbkReJ8TorzSAFbSKrlNaQSKfIzqYqVY8zlbs2NLBbWpRiU52GX2PbaBVNkg==}
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     hasBin: true
     dependencies:
       foreground-child: 3.3.1
@@ -8941,7 +8976,7 @@ packages:
   /glob@8.1.0:
     resolution: {integrity: sha512-r8hpEjiQEYlF2QU0df3dS+nxxSIreXQS1qRhMJM0Q5NDdR386C7jb7Hwwod8Fgiuex+k0GFjgft18yvxm5XoCQ==}
     engines: {node: '>=12'}
-    deprecated: Glob versions prior to v9 are no longer supported
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     dependencies:
       fs.realpath: 1.0.0
       inflight: 1.0.6
@@ -8984,7 +9019,7 @@ packages:
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     dependencies:
       dir-glob: 3.0.1
-      fast-glob: 3.3.2
+      fast-glob: 3.3.3
       ignore: 5.3.2
       merge2: 1.4.1
       slash: 4.0.0
@@ -10433,6 +10468,11 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  /loglevel@1.9.2:
+    resolution: {integrity: sha512-HgMmCqIJSAKqo68l0rS2AanEWfkxaZ5wNiEFb5ggm08lDs9Xl2KxBlX3PTcaD2chBM1gXAYf491/M2Rv8Jwayg==}
+    engines: {node: '>= 0.6.0'}
+    dev: false
 
   /long@5.3.2:
     resolution: {integrity: sha512-mNAgZ1GmyNhD7AuqnTG3/VQ26o760+ZYBPKjPvugO8+nLbYfX6TVpJPseBvopbdY+qpZ/lKUnmEc1LeZYS3QAA==}

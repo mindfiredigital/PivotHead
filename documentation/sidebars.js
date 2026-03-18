@@ -150,6 +150,11 @@ const sidebars = {
           id: 'tutorials/pivot-charts',
           label: 'Pivot Charts',
         },
+        {
+          type: 'doc',
+          id: 'tutorials/llm-assistant',
+          label: 'LLM Assistant',
+        },
       ],
     },
     {
@@ -177,6 +182,7 @@ const sidebars = {
             'reference/api-reference/angular-api-reference',
             'reference/api-reference/vue-api-reference',
             'reference/api-reference/analytics-api-reference',
+            'reference/api-reference/llm-api-reference',
           ],
         },
       ],
