@@ -1,5 +1,50 @@
 # vue-example
 
+## 1.0.17
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead-analytics@1.0.7
+  - @mindfiredigital/pivothead-web-component@1.0.12
+  - @mindfiredigital/pivothead-vue@1.0.10
+
+## 1.0.16
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead-analytics@1.0.6
+  - @mindfiredigital/pivothead-web-component@1.0.11
+  - @mindfiredigital/pivothead-vue@1.0.9
+
+## 1.0.15
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead-analytics@1.0.5
+  - @mindfiredigital/pivothead-web-component@1.0.10
+  - @mindfiredigital/pivothead-vue@1.0.8
+
+## 1.0.14
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead-analytics@1.0.4
+  - @mindfiredigital/pivothead-web-component@1.0.9
+  - @mindfiredigital/pivothead-vue@1.0.7
+
+## 1.0.13
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead-analytics@1.0.3
+  - @mindfiredigital/pivothead-web-component@1.0.8
+  - @mindfiredigital/pivothead-vue@1.0.6
+
 ## 1.0.12
 
 ### Patch Changes

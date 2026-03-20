@@ -1,5 +1,50 @@
 # react-demo
 
+## 0.0.23
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.18.0
+  - @mindfiredigital/pivothead-web-component@1.0.12
+  - @mindfiredigital/pivothead-react@1.0.12
+
+## 0.0.22
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.17.0
+  - @mindfiredigital/pivothead-web-component@1.0.11
+  - @mindfiredigital/pivothead-react@1.0.11
+
+## 0.0.21
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.16.0
+  - @mindfiredigital/pivothead-web-component@1.0.10
+  - @mindfiredigital/pivothead-react@1.0.10
+
+## 0.0.20
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.15.0
+  - @mindfiredigital/pivothead-web-component@1.0.9
+  - @mindfiredigital/pivothead-react@1.0.9
+
+## 0.0.19
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.14.0
+  - @mindfiredigital/pivothead-web-component@1.0.8
+  - @mindfiredigital/pivothead-react@1.0.8
+
 ## 0.0.18
 
 ### Patch Changes

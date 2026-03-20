@@ -1,5 +1,46 @@
 # simple-js-demo
 
+## 1.0.28
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.18.0
+  - @mindfiredigital/pivothead-analytics@1.0.7
+  - @mindfiredigital/pivothead-llm@2.0.0
+
+## 1.0.27
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.17.0
+  - @mindfiredigital/pivothead-analytics@1.0.6
+
+## 1.0.26
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.16.0
+  - @mindfiredigital/pivothead-analytics@1.0.5
+
+## 1.0.25
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.15.0
+  - @mindfiredigital/pivothead-analytics@1.0.4
+
+## 1.0.24
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.14.0
+  - @mindfiredigital/pivothead-analytics@1.0.3
+
 ## 1.0.23
 
 ### Patch Changes

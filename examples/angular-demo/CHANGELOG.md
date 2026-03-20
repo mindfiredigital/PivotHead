@@ -1,5 +1,52 @@
 # angular-demo
 
+## 0.0.8
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.18.0
+  - @mindfiredigital/pivothead-analytics@1.0.7
+  - @mindfiredigital/pivothead-web-component@1.0.12
+  - @mindfiredigital/pivothead-angular@0.1.8
+
+## 0.0.7
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.17.0
+  - @mindfiredigital/pivothead-analytics@1.0.6
+  - @mindfiredigital/pivothead-web-component@1.0.11
+  - @mindfiredigital/pivothead-angular@0.1.7
+
+## 0.0.6
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.16.0
+  - @mindfiredigital/pivothead-web-component@1.0.10
+  - @mindfiredigital/pivothead-angular@0.1.6
+
+## 0.0.5
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.15.0
+  - @mindfiredigital/pivothead-web-component@1.0.9
+  - @mindfiredigital/pivothead-angular@0.1.5
+
+## 0.0.4
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.14.0
+  - @mindfiredigital/pivothead-web-component@1.0.8
+  - @mindfiredigital/pivothead-angular@0.1.4
+
 ## 0.0.3
 
 ### Patch Changes
