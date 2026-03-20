@@ -1,5 +1,12 @@
 # @mindfiredigital/pivothead-analytics
 
+## 1.0.8
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.19.0
+
 ## 1.0.7
 
 ### Patch Changes
