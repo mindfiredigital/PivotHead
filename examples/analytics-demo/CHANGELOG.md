@@ -1,5 +1,13 @@
 # analytics-demo
 
+## 1.0.7
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.20.0
+  - @mindfiredigital/pivothead-analytics@1.0.9
+
 ## 1.0.6
 
 ### Patch Changes
