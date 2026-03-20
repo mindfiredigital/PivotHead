@@ -1,5 +1,13 @@
 # react-wrapper-example
 
+## 0.0.19
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.19.0
+  - @mindfiredigital/pivothead-web-component@1.0.13
+
 ## 0.0.18
 
 ### Patch Changes
