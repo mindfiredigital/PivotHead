@@ -1,6 +1,6 @@
 {
   "name": "@mindfiredigital/pivothead-llm",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "private": false,
   "type": "module",
   "description": "In-browser LLM integration for PivotHead — natural-language control of pivot tables via WebLLM (no server required)",
