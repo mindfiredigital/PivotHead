@@ -241,19 +241,18 @@ describe('PivotExportService', () => {
         querySelector: vi.fn().mockReturnValue(null),
       }));
 
-      // Mock console.error
-      const originalConsoleError = console.error;
-      console.error = vi.fn();
+      const consoleErrorSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
 
       PivotExportService.exportToPDF(state);
 
-      expect(console.error).toHaveBeenCalledWith(
-        'No table found in the generated HTML'
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('No table found in the generated HTML')
       );
       expect(document.body.removeChild).toHaveBeenCalled();
 
-      // Restore console.error
-      console.error = originalConsoleError;
+      consoleErrorSpy.mockRestore();
     });
   });
 
@@ -276,34 +275,36 @@ describe('PivotExportService', () => {
 
     it('should handle empty data', () => {
       const state = createMockState(true);
-      const consoleLogSpy = vi
-        .spyOn(console, 'log')
+      const consoleInfoSpy = vi
+        .spyOn(console, 'info')
         .mockImplementation(() => {});
 
       PivotExportService.exportToExcel(state);
 
-      expect(console.log).toHaveBeenCalledWith('No data to export!');
+      expect(consoleInfoSpy).toHaveBeenCalledWith(
+        expect.stringContaining('No data to export!')
+      );
       expect(XLSX.writeFile).not.toHaveBeenCalled();
 
-      consoleLogSpy.mockRestore();
+      consoleInfoSpy.mockRestore();
     });
 
     it('should handle missing dimension configuration', () => {
       const state = createMockState();
       state.rows = [];
 
-      const consoleLogSpy = vi
-        .spyOn(console, 'log')
+      const consoleInfoSpy = vi
+        .spyOn(console, 'info')
         .mockImplementation(() => {});
 
       PivotExportService.exportToExcel(state);
 
-      expect(console.log).toHaveBeenCalledWith(
-        'Missing row or column dimension'
+      expect(consoleInfoSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Missing row or column dimension')
       );
       expect(XLSX.writeFile).not.toHaveBeenCalled();
 
-      consoleLogSpy.mockRestore();
+      consoleInfoSpy.mockRestore();
     });
 
     it('should apply correct formatting to Excel cells', () => {
@@ -346,16 +347,17 @@ describe('PivotExportService', () => {
       // Mock window.open to return null (blocked popup)
       window.open = vi.fn().mockReturnValue(null);
 
-      // Mock console.error
-      const originalConsoleError = console.error;
-      console.error = vi.fn();
+      const consoleErrorSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
 
       PivotExportService.openPrintDialog(state);
 
-      expect(console.error).toHaveBeenCalledWith('Failed to open print dialog');
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Failed to open print dialog')
+      );
 
-      // Restore console.error
-      console.error = originalConsoleError;
+      consoleErrorSpy.mockRestore();
     });
   });
 });

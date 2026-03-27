@@ -14,6 +14,7 @@
  */
 
 import { WasmLoader } from '@mindfiredigital/pivothead';
+import { logger } from '../logger.js';
 
 // ─── WASM singleton ───────────────────────────────────────────────────────────
 
@@ -30,7 +31,7 @@ export async function initWasm() {
 
   try {
     if (typeof WebAssembly === 'undefined') {
-      console.warn(
+      logger.warn(
         'WebAssembly not supported in this browser — using JS fallback.'
       );
       return false;
@@ -41,11 +42,11 @@ export async function initWasm() {
     _ready = _loader.isModuleLoaded();
 
     if (_ready) {
-      console.log(`✅ WASM CSV parser loaded (v${_loader.getVersion()})`);
+      logger.info(`✅ WASM CSV parser loaded (v${_loader.getVersion()})`);
     }
     return _ready;
   } catch (err) {
-    console.warn('⚠️ WASM init failed, will use JS fallback:', err.message);
+    logger.warn('⚠️ WASM init failed, will use JS fallback:', err.message);
     _ready = false;
     return false;
   }
@@ -195,7 +196,7 @@ export async function parseCSV(text) {
   // Report 'wasm' if WASM was available for type coercion
   const method = _ready ? 'wasm' : 'js';
 
-  console.log(
+  logger.info(
     `✅ Parsed ${dataRows.length} rows × ${headers.length} cols in` +
       ` ${(performance.now() - start).toFixed(1)}ms [${method}]`
   );

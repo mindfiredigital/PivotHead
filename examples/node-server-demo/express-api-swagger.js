@@ -4,6 +4,7 @@
  * Interactive API documentation and testing interface for PivotHead CSV parser
  * Access Swagger UI at: http://localhost:3000/api-docs
  */
+const { logger } = require('./logger');
 
 const express = require('express');
 const swaggerUi = require('swagger-ui-express');
@@ -11,11 +12,15 @@ const swaggerJsdoc = require('swagger-jsdoc');
 const {
   WasmLoader,
 } = require('../../packages/core/dist/pivothead-core.umd.js');
+const { applySecurity, getSwaggerSecuritySchemes } = require('./security');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
+// Security middleware (CORS, rate limiting, API key auth, security headers)
+applySecurity(app);
+
+// Body parsing middleware
 app.use(express.json({ limit: '50mb' }));
 app.use(express.text({ type: 'text/csv', limit: '50mb' }));
 
@@ -61,7 +66,9 @@ const swaggerOptions = {
         description: 'Utility functions and helpers',
       },
     ],
+    security: [{ ApiKeyAuth: [] }],
     components: {
+      securitySchemes: getSwaggerSecuritySchemes(),
       schemas: {
         CSVParseRequest: {
           type: 'object',
@@ -226,15 +233,15 @@ app.use(
 );
 
 // Initialize WASM on startup
-console.log('Initializing WASM module...');
+logger.info('Initializing WASM module...');
 wasm
   .load()
   .then(() => {
     wasmReady = true;
-    console.log(`✓ WASM module loaded successfully (v${wasm.getVersion()})`);
+    logger.info(`✓ WASM module loaded successfully (v${wasm.getVersion()})`);
   })
   .catch(err => {
-    console.error('✗ Failed to load WASM module:', err);
+    logger.error('✗ Failed to load WASM module:', err);
     process.exit(1);
   });
 
@@ -379,7 +386,7 @@ app.post('/api/parse', ensureWasmReady, (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Error in /api/parse:', error);
+    logger.error('Error in /api/parse:', error);
     res.status(500).json({
       error: 'Internal Server Error',
       message: error.message,
@@ -449,7 +456,7 @@ app.post('/api/analyze', ensureWasmReady, (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Error in /api/analyze:', error);
+    logger.error('Error in /api/analyze:', error);
     res.status(500).json({
       error: 'Internal Server Error',
       message: error.message,
@@ -516,7 +523,7 @@ app.post('/api/benchmark', ensureWasmReady, (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Error in /api/benchmark:', error);
+    logger.error('Error in /api/benchmark:', error);
     res.status(500).json({
       error: 'Internal Server Error',
       message: error.message,
@@ -575,7 +582,7 @@ app.post('/api/detect-types', ensureWasmReady, (req, res) => {
 
     res.json({ results });
   } catch (error) {
-    console.error('Error in /api/detect-types:', error);
+    logger.error('Error in /api/detect-types:', error);
     res.status(500).json({
       error: 'Internal Server Error',
       message: error.message,
@@ -619,7 +626,7 @@ app.get('/', (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error('Unhandled error:', err);
+  logger.error('Unhandled error:', err);
   res.status(500).json({
     error: 'Internal Server Error',
     message: err.message,
@@ -637,32 +644,32 @@ app.use((req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log('='.repeat(60));
-  console.log('PivotHead CSV Parser API Server with Swagger');
-  console.log('='.repeat(60));
-  console.log(`Server:        http://localhost:${PORT}`);
-  console.log(`Documentation: http://localhost:${PORT}/api-docs`);
-  console.log('');
-  console.log('Quick Test:');
-  console.log(`  curl http://localhost:${PORT}/health`);
-  console.log('');
-  console.log('Interactive Testing:');
-  console.log(`  Open http://localhost:${PORT}/api-docs in your browser`);
-  console.log('  Click "Try it out" on any endpoint to test it');
-  console.log('');
-  console.log('Press Ctrl+C to stop');
-  console.log('='.repeat(60));
+  logger.info('='.repeat(60));
+  logger.info('PivotHead CSV Parser API Server with Swagger');
+  logger.info('='.repeat(60));
+  logger.info(`Server:        http://localhost:${PORT}`);
+  logger.info(`Documentation: http://localhost:${PORT}/api-docs`);
+  logger.info('');
+  logger.info('Quick Test:');
+  logger.info(`  curl http://localhost:${PORT}/health`);
+  logger.info('');
+  logger.info('Interactive Testing:');
+  logger.info(`  Open http://localhost:${PORT}/api-docs in your browser`);
+  logger.info('  Click "Try it out" on any endpoint to test it');
+  logger.info('');
+  logger.info('Press Ctrl+C to stop');
+  logger.info('='.repeat(60));
 });
 
 // Handle shutdown gracefully
 process.on('SIGTERM', () => {
-  console.log('Received SIGTERM, shutting down gracefully...');
+  logger.info('Received SIGTERM, shutting down gracefully...');
   wasm.unload();
   process.exit(0);
 });
 
 process.on('SIGINT', () => {
-  console.log('\nReceived SIGINT, shutting down gracefully...');
+  logger.info('\nReceived SIGINT, shutting down gracefully...');
   wasm.unload();
   process.exit(0);
 });

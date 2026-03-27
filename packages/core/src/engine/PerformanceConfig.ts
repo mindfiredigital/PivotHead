@@ -2,42 +2,30 @@
  * Performance Configuration and Thresholds
  * Centralized configuration for performance optimizations
  */
+import {
+  WORKERS_THRESHOLD as _WORKERS_THRESHOLD,
+  WASM_THRESHOLD as _WASM_THRESHOLD,
+  WASM_SAFETY_LIMIT as _WASM_SAFETY_LIMIT,
+  CHUNK_SIZE_256KB,
+  CHUNK_SIZE_1MB,
+  CHUNK_SIZE_2MB,
+  CHUNK_SIZE_5MB,
+  CHUNK_MEDIUM_UPPER,
+  CHUNK_LARGE_UPPER,
+} from '../config/constants.js';
+import type { PerformanceThresholds } from '../types/interfaces';
 
-export interface PerformanceThresholds {
-  // Worker thresholds
-  useWorkersAboveSize: number; // File size in bytes
-  useWorkersAboveRows: number; // Row count
-
-  // WASM thresholds (future use)
-  useWasmAboveSize: number; // File size in bytes
-  useWasmAboveRows: number; // Row count
-
-  // UI interaction thresholds
-  maxRowsForDragDrop: number; // Max rows to allow drag/drop
-  maxRowsForFullRender: number; // Max rows to render at once
-  defaultPageSize: number; // Default pagination page size
-  maxPageSize: number; // Maximum page size
-
-  // Sampling thresholds
-  sampleThreshold: number; // When to start sampling
-  sampleSize: number; // How many rows to sample
-
-  // Virtual scrolling configuration
-  enableVirtualScroll: boolean; // Enable virtual scrolling
-  virtualScrollThreshold: number; // Auto-enable at N rows
-  virtualScrollRowHeight: number; // Default row height (px)
-  virtualScrollBuffer: number; // Extra rows for smooth scrolling
-}
+export type { PerformanceThresholds };
 
 export class PerformanceConfig {
   private static config: PerformanceThresholds = {
     // Worker configuration - for files < 5MB
-    useWorkersAboveSize: 1 * 1024 * 1024, // 1MB (workers for smaller files)
+    useWorkersAboveSize: _WORKERS_THRESHOLD,
     useWorkersAboveRows: 5000, // 5k rows
 
     // WASM configuration - for files >= 5MB (up to 8MB safety limit)
     // Strategy: Workers for < 5MB, WASM for 5-8MB, Workers for > 8MB (streaming)
-    useWasmAboveSize: 5 * 1024 * 1024, // 5MB (WASM for larger files)
+    useWasmAboveSize: _WASM_THRESHOLD,
     useWasmAboveRows: 20000, // 20k rows
 
     // UI interaction limits (with virtual scrolling support)
@@ -140,10 +128,10 @@ export class PerformanceConfig {
    * Get optimal chunk size for file
    */
   public static getChunkSize(fileSize: number): number {
-    if (fileSize < 1024 * 1024) return 256 * 1024; // 256KB
-    if (fileSize < 10 * 1024 * 1024) return 1024 * 1024; // 1MB
-    if (fileSize < 100 * 1024 * 1024) return 2 * 1024 * 1024; // 2MB
-    return 5 * 1024 * 1024; // 5MB
+    if (fileSize < CHUNK_SIZE_1MB) return CHUNK_SIZE_256KB;
+    if (fileSize < CHUNK_MEDIUM_UPPER) return CHUNK_SIZE_1MB;
+    if (fileSize < CHUNK_LARGE_UPPER) return CHUNK_SIZE_2MB;
+    return CHUNK_SIZE_5MB;
   }
 
   /**
@@ -154,16 +142,13 @@ export class PerformanceConfig {
     fileSize: number,
     rowCount: number
   ): 'standard' | 'workers' | 'wasm' | 'streaming-wasm' {
-    const WASM_THRESHOLD = 5 * 1024 * 1024; // 5MB
-    const WASM_SAFETY_LIMIT = 8 * 1024 * 1024; // 8MB
-
     // TIER 3: Files > 8MB → Streaming + WASM Hybrid
-    if (fileSize > WASM_SAFETY_LIMIT) {
+    if (fileSize > _WASM_SAFETY_LIMIT) {
       return 'streaming-wasm';
     }
 
     // TIER 2: Files 5-8MB → Pure WASM (in-memory, fastest)
-    if (fileSize >= WASM_THRESHOLD && fileSize <= WASM_SAFETY_LIMIT) {
+    if (fileSize >= _WASM_THRESHOLD && fileSize <= _WASM_SAFETY_LIMIT) {
       return 'wasm';
     }
 

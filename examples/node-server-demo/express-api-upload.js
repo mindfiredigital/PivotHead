@@ -4,6 +4,7 @@
  * This version supports uploading large CSV files (like 800MB+)
  * with streaming processing and progress tracking.
  */
+const { logger } = require('./logger');
 
 const express = require('express');
 const multer = require('multer');
@@ -16,10 +17,15 @@ const {
   WasmLoader,
 } = require('../../packages/core/dist/pivothead-core.umd.js');
 
+const { applySecurity, getSwaggerSecuritySchemes } = require('./security');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
+// Security middleware (CORS, rate limiting, API key auth, security headers)
+applySecurity(app);
+
+// Body parsing middleware
 app.use(express.json({ limit: '50mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -46,6 +52,10 @@ const swaggerOptions = {
         'High-performance CSV parsing with support for large file uploads (800MB+)',
     },
     servers: [{ url: `http://localhost:${PORT}` }],
+    security: [{ ApiKeyAuth: [] }],
+    components: {
+      securitySchemes: getSwaggerSecuritySchemes(),
+    },
     tags: [
       { name: 'Health', description: 'Health check' },
       { name: 'File Upload', description: 'Upload and process CSV files' },
@@ -59,15 +69,15 @@ const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Initialize WASM
-console.log('Initializing WASM module...');
+logger.info('Initializing WASM module...');
 wasm
   .load()
   .then(() => {
     wasmReady = true;
-    console.log(`✓ WASM module loaded (v${wasm.getVersion()})`);
+    logger.info(`✓ WASM module loaded (v${wasm.getVersion()})`);
   })
   .catch(err => {
-    console.error('✗ Failed to load WASM:', err);
+    logger.error('✗ Failed to load WASM:', err);
     process.exit(1);
   });
 
@@ -192,7 +202,7 @@ app.post(
       const delimiter = req.body.delimiter || ',';
       const chunkSize = parseInt(req.body.chunkSize) || 10000;
 
-      console.log(
+      logger.info(
         `Processing file: ${filename} (${(fileSize / 1024 / 1024).toFixed(2)} MB)`
       );
 
@@ -207,7 +217,7 @@ app.post(
       fs.unlinkSync(filePath);
 
       // Debug logging
-      console.log('Result structure:', {
+      logger.info('Result structure:', {
         hasHeader: !!result.header,
         headerLength: result.header ? result.header.length : 0,
         hasDataRows: !!result.dataRows,
@@ -245,13 +255,13 @@ app.post(
         message: `Successfully processed ${result.totalRows.toLocaleString()} rows in ${(totalTime / 1000).toFixed(2)}s${result.totalRows > 10000 ? ' (showing first 10,000 rows in table)' : ''}`,
       };
 
-      console.log(
+      logger.info(
         'Sending response with data.header:',
         responseData.data.header
       );
       res.json(responseData);
     } catch (error) {
-      console.error('Error processing upload:', error);
+      logger.error('Error processing upload:', error);
 
       // Clean up file if it exists
       if (req.file && fs.existsSync(req.file.path)) {
@@ -358,11 +368,11 @@ async function processLargeCSV(filePath, delimiter = ',', chunkSize = 10000) {
 
             // Log progress for large files
             if (chunksProcessed % 10 === 0) {
-              console.log(`  Processed ${totalRows.toLocaleString()} rows...`);
+              logger.info(`  Processed ${totalRows.toLocaleString()} rows...`);
             }
           }
         } catch (error) {
-          console.error('Error parsing chunk:', error);
+          logger.error('Error parsing chunk:', error);
         }
 
         chunk = [];
@@ -387,11 +397,11 @@ async function processLargeCSV(filePath, delimiter = ',', chunkSize = 10000) {
             chunksProcessed++;
           }
         } catch (error) {
-          console.error('Error parsing final chunk:', error);
+          logger.error('Error parsing final chunk:', error);
         }
       }
 
-      console.log(
+      logger.info(
         `✓ Completed: ${totalRows.toLocaleString()} rows in ${chunksProcessed} chunks`
       );
 
@@ -507,7 +517,7 @@ app.get('/', (req, res) => {
 
 // Error handling
 app.use((err, req, res, next) => {
-  console.error('Unhandled error:', err);
+  logger.error('Unhandled error:', err);
   res.status(500).json({
     error: 'Internal Server Error',
     message: err.message,
@@ -516,37 +526,37 @@ app.use((err, req, res, next) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log('='.repeat(60));
-  console.log('PivotHead CSV Parser - File Upload Server');
-  console.log('='.repeat(60));
-  console.log(`Server:        http://localhost:${PORT}`);
-  console.log(`Upload UI:     http://localhost:${PORT}/upload.html`);
-  console.log(`API Docs:      http://localhost:${PORT}/api-docs`);
-  console.log('');
-  console.log('Features:');
-  console.log('  ✓ Upload CSV files up to 2GB');
-  console.log('  ✓ Streaming processing for large files');
-  console.log('  ✓ Real-time progress tracking');
-  console.log('  ✓ Chunked parsing (10,000 rows per chunk)');
-  console.log('');
-  console.log('Test with:');
-  console.log(
+  logger.info('='.repeat(60));
+  logger.info('PivotHead CSV Parser - File Upload Server');
+  logger.info('='.repeat(60));
+  logger.info(`Server:        http://localhost:${PORT}`);
+  logger.info(`Upload UI:     http://localhost:${PORT}/upload.html`);
+  logger.info(`API Docs:      http://localhost:${PORT}/api-docs`);
+  logger.info('');
+  logger.info('Features:');
+  logger.info('  ✓ Upload CSV files up to 2GB');
+  logger.info('  ✓ Streaming processing for large files');
+  logger.info('  ✓ Real-time progress tracking');
+  logger.info('  ✓ Chunked parsing (10,000 rows per chunk)');
+  logger.info('');
+  logger.info('Test with:');
+  logger.info(
     `  curl -F "file=@yourfile.csv" http://localhost:${PORT}/api/upload`
   );
-  console.log('');
-  console.log('Press Ctrl+C to stop');
-  console.log('='.repeat(60));
+  logger.info('');
+  logger.info('Press Ctrl+C to stop');
+  logger.info('='.repeat(60));
 });
 
 // Cleanup
 process.on('SIGTERM', () => {
-  console.log('Shutting down...');
+  logger.info('Shutting down...');
   wasm.unload();
   process.exit(0);
 });
 
 process.on('SIGINT', () => {
-  console.log('\nShutting down...');
+  logger.info('\nShutting down...');
   wasm.unload();
   process.exit(0);
 });

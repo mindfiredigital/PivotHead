@@ -1,6 +1,28 @@
-import type { SortConfig, GroupConfig, Group } from '../types/interfaces';
+import type {
+  SortConfig,
+  GroupConfig,
+  Group,
+  DataRecord,
+} from '../types/interfaces';
 
-export function applySort<T extends Record<string, any>>(
+/**
+ * Sorts an array of data records according to one or more sort descriptors.
+ *
+ * Records are compared using each {@link SortConfig} in order; the next config is
+ * only consulted when the current one considers two records equal (stable
+ * multi-column sort). Dimension fields are compared lexicographically; measure
+ * fields are compared numerically via {@link calculateMeasureValue}.
+ *
+ * @param data - The array of records to sort. The original array is not mutated.
+ * @param sortConfig - Ordered list of sort descriptors. An empty array returns `data` unchanged.
+ * @param groupConfig - Unused in the current implementation; reserved for future
+ *   group-aware sorting strategies.
+ * @returns A new sorted array; the input `data` array is never mutated.
+ *
+ * @example
+ * const sorted = applySort(rows, [{ field: 'region', direction: 'asc', type: 'dimension' }]);
+ */
+export function applySort<T extends DataRecord>(
   data: T[],
   sortConfig: SortConfig[],
   groupConfig?: GroupConfig | null
@@ -19,8 +41,8 @@ export function applySort<T extends Record<string, any>>(
           return direction === 'asc' ? valueA - valueB : valueB - valueA;
         }
       } else {
-        const valueA = a[field];
-        const valueB = b[field];
+        const valueA = a[field] as string | number;
+        const valueB = b[field] as string | number;
 
         if (valueA !== valueB) {
           return direction === 'asc'
@@ -28,8 +50,8 @@ export function applySort<T extends Record<string, any>>(
               ? -1
               : 1
             : valueA > valueB
-            ? -1
-            : 1;
+              ? -1
+              : 1;
         }
       }
     }
@@ -38,7 +60,7 @@ export function applySort<T extends Record<string, any>>(
 }
 
 function calculateMeasureValue(
-  item: Record<string, any>,
+  item: DataRecord,
   field: string,
   aggregation?: string
 ): number {
@@ -46,6 +68,20 @@ function calculateMeasureValue(
   return value;
 }
 
+/**
+ * Sorts an array of pre-computed {@link Group} objects by their aggregate values.
+ *
+ * Each group's `aggregates` map is keyed as `"<aggregation>_<field>"` (e.g. `"sum_sales"`).
+ * Groups are compared in `sortConfig` order, falling back to the next descriptor on a tie.
+ *
+ * @param groups - The groups to sort. The original array is not mutated.
+ * @param sortConfig - Ordered list of sort descriptors referencing measure fields.
+ *   An empty array returns `groups` unchanged.
+ * @returns A new sorted array of groups.
+ *
+ * @example
+ * const sorted = sortGroups(groups, [{ field: 'sales', direction: 'desc', aggregation: 'sum', type: 'measure' }]);
+ */
 export function sortGroups(groups: Group[], sortConfig: SortConfig[]): Group[] {
   if (!sortConfig || sortConfig.length === 0) return groups;
 

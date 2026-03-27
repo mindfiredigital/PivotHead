@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 import { resolve } from 'path';
 import { copyFileSync, mkdirSync, existsSync } from 'fs';
+import { logger } from './src/logger/logger';
 
 export default defineConfig({
   build: {
@@ -9,10 +10,10 @@ export default defineConfig({
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'PivotHeadCore',
       fileName: 'pivothead-core',
-      formats: ['es', 'umd'],
+      formats: ['es', 'cjs'],
     },
     rollupOptions: {
-      external: ['fs', 'path'],
+      external: ['fs', 'path', 'jspdf', 'jspdf-autotable', 'xlsx', 'jsdom'],
       output: {
         globals: {},
         assetFileNames: assetInfo => {
@@ -82,18 +83,18 @@ export default defineConfig({
               copyFileSync(srcPath, destPath);
               copiedCount++;
               if (file === 'csvParser.wasm') {
-                console.log(`✅ WASM module restored: ${file}`);
+                logger.info(`✅ WASM module restored: ${file}`);
               }
             }
           });
 
           if (copiedCount === 0) {
-            console.warn(
+            logger.warn(
               '⚠️ No WASM files found to restore. Run: npm run build:wasm'
             );
           }
         } else {
-          console.warn(
+          logger.warn(
             '⚠️ WASM files not found. Run: npm run build:wasm before build'
           );
         }

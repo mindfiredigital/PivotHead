@@ -1,8 +1,26 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import { autoTable } from 'jspdf-autotable';
-import { PivotTableState } from '../types/interfaces';
+import {
+  PivotTableState,
+  FormatOptions,
+  DataRecord,
+  CellValue,
+} from '../types/interfaces';
+import { logger } from '../logger/logger.js';
+
+/**
+ * Escapes HTML special characters to prevent XSS in generated HTML exports.
+ */
+function escapeHtml(value: unknown): string {
+  const str = value == null ? '' : String(value);
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
 
 /**
  * Service class for handling export operations for the PivotEngine
@@ -13,7 +31,7 @@ export class PivotExportService {
    * @param {PivotTableState<T>} state - The current state of the pivot table
    * @returns {string} HTML string representation of the pivot table
    */
-  public static convertToHtml<T extends Record<string, any>>(
+  public static convertToHtml<T extends DataRecord>(
     state: PivotTableState<T>
   ): string {
     const { rows, columns, selectedMeasures, formatting, rawData } = state;
@@ -28,19 +46,18 @@ export class PivotExportService {
 
     // Get unique column values
     const uniqueColumns = [
-      ...new Set(
-        rawData.map((item: { [x: string]: any }) => item[columns[0].uniqueName])
-      ),
+      ...new Set(rawData.map(item => item[columns[0].uniqueName])),
     ];
 
     // Get unique row values
     const uniqueRows = [
-      ...new Set(
-        rawData.map((item: { [x: string]: any }) => item[rows[0].uniqueName])
-      ),
+      ...new Set(rawData.map(item => item[rows[0].uniqueName])),
     ];
 
-    const formatValue = (value: any, formatConfig: any): string => {
+    const formatValue = (
+      value: number,
+      formatConfig: FormatOptions | undefined
+    ): string => {
       if (value === 0) return '$0.00';
       if (!value && value !== 0) return '';
 
@@ -62,7 +79,7 @@ export class PivotExportService {
     };
 
     // Determine cell background based on conditional formatting (placeholder function)
-    const getCellStyle = (value: any, measureName: string): string => {
+    const getCellStyle = (_value: number, _measureName: string): string => {
       return '';
     };
 
@@ -118,17 +135,17 @@ export class PivotExportService {
         font-family: Arial, sans-serif;
       }
     </style>
-    
+
     <table class="pivot-table">
       <thead>
         <tr>
-          <th rowspan="2" class="corner-header">${
+          <th rowspan="2" class="corner-header">${escapeHtml(
             rows[0]?.caption || rows[0]?.uniqueName || ''
-          } /<br>Region</th>`;
+          )} /<br>Region</th>`;
 
     // Add region headers
     uniqueColumns.forEach(column => {
-      html += `<th colspan="${selectedMeasures.length}" class="region-header">${column}</th>`;
+      html += `<th colspan="${selectedMeasures.length}" class="region-header">${escapeHtml(column)}</th>`;
     });
 
     html += `
@@ -136,11 +153,11 @@ export class PivotExportService {
         <tr>`;
 
     // Add measure headers under each region
-    uniqueColumns.forEach(column => {
+    uniqueColumns.forEach(() => {
       selectedMeasures.forEach(measure => {
-        html += `<th class="measure-header sort-icon">${
+        html += `<th class="measure-header sort-icon">${escapeHtml(
           measure.caption || measure.uniqueName
-        }</th>`;
+        )}</th>`;
       });
     });
 
@@ -152,14 +169,14 @@ export class PivotExportService {
     // Add data rows
     uniqueRows.forEach(row => {
       html += `<tr>
-      <td class="row-header">${row}</td>`;
+      <td class="row-header">${escapeHtml(row)}</td>`;
 
       // Add cells for each column (region)
       uniqueColumns.forEach(column => {
         selectedMeasures.forEach(measure => {
           // Filter data for this row and column intersection
           const filteredData = rawData.filter(
-            (item: any) =>
+            (item: T) =>
               item[rows[0].uniqueName] === row &&
               item[columns[0].uniqueName] === column
           );
@@ -170,8 +187,8 @@ export class PivotExportService {
             switch (measure.aggregation) {
               case 'sum':
                 value = filteredData.reduce(
-                  (sum: any, item: any) =>
-                    sum + (item[measure.uniqueName] || 0),
+                  (sum: number, item: T) =>
+                    sum + (Number(item[measure.uniqueName]) || 0),
                   0
                 );
                 break;
@@ -179,15 +196,15 @@ export class PivotExportService {
                 if (measure?.formula && typeof measure.formula === 'function') {
                   value =
                     filteredData.reduce(
-                      (sum: number, item: any) =>
+                      (sum: number, item: T) =>
                         sum + (measure.formula?.(item) || 0),
                       0
                     ) / filteredData.length;
                 } else {
                   value =
                     filteredData.reduce(
-                      (sum: any, item: any) =>
-                        sum + (item[measure.uniqueName] || 0),
+                      (sum: number, item: T) =>
+                        sum + (Number(item[measure.uniqueName]) || 0),
                       0
                     ) / filteredData.length;
                 }
@@ -195,14 +212,14 @@ export class PivotExportService {
               case 'max':
                 value = Math.max(
                   ...filteredData.map(
-                    (item: any) => item[measure.uniqueName] || 0
+                    (item: T) => Number(item[measure.uniqueName]) || 0
                   )
                 );
                 break;
               case 'min':
                 value = Math.min(
                   ...filteredData.map(
-                    (item: any) => item[measure.uniqueName] || 0
+                    (item: T) => Number(item[measure.uniqueName]) || 0
                   )
                 );
                 break;
@@ -223,7 +240,7 @@ export class PivotExportService {
             formatting[measure.uniqueName]
           );
 
-          html += `<td${cellStyle}>${formattedValue}</td>`;
+          html += `<td${cellStyle}>${escapeHtml(formattedValue)}</td>`;
         });
       });
 
@@ -233,13 +250,13 @@ export class PivotExportService {
     html += `
       </tbody>
     </table>
-    
+
     <div class="pagination">
       Page ${state.paginationConfig?.currentPage || 1} of ${
         state.paginationConfig?.totalPages || 1
       }
     </div>
-    
+
     <div class="export-info">
       <p>Generated: ${new Date().toLocaleString()}</p>
     </div>
@@ -253,25 +270,25 @@ export class PivotExportService {
    * @param {PivotTableState<T>} state - The current state of the pivot table
    * @param {string} fileName - The name of the downloaded file (without extension)
    */
-  public static exportToHTML<T extends Record<string, any>>(
+  public static exportToHTML<T extends DataRecord>(
     state: PivotTableState<T>,
     fileName = 'pivot-table'
   ): void {
-    console.log(
+    logger.info(
       'PivotExportService.exportToHTML called with fileName:',
       fileName
     );
-    console.log('State rawData length:', state.rawData?.length || 0);
+    logger.info('State rawData length:', state.rawData?.length || 0);
 
     const htmlContent = PivotExportService.convertToHtml(state);
-    console.log('HTML content length:', htmlContent.length);
+    logger.info('HTML content length:', htmlContent.length);
 
     // Wrap in full HTML document
     const fullHtml = `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>${fileName}</title>
+  <title>${escapeHtml(fileName)}</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; }
     .pivot-export { max-width: 100%; overflow-x: auto; }
@@ -282,21 +299,21 @@ export class PivotExportService {
 </body>
 </html>`;
 
-    console.log('Full HTML length:', fullHtml.length);
+    logger.info('Full HTML length:', fullHtml.length);
 
     const dataUrl =
       'data:text/html;charset=utf-8,' + encodeURIComponent(fullHtml);
-    console.log('Data URL created, length:', dataUrl.length);
+    logger.info('Data URL created, length:', dataUrl.length);
 
     const a = document.createElement('a');
     a.href = dataUrl;
     a.download = `${fileName}.html`;
     document.body.appendChild(a);
-    console.log('Clicking download link...');
+    logger.info('Clicking download link...');
     a.click();
 
     document.body.removeChild(a);
-    console.log('HTML export completed');
+    logger.info('HTML export completed');
   }
 
   /**
@@ -304,19 +321,19 @@ export class PivotExportService {
    * @param {PivotTableState<T>} state - The current state of the pivot table
    * @param {string} fileName - The name of the downloaded file (without extension)
    */
-  public static exportToPDF<T extends Record<string, any>>(
+  public static exportToPDF<T extends DataRecord>(
     state: PivotTableState<T>,
     fileName = 'pivot-table'
   ): void {
-    console.log(
+    logger.info(
       'PivotExportService.exportToPDF called with fileName:',
       fileName
     );
-    console.log('State rawData length:', state.rawData?.length || 0);
+    logger.info('State rawData length:', state.rawData?.length || 0);
 
     // Convert pivot data to an HTML table
     const htmlContent = PivotExportService.convertToHtml(state);
-    console.log('HTML content length for PDF:', htmlContent.length);
+    logger.info('HTML content length for PDF:', htmlContent.length);
 
     // Create a temporary container for the HTML
     const container = document.createElement('div');
@@ -329,16 +346,16 @@ export class PivotExportService {
     const tableElement = container.querySelector('table');
 
     if (!tableElement) {
-      console.error('No table found in the generated HTML');
+      logger.error('No table found in the generated HTML');
       document.body.removeChild(container);
       return;
     }
 
-    console.log('Table element found, proceeding with PDF generation');
+    logger.info('Table element found, proceeding with PDF generation');
 
     try {
       // Create a new PDF document
-      console.log('Creating jsPDF instance...');
+      logger.info('Creating jsPDF instance...');
       const pdf = new jsPDF();
 
       // Add title
@@ -379,7 +396,7 @@ export class PivotExportService {
       // Clean up
       document.body.removeChild(container);
     } catch (error) {
-      console.error('Error exporting to PDF:', error);
+      logger.error('Error exporting to PDF:', error);
       document.body.removeChild(container);
     }
   }
@@ -389,20 +406,20 @@ export class PivotExportService {
    * @param {PivotTableState<T>} state - The current state of the pivot table
    * @param {string} fileName - The name of the downloaded file (without extension)
    */
-  public static exportToExcel<T extends Record<string, any>>(
+  public static exportToExcel<T extends DataRecord>(
     state: PivotTableState<T>,
     fileName = 'pivot-table'
   ): void {
-    console.log(
+    logger.info(
       'PivotExportService.exportToExcel called with fileName:',
       fileName
     );
-    console.log('State rawData length:', state.rawData?.length || 0);
+    logger.info('State rawData length:', state.rawData?.length || 0);
 
     try {
       PivotExportService.generateExcel(state, fileName);
     } catch (error) {
-      console.error('Error exporting to Excel:', error);
+      logger.error('Error exporting to Excel:', error);
     }
   }
 
@@ -411,12 +428,12 @@ export class PivotExportService {
    * @param {PivotTableState<T>} state - The current state of the pivot table
    * @param {string} fileName - The name of the downloaded file (without extension)
    */
-  private static generateExcel<T extends Record<string, any>>(
+  private static generateExcel<T extends DataRecord>(
     state: PivotTableState<T>,
     fileName: string
   ): void {
     if (!state.data || state.data.length === 0) {
-      console.log('No data to export!');
+      logger.info('No data to export!');
       return;
     }
 
@@ -430,23 +447,19 @@ export class PivotExportService {
     const colDimension = columns[0]?.uniqueName;
 
     if (!rowDimension || !colDimension) {
-      console.log('Missing row or column dimension');
+      logger.info('Missing row or column dimension');
       return;
     }
 
     const uniqueRowValues = [
-      ...new Set(
-        state.data.map((item: { [x: string]: any }) => item[rowDimension])
-      ),
+      ...new Set(state.data.map(item => item[rowDimension])),
     ];
     const uniqueColValues = [
-      ...new Set(
-        state.data.map((item: { [x: string]: any }) => item[colDimension])
-      ),
+      ...new Set(state.data.map(item => item[colDimension])),
     ];
 
     // Create header rows
-    const headerRow = [
+    const headerRow: CellValue[] = [
       rows[0]?.caption || 'Dimension',
       ...uniqueColValues.flatMap(colValue =>
         measures.map(
@@ -457,13 +470,13 @@ export class PivotExportService {
 
     // Create data rows
     const dataRows = uniqueRowValues.map(rowValue => {
-      const row = [rowValue];
+      const row: CellValue[] = [rowValue as CellValue];
 
       uniqueColValues.forEach(colValue => {
         measures.forEach(measure => {
           // Filter data for this row and column intersection
           const filteredData = state.data.filter(
-            (item: { [x: string]: unknown }) =>
+            (item: T) =>
               item[rowDimension] === rowValue && item[colDimension] === colValue
           );
 
@@ -473,8 +486,8 @@ export class PivotExportService {
             switch (measure.aggregation) {
               case 'sum':
                 value = filteredData.reduce(
-                  (sum: any, item: { [x: string]: any }) =>
-                    sum + (item[measure.uniqueName] || 0),
+                  (sum: number, item: T) =>
+                    sum + (Number(item[measure.uniqueName]) || 0),
                   0
                 );
                 break;
@@ -486,15 +499,15 @@ export class PivotExportService {
                 ) {
                   value =
                     filteredData.reduce(
-                      (sum: number, item: any) =>
+                      (sum: number, item: T) =>
                         sum + (measure.formula?.(item) || 0),
                       0
                     ) / filteredData.length;
                 } else {
                   value =
                     filteredData.reduce(
-                      (sum: any, item: { [x: string]: any }) =>
-                        sum + (item[measure.uniqueName] || 0),
+                      (sum: number, item: T) =>
+                        sum + (Number(item[measure.uniqueName]) || 0),
                       0
                     ) / filteredData.length;
                 }
@@ -502,16 +515,14 @@ export class PivotExportService {
               case 'max':
                 value = Math.max(
                   ...filteredData.map(
-                    (item: { [x: string]: any }) =>
-                      item[measure.uniqueName] || 0
+                    (item: T) => Number(item[measure.uniqueName]) || 0
                   )
                 );
                 break;
               case 'min':
                 value = Math.min(
                   ...filteredData.map(
-                    (item: { [x: string]: any }) =>
-                      item[measure.uniqueName] || 0
+                    (item: T) => Number(item[measure.uniqueName]) || 0
                   )
                 );
                 break;
@@ -533,14 +544,14 @@ export class PivotExportService {
 
     // Add a totals row if available
     if (state.processedData && state.processedData.totals) {
-      const totalsRow = ['Total'];
+      const totalsRow: CellValue[] = ['Total'];
 
-      uniqueColValues.forEach(colValue => {
+      uniqueColValues.forEach(() => {
         measures.forEach(measure => {
           // Get total for this measure across all data
           const totalValue =
             state.processedData.totals[measure.uniqueName] || 0;
-          totalsRow.push(totalValue?.toString());
+          totalsRow.push(totalValue);
         });
       });
 
@@ -618,14 +629,14 @@ export class PivotExportService {
    * @param {PivotTableState<T>} state - The current state of the pivot table
    * @param {string} title - Optional title for the printed page
    */
-  public static openPrintDialog<T extends Record<string, any>>(
+  public static openPrintDialog<T extends DataRecord>(
     state: PivotTableState<T>
   ): void {
     const htmlContent = PivotExportService.convertToHtml(state);
 
     const printWindow = window.open('', '_blank');
     if (!printWindow) {
-      console.error('Failed to open print dialog');
+      logger.error('Failed to open print dialog');
       return;
     }
 

@@ -6,11 +6,6 @@ export default defineConfig({
   input: 'src/index.ts',
   output: [
     {
-      file: 'dist/pivot-head.js',
-      format: 'esm',
-      sourcemap: true
-    },
-    {
       file: 'dist/pivot-head.mjs',
       format: 'esm',
       sourcemap: true

@@ -8,6 +8,7 @@ import type {
 } from '@mindfiredigital/pivothead';
 import type { PivotHeadHost } from './host';
 import type { PivotDataRecord, FormatOptions } from '../../types/types';
+import { logger } from '../../logger.js';
 
 import {
   FieldService,
@@ -30,7 +31,7 @@ export function sort(
   direction: 'asc' | 'desc'
 ): void {
   if (!host.engine) {
-    console.error('Engine not initialized');
+    logger.error('Engine not initialized');
     return;
   }
   host.engine.sort(field, direction);
@@ -41,7 +42,7 @@ export function setMeasures(
   measures: MeasureConfig[]
 ): void {
   if (!host.engine) {
-    console.error('Engine not initialized');
+    logger.error('Engine not initialized');
     return;
   }
   host.engine.setMeasures(measures);
@@ -52,7 +53,7 @@ export function setDimensions(
   dimensions: Dimension[]
 ): void {
   if (!host.engine) {
-    console.error('Engine not initialized');
+    logger.error('Engine not initialized');
     return;
   }
   host.engine.setDimensions(dimensions);
@@ -63,7 +64,7 @@ export function setGroupConfig(
   groupConfig: GroupConfig | null
 ): void {
   if (!host.engine) {
-    console.error('Engine not initialized');
+    logger.error('Engine not initialized');
     return;
   }
   host.engine.setGroupConfig(groupConfig);
@@ -74,7 +75,7 @@ export function setAggregation(
   type: AggregationType
 ): void {
   if (!host.engine) {
-    console.error('Engine not initialized');
+    logger.error('Engine not initialized');
     return;
   }
   host.engine.setAggregation(type);
@@ -86,7 +87,7 @@ export function formatValue(
   field: string
 ): string {
   if (!host.engine) {
-    console.error('Engine not initialized');
+    logger.error('Engine not initialized');
     return String(value);
   }
   return host.engine.formatValue(value, field);
@@ -94,7 +95,7 @@ export function formatValue(
 
 export function getGroupedData(host: PivotHeadHost): Group[] {
   if (!host.engine) {
-    console.error('Engine not initialized');
+    logger.error('Engine not initialized');
     return [];
   }
   return host.engine.getGroupedData();
@@ -102,7 +103,7 @@ export function getGroupedData(host: PivotHeadHost): Group[] {
 
 export function getData(host: PivotHeadHost): PivotDataRecord[] {
   if (!host.engine) {
-    console.error('Engine not initialized');
+    logger.error('Engine not initialized');
     return [];
   }
   return host.engine.getState().rawData;
@@ -110,7 +111,7 @@ export function getData(host: PivotHeadHost): PivotDataRecord[] {
 
 export function getProcessedData(host: PivotHeadHost): unknown {
   if (!host.engine) {
-    console.error('Engine not initialized');
+    logger.error('Engine not initialized');
     return null;
   }
   return host.engine.getState().processedData;
@@ -122,7 +123,7 @@ export function updateFieldFormatting(
   format: FormatOptions
 ): void {
   if (!host.engine) {
-    console.error('Engine not initialized');
+    logger.error('Engine not initialized');
     return;
   }
   host.engine.updateFieldFormatting(field, format);
@@ -156,7 +157,7 @@ export function buildLayout(
 
 export function getFieldAlignment(host: PivotHeadHost, field: string): string {
   if (!host.engine) {
-    console.error('Engine not initialized');
+    logger.error('Engine not initialized');
     return 'left';
   }
   return host.engine.getFieldAlignment(field);

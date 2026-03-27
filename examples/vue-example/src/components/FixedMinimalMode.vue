@@ -73,6 +73,7 @@
 <script lang="ts">
 import { defineComponent, ref, computed, watch, onMounted, nextTick } from 'vue'
 import PivotHead from '@mindfiredigital/pivothead-vue'
+import { logger } from '../../logger'
 
 // Simple processed table component
 const SimpleProcessedTable = defineComponent({
@@ -289,17 +290,17 @@ export default defineComponent({
     
     // Event handlers
     const handleStateChange = (state: any) => {
-      console.log('FixedMinimalMode - state change:', state)
+      logger.info('FixedMinimalMode - state change:', state)
       pivotState.value = state
     }
     
     const handleViewModeChange = (data: { mode: 'raw' | 'processed' }) => {
-      console.log('FixedMinimalMode - view mode change:', data)
+      logger.info('FixedMinimalMode - view mode change:', data)
       viewMode.value = data.mode
     }
     
     const handlePaginationChange = (paginationData: any) => {
-      console.log('FixedMinimalMode - pagination change:', paginationData)
+      logger.info('FixedMinimalMode - pagination change:', paginationData)
       Object.assign(pagination.value, paginationData)
     }
     
@@ -314,13 +315,13 @@ export default defineComponent({
       }
       
       filters.value = [newFilter]
-      console.log('Applied filter:', newFilter)
+      logger.info('Applied filter:', newFilter)
     }
     
     const resetFilter = () => {
       filters.value = []
       filterValue.value = ''
-      console.log('Reset filters')
+      logger.info('Reset filters')
     }
     
     const toggleViewMode = () => {
@@ -356,8 +357,8 @@ export default defineComponent({
     
     // Mount: initialize
     onMounted(async () => {
-      console.log('FixedMinimalMode mounted with data:', props.data.length, 'records')
-      console.log('FixedMinimalMode options:', props.options)
+      logger.info('FixedMinimalMode mounted with data:', props.data.length, 'records')
+      logger.info('FixedMinimalMode options:', props.options)
       
       await nextTick()
       
@@ -369,7 +370,7 @@ export default defineComponent({
         setTimeout(() => {
           const st = pivotRef.value?.getState?.()
           if (st) {
-            console.log('Initial state loaded:', st)
+            logger.info('Initial state loaded:', st)
             pivotState.value = st
           }
         }, 100)

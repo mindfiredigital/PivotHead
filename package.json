@@ -58,13 +58,36 @@
     "eslint-plugin-prettier": "^5.5.4",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.0",
-    "ng-packagr": "^20.3.0",
+    "ng-packagr": "^20.3.2",
     "turbo": "^2.5.6",
     "typescript": "5.9.2"
   },
   "pnpm": {
     "overrides": {
-      "typescript": "~5.4.5"
+      "typescript": "~5.4.5",
+      "jspdf": "^4.2.1",
+      "multer": "^2.1.1",
+      "dompurify": "^3.3.2",
+      "flatted": "^3.4.2",
+      "immutable": "^5.1.5",
+      "on-headers": "^1.1.0",
+      "socket.io-parser": "^4.2.6",
+      "serialize-javascript": "^7.0.3",
+      "@isaacs/brace-expansion": "^5.0.1",
+      "diff": "^8.0.3",
+      "@babel/runtime": "^7.26.10",
+      "@tootallnate/once": "^3.0.1",
+      "undici": "^6.24.0",
+      "qs": "^6.14.2",
+      "http-proxy-middleware": "^3.0.5",
+      "webpack": "^5.94.0",
+      "webpack-dev-server": "^5.2.1",
+      "lodash": "^4.17.23",
+      "esbuild": "^0.25.0",
+      "rollup": "^4.60.0",
+      "tmp": "^0.2.5",
+      "@angular/compiler-cli": "20.3.18",
+      "@angular/compiler": "20.3.18"
     }
   },
   "lint-staged": {

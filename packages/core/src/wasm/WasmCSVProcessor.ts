@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * WebAssembly CSV Processor
  *
@@ -6,23 +5,15 @@
  */
 
 import { getWasmLoader, WasmLoader } from './WasmLoader';
+import { logger } from '../logger/logger.js';
+import { WASM_SAFETY_LIMIT } from '../config/constants.js';
+import type {
+  WasmProcessOptions,
+  WasmProcessResult,
+  DataRecord,
+} from '../types/interfaces';
 
-export interface WasmProcessOptions {
-  delimiter?: string;
-  hasHeader?: boolean;
-  trimValues?: boolean;
-  skipEmptyLines?: boolean;
-}
-
-export interface WasmProcessResult {
-  success: boolean;
-  data: any[];
-  headers?: string[];
-  rowCount: number;
-  colCount: number;
-  parseTime: number;
-  error?: string;
-}
+export type { WasmProcessOptions, WasmProcessResult };
 
 export class WasmCSVProcessor {
   private wasmLoader: WasmLoader;
@@ -42,7 +33,7 @@ export class WasmCSVProcessor {
 
     try {
       if (!WasmLoader.isSupported()) {
-        console.warn(
+        logger.warn(
           '⚠️ WebAssembly not supported, falling back to Web Workers'
         );
         return false;
@@ -52,7 +43,7 @@ export class WasmCSVProcessor {
       this.isInitialized = true;
       return true;
     } catch (error) {
-      console.warn('⚠️ Failed to initialize WASM:', error);
+      logger.warn('⚠️ Failed to initialize WASM:', error);
       return false;
     }
   }
@@ -85,7 +76,7 @@ export class WasmCSVProcessor {
         skipEmptyLines = true,
       } = options;
 
-      console.log('🚀 Processing CSV with WebAssembly...');
+      logger.info('🚀 Processing CSV with WebAssembly...');
 
       // Parse CSV structure using WASM
       const parseResult = this.wasmLoader.parseCSVChunk(csvData, {
@@ -98,7 +89,7 @@ export class WasmCSVProcessor {
         throw new Error(parseResult.errorMessage || 'WASM parsing failed');
       }
 
-      console.log(
+      logger.info(
         `📊 WASM parsed: ${parseResult.rowCount} rows, ${parseResult.colCount} columns`
       );
 
@@ -111,15 +102,27 @@ export class WasmCSVProcessor {
         skipEmptyLines,
       });
 
-      const headers = hasHeader && rows.length > 0 ? rows[0] : undefined;
-      const dataRows = hasHeader ? rows.slice(1) : rows;
+      // Use providedHeaders (for non-first streaming chunks) or detect from first row
+      let headers: string[] | undefined;
+      let dataRows: string[][];
+      if (options.providedHeaders && options.providedHeaders.length > 0) {
+        // Headers supplied externally — all rows in this chunk are data
+        headers = options.providedHeaders;
+        dataRows = rows;
+      } else if (hasHeader && rows.length > 0) {
+        headers = rows[0];
+        dataRows = rows.slice(1);
+      } else {
+        headers = undefined;
+        dataRows = rows;
+      }
 
       // Convert rows to objects
       const data = this.rowsToObjects(dataRows, headers);
 
       const parseTime = performance.now() - startTime;
 
-      console.log(`✅ WASM processing completed in ${parseTime.toFixed(2)}ms`);
+      logger.info(`✅ WASM processing completed in ${parseTime.toFixed(2)}ms`);
 
       return {
         success: true,
@@ -131,7 +134,7 @@ export class WasmCSVProcessor {
       };
     } catch (error) {
       const parseTime = performance.now() - startTime;
-      console.error('❌ WASM processing error:', error);
+      logger.error('❌ WASM processing error:', error);
 
       return {
         success: false,
@@ -220,14 +223,14 @@ export class WasmCSVProcessor {
   /**
    * Convert rows to objects
    */
-  private rowsToObjects(rows: string[][], headers?: string[]): any[] {
+  private rowsToObjects(rows: string[][], headers?: string[]): DataRecord[] {
     if (!headers || headers.length === 0) {
       // No headers, return as arrays
       return rows.map(row => ({ ...row }));
     }
 
     return rows.map(row => {
-      const obj: any = {};
+      const obj: DataRecord = {};
       headers.forEach((header, index) => {
         const value = row[index] ?? '';
 
@@ -265,10 +268,8 @@ export class WasmCSVProcessor {
   ): Promise<WasmProcessResult> {
     try {
       // Safety check: Don't process files that are too large for in-memory processing
-      const MAX_FILE_SIZE = 8 * 1024 * 1024; // 8MB limit for WASM (no streaming yet)
-
-      if (file.size > MAX_FILE_SIZE) {
-        console.warn(
+      if (file.size > WASM_SAFETY_LIMIT) {
+        logger.warn(
           `⚠️ File too large for WASM (${(file.size / 1024 / 1024).toFixed(2)}MB > 8MB). Should use Web Workers instead.`
         );
         return {

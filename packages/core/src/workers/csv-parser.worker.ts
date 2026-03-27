@@ -1,35 +1,14 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * CSV Parser Web Worker
  * Handles chunked CSV parsing in a separate thread
  */
-
-interface ParseChunkMessage {
-  type: 'PARSE_CHUNK';
-  chunkId: number;
-  text: string;
-  isFirstChunk: boolean;
-  isLastChunk: boolean;
-  delimiter: string;
-  headers?: string[];
-  leftover?: string;
-}
-
-interface ParseResultMessage {
-  type: 'CHUNK_PARSED';
-  chunkId: number;
-  data: any[];
-  headers?: string[];
-  leftover?: string;
-  rowCount: number;
-  error?: string;
-}
-
-interface ProgressMessage {
-  type: 'PROGRESS';
-  chunkId: number;
-  progress: number;
-}
+import type {
+  ParseChunkMessage,
+  ParseResultMessage,
+  ProgressMessage,
+  CellValue,
+  DataRecord,
+} from '../types/interfaces';
 
 /**
  * Parse a CSV line handling quoted values
@@ -59,7 +38,7 @@ function parseCsvLine(line: string, delimiter: string): string[] {
 /**
  * Convert string value to appropriate type
  */
-function convertValue(value: string): any {
+function convertValue(value: string): CellValue {
   if (value === '' || value === null || value === undefined) {
     return null;
   }
@@ -98,7 +77,7 @@ function parseChunk(
   leftover: string | undefined,
   isFirstChunk: boolean,
   isLastChunk: boolean
-): { data: any[]; headers?: string[]; leftover?: string } {
+): { data: DataRecord[]; headers?: string[]; leftover?: string } {
   // Prepend leftover from previous chunk
   const fullText = (leftover || '') + text;
 
@@ -107,7 +86,7 @@ function parseChunk(
   // If not last chunk, keep the last (potentially incomplete) line for next chunk
   const incompleteLine = !isLastChunk ? lines.pop() : '';
 
-  const data: any[] = [];
+  const data: DataRecord[] = [];
   let processedHeaders = headers;
   let startIndex = 0;
 
@@ -127,7 +106,7 @@ function parseChunk(
     const values = parseCsvLine(line, delimiter);
     if (values.length === 0) continue;
 
-    const row: any = {};
+    const row: DataRecord = {};
     processedHeaders?.forEach((header, index) => {
       row[header] = convertValue(values[index] || '');
     });

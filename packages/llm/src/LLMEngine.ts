@@ -8,9 +8,11 @@ import type {
   PivotContext,
   CapabilityReport,
 } from './types.js';
-
-const DEFAULT_MODEL = 'Llama-3.2-3B-Instruct-q4f16_1-MLC';
-const DEFAULT_MAX_HISTORY = 10;
+import {
+  DEFAULT_MODEL,
+  DEFAULT_MAX_HISTORY,
+  DEFAULT_SYSTEM_PROMPT,
+} from './constants.js';
 
 interface ChatMessage {
   role: 'system' | 'user' | 'assistant';
@@ -119,7 +121,7 @@ export class LLMEngine {
   private buildMessages(userMessage: string): ChatMessage[] {
     const systemPrompt = this.context
       ? this.promptBuilder.build(this.context)
-      : 'You are a pivot table AI assistant. Respond only with valid JSON action objects.';
+      : DEFAULT_SYSTEM_PROMPT;
 
     const recentHistory = this.history.slice(-(this.maxHistory * 2));
 

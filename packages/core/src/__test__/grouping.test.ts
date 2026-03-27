@@ -86,6 +86,7 @@ describe('PivotEngine Grouping', () => {
       columnFields: ['date'],
       grouper: (item, fields) => fields.map(field => item[field]).join(' - '),
     },
+    rawData: [],
   };
 
   it('should group data by a single row field', () => {

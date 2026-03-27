@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   AggregationType,
   Dimension,
+  FieldOrder,
   Group,
   GroupConfig,
   MeasureConfig,
@@ -15,24 +15,26 @@ import {
   DataHandlingMode,
   FormatOptions,
   AxisConfig,
+  CellValue,
 } from '../types/interfaces';
 import { calculateAggregates } from './aggregator';
 import { processData } from './dataProcessor';
 import { PivotExportService } from './exportService';
+import { logger } from '../logger/logger.js';
 // import { applySort, sortGroups } from './sorter';
 
 /**
  * Creates an instance of PivotEngine.
  * @param {PivotTableConfig<T>} config - The configuration for the pivot table.
  */
-export class PivotEngine<T extends Record<string, any>> {
-  setColumns(columns: any) {
+export class PivotEngine<T extends Record<string, unknown>> {
+  setColumns(columns: AxisConfig[]) {
     throw new Error('Method not implemented.');
   }
-  setRows(rows: any) {
+  setRows(rows: AxisConfig[]) {
     throw new Error('Method not implemented.');
   }
-  setData(augmentedData: any[]) {
+  setData(augmentedData: T[]) {
     throw new Error('Method not implemented.');
   }
   private config: PivotTableConfig<T>;
@@ -50,7 +52,7 @@ export class PivotEngine<T extends Record<string, any>> {
   private autoAllColumnEnabled = false;
 
   // Add cache for expensive calculations
-  private cache: Map<string, any> = new Map();
+  private cache: Map<string, unknown> = new Map();
 
   constructor(config: PivotTableConfig<T>) {
     // Validate required config properties
@@ -121,7 +123,7 @@ export class PivotEngine<T extends Record<string, any>> {
       } else if (type === 'file' && file) {
         this.state.rawData = await this.readFileData(file);
       } else {
-        console.error('Invalid data source configuration');
+        logger.error('Invalid data source configuration');
       }
     } else if (this.config.data) {
       this.state.rawData = this.config.data;
@@ -163,9 +165,9 @@ export class PivotEngine<T extends Record<string, any>> {
         const source = Array.isArray(arr) ? arr : [];
         let changed = false;
         const out = source.map(row => {
-          if (row && (row as any).__all__ === undefined) {
+          if (row && row['__all__'] === undefined) {
             changed = true;
-            return { ...(row as any), __all__: 'All' } as T;
+            return { ...row, __all__: 'All' } as unknown as T;
           }
           return row;
         });
@@ -245,7 +247,7 @@ export class PivotEngine<T extends Record<string, any>> {
       }
       return await response.json();
     } catch (error) {
-      console.error('Error fetching remote data:', error);
+      logger.error('Error fetching remote data:', error);
       return [];
     }
   }
@@ -303,7 +305,7 @@ export class PivotEngine<T extends Record<string, any>> {
       // extract data from sorted groups to respect the sorted order
       if (this.state.groups.length > 0) {
         // Extract data from sorted groups in the correct order
-        dataToUse = this.state.groups.flatMap(group => group.items);
+        dataToUse = this.state.groups.flatMap(group => group.items as T[]);
       } else {
         // If no groups, sort the raw data directly
         dataToUse = this.sortData(this.state.rawData, sortConfig);
@@ -341,22 +343,22 @@ export class PivotEngine<T extends Record<string, any>> {
   /**
    * Generates rows for the pivot table.
    * @param {T[]} data - The data to generate rows from.
-   * @returns {any[][]} A 2D array representing the rows.
+   * @returns {CellValue[][]} A 2D array representing the rows.
    * @private
    */
   /**
    * Generates rows for the pivot table with enhanced formatting.
    * @param {T[]} data - The data to generate rows from.
-   * @returns {any[][]} A 2D array representing the rows.
+   * @returns {CellValue[][]} A 2D array representing the rows.
    * @private
    */
-  private generateRows(data: T[]): any[][] {
+  private generateRows(data: T[]): CellValue[][] {
     if (!data || !this.state.rows || !this.state.columns) {
       return [];
     }
     return data.map(item => [
-      ...this.state.rows.map(r => item[r.uniqueName]),
-      ...this.state.columns.map(c => item[c.uniqueName]),
+      ...this.state.rows.map(r => item[r.uniqueName] as CellValue),
+      ...this.state.columns.map(c => item[c.uniqueName] as CellValue),
       ...this.state.measures.map(m => {
         const rawValue = this.calculateMeasureValue(item, m);
         return this.formatValue(rawValue, m.uniqueName);
@@ -375,7 +377,7 @@ export class PivotEngine<T extends Record<string, any>> {
     if (measure.formula && typeof measure.formula === 'function') {
       return measure.formula(item);
     }
-    return item[measure.uniqueName] || 0;
+    return (item[measure.uniqueName] as number) || 0;
   }
 
   /**
@@ -392,15 +394,24 @@ export class PivotEngine<T extends Record<string, any>> {
       let total = 0;
 
       if (aggregation === 'sum') {
-        total = data.reduce((sum, item) => sum + (item[uniqueName] || 0), 0);
+        total = data.reduce(
+          (sum, item) => sum + ((item[uniqueName] as number) || 0),
+          0
+        );
       } else if (aggregation === 'avg') {
         total =
-          data.reduce((sum, item) => sum + (item[uniqueName] || 0), 0) /
-          data.length;
+          data.reduce(
+            (sum, item) => sum + ((item[uniqueName] as number) || 0),
+            0
+          ) / data.length;
       } else if (aggregation === 'max') {
-        total = Math.max(...data.map(item => item[uniqueName] || 0));
+        total = Math.max(
+          ...data.map(item => (item[uniqueName] as number) || 0)
+        );
       } else if (aggregation === 'min') {
-        total = Math.min(...data.map(item => item[uniqueName] || 0));
+        total = Math.min(
+          ...data.map(item => (item[uniqueName] as number) || 0)
+        );
       } else if (aggregation === 'count') {
         total = data.length;
       }
@@ -431,7 +442,7 @@ export class PivotEngine<T extends Record<string, any>> {
       try {
         fn(state);
       } catch (error) {
-        console.error('Error in pivot engine subscriber:', error);
+        logger.error('Error in pivot engine subscriber:', error);
         // Continue processing other subscribers even if one fails
       }
     });
@@ -501,12 +512,12 @@ export class PivotEngine<T extends Record<string, any>> {
 
   /**
    * Enhanced formatValue method with comprehensive formatting support
-   * @param {any} value - The value to format.
+   * @param {CellValue} value - The value to format.
    * @param {string} field - The field name to use for formatting.
    * @returns {string} The formatted value as a string.
    * @public
    */
-  public formatValue(value: any, field: string): string {
+  public formatValue(value: CellValue, field: string): string {
     // Handle null/undefined values first
     if (
       value === null ||
@@ -542,7 +553,7 @@ export class PivotEngine<T extends Record<string, any>> {
 
       return this.applyFormatting(value, effectiveFormat);
     } catch (error) {
-      console.error(`Error formatting value for field ${field}:`, error);
+      logger.error(`Error formatting value for field ${field}:`, error);
       return String(value);
     }
   }
@@ -550,7 +561,7 @@ export class PivotEngine<T extends Record<string, any>> {
   /**
    * Get formatting configuration for a field
    * @param {string} field - The field name
-   * @returns {EnhancedMeasureFormat | null} The format configuration
+   * @returns {FormatOptions | null} The format configuration
    * @private
    */
   private getFieldFormat(field: string): FormatOptions | null {
@@ -571,13 +582,13 @@ export class PivotEngine<T extends Record<string, any>> {
 
   /**
    * Apply comprehensive formatting to a value
-   * @param {any} value - The value to format
-   * @param {EnhancedMeasureFormat} format - The format configuration
+   * @param {CellValue} value - The value to format
+   * @param {FormatOptions} format - The format configuration
    * @returns {string} The formatted value
    * @private
    */
-  private applyFormatting(value: any, format: FormatOptions): string {
-    let num = parseFloat(value);
+  private applyFormatting(value: CellValue, format: FormatOptions): string {
+    let num = parseFloat(String(value));
     if (isNaN(num)) {
       return String(value);
     }
@@ -618,7 +629,7 @@ export class PivotEngine<T extends Record<string, any>> {
   /**
    * Format as currency
    * @param {number} num - The number to format
-   * @param {EnhancedMeasureFormat} format - The format configuration
+   * @param {FormatOptions} format - The format configuration
    * @param {number} decimals - Number of decimal places
    * @returns {string} The formatted currency value
    * @private
@@ -653,7 +664,7 @@ export class PivotEngine<T extends Record<string, any>> {
   /**
    * Format as percentage
    * @param {number} num - The number to format
-   * @param {EnhancedMeasureFormat} format - The format configuration
+   * @param {FormatOptions} format - The format configuration
    * @param {number} decimals - Number of decimal places
    * @returns {string} The formatted percentage value
    * @private
@@ -677,7 +688,7 @@ export class PivotEngine<T extends Record<string, any>> {
   /**
    * Format as number
    * @param {number} num - The number to format
-   * @param {EnhancedMeasureFormat} format - The format configuration
+   * @param {FormatOptions} format - The format configuration
    * @param {number} decimals - Number of decimal places
    * @returns {string} The formatted number value
    * @private
@@ -697,16 +708,16 @@ export class PivotEngine<T extends Record<string, any>> {
 
   /**
    * Format as date
-   * @param {any} value - The date value to format
-   * @param {EnhancedMeasureFormat} format - The format configuration
+   * @param {CellValue} value - The date value to format
+   * @param {FormatOptions} format - The format configuration
    * @returns {string} The formatted date value
    * @private
    */
-  private formatDate(value: any, format: FormatOptions): string {
+  private formatDate(value: CellValue, format: FormatOptions): string {
     const locale = format.locale || 'en-US';
 
     try {
-      const date = new Date(value);
+      const date = new Date(value as string | number | Date);
       return date.toLocaleDateString(locale, {
         dateStyle: 'medium',
       });
@@ -718,7 +729,7 @@ export class PivotEngine<T extends Record<string, any>> {
   /**
    * Apply custom thousand and decimal separators
    * @param {string} formattedValue - The pre-formatted value
-   * @param {EnhancedMeasureFormat} format - The format configuration
+   * @param {FormatOptions} format - The format configuration
    * @returns {string} The value with custom separators applied
    * @private
    */
@@ -770,7 +781,9 @@ export class PivotEngine<T extends Record<string, any>> {
     rowFieldName: string,
     columnFieldName: string
   ): number {
-    const filteredData = this.state.rawData.filter(
+    // Use full dataset for aggregation so results are correct regardless of pagination
+    const sourceData: T[] = (this.config.data as T[]) || this.state.rawData;
+    const filteredData = sourceData.filter(
       item =>
         item[rowFieldName] === rowValue && item[columnFieldName] === columnValue
     );
@@ -783,25 +796,25 @@ export class PivotEngine<T extends Record<string, any>> {
     switch (measure.aggregation) {
       case 'sum':
         value = filteredData.reduce(
-          (sum, item) => sum + (item[measure.uniqueName] || 0),
+          (sum, item) => sum + ((item[measure.uniqueName] as number) || 0),
           0
         );
         break;
       case 'avg':
         value =
           filteredData.reduce(
-            (sum, item) => sum + (item[measure.uniqueName] || 0),
+            (sum, item) => sum + ((item[measure.uniqueName] as number) || 0),
             0
           ) / filteredData.length;
         break;
       case 'max':
         value = Math.max(
-          ...filteredData.map(item => item[measure.uniqueName] || 0)
+          ...filteredData.map(item => (item[measure.uniqueName] as number) || 0)
         );
         break;
       case 'min':
         value = Math.min(
-          ...filteredData.map(item => item[measure.uniqueName] || 0)
+          ...filteredData.map(item => (item[measure.uniqueName] as number) || 0)
         );
         break;
       case 'count':
@@ -824,7 +837,7 @@ export class PivotEngine<T extends Record<string, any>> {
     // Check cache first for performance
     const cacheKey = `alignment:${field}`;
     if (this.cache.has(cacheKey)) {
-      return this.cache.get(cacheKey);
+      return this.cache.get(cacheKey) as string;
     }
 
     const format = this.getFieldFormat(field);
@@ -849,7 +862,7 @@ export class PivotEngine<T extends Record<string, any>> {
   /**
    * Update formatting configuration for a specific field
    * @param {string} field - The field name
-   * @param {EnhancedMeasureFormat} format - The format configuration
+   * @param {FormatOptions} format - The format configuration
    * @public
    */
   public updateFieldFormatting(field: string, format: FormatOptions) {
@@ -952,7 +965,7 @@ export class PivotEngine<T extends Record<string, any>> {
     });
   }
 
-  private getFieldValue(item: T, sortConfig: SortConfig): any {
+  private getFieldValue(item: T, sortConfig: SortConfig): string | number {
     if (sortConfig.type === 'measure') {
       const measure = this.state.measures.find(
         m => m.uniqueName === sortConfig.field
@@ -961,13 +974,13 @@ export class PivotEngine<T extends Record<string, any>> {
         return measure.formula(item);
       }
     }
-    return item[sortConfig.field];
+    return item[sortConfig.field] as string | number;
   }
 
   private sortGroups(groups: Group[], sortConfig: SortConfig): Group[] {
     return [...groups].sort((a, b) => {
-      let aValue: any;
-      let bValue: any;
+      let aValue: string | number;
+      let bValue: string | number;
 
       if (sortConfig.type === 'measure') {
         // Sort by aggregated measure values
@@ -994,8 +1007,12 @@ export class PivotEngine<T extends Record<string, any>> {
           bValue = bKeys[1] || '';
         } else {
           // Fallback: try to find the field in the first item of each group
-          aValue = a.items[0]?.[sortConfig.field] || '';
-          bValue = b.items[0]?.[sortConfig.field] || '';
+          aValue =
+            (a.items[0]?.[sortConfig.field] as string | number | undefined) ||
+            '';
+          bValue =
+            (b.items[0]?.[sortConfig.field] as string | number | undefined) ||
+            '';
         }
 
         // Handle string comparison
@@ -1030,7 +1047,7 @@ export class PivotEngine<T extends Record<string, any>> {
           );
         } else {
           group.aggregates[aggregateKey] = calculateAggregates(
-            group.items,
+            group.items as T[],
             measure.uniqueName as keyof T,
             (measure.aggregation as AggregationType) ||
               (this.state.selectedAggregation as AggregationType)
@@ -1056,7 +1073,7 @@ export class PivotEngine<T extends Record<string, any>> {
     const { rowFields, columnFields, grouper } = this.state.groupConfig;
 
     if (!rowFields || !columnFields || !grouper) {
-      console.error('Invalid groupConfig:', this.state.groupConfig);
+      logger.error('Invalid groupConfig:', this.state.groupConfig);
       return;
     }
 
@@ -1247,15 +1264,15 @@ export class PivotEngine<T extends Record<string, any>> {
       if (typeof this.config.onColumnDragEnd === 'function') {
         // Map Group[] to { uniqueName, caption }[] before passing to callback
         const mappedColumnGroups = newColumnGroups.map(group => ({
-          uniqueName: (group as any).uniqueName ?? group.key ?? '',
-          caption: (group as any).caption ?? group.key ?? '',
+          uniqueName: group.uniqueName ?? group.key ?? '',
+          caption: group.caption ?? group.key ?? '',
         }));
         this.config.onColumnDragEnd(fromIndex, toIndex, mappedColumnGroups);
       }
 
       this._emit(); // Notify subscribers after state change
     } catch (error) {
-      console.error('Error during column drag operation:', error);
+      logger.error('Error during column drag operation:', error);
     }
   }
 
@@ -1271,7 +1288,7 @@ export class PivotEngine<T extends Record<string, any>> {
     const isValid =
       fromIndex >= 0 && toIndex >= 0 && fromIndex < length && toIndex < length;
     if (!isValid) {
-      console.warn(
+      logger.warn(
         `Invalid drag indices: from ${fromIndex} to ${toIndex} with length ${length}`
       );
     }
@@ -1401,8 +1418,16 @@ export class PivotEngine<T extends Record<string, any>> {
             return Number(value) > Number(filterValue);
           case 'lessThan':
             return Number(value) < Number(filterValue);
-          case 'between':
-            return value >= filterValue[0] && value <= filterValue[1];
+          case 'between': {
+            const range = filterValue as readonly [
+              string | number,
+              string | number,
+            ];
+            return (
+              (value as string | number) >= range[0] &&
+              (value as string | number) <= range[1]
+            );
+          }
           default:
             return true;
         }
@@ -1445,8 +1470,8 @@ export class PivotEngine<T extends Record<string, any>> {
    * @public
    */
   public exportToHTML(fileName = 'pivot-table'): void {
-    console.log('PivotEngine.exportToHTML called with fileName:', fileName);
-    console.log(
+    logger.info('PivotEngine.exportToHTML called with fileName:', fileName);
+    logger.info(
       'PivotEngine state rawData length:',
       this.state.rawData?.length || 0
     );
@@ -1459,8 +1484,8 @@ export class PivotEngine<T extends Record<string, any>> {
    * @public
    */
   public exportToPDF(fileName = 'pivot-table'): void {
-    console.log('PivotEngine.exportToPDF called with fileName:', fileName);
-    console.log(
+    logger.info('PivotEngine.exportToPDF called with fileName:', fileName);
+    logger.info(
       'PivotEngine state rawData length:',
       this.state.rawData?.length || 0
     );
@@ -1473,8 +1498,8 @@ export class PivotEngine<T extends Record<string, any>> {
    * @public
    */
   public exportToExcel(fileName = 'pivot-table'): void {
-    console.log('PivotEngine.exportToExcel called with fileName:', fileName);
-    console.log(
+    logger.info('PivotEngine.exportToExcel called with fileName:', fileName);
+    logger.info(
       'PivotEngine state rawData length:',
       this.state.rawData?.length || 0
     );
@@ -1501,7 +1526,7 @@ export class PivotEngine<T extends Record<string, any>> {
   public dragDataRow(fromIndex: number, toIndex: number): void {
     // Get unique products with proper type casting
     const uniqueProducts = [
-      ...new Set(this.state.data.map((item: { product: any }) => item.product)),
+      ...new Set(this.state.data.map(item => item['product'])),
     ].filter((product): product is string => typeof product === 'string');
 
     if (
@@ -1515,7 +1540,7 @@ export class PivotEngine<T extends Record<string, any>> {
       const fromProduct = uniqueProducts[fromIndex];
       const toProduct = uniqueProducts[toIndex];
 
-      console.log(`Reordering products: ${fromProduct} -> ${toProduct}`);
+      logger.info(`Reordering products: ${fromProduct} -> ${toProduct}`);
 
       // Create a new data array with reordered products
       const newData = [...this.state.data];
@@ -1527,8 +1552,8 @@ export class PivotEngine<T extends Record<string, any>> {
 
       // Sort the data array based on the new product order
       newData.sort((a, b) => {
-        const aIndex = reorderedProducts.indexOf(a.product as string);
-        const bIndex = reorderedProducts.indexOf(b.product as string);
+        const aIndex = reorderedProducts.indexOf(a['product'] as string);
+        const bIndex = reorderedProducts.indexOf(b['product'] as string);
         return aIndex - bIndex;
       });
 
@@ -1549,7 +1574,7 @@ export class PivotEngine<T extends Record<string, any>> {
         this.config.onRowDragEnd(fromIndex, toIndex, this.state.rowGroups);
       }
     } catch (error) {
-      console.error('Error during data row drag operation:', error);
+      logger.error('Error during data row drag operation:', error);
     }
   }
 
@@ -1563,7 +1588,7 @@ export class PivotEngine<T extends Record<string, any>> {
   public dragDataColumn(fromIndex: number, toIndex: number): void {
     // Get unique regions with proper type casting
     const uniqueRegions = [
-      ...new Set(this.state.data.map((item: { region: any }) => item.region)),
+      ...new Set(this.state.data.map(item => item['region'])),
     ].filter((region): region is string => typeof region === 'string');
 
     if (!this.validateDragOperation(fromIndex, toIndex, uniqueRegions.length)) {
@@ -1616,7 +1641,7 @@ export class PivotEngine<T extends Record<string, any>> {
         this.config.onColumnDragEnd(fromIndex, toIndex, mappedColumns);
       }
     } catch (error) {
-      console.error('Error during data column drag operation:', error);
+      logger.error('Error during data column drag operation:', error);
     }
   }
 
@@ -1635,15 +1660,13 @@ export class PivotEngine<T extends Record<string, any>> {
   ): void {
     try {
       const uniqueProducts = [
-        ...new Set(
-          this.state.data.map((item: { product: any }) => item.product)
-        ),
+        ...new Set(this.state.data.map(item => item['product'])),
       ];
       const fromIndex = uniqueProducts.indexOf(fromProduct);
       const toIndex = uniqueProducts.indexOf(toProduct);
 
       if (fromIndex === -1 || toIndex === -1) {
-        console.warn('Invalid product names for reordering:', {
+        logger.warn('Invalid product names for reordering:', {
           fromProduct,
           toProduct,
         });
@@ -1656,7 +1679,7 @@ export class PivotEngine<T extends Record<string, any>> {
       // Use the existing dragDataRow method
       this.dragDataRow(fromIndex, actualToIndex);
     } catch (error) {
-      console.error('Error reordering products by name:', error);
+      logger.error('Error reordering products by name:', error);
     }
   }
 
@@ -1664,7 +1687,7 @@ export class PivotEngine<T extends Record<string, any>> {
 
   // Also add a method to get the custom region order:
   public getCustomRegionOrder(): string[] | null {
-    return (this.state as any).customRegionOrder || null;
+    return this.state.customRegionOrder ?? null;
   }
 
   // GENERIC CORE ENGINE METHODS - Works with any field names
@@ -1681,14 +1704,14 @@ export class PivotEngine<T extends Record<string, any>> {
         : null;
 
     if (!rowField) {
-      console.warn('No row field configured for swapping');
+      logger.warn('No row field configured for swapping');
       return;
     }
 
     const rowFieldName = rowField.uniqueName;
 
     // Get unique values for the row field from FULL DATASET - use current custom order if it exists
-    const customRowOrder = (this.state as any).customRowOrder;
+    const customRowOrder = this.state.customRowOrder;
     let uniqueRowValues: string[];
 
     if (
@@ -1701,18 +1724,14 @@ export class PivotEngine<T extends Record<string, any>> {
     } else {
       // Use original FULL data order - THIS IS THE KEY FIX
       uniqueRowValues = [
-        ...new Set(
-          (this.config.data || []).map(
-            (item: { [x: string]: any }) => item[rowFieldName]
-          )
-        ),
+        ...new Set((this.config.data || []).map(item => item[rowFieldName])),
       ].filter(
         (value): value is string =>
           typeof value === 'string' && value !== null && value !== undefined
       );
     }
 
-    console.log(
+    logger.info(
       `Row swap validation: ${rowFieldName} has ${uniqueRowValues.length} unique values:`,
       uniqueRowValues
     );
@@ -1723,7 +1742,7 @@ export class PivotEngine<T extends Record<string, any>> {
       fromIndex >= uniqueRowValues.length ||
       toIndex >= uniqueRowValues.length
     ) {
-      console.warn(`Invalid indices for row swap operation:`, {
+      logger.warn(`Invalid indices for row swap operation:`, {
         fromIndex,
         toIndex,
         totalRows: uniqueRowValues.length,
@@ -1750,7 +1769,7 @@ export class PivotEngine<T extends Record<string, any>> {
       swappedValues[toIndex] = fromValue;
 
       // Store the custom row order
-      (this.state as any).customRowOrder = {
+      this.state.customRowOrder = {
         fieldName: rowFieldName,
         order: swappedValues,
       };
@@ -1782,12 +1801,12 @@ export class PivotEngine<T extends Record<string, any>> {
         this.config.onRowDragEnd(fromIndex, toIndex, this.state.rowGroups);
       }
 
-      console.log(`Row swap completed successfully for field: ${rowFieldName}`);
+      logger.info(`Row swap completed successfully for field: ${rowFieldName}`);
 
       // Emit state change to notify subscribers
       this._emit();
     } catch (error) {
-      console.error('Error during row swap operation:', error);
+      logger.error('Error during row swap operation:', error);
     }
   }
 
@@ -1803,14 +1822,14 @@ export class PivotEngine<T extends Record<string, any>> {
         : null;
 
     if (!columnField) {
-      console.warn('No column field configured for swapping');
+      logger.warn('No column field configured for swapping');
       return;
     }
 
     const columnFieldName = columnField.uniqueName;
 
     // Get unique values for the column field from FULL DATASET - use current custom order if it exists
-    const customColumnOrder = (this.state as any).customColumnOrder;
+    const customColumnOrder = this.state.customColumnOrder;
     let uniqueColumnValues: string[];
 
     if (
@@ -1823,18 +1842,14 @@ export class PivotEngine<T extends Record<string, any>> {
     } else {
       // Use original FULL data order - THIS IS THE KEY FIX
       uniqueColumnValues = [
-        ...new Set(
-          (this.config.data || []).map(
-            (item: { [x: string]: any }) => item[columnFieldName]
-          )
-        ),
+        ...new Set((this.config.data || []).map(item => item[columnFieldName])),
       ].filter(
         (value): value is string =>
           typeof value === 'string' && value !== null && value !== undefined
       );
     }
 
-    console.log(
+    logger.info(
       `Column swap validation: ${columnFieldName} has ${uniqueColumnValues.length} unique values:`,
       uniqueColumnValues
     );
@@ -1845,7 +1860,7 @@ export class PivotEngine<T extends Record<string, any>> {
       fromIndex >= uniqueColumnValues.length ||
       toIndex >= uniqueColumnValues.length
     ) {
-      console.warn(`Invalid indices for column swap operation:`, {
+      logger.warn(`Invalid indices for column swap operation:`, {
         fromIndex,
         toIndex,
         totalColumns: uniqueColumnValues.length,
@@ -1887,12 +1902,12 @@ export class PivotEngine<T extends Record<string, any>> {
             newColumns[fromColumnIndex],
           ];
           this.state.columns = newColumns;
-          console.log('Updated column configurations');
+          logger.info('Updated column configurations');
         }
       }
 
       // Store the custom column order
-      (this.state as any).customColumnOrder = {
+      this.state.customColumnOrder = {
         fieldName: columnFieldName,
         order: swappedValues,
       };
@@ -1915,14 +1930,14 @@ export class PivotEngine<T extends Record<string, any>> {
         this.config.onColumnDragEnd(fromIndex, toIndex, mappedColumns);
       }
 
-      console.log(
+      logger.info(
         `Column swap completed successfully for field: ${columnFieldName}`
       );
 
       // Emit state change to notify subscribers
       this._emit();
     } catch (error) {
-      console.error('Error during column swap operation:', error);
+      logger.error('Error during column swap operation:', error);
     }
   }
 
@@ -1935,20 +1950,18 @@ export class PivotEngine<T extends Record<string, any>> {
     // Use the original config data, not the paginated state data
     const dataSource = this.config.data || [];
 
-    console.log(
+    logger.info(
       `Getting unique values for field: ${fieldName} from ${dataSource.length} total items`
     );
 
     const uniqueValues = [
-      ...new Set(
-        dataSource.map((item: { [x: string]: any }) => item[fieldName])
-      ),
+      ...new Set(dataSource.map(item => item[fieldName])),
     ].filter(
       (value): value is string =>
         typeof value === 'string' && value !== null && value !== undefined
     );
 
-    console.log(
+    logger.info(
       `Found ${uniqueValues.length} unique values for ${fieldName}:`,
       uniqueValues
     );
@@ -1965,15 +1978,16 @@ export class PivotEngine<T extends Record<string, any>> {
     isRowField = false
   ): string[] {
     // Check if there's a custom order for this field
-    const customOrderKey = isRowField ? 'customRowOrder' : 'customColumnOrder';
-    const customOrder = (this.state as any)[customOrderKey];
+    const customOrder: FieldOrder | undefined = isRowField
+      ? this.state.customRowOrder
+      : this.state.customColumnOrder;
 
     if (
       customOrder &&
       customOrder.fieldName === fieldName &&
       customOrder.order
     ) {
-      console.log(`Using custom order for ${fieldName}:`, customOrder.order);
+      logger.info(`Using custom order for ${fieldName}:`, customOrder.order);
       return customOrder.order;
     }
 
@@ -2008,11 +2022,12 @@ export class PivotEngine<T extends Record<string, any>> {
     order: string[],
     isRowField = true
   ): void {
-    const customKey = isRowField ? 'customRowOrder' : 'customColumnOrder';
-    (this.state as any)[customKey] = {
-      fieldName,
-      order,
-    };
+    const fieldOrder: FieldOrder = { fieldName, order };
+    if (isRowField) {
+      this.state.customRowOrder = fieldOrder;
+    } else {
+      this.state.customColumnOrder = fieldOrder;
+    }
 
     // Regenerate processed data
     this.state.processedData = this.generateProcessedDataForDisplay();
@@ -2023,19 +2038,19 @@ export class PivotEngine<T extends Record<string, any>> {
    * Get ordered column values if custom order exists
    */
   public getOrderedColumnValues(): string[] | null {
-    const customColumnOrder = (this.state as any).customColumnOrder;
+    const customColumnOrder = this.state.customColumnOrder;
     if (
       customColumnOrder &&
       customColumnOrder.order &&
       customColumnOrder.order.length > 0
     ) {
-      console.log(
+      logger.info(
         'Engine returning custom column order:',
         customColumnOrder.order
       );
       return customColumnOrder.order;
     }
-    console.log('Engine has no custom column order');
+    logger.info('Engine has no custom column order');
     return null;
   }
 
@@ -2043,16 +2058,16 @@ export class PivotEngine<T extends Record<string, any>> {
    * Get ordered row values if custom order exists
    */
   public getOrderedRowValues(): string[] | null {
-    const customRowOrder = (this.state as any).customRowOrder;
+    const customRowOrder = this.state.customRowOrder;
     if (
       customRowOrder &&
       customRowOrder.order &&
       customRowOrder.order.length > 0
     ) {
-      console.log('Engine returning custom row order:', customRowOrder.order);
+      logger.info('Engine returning custom row order:', customRowOrder.order);
       return customRowOrder.order;
     }
-    console.log('Engine has no custom row order');
+    logger.info('Engine has no custom row order');
     return null;
   }
 
@@ -2062,7 +2077,7 @@ export class PivotEngine<T extends Record<string, any>> {
    */
   public swapRawDataRows(fromIndex: number, toIndex: number): void {
     if (!this.state.data || this.state.data.length === 0) {
-      console.warn('No data available for raw row swap');
+      logger.warn('No data available for raw row swap');
       return;
     }
 
@@ -2072,7 +2087,7 @@ export class PivotEngine<T extends Record<string, any>> {
       fromIndex >= this.state.data.length ||
       toIndex >= this.state.data.length
     ) {
-      console.warn(`Invalid indices for raw row swap operation:`, {
+      logger.warn(`Invalid indices for raw row swap operation:`, {
         fromIndex,
         toIndex,
         totalRows: this.state.data.length,
@@ -2106,7 +2121,7 @@ export class PivotEngine<T extends Record<string, any>> {
       // Emit state change to notify subscribers
       this._emit();
     } catch (error) {
-      console.error('Error during raw row swap operation:', error);
+      logger.error('Error during raw row swap operation:', error);
     }
   }
 
@@ -2184,8 +2199,16 @@ export class PivotEngine<T extends Record<string, any>> {
               return Number(value) > Number(filterValue);
             case 'lessThan':
               return Number(value) < Number(filterValue);
-            case 'between':
-              return value >= filterValue[0] && value <= filterValue[1];
+            case 'between': {
+              const range = filterValue as readonly [
+                string | number,
+                string | number,
+              ];
+              return (
+                (value as string | number) >= range[0] &&
+                (value as string | number) <= range[1]
+              );
+            }
             default:
               return true;
           }
@@ -2232,7 +2255,7 @@ export class PivotEngine<T extends Record<string, any>> {
       );
 
       // Extract the filtered data from the filtered groups
-      filteredData = filteredGroups.flatMap(group => group.items);
+      filteredData = filteredGroups.flatMap(group => group.items as T[]);
     }
 
     return filteredData;
@@ -2263,7 +2286,7 @@ export class PivotEngine<T extends Record<string, any>> {
             field: r.uniqueName,
             label: r.caption || r.uniqueName,
             type: 'string',
-          }) as any
+          }) as Dimension
       ),
       ...columns.map(
         c =>
@@ -2271,7 +2294,7 @@ export class PivotEngine<T extends Record<string, any>> {
             field: c.uniqueName,
             label: c.caption || c.uniqueName,
             type: 'string',
-          }) as any
+          }) as Dimension
       ),
     ];
 

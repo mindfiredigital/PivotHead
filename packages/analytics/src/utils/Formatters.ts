@@ -4,6 +4,7 @@
  */
 
 import type { FormatConfig } from '../types/config-types';
+import { BYTES_PER_KB, BYTE_SIZE_LABELS } from '../constants.js';
 
 /**
  * Format type options
@@ -262,11 +263,9 @@ export class ValueFormatter {
   formatBytes(bytes: number, decimals: number = 2): string {
     if (bytes === 0) return '0 Bytes';
 
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    const i = Math.floor(Math.log(bytes) / Math.log(BYTES_PER_KB));
 
-    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(decimals))} ${sizes[i]}`;
+    return `${parseFloat((bytes / Math.pow(BYTES_PER_KB, i)).toFixed(decimals))} ${BYTE_SIZE_LABELS[i]}`;
   }
 
   /**

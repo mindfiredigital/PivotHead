@@ -1,5 +1,17 @@
 import type { AggregationType } from '../types/interfaces';
 
+/**
+ * Calculates an aggregate value for a specific field across a collection of items.
+ *
+ * @param items - Array of data records to aggregate.
+ * @param field - The key of the field to aggregate on each record.
+ * @param type - The aggregation operation to apply: `'sum'`, `'avg'`, `'min'`, `'max'`, or `'count'`.
+ * @returns The computed aggregate as a number, or `0` if the array is empty or the type is unrecognised.
+ *
+ * @example
+ * const total = calculateAggregates(rows, 'sales', 'sum');
+ * const average = calculateAggregates(rows, 'profit', 'avg');
+ */
 export function calculateAggregates<T>(
   items: T[],
   field: keyof T,

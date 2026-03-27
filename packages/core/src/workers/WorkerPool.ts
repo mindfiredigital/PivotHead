@@ -1,21 +1,13 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Worker Pool Manager
  * Manages a pool of Web Workers for parallel processing
  */
-
-interface WorkerTask {
-  id: number;
-  data: any;
-  resolve: (value: any) => void;
-  reject: (reason?: any) => void;
-}
-
-interface WorkerInstance {
-  worker: Worker;
-  busy: boolean;
-  currentTaskId?: number;
-}
+import type {
+  WorkerTask,
+  WorkerInstance,
+  ParseChunkMessage,
+  ParseResultMessage,
+} from '../types/interfaces';
 
 export class WorkerPool {
   private workers: WorkerInstance[] = [];
@@ -47,13 +39,13 @@ export class WorkerPool {
   /**
    * Execute a task on an available worker
    */
-  public execute<T = any>(data: any): Promise<T> {
+  public execute(data: ParseChunkMessage): Promise<ParseResultMessage> {
     return new Promise((resolve, reject) => {
       const taskId = this.nextTaskId++;
       const task: WorkerTask = {
         id: taskId,
         data,
-        resolve,
+        resolve: resolve as (value: unknown) => void,
         reject,
       };
 

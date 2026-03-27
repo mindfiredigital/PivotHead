@@ -4,6 +4,7 @@
  */
 
 import type { DrillDownConfig, DrillDownLevel } from '../types/config-types';
+import { logger } from '../logger.js';
 
 /**
  * Event types for drill-down state changes
@@ -332,7 +333,7 @@ export class DrillDownManager {
       try {
         listener(event, level, path);
       } catch (error) {
-        console.error('DrillDownManager listener error:', error);
+        logger.error('DrillDownManager listener error:', error);
       }
     });
   }
