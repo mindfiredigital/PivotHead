@@ -1,20 +1,21 @@
 import type { FilterConfig } from '@mindfiredigital/pivothead';
 import type { PivotHeadHost } from './host';
+import { logger } from '../../logger.js';
 
 // Filters
 export function setFilters(host: PivotHeadHost, value: FilterConfig[]): void {
-  console.log(
+  logger.info(
     'Setting filters, current view mode:',
     host._showRawData ? 'RAW' : 'PROCESSED'
   );
-  console.log('New filter value:', value);
+  logger.info('New filter value:', value);
 
   if (host._showRawData) {
     host._rawFilters = value || [];
-    console.log('Applied RAW filters:', host._rawFilters);
+    logger.info('Applied RAW filters:', host._rawFilters);
   } else {
     host._processedFilters = value || [];
-    console.log('Applied PROCESSED filters:', host._processedFilters);
+    logger.info('Applied PROCESSED filters:', host._processedFilters);
   }
 
   if (host.engine) {
@@ -45,7 +46,7 @@ export function getFilters(host: PivotHeadHost): FilterConfig[] {
 // Refresh/reset
 export function refresh(host: PivotHeadHost): void {
   if (!host.engine) {
-    console.error('Engine not initialized');
+    logger.error('Engine not initialized');
     return;
   }
 
@@ -63,7 +64,7 @@ export function refresh(host: PivotHeadHost): void {
 
 export function reset(host: PivotHeadHost): void {
   if (!host.engine) {
-    console.error('Engine not initialized');
+    logger.error('Engine not initialized');
     return;
   }
 

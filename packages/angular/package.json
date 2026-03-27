@@ -27,11 +27,15 @@
     "tslib": "^2.3.0"
   },
   "devDependencies": {
+    "jsdom": "^26.0.0",
     "ng-packagr": "^17.3.0",
-    "typescript": "~5.4.5"
+    "typescript": "~5.4.5",
+    "vitest": "^0.32.0"
   },
   "sideEffects": false,
   "scripts": {
-    "build": "ng-packagr -p ng-package.json"
+    "build": "ng-packagr -p ng-package.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
   }
 }

@@ -1,22 +1,5 @@
 import type { PivotAction } from './types.js';
-
-const VALID_ACTION_TYPES = new Set([
-  'filter',
-  'removeFilter',
-  'sort',
-  'groupBy',
-  'topN',
-  'aggregate',
-  'resetAll',
-  'export',
-  'switchTab',
-  'chartType',
-  'answer',
-  'clarify',
-  'error',
-  'style',
-  'resetStyle',
-]);
+import { VALID_ACTION_TYPES } from './constants.js';
 
 export class ActionParser {
   /** Extracts the first balanced JSON object from text, ignoring anything after it. */

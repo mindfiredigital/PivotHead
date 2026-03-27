@@ -1,3 +1,4 @@
+import { logger } from '../logger/logger.js';
 /**
  * WASM Asset Helper
  *
@@ -40,7 +41,7 @@ function getNodeWasmPath(): string {
       return wasmPath;
     }
   } catch (error) {
-    console.warn('Could not resolve __dirname:', error);
+    logger.warn('Could not resolve __dirname:', error);
   }
 
   // Fallback: try relative paths
@@ -67,15 +68,15 @@ export function getWasmUrl(): string {
 
       // csvParser.wasm is in the same directory as this file in the dist
       const wasmUrl = `${basePath}/csvParser.wasm`;
-      console.log(`Computed WASM URL: ${wasmUrl}`);
+      logger.info(`Computed WASM URL: ${wasmUrl}`);
       return wasmUrl;
     }
   } catch (error) {
-    console.warn('import.meta.url not available:', error);
+    logger.warn('import.meta.url not available:', error);
   }
 
   // Fallback: try common paths
-  console.warn('Using fallback WASM path');
+  logger.warn('Using fallback WASM path');
   // Try public directory first (for simple demos)
   return '/wasm/csvParser.wasm';
 }
@@ -119,7 +120,7 @@ function loadWasmNode(filePath: string): ArrayBuffer {
   for (const tryPath of possiblePaths) {
     try {
       if (fs.existsSync(tryPath)) {
-        console.log(`✅ Loading WASM from: ${tryPath}`);
+        logger.info(`✅ Loading WASM from: ${tryPath}`);
         const buffer = fs.readFileSync(tryPath);
 
         // Convert Node.js Buffer to ArrayBuffer properly
@@ -133,7 +134,7 @@ function loadWasmNode(filePath: string): ArrayBuffer {
         if (isValidWasm(bytes)) {
           return arrayBuffer;
         } else {
-          console.warn(`Invalid WASM file at ${tryPath}`);
+          logger.warn(`Invalid WASM file at ${tryPath}`);
         }
       }
     } catch (error) {
@@ -157,7 +158,7 @@ export async function fetchWasmBinary(): Promise<ArrayBuffer> {
     try {
       return loadWasmNode(url);
     } catch (error) {
-      console.error('Failed to load WASM in Node.js:', error);
+      logger.error('Failed to load WASM in Node.js:', error);
       throw error;
     }
   }
@@ -186,7 +187,7 @@ export async function fetchWasmBinary(): Promise<ArrayBuffer> {
       throw new Error(`Invalid WASM file format from ${url}`);
     }
   } catch (primaryError) {
-    console.warn(`Failed to fetch WASM from ${url}:`, primaryError);
+    logger.warn(`Failed to fetch WASM from ${url}:`, primaryError);
 
     // Try fallback URLs
     const fallbackUrls = [
@@ -198,7 +199,7 @@ export async function fetchWasmBinary(): Promise<ArrayBuffer> {
       if (fallbackUrl === url) continue; // Skip if it's the same as primary
 
       try {
-        console.log(`Trying fallback URL: ${fallbackUrl}`);
+        logger.info(`Trying fallback URL: ${fallbackUrl}`);
         const response = await fetch(fallbackUrl);
         if (!response.ok) continue;
 
@@ -206,13 +207,13 @@ export async function fetchWasmBinary(): Promise<ArrayBuffer> {
         const bytes = new Uint8Array(buffer);
 
         if (isValidWasm(bytes)) {
-          console.log(
+          logger.info(
             `✅ Successfully loaded WASM from fallback: ${fallbackUrl}`
           );
           return buffer;
         }
       } catch (error) {
-        console.warn(`Fallback ${fallbackUrl} failed:`, error);
+        logger.warn(`Fallback ${fallbackUrl} failed:`, error);
       }
     }
 

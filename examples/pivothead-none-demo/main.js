@@ -1,4 +1,5 @@
 import '@mindfiredigital/pivothead-web-component';
+import { logger } from './logger.js';
 
 const pivot = document.getElementById('pivot');
 const tableEl = document.getElementById('table');
@@ -309,7 +310,7 @@ function wireToolbar() {
     try {
       showFormatPopup();
     } catch (error) {
-      console.error('Error opening format popup:', error);
+      logger.error('Error opening format popup:', error);
     }
   };
 
@@ -477,7 +478,7 @@ function showFormatPopup() {
   try {
     state = pivot.getState();
   } catch {
-    console.error('Engine not initialized');
+    logger.error('Engine not initialized');
     return;
   }
 
@@ -737,7 +738,7 @@ function showFormatPopup() {
                   pivot.updateFieldFormatting(field, formatOptions);
                 }
               });
-              console.log(
+              logger.info(
                 'Applied formatting to all numeric fields:',
                 numericFields
               );
@@ -749,7 +750,7 @@ function showFormatPopup() {
                 pivot.updateFieldFormatting(measure.uniqueName, formatOptions);
               }
             });
-            console.log(
+            logger.info(
               'Applied formatting to all measures:',
               availableMeasures.map(m => m.uniqueName)
             );
@@ -770,7 +771,7 @@ function showFormatPopup() {
           if (pivot.updateFieldFormatting) {
             pivot.updateFieldFormatting(fieldName, formatOptions);
           }
-          console.log(
+          logger.info(
             'Applied formatting:',
             formatOptions,
             'to field:',
@@ -782,10 +783,10 @@ function showFormatPopup() {
         try {
           renderFromState(pivot.getState());
         } catch (e) {
-          console.error('Error re-rendering after format:', e);
+          logger.error('Error re-rendering after format:', e);
         }
       } catch (error) {
-        console.error('Error applying formatting:', error);
+        logger.error('Error applying formatting:', error);
       }
     }
 
@@ -983,7 +984,7 @@ pivot.addEventListener('viewModeChange', () => {
 });
 
 pivot.addEventListener('pivotError', e => {
-  console.warn('Pivot error:', e.detail || {});
+  logger.warn('Pivot error:', e.detail || {});
 });
 
 (function init() {

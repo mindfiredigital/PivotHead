@@ -8,6 +8,8 @@ import {
   PerformanceConfig,
 } from '@mindfiredigital/pivothead';
 import type { PivotHeadHost } from './host';
+import { logger } from '../../logger.js';
+import { escapeHtml } from './sanitize.js';
 
 /**
  * Helper function to normalize string | AxisConfig to AxisConfig
@@ -102,12 +104,12 @@ export function handleEngineStateChange(host: PivotHeadHost, state: unknown) {
 export function renderFullUI(host: PivotHeadHost) {
   const engine = host.engine;
   if (!engine) {
-    console.error('❌ renderFullUI: No engine');
+    logger.error('❌ renderFullUI: No engine');
     if (host.shadowRoot) host.shadowRoot.innerHTML = '';
     return;
   }
   const state = engine.getState();
-  console.log('🔍 renderFullUI - State check:', {
+  logger.info('🔍 renderFullUI - State check:', {
     hasState: !!state,
     hasProcessedData: !!state?.processedData,
     processedDataType: state?.processedData
@@ -119,7 +121,7 @@ export function renderFullUI(host: PivotHeadHost) {
   });
 
   if (!state.processedData) {
-    console.error('❌ renderFullUI: No processed data available', state);
+    logger.error('❌ renderFullUI: No processed data available', state);
     return;
   }
   const rawRowField = host._options.rows?.[0];
@@ -127,7 +129,7 @@ export function renderFullUI(host: PivotHeadHost) {
   const measures = host._options.measures || [];
 
   if (!rawRowField || !rawColumnField || !measures.length) {
-    console.error(
+    logger.error(
       '❌ renderFullUI: Missing row, column, or measures configuration',
       {
         rawRowField,
@@ -142,7 +144,7 @@ export function renderFullUI(host: PivotHeadHost) {
   const rowField = normalizeAxisConfig(rawRowField);
   const columnField = normalizeAxisConfig(rawColumnField);
 
-  console.log('🔍 renderFullUI - Options check:', {
+  logger.info('🔍 renderFullUI - Options check:', {
     rowField,
     columnField,
     measuresCount: measures.length,
@@ -310,13 +312,13 @@ export function renderFullUI(host: PivotHeadHost) {
 
   // Determine column labels using engine's custom column order if any
   const groupedData = engine.getGroupedData();
-  console.log('🔍 renderFullUI - Grouped data:', {
+  logger.info('🔍 renderFullUI - Grouped data:', {
     count: groupedData?.length || 0,
     sample: groupedData?.[0],
     sampleKey: groupedData?.[0]?.key,
     sampleAggregates: groupedData?.[0]?.aggregates,
   });
-  console.log('🔍 renderFullUI - GroupConfig:', host._options?.groupConfig);
+  logger.info('🔍 renderFullUI - GroupConfig:', host._options?.groupConfig);
 
   let uniqueColumnValues =
     engine.getOrderedColumnValues() ||
@@ -329,7 +331,7 @@ export function renderFullUI(host: PivotHeadHost) {
       ),
     ].filter(Boolean) as string[]);
 
-  console.log('🔍 renderFullUI - Column values:', uniqueColumnValues);
+  logger.info('🔍 renderFullUI - Column values:', uniqueColumnValues);
   if (host._processedColumnOrder.length === 0) {
     host._processedColumnOrder = [...uniqueColumnValues];
   }
@@ -342,21 +344,21 @@ export function renderFullUI(host: PivotHeadHost) {
   html += '<table role="grid">';
   html += '<thead>';
   html += '<tr>';
-  html += `<th class="corner-cell">${rowField.caption} / ${columnField.caption}</th>`;
+  html += `<th class="corner-cell">${escapeHtml(rowField.caption)} / ${escapeHtml(columnField.caption)}</th>`;
   uniqueColumnValues.forEach((colValue, index) => {
-    html += `<th class="column-header" draggable="true" data-column-index="${index}" data-column-value="${colValue}" colspan="${measures.length}">${colValue}</th>`;
+    html += `<th class="column-header" draggable="true" data-column-index="${index}" data-column-value="${escapeHtml(colValue)}" colspan="${measures.length}">${escapeHtml(colValue)}</th>`;
   });
   html += '</tr>';
   html += '<tr>';
   const rowSortIcon = host.createProcessedSortIcon(rowField.uniqueName);
-  html += `<th class="row-cell sortable-header" data-field="${rowField.uniqueName}">
-      ${rowField.caption}${rowSortIcon}
+  html += `<th class="row-cell sortable-header" data-field="${escapeHtml(rowField.uniqueName)}">
+      ${escapeHtml(rowField.caption)}${rowSortIcon}
     </th>`;
   uniqueColumnValues.forEach(colValue => {
     measures.forEach((measure: MeasureConfig, measureIndex: number) => {
       const sortIcon = host.createProcessedSortIcon(measure.uniqueName);
-      html += `<th class="measure-header sortable-header" data-measure-index="${measureIndex}" data-field="${measure.uniqueName}" data-column-value="${colValue}">
-          ${measure.caption}${sortIcon}
+      html += `<th class="measure-header sortable-header" data-measure-index="${measureIndex}" data-field="${escapeHtml(measure.uniqueName)}" data-column-value="${escapeHtml(colValue)}">
+          ${escapeHtml(measure.caption)}${sortIcon}
         </th>`;
     });
   });
@@ -380,20 +382,20 @@ export function renderFullUI(host: PivotHeadHost) {
     ].filter(Boolean) as string[];
   }
 
-  console.log('🔍 renderFullUI - Row values:', {
+  logger.info('🔍 renderFullUI - Row values:', {
     total: uniqueRowValues.length,
     values: uniqueRowValues,
   });
 
   const paginatedRowValues = host.getPaginatedData(uniqueRowValues);
 
-  console.log('🔍 renderFullUI - Paginated rows:', {
+  logger.info('🔍 renderFullUI - Paginated rows:', {
     count: paginatedRowValues.length,
     values: paginatedRowValues,
   });
   paginatedRowValues.forEach((rowValue, rowIndex) => {
-    html += `<tr draggable="true" data-row-index="${rowIndex}" data-row-value="${rowValue}">`;
-    html += `<td class="row-cell">${rowValue}</td>`;
+    html += `<tr draggable="true" data-row-index="${rowIndex}" data-row-value="${escapeHtml(rowValue)}">`;
+    html += `<td class="row-cell">${escapeHtml(rowValue)}</td>`;
     uniqueColumnValues.forEach(colValue => {
       measures.forEach((measure: MeasureConfig) => {
         const matchingGroup = groupedData.find((g: Group) => {
@@ -414,20 +416,20 @@ export function renderFullUI(host: PivotHeadHost) {
           value !== undefined && value !== null && Number(value) > 0;
         const cellClass = hasData ? 'data-cell drill-down-cell' : 'data-cell';
         const cellTitle = hasData
-          ? `Double-click to see details for ${rowField.caption}: ${rowValue} - ${columnField.caption}: ${colValue}`
+          ? `Double-click to see details for ${escapeHtml(rowField.caption)}: ${escapeHtml(rowValue)} - ${escapeHtml(columnField.caption)}: ${escapeHtml(colValue)}`
           : '';
         const textAlign = engine.getFieldAlignment(measure.uniqueName);
-        html += `<td class="${cellClass}" 
+        html += `<td class="${cellClass}"
                       style="text-align: ${textAlign};"
                       title="${cellTitle}"
-                      data-row-value="${rowValue}" 
-                      data-column-value="${colValue}" 
-                      data-measure-name="${measure.uniqueName}"
-                      data-measure-caption="${measure.caption}"
-                      data-row-field="${rowField.uniqueName}"
-                      data-column-field="${columnField.uniqueName}"
-                      data-aggregate-value="${value || 0}">
-                      ${formattedValue}
+                      data-row-value="${escapeHtml(rowValue)}"
+                      data-column-value="${escapeHtml(colValue)}"
+                      data-measure-name="${escapeHtml(measure.uniqueName)}"
+                      data-measure-caption="${escapeHtml(measure.caption)}"
+                      data-row-field="${escapeHtml(rowField.uniqueName)}"
+                      data-column-field="${escapeHtml(columnField.uniqueName)}"
+                      data-aggregate-value="${escapeHtml(value || 0)}">
+                      ${escapeHtml(formattedValue)}
                    </td>`;
       });
     });
@@ -439,7 +441,7 @@ export function renderFullUI(host: PivotHeadHost) {
   // Debug: Log table header structure
   const theadMatch = html.match(/<thead>.*?<\/thead>/s);
   if (theadMatch) {
-    console.log(
+    logger.info(
       '🔍 renderFullUI - Table header HTML:',
       theadMatch[0].substring(0, 500)
     );
@@ -543,8 +545,8 @@ export function renderRawTable(host: PivotHeadHost) {
   html += '<thead><tr>';
   headers.forEach((header, index) => {
     const sortIcon = host.createSortIcon(header);
-    html += `<th class="sortable-header" draggable="true" data-column-index="${index}" data-field="${header}">
-        ${header}${sortIcon}
+    html += `<th class="sortable-header" draggable="true" data-column-index="${index}" data-field="${escapeHtml(header)}">
+        ${escapeHtml(header)}${sortIcon}
       </th>`;
   });
   html += '</tr></thead>';
@@ -559,7 +561,7 @@ export function renderRawTable(host: PivotHeadHost) {
         formattedValue = engine.formatValue(cellValue, header);
       }
       const textAlign = engine.getFieldAlignment(header);
-      html += `<td style="text-align: ${textAlign};">${formattedValue}</td>`;
+      html += `<td style="text-align: ${textAlign};">${escapeHtml(formattedValue)}</td>`;
     });
     html += '</tr>';
   });
@@ -587,7 +589,9 @@ function createVirtualScrollHeader(
     th.textContent = header;
 
     const sortIcon = host.createSortIcon(header);
-    th.innerHTML += sortIcon;
+    const iconSpan = document.createElement('span');
+    iconSpan.innerHTML = sortIcon;
+    if (iconSpan.firstChild) th.appendChild(iconSpan.firstChild);
 
     tr.appendChild(th);
   });

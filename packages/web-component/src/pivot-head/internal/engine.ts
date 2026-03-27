@@ -6,6 +6,7 @@ import type {
   MeasureConfig,
 } from '@mindfiredigital/pivothead';
 import type { PivotHeadHost } from './host';
+import { logger } from '../../logger.js';
 import type {
   PivotDataRecord,
   PivotOptions,
@@ -144,6 +145,6 @@ export function tryInitializeEngine(host: PivotHeadHost): void {
       return;
     }
   } catch (error) {
-    console.error('Error initializing PivotEngine:', error);
+    logger.error('Error initializing PivotEngine:', error);
   }
 }

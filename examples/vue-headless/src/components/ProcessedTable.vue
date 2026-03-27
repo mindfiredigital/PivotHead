@@ -98,6 +98,7 @@
 
 <script setup lang="ts">
 import { computed, defineOptions } from 'vue'
+import { logger } from '../../logger'
 
 defineOptions({
   name: 'ProcessedTable'
@@ -151,7 +152,7 @@ const rowField = computed(() => {
     result = fullState?.rows?.[0]
   }
   
-  console.log('ProcessedTable rowField:', result, 'from state:', !!props.pivotState)
+  logger.info('ProcessedTable rowField:', result, 'from state:', !!props.pivotState)
   return result
 })
 const colField = computed(() => {
@@ -163,7 +164,7 @@ const colField = computed(() => {
     result = fullState?.columns?.[0]
   }
   
-  console.log('ProcessedTable colField:', result)
+  logger.info('ProcessedTable colField:', result)
   return result
 })
 const measures = computed(() => {
@@ -175,7 +176,7 @@ const measures = computed(() => {
     result = fullState?.measures || []
   }
   
-  console.log('ProcessedTable measures:', result.length, result)
+  logger.info('ProcessedTable measures:', result.length, result)
   return result
 })
 
@@ -191,8 +192,8 @@ const groups = computed(() => {
     }>
   }
   
-  console.log('ProcessedTable groups:', result.length, result)
-  console.log('ProcessedTable using groups from:', props.pivotState?.groups ? 'state' : 'pivotRef')
+  logger.info('ProcessedTable groups:', result.length, result)
+  logger.info('ProcessedTable using groups from:', props.pivotState?.groups ? 'state' : 'pivotRef')
   return result
 })
 
@@ -214,7 +215,7 @@ const pageRows = computed(() => {
   const start = (props.pagination.currentPage - 1) * props.pagination.pageSize
   const end = start + props.pagination.pageSize
   const result = uniqueRows.value.slice(start, end)
-  console.log('ProcessedTable pageRows:', result.length, 'from uniqueRows:', uniqueRows.value.length)
+  logger.info('ProcessedTable pageRows:', result.length, 'from uniqueRows:', uniqueRows.value.length)
   return result
 })
 

@@ -43,7 +43,7 @@
  *
  * // Or get recommendations first
  * const recommendations = chartEngine.recommend();
- * console.log(recommendations[0]); // { type: 'bar', score: 0.95, reason: '...' }
+ * logger.info(recommendations[0]); // { type: 'bar', score: 0.95, reason: '...' }
  *
  * // Or use convenience methods
  * chartEngine.bar({ container: '#bar-chart' });

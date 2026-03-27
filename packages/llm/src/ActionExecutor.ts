@@ -1,4 +1,5 @@
 import type { PivotAction } from './types.js';
+import { SWITCH_TAB_EVENT } from './constants.js';
 
 export interface PivotEngineRef {
   applyFilter?: (opts: {
@@ -127,7 +128,7 @@ export class ActionExecutor {
 
         case 'switchTab':
           window.dispatchEvent(
-            new CustomEvent('pivothead:switchTab', {
+            new CustomEvent(SWITCH_TAB_EVENT, {
               detail: { tab: action.tab },
             })
           );

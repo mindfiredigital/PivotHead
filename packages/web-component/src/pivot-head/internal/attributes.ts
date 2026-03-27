@@ -1,5 +1,6 @@
 import type { PivotHeadHost } from './host';
 import { renderSwitch as renderSwitchHelper } from './render';
+import { logger } from '../../logger.js';
 
 export function parseAttributesIfNeeded(host: PivotHeadHost): void {
   // Parse data attribute
@@ -8,7 +9,7 @@ export function parseAttributesIfNeeded(host: PivotHeadHost): void {
     try {
       host.data = JSON.parse(rawData);
     } catch (error) {
-      console.error('Error parsing data attribute:', error);
+      logger.error('Error parsing data attribute:', error);
     }
   }
 
@@ -18,7 +19,7 @@ export function parseAttributesIfNeeded(host: PivotHeadHost): void {
     try {
       host.options = JSON.parse(rawOptions);
     } catch (error) {
-      console.error('Error parsing options attribute:', error);
+      logger.error('Error parsing options attribute:', error);
     }
   }
 
@@ -33,7 +34,7 @@ export function parseOtherAttributes(host: PivotHeadHost): void {
     try {
       host.filters = JSON.parse(rawFilters);
     } catch (error) {
-      console.error('Error parsing filters attribute:', error);
+      logger.error('Error parsing filters attribute:', error);
     }
   }
 
@@ -46,7 +47,7 @@ export function parseOtherAttributes(host: PivotHeadHost): void {
         ...JSON.parse(rawPagination),
       } as typeof host._pagination;
     } catch (error) {
-      console.error('Error parsing pagination attribute:', error);
+      logger.error('Error parsing pagination attribute:', error);
     }
   }
 }
@@ -71,7 +72,7 @@ export function attributeChanged(
         try {
           host.data = JSON.parse(newValue);
         } catch (error) {
-          console.error('Error parsing data attribute:', error);
+          logger.error('Error parsing data attribute:', error);
         }
       }
       break;
@@ -81,7 +82,7 @@ export function attributeChanged(
         try {
           host.options = JSON.parse(newValue);
         } catch (error) {
-          console.error('Error parsing options attribute:', error);
+          logger.error('Error parsing options attribute:', error);
         }
       }
       break;
@@ -91,7 +92,7 @@ export function attributeChanged(
         try {
           host.filters = JSON.parse(newValue);
         } catch (error) {
-          console.error('Error parsing filters attribute:', error);
+          logger.error('Error parsing filters attribute:', error);
         }
       } else {
         host.filters = [];
@@ -106,7 +107,7 @@ export function attributeChanged(
             ...JSON.parse(newValue),
           } as typeof host._pagination;
         } catch (error) {
-          console.error('Error parsing pagination attribute:', error);
+          logger.error('Error parsing pagination attribute:', error);
         }
       } else {
         host.pagination = {

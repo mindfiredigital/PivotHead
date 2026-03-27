@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import { copyFileSync, mkdirSync, existsSync } from 'fs';
+import { logger } from './src/logger.js';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -26,10 +27,10 @@ export default defineConfig({
         // Copy WASM file if source exists
         if (existsSync(wasmSource)) {
           copyFileSync(wasmSource, wasmDest);
-          console.log('✅ Copied WASM file to public/wasm/');
+          logger.info('✅ Copied WASM file to public/wasm/');
         } else {
-          console.warn('⚠️ WASM file not found at:', wasmSource);
-          console.warn('Run "pnpm build:wasm" in packages/core to generate it');
+          logger.warn('⚠️ WASM file not found at:', wasmSource);
+          logger.warn('Run "pnpm build:wasm" in packages/core to generate it');
         }
       },
     },

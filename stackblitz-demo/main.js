@@ -1,5 +1,6 @@
 import { PivotEngine } from '@mindfiredigital/pivothead';
 import './style.css';
+import { logger } from './logger.js';
 
 // Import WASM CSV Processor dynamically
 let getWasmCSVProcessor;
@@ -9,9 +10,9 @@ let getWasmCSVProcessor;
     const { getWasmCSVProcessor: wasmGetter } =
       await import('@mindfiredigital/pivothead');
     getWasmCSVProcessor = wasmGetter;
-    console.log('✅ WASM CSV Processor loaded successfully');
+    logger.info('✅ WASM CSV Processor loaded successfully');
   } catch (error) {
-    console.warn('⚠️ WASM CSV Processor not available:', error.message);
+    logger.warn('⚠️ WASM CSV Processor not available:', error.message);
   }
 })();
 
@@ -372,7 +373,7 @@ function handleDragStart(e) {
   this.classList.add('dragging');
   e.dataTransfer.effectAllowed = 'move';
   e.dataTransfer.setData('text/plain', this.getAttribute('data-index'));
-  console.log(`Started dragging ${dragType}:`, this.getAttribute('data-index'));
+  logger.info(`Started dragging ${dragType}:`, this.getAttribute('data-index'));
 }
 
 function handleDragOver(e) {
@@ -402,13 +403,13 @@ function handleRowDrop(e) {
     const fromIndex = parseInt(draggedElement.getAttribute('data-index'));
     const toIndex = parseInt(this.getAttribute('data-index'));
 
-    console.log(`Dropping row from index ${fromIndex} to ${toIndex}`);
+    logger.info(`Dropping row from index ${fromIndex} to ${toIndex}`);
 
     // Reorder the custom product order array
     const [movedProduct] = customProductOrder.splice(fromIndex, 1);
     customProductOrder.splice(toIndex, 0, movedProduct);
 
-    console.log('New product order:', customProductOrder);
+    logger.info('New product order:', customProductOrder);
 
     // Re-render the table with new order
     renderPivotTable();
@@ -427,13 +428,13 @@ function handleColumnDrop(e) {
     const fromIndex = parseInt(draggedElement.getAttribute('data-index'));
     const toIndex = parseInt(this.getAttribute('data-index'));
 
-    console.log(`Dropping column from index ${fromIndex} to ${toIndex}`);
+    logger.info(`Dropping column from index ${fromIndex} to ${toIndex}`);
 
     // Reorder the custom region order array
     const [movedRegion] = customRegionOrder.splice(fromIndex, 1);
     customRegionOrder.splice(toIndex, 0, movedRegion);
 
-    console.log('New region order:', customRegionOrder);
+    logger.info('New region order:', customRegionOrder);
 
     // Re-render the table with new order
     renderPivotTable();
@@ -488,7 +489,7 @@ async function handleFileUpload(file) {
   if (!file) return false;
 
   try {
-    console.log(
+    logger.info(
       `🚀 Loading file: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`
     );
 
@@ -523,16 +524,16 @@ async function handleFileUpload(file) {
     const fileName = file.name.toLowerCase();
 
     if (fileName.endsWith('.csv')) {
-      console.log('📊 Processing CSV with WASM...');
+      logger.info('📊 Processing CSV with WASM...');
 
       // Use WASM CSV Processor if available
       if (getWasmCSVProcessor) {
         try {
           const processor = getWasmCSVProcessor();
-          console.log('Initializing WASM module...');
+          logger.info('Initializing WASM module...');
           await processor.initialize();
 
-          console.log('✅ WASM initialized, processing file...');
+          logger.info('✅ WASM initialized, processing file...');
           const result = await processor.processFile(file, {
             hasHeader: true,
             trimValues: true,
@@ -541,15 +542,15 @@ async function handleFileUpload(file) {
 
           if (result.success) {
             newData = result.data;
-            console.log(`✅ WASM processing complete!`);
-            console.log(`   Rows: ${result.rowCount.toLocaleString()}`);
-            console.log(`   Columns: ${result.colCount}`);
-            console.log(`   Parse time: ${result.parseTime.toFixed(2)}ms`);
+            logger.info(`✅ WASM processing complete!`);
+            logger.info(`   Rows: ${result.rowCount.toLocaleString()}`);
+            logger.info(`   Columns: ${result.colCount}`);
+            logger.info(`   Parse time: ${result.parseTime.toFixed(2)}ms`);
           } else {
             throw new Error(result.error || 'WASM processing failed');
           }
         } catch (wasmError) {
-          console.error('WASM processing failed:', wasmError);
+          logger.error('WASM processing failed:', wasmError);
           throw wasmError;
         }
       } else {
@@ -558,7 +559,7 @@ async function handleFileUpload(file) {
         );
       }
     } else if (fileName.endsWith('.json')) {
-      console.log('📄 Processing JSON...');
+      logger.info('📄 Processing JSON...');
       const text = await file.text();
       newData = JSON.parse(text);
     } else {
@@ -573,7 +574,7 @@ async function handleFileUpload(file) {
     }
 
     if (newData && newData.length > 0) {
-      console.log(
+      logger.info(
         `✅ Successfully loaded ${newData.length.toLocaleString()} rows`
       );
 
@@ -597,7 +598,7 @@ async function handleFileUpload(file) {
       return false;
     }
   } catch (error) {
-    console.error('❌ Error reading file:', error);
+    logger.error('❌ Error reading file:', error);
 
     // More detailed error message
     let errorMsg = 'Error reading file:\n\n';
@@ -798,6 +799,6 @@ document
 // Initial render
 renderPivotTable();
 
-console.log('✅ PivotHead engine initialized successfully!');
-console.log('Current state:', engine.getState());
-console.log('Sample data loaded:', salesData.length, 'rows');
+logger.info('✅ PivotHead engine initialized successfully!');
+logger.info('Current state:', engine.getState());
+logger.info('Sample data loaded:', salesData.length, 'rows');

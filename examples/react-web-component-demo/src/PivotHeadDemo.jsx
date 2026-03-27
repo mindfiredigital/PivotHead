@@ -4,6 +4,7 @@ import { ChartService } from '@mindfiredigital/pivothead-analytics';
 import { Chart, registerables } from 'chart.js';
 import { data as sampleData, options as sampleOptions } from './config/config';
 import { initWasm, parseCSV, detectPivotOptions } from './utils/csvWasm';
+import { logger } from './logger.js';
 
 // Register Chart.js components
 Chart.register(...registerables);
@@ -131,7 +132,7 @@ const PivotHeadDemo = () => {
         setSelectedMeasure(filterOptions.measures[0].uniqueName);
       }
     } catch (error) {
-      console.error('Failed to initialize ChartService:', error);
+      logger.error('Failed to initialize ChartService:', error);
     }
   }, []);
 
@@ -317,7 +318,7 @@ const PivotHeadDemo = () => {
       // in some browsers, causing file.text() / FileReader to return empty content.
       if (fileInputRef.current) fileInputRef.current.value = '';
 
-      console.log(`[CSV] Read "${file.name}": ${text.length} chars`);
+      logger.info(`[CSV] Read "${file.name}": ${text.length} chars`);
       const result = await parseCSV(text);
 
       const pivotOptions = detectPivotOptions(result.data, result.headers);
@@ -350,7 +351,7 @@ const PivotHeadDemo = () => {
       });
       setUploadStatus('done');
     } catch (err) {
-      console.error('CSV upload failed:', err);
+      logger.error('CSV upload failed:', err);
       setUploadError(err.message || 'Failed to parse CSV file.');
       setUploadStatus('error');
     }

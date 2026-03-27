@@ -12,6 +12,7 @@ import {
   type SetupContext,
 } from 'vue';
 import '@mindfiredigital/pivothead-web-component';
+import { logger } from './logger.js';
 import type {
   PivotHeadEl,
   PivotHeadProps,
@@ -125,7 +126,7 @@ export const PivotHead = defineComponent({
             if (process.env.NODE_ENV === 'test' || process.env.VITEST) {
               return;
             }
-            console.warn('Error getting state after data change:', error);
+            logger.warn('Error getting state after data change:', error);
           }
         }, 50);
       },
@@ -155,11 +156,11 @@ export const PivotHead = defineComponent({
               if (process.env.NODE_ENV === 'test' || process.env.VITEST) {
                 return;
               }
-              console.warn('Error getting state after options change:', error);
+              logger.warn('Error getting state after options change:', error);
             }
           }, 50);
         } catch (error) {
-          console.error(
+          logger.error(
             'Error setting options in Vue wrapper:',
             error,
             newOptions
@@ -272,7 +273,7 @@ export const PivotHead = defineComponent({
             );
             el.options = clonedOptions;
           } catch (error) {
-            console.error(
+            logger.error(
               'Error setting initial options in Vue wrapper:',
               error,
               props.options
@@ -323,7 +324,7 @@ export const PivotHead = defineComponent({
               if (process.env.NODE_ENV === 'test' || process.env.VITEST) {
                 return;
               }
-              console.warn('Error getting initial state:', error);
+              logger.warn('Error getting initial state:', error);
             }
           }, 100);
         }

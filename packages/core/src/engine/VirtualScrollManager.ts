@@ -1,35 +1,18 @@
-/**
- * Virtual Scrolling Manager for Large Datasets
- *
- * Efficiently renders only visible rows to handle 100k+ rows smoothly.
- * This is a framework-agnostic implementation that works with any DOM environment.
- *
- * @module VirtualScrollManager
- */
+import { logger } from '../logger/logger.js';
+import {
+  VIRTUAL_SCROLL_DEFAULT_ROW_HEIGHT,
+  VIRTUAL_SCROLL_DEFAULT_BUFFER_SIZE,
+  VIRTUAL_SCROLL_HEADER_OFFSET,
+  VIRTUAL_SCROLL_STICKY_Z_INDEX,
+  VIRTUAL_SCROLL_HEADER_BG,
+} from '../config/constants.js';
+import type {
+  VirtualScrollConfig,
+  VisibleRange,
+  DataRecord,
+} from '../types/interfaces';
 
-export interface VirtualScrollConfig {
-  /** Container element for the virtual scroller */
-  container: HTMLElement;
-  /** Full dataset to render */
-  data: any[];
-  /** Fixed row height in pixels (default: 40) */
-  rowHeight?: number;
-  /** Number of extra rows to render for smooth scrolling (default: 10) */
-  bufferSize?: number;
-  /** Function to render a single row */
-  renderRow: (item: any, index: number) => HTMLElement;
-  /** Optional function to render the table header */
-  renderHeader?: () => HTMLElement;
-  /** Optional callback when visible range changes */
-  onVisibleRangeChange?: (start: number, end: number) => void;
-  /** Optional drag-drop handler */
-  onDragDrop?: (fromIndex: number, toIndex: number) => void;
-}
-
-export interface VisibleRange {
-  start: number;
-  end: number;
-}
+export type { VirtualScrollConfig, VisibleRange };
 
 /**
  * VirtualScrollManager - Efficient virtual scrolling implementation
@@ -51,10 +34,10 @@ export interface VisibleRange {
  */
 export class VirtualScrollManager {
   private container: HTMLElement;
-  private data: any[];
+  private data: DataRecord[];
   private rowHeight: number;
   private bufferSize: number;
-  private renderRow: (item: any, index: number) => HTMLElement;
+  private renderRow: (item: DataRecord, index: number) => HTMLElement;
   private renderHeader?: () => HTMLElement;
   private onVisibleRangeChange?: (start: number, end: number) => void;
   private onDragDrop?: (fromIndex: number, toIndex: number) => void;
@@ -73,8 +56,8 @@ export class VirtualScrollManager {
   constructor(config: VirtualScrollConfig) {
     this.container = config.container;
     this.data = config.data || [];
-    this.rowHeight = config.rowHeight || 40;
-    this.bufferSize = config.bufferSize || 10;
+    this.rowHeight = config.rowHeight || VIRTUAL_SCROLL_DEFAULT_ROW_HEIGHT;
+    this.bufferSize = config.bufferSize || VIRTUAL_SCROLL_DEFAULT_BUFFER_SIZE;
     this.renderRow = config.renderRow;
     this.renderHeader = config.renderHeader;
     this.onVisibleRangeChange = config.onVisibleRangeChange;
@@ -89,7 +72,7 @@ export class VirtualScrollManager {
    */
   private init(): void {
     if (!this.container) {
-      console.error('VirtualScrollManager: Container not found');
+      logger.error('VirtualScrollManager: Container not found');
       return;
     }
 
@@ -214,7 +197,8 @@ export class VirtualScrollManager {
     }
 
     // Update spacer height to match total content height
-    const totalHeight = this.data.length * this.rowHeight + 50; // +50 for header
+    const totalHeight =
+      this.data.length * this.rowHeight + VIRTUAL_SCROLL_HEADER_OFFSET;
     this.spacer.style.height = `${totalHeight}px`;
 
     // Clear content
@@ -234,8 +218,8 @@ export class VirtualScrollManager {
       thead.style.cssText = `
         position: sticky;
         top: 0;
-        z-index: 10;
-        background: #f8f9fa;
+        z-index: ${VIRTUAL_SCROLL_STICKY_Z_INDEX};
+        background: ${VIRTUAL_SCROLL_HEADER_BG};
       `;
       table.appendChild(thead);
     }
@@ -305,7 +289,7 @@ export class VirtualScrollManager {
    * Update the dataset
    * @param data New dataset
    */
-  public setData(data: any[]): void {
+  public setData(data: DataRecord[]): void {
     this.data = data;
     this.scrollTop = 0;
     if (this.wrapper) {
@@ -393,7 +377,7 @@ export class VirtualScrollManager {
    * Clean up resources and remove event listeners
    */
   public destroy(): void {
-    // Cancel any pending RAF
+    // Cancel pending RAF
     if (this.scrollRAF !== null) {
       cancelAnimationFrame(this.scrollRAF);
       this.scrollRAF = null;

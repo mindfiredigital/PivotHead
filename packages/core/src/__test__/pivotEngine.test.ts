@@ -1,5 +1,5 @@
 import { PivotEngine } from '../engine/pivotEngine';
-import { PivotTableConfig } from '../types/interfaces';
+import { PivotTableConfig, DataRecord } from '../types/interfaces';
 import { vi } from 'vitest';
 
 describe('PivotEngine', () => {
@@ -20,6 +20,7 @@ describe('PivotEngine', () => {
     measures: [],
     dimensions: [],
     defaultAggregation: 'sum',
+    rawData: [],
   };
 
   it('should initialize with correct data and default row sizes', () => {
@@ -346,6 +347,7 @@ describe('PivotEngine', () => {
     it('should handle empty or single-row datasets', () => {
       // Test with empty data
       interface EmptyTestData {
+        [key: string]: unknown;
         test?: string;
       }
 
@@ -365,6 +367,7 @@ describe('PivotEngine', () => {
 
       // Test with single row
       interface SingleTestData {
+        [key: string]: unknown;
         test: string;
         value: number;
       }
@@ -504,6 +507,7 @@ describe('PivotEngine', () => {
 
       // Test with no row field configured
       interface NoRowData {
+        [key: string]: unknown;
         category?: string;
         subcategory?: string;
         value?: number;
@@ -607,10 +611,8 @@ describe('PivotEngine', () => {
       engine.setGroupConfig({
         rowFields: ['country'],
         columnFields: [],
-        grouper: (item: (typeof filterTestData)[0], fields: string[]) => {
-          return fields
-            .map(field => item[field as keyof typeof item])
-            .join('-');
+        grouper: (item: DataRecord, fields: string[]) => {
+          return fields.map(field => String(item[field] ?? '')).join('-');
         },
       });
 
@@ -655,10 +657,8 @@ describe('PivotEngine', () => {
       engine.setGroupConfig({
         rowFields: ['country'],
         columnFields: [],
-        grouper: (item: (typeof filterTestData)[0], fields: string[]) => {
-          return fields
-            .map(field => item[field as keyof typeof item])
-            .join('-');
+        grouper: (item: DataRecord, fields: string[]) => {
+          return fields.map(field => String(item[field] ?? '')).join('-');
         },
       });
 
@@ -693,10 +693,8 @@ describe('PivotEngine', () => {
       engine.setGroupConfig({
         rowFields: ['country'],
         columnFields: [],
-        grouper: (item: (typeof filterTestData)[0], fields: string[]) => {
-          return fields
-            .map(field => item[field as keyof typeof item])
-            .join('-');
+        grouper: (item: DataRecord, fields: string[]) => {
+          return fields.map(field => String(item[field] ?? '')).join('-');
         },
       });
 
@@ -746,10 +744,8 @@ describe('PivotEngine', () => {
       engine.setGroupConfig({
         rowFields: ['country'],
         columnFields: [],
-        grouper: (item: (typeof filterTestData)[0], fields: string[]) => {
-          return fields
-            .map(field => item[field as keyof typeof item])
-            .join('-');
+        grouper: (item: DataRecord, fields: string[]) => {
+          return fields.map(field => String(item[field] ?? '')).join('-');
         },
       });
 
@@ -793,10 +789,8 @@ describe('PivotEngine', () => {
       engine.setGroupConfig({
         rowFields: ['country'],
         columnFields: [],
-        grouper: (item: (typeof filterTestData)[0], fields: string[]) => {
-          return fields
-            .map(field => item[field as keyof typeof item])
-            .join('-');
+        grouper: (item: DataRecord, fields: string[]) => {
+          return fields.map(field => String(item[field] ?? '')).join('-');
         },
       });
 
@@ -827,10 +821,8 @@ describe('PivotEngine', () => {
       engine.setGroupConfig({
         rowFields: ['country'],
         columnFields: [],
-        grouper: (item: (typeof filterTestData)[0], fields: string[]) => {
-          return fields
-            .map(field => item[field as keyof typeof item])
-            .join('-');
+        grouper: (item: DataRecord, fields: string[]) => {
+          return fields.map(field => String(item[field] ?? '')).join('-');
         },
       });
 

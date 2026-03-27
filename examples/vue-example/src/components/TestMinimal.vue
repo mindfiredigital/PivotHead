@@ -41,6 +41,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, nextTick } from 'vue'
 import { PivotHead } from '@mindfiredigital/pivothead-vue'
+import { logger } from '../../logger'
 
 export default defineComponent({
   name: 'TestMinimal',
@@ -62,32 +63,32 @@ export default defineComponent({
     const pivotState = ref(null)
 
     const handleStateChange = (e: any) => {
-      console.log('TestMinimal - State change event:', e)
-      console.log('TestMinimal - Event detail:', e.detail)
+      logger.info('TestMinimal - State change event:', e)
+      logger.info('TestMinimal - Event detail:', e.detail)
       pivotState.value = e.detail || e
     }
 
     const handleViewModeChange = (e: any) => {
-      console.log('TestMinimal - View mode change:', e)
+      logger.info('TestMinimal - View mode change:', e)
     }
 
     const handlePaginationChange = (e: any) => {
-      console.log('TestMinimal - Pagination change:', e)
+      logger.info('TestMinimal - Pagination change:', e)
     }
 
     onMounted(async () => {
-      console.log('TestMinimal mounted')
-      console.log('Props data:', props.data)
-      console.log('Props options:', props.options)
+      logger.info('TestMinimal mounted')
+      logger.info('Props data:', props.data)
+      logger.info('Props options:', props.options)
       
       await nextTick()
       
       // Try to get initial state
       setTimeout(() => {
         if (pivotRef.value) {
-          console.log('PivotRef available:', pivotRef.value)
+          logger.info('PivotRef available:', pivotRef.value)
           const state = pivotRef.value.getState?.()
-          console.log('Initial state:', state)
+          logger.info('Initial state:', state)
           if (state) {
             pivotState.value = state
           }

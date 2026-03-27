@@ -8,6 +8,7 @@ import {
   type PivotDataRecord,
   type PivotHeadProps,
 } from '@mindfiredigital/pivothead-react';
+import { logger } from '../logger';
 
 // Local UI store types
 type SortDir = 'asc' | 'desc';
@@ -173,10 +174,10 @@ export default function MinimalMode({ data, options }: Props) {
   const handleStateChange = (e: CustomEvent) => {
     // Ignore state changes during drag operations to prevent interference
     if (isDragging) {
-      console.log(`[DRAG] Ignoring state change during drag operation`);
+      logger.info(`[DRAG] Ignoring state change during drag operation`);
       return;
     }
-    console.log(`[STATE] Handling state change, viewMode=${viewMode}`);
+    logger.info(`[STATE] Handling state change, viewMode=${viewMode}`);
     setPivotState(e.detail as PivotTableState<PivotDataRecord>);
     // No engine-order mirroring; we control row order locally in minimal mode
     syncPagination();
@@ -287,7 +288,7 @@ export default function MinimalMode({ data, options }: Props) {
         }
       }
     } catch (err) {
-      console.warn('Failed to compute local row order for processed sort:', err);
+      logger.warn('Failed to compute local row order for processed sort:', err);
     }
 
     // No engine.sort call; local state drives UI
@@ -321,7 +322,7 @@ export default function MinimalMode({ data, options }: Props) {
     const from = dnd.fromIndex;
     const to = toIndex;
     // Perform swap at engine level when available
-    try { ref.current?.methods.swapColumns?.(from, to); } catch (err) { console.warn('swapColumns failed', err); }
+    try { ref.current?.methods.swapColumns?.(from, to); } catch (err) { logger.warn('swapColumns failed', err); }
     // Mirror swap locally for deterministic UI
     setCurrentStore(s => {
       const arr = [...(s.colOrder.length ? s.colOrder : [])];
@@ -338,13 +339,13 @@ export default function MinimalMode({ data, options }: Props) {
 
   // Row DnD - simple implementation that delegates to web component
   const handleRowDragStart = (index: number) => {
-    console.log(`[DRAG] Starting row drag: index=${index}, viewMode=${viewMode}`);
+    logger.info(`[DRAG] Starting row drag: index=${index}, viewMode=${viewMode}`);
     setIsDragging(true);
     setDnd({ type: 'row', fromIndex: index });
   };
   const handleRowDropProcessed = (toIndex: number, visibleLabels: string[]) => {
     if (dnd.type !== 'row') return;
-    console.log(`[DRAG] Processing row drop: fromIndex=${dnd.fromIndex}, toIndex=${toIndex}, viewMode=${viewMode}`);
+    logger.info(`[DRAG] Processing row drop: fromIndex=${dnd.fromIndex}, toIndex=${toIndex}, viewMode=${viewMode}`);
     setCurrentStore(s => {
       const order = s.rowOrder.length ? [...s.rowOrder] : [...visibleLabels];
       const from = dnd.fromIndex;
@@ -353,7 +354,7 @@ export default function MinimalMode({ data, options }: Props) {
       const tmp = order[from];
       order[from] = order[to];
       order[to] = tmp;
-      console.log(`[DRAG] Updated processed row order:`, order);
+      logger.info(`[DRAG] Updated processed row order:`, order);
       return { ...s, rowOrder: order };
     });
     setDnd({ type: null, fromIndex: -1 });
@@ -361,18 +362,18 @@ export default function MinimalMode({ data, options }: Props) {
   };
   const handleRowDropRaw = (toIndex: number) => {
     if (dnd.type !== 'row') return;
-    console.log(`[DRAG] Raw row drop: fromIndex=${dnd.fromIndex}, toIndex=${toIndex}, viewMode=${viewMode}`);
+    logger.info(`[DRAG] Raw row drop: fromIndex=${dnd.fromIndex}, toIndex=${toIndex}, viewMode=${viewMode}`);
     const elSwap = ref.current?.methods.swapRows;
     if (elSwap) {
       try { 
-        console.log(`[DRAG] Calling engine swapRows(${dnd.fromIndex}, ${toIndex})`);
+        logger.info(`[DRAG] Calling engine swapRows(${dnd.fromIndex}, ${toIndex})`);
         elSwap(dnd.fromIndex, toIndex); 
-        console.log(`[DRAG] Engine swapRows completed successfully`);
+        logger.info(`[DRAG] Engine swapRows completed successfully`);
       } catch (err) { 
-        console.warn('[DRAG] swapRows failed', err); 
+        logger.warn('[DRAG] swapRows failed', err); 
       }
     } else {
-      console.warn('[DRAG] No swapRows method available');
+      logger.warn('[DRAG] No swapRows method available');
     }
     setDnd({ type: null, fromIndex: -1 });
     setIsDragging(false);

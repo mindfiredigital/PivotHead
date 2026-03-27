@@ -1,3 +1,5 @@
+import { logger } from '../logger.js';
+
 // Sample data for the pivot table
 export const sampleData = [
   {
@@ -189,9 +191,9 @@ export const config = {
     },
   ],
   onRowDragEnd: (fromIndex, toIndex, newData) => {
-    console.log('Row dragged:', { fromIndex, toIndex, newData });
+    logger.info('Row dragged:', { fromIndex, toIndex, newData });
   },
   onColumnDragEnd: (fromIndex, toIndex, newColumns) => {
-    console.log('Column dragged:', { fromIndex, toIndex, newColumns });
+    logger.info('Column dragged:', { fromIndex, toIndex, newColumns });
   },
 };

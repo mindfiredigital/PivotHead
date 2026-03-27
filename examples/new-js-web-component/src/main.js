@@ -1,5 +1,6 @@
 import '@mindfiredigital/pivothead-web-component';
 import { originalData, options } from './config';
+import { logger } from './logger.js';
 
 // declared pivot head globally
 let pivot;
@@ -10,7 +11,7 @@ window.addEventListener('DOMContentLoaded', () => {
     // Assign to the global 'pivot' variable
     pivot = document.querySelector('pivot-head');
     if (!pivot) {
-      console.error('Could not find the <pivot-head> element!');
+      logger.error('Could not find the <pivot-head> element!');
       return;
     }
 
@@ -20,11 +21,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
     pivot.addEventListener('stateChange', e => {
       const updatedState = e.detail;
-      console.log('State changed:', updatedState);
+      logger.info('State changed:', updatedState);
       renderTable(updatedState);
     });
 
-    console.log(pivot.getState());
+    logger.info(pivot.getState());
     // setRowColumnGroups();
     renderTable(pivot.getState());
     populateFieldsModalStructure();
@@ -385,12 +386,12 @@ document.addEventListener('DOMContentLoaded', () => {
 window.handleExport = function (format) {
   // Ensure the pivot component is available
   if (!pivot) {
-    console.error('Pivot component not found. Cannot export.');
+    logger.error('Pivot component not found. Cannot export.');
     alert('Export functionality is not ready yet.');
     return;
   }
 
-  console.log(`Exporting to ${format}...`);
+  logger.info(`Exporting to ${format}...`);
 
   // Use a switch statement to call the correct method
   switch (format) {
@@ -407,7 +408,7 @@ window.handleExport = function (format) {
       pivot.openPrintDialog();
       break;
     default:
-      console.error(`Unknown export format requested: ${format}`);
+      logger.error(`Unknown export format requested: ${format}`);
   }
 };
 
@@ -420,7 +421,7 @@ function populateFieldsModalStructure() {
 
   // Populate dropdowns with available dimensions
   options.dimensions.forEach(dim => {
-    console.log(dim);
+    logger.info(dim);
     const option = document.createElement('option');
     option.value = dim.field;
     option.textContent = dim.label;
@@ -475,7 +476,7 @@ window.openFieldsModal = function () {
  */
 window.applyFieldChanges = function () {
   if (!pivot) {
-    console.error('Pivot component not ready.');
+    logger.error('Pivot component not ready.');
     return;
   }
 
@@ -531,7 +532,7 @@ window.applyFieldChanges = function () {
 
 function renderTable(state) {
   if (!state) {
-    console.error('State is not present');
+    logger.error('State is not present');
     return;
   }
 

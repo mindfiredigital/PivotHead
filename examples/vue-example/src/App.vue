@@ -272,6 +272,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, watch, nextTick } from 'vue'
 import { PivotHead } from '@mindfiredigital/pivothead-vue'
+import { logger } from './logger'
 // @ts-ignore
 import MinimalMode from './components/MinimalMode.vue'
 import type { PivotDataRecord, PivotOptions, PaginationConfig, FileConnectionResult } from '@mindfiredigital/pivothead-vue'
@@ -388,7 +389,7 @@ const paginationConfig = ref<PaginationConfig>({
 
 // Event handlers
 const handleStateChange = (state: any) => {
-  console.log('Pivot state changed:', state)
+  logger.info('Pivot state changed:', state)
   statusMessage.value = `State updated at ${new Date().toLocaleTimeString()}`
 }
 
@@ -482,13 +483,13 @@ const uploadCSVFile = async () => {
 
     if (result.success) {
       statusMessage.value = `Successfully loaded ${result.recordCount} records from ${result.fileName}`
-      console.log('Upload result:', result)
+      logger.info('Upload result:', result)
     } else {
       statusMessage.value = `Failed to upload: ${result.error}`
-      console.error('Upload failed:', result)
+      logger.error('Upload failed:', result)
     }
   } catch (error) {
-    console.error('Error uploading CSV:', error)
+    logger.error('Error uploading CSV:', error)
     statusMessage.value = `Error: ${error instanceof Error ? error.message : 'Unknown error'}`
   } finally {
     isUploading.value = false
@@ -518,13 +519,13 @@ const uploadJSONFile = async () => {
 
     if (result.success) {
       statusMessage.value = `Successfully loaded ${result.recordCount} records from ${result.fileName}`
-      console.log('Upload result:', result)
+      logger.info('Upload result:', result)
     } else {
       statusMessage.value = `Failed to upload: ${result.error}`
-      console.error('Upload failed:', result)
+      logger.error('Upload failed:', result)
     }
   } catch (error) {
-    console.error('Error uploading JSON:', error)
+    logger.error('Error uploading JSON:', error)
     statusMessage.value = `Error: ${error instanceof Error ? error.message : 'Unknown error'}`
   } finally {
     isUploading.value = false
@@ -554,13 +555,13 @@ const uploadAnyFile = async () => {
 
     if (result.success) {
       statusMessage.value = `Successfully loaded ${result.recordCount} records from ${result.fileName}`
-      console.log('Upload result:', result)
+      logger.info('Upload result:', result)
     } else {
       statusMessage.value = `Failed to upload: ${result.error}`
-      console.error('Upload failed:', result)
+      logger.error('Upload failed:', result)
     }
   } catch (error) {
-    console.error('Error uploading file:', error)
+    logger.error('Error uploading file:', error)
     statusMessage.value = `Error: ${error instanceof Error ? error.message : 'Unknown error'}`
   } finally {
     isUploading.value = false
@@ -588,7 +589,7 @@ const initChartService = () => {
 
     if (pivotElement && pivotElement.engine) {
       chartServiceRef.value = new ChartService(pivotElement.engine)
-      console.log('ChartService initialized successfully')
+      logger.info('ChartService initialized successfully')
 
       // Get available filter options
       const filterOptions = chartServiceRef.value.getAvailableFilterOptions()
@@ -603,12 +604,12 @@ const initChartService = () => {
 
       statusMessage.value = 'Chart service initialized'
     } else {
-      console.warn('Pivot engine not available yet')
+      logger.warn('Pivot engine not available yet')
       // Retry after a short delay
       setTimeout(initChartService, 500)
     }
   } catch (error) {
-    console.error('Failed to initialize ChartService:', error)
+    logger.error('Failed to initialize ChartService:', error)
     statusMessage.value = 'Failed to initialize chart service'
   }
 }
@@ -634,10 +635,10 @@ const handleChartTypeChange = (event: Event) => {
 }
 
 const applyChartFilters = () => {
-  console.log('applyChartFilters called', { chartType: chartType.value })
+  logger.info('applyChartFilters called', { chartType: chartType.value })
 
   if (!chartServiceRef.value || chartType.value === 'none') {
-    console.warn('Cannot render chart: chartService or chartType not available')
+    logger.warn('Cannot render chart: chartService or chartType not available')
     return
   }
 
@@ -649,7 +650,7 @@ const applyChartFilters = () => {
       limit: chartLimit.value
     }
 
-    console.log('Chart filters:', filters)
+    logger.info('Chart filters:', filters)
 
     // Set filters on the chart service
     chartServiceRef.value.setFilters(filters)
@@ -662,7 +663,7 @@ const applyChartFilters = () => {
     showChart.value = true
     statusMessage.value = `Chart rendered: ${chartType.value}`
   } catch (error) {
-    console.error('Failed to render chart:', error)
+    logger.error('Failed to render chart:', error)
     statusMessage.value = `Failed to render chart: ${error}`
   }
 }
@@ -693,7 +694,7 @@ const getChartJsType = (type: ChartType): string => {
 // Render chart directly using Chart.js
 const renderChartDirectly = () => {
   if (!chartCanvasRef.value || !chartServiceRef.value) {
-    console.warn('Canvas or ChartService not available')
+    logger.warn('Canvas or ChartService not available')
     return
   }
 
@@ -767,7 +768,7 @@ const renderChartDirectly = () => {
     options: chartOptions
   })
 
-  console.log('Chart rendered directly with Chart.js')
+  logger.info('Chart rendered directly with Chart.js')
 }
 
 const resetChartFilters = () => {
@@ -793,7 +794,7 @@ const hideChart = () => {
 }
 
 const handleChartRendered = (event: any) => {
-  console.log('Chart rendered:', event)
+  logger.info('Chart rendered:', event)
   statusMessage.value = `Chart rendered successfully: ${event.type}`
 }
 

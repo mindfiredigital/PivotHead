@@ -15,7 +15,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "!dist/*.map"
   ],
   "author": "Mindfiredigital",
   "license": "MIT",
@@ -45,6 +46,8 @@
     "build": "rimraf dist && tsup src/index.ts --format esm,cjs --dts",
     "dev": "tsup src/index.ts --watch --format esm,cjs --dts",
     "clean": "rimraf dist",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
@@ -60,8 +63,11 @@
     }
   },
   "devDependencies": {
+    "@types/node": "^22.10.1",
+    "jsdom": "^26.0.0",
     "rimraf": "^5.0.0",
     "tsup": "^7.2.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vitest": "^0.32.0"
   }
 }
