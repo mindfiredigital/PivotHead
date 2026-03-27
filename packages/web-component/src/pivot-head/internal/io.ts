@@ -5,6 +5,7 @@ import {
   type FileConnectionResult,
 } from '@mindfiredigital/pivothead';
 import { tryInitializeEngine } from './engine';
+import { logger } from '../../logger.js';
 
 // Exporting helpers
 export function exportToHTML(
@@ -12,7 +13,7 @@ export function exportToHTML(
   fileName = 'pivot-table'
 ): void {
   if (!host.engine) {
-    console.error('Engine not initialized. Cannot export to HTML.');
+    logger.error('Engine not initialized. Cannot export to HTML.');
     return;
   }
   host.engine.exportToHTML(fileName);
@@ -23,7 +24,7 @@ export function exportToPDF(
   fileName = 'pivot-table'
 ): void {
   if (!host.engine) {
-    console.error('Engine not initialized. Cannot export to PDF.');
+    logger.error('Engine not initialized. Cannot export to PDF.');
     return;
   }
   host.engine.exportToPDF(fileName);
@@ -34,7 +35,7 @@ export function exportToExcel(
   fileName = 'pivot-table'
 ): void {
   if (!host.engine) {
-    console.error('Engine not initialized. Cannot export to Excel.');
+    logger.error('Engine not initialized. Cannot export to Excel.');
     return;
   }
   host.engine.exportToExcel(fileName);
@@ -42,7 +43,7 @@ export function exportToExcel(
 
 export function openPrintDialog(host: PivotHeadHost): void {
   if (!host.engine) {
-    console.error('Engine not initialized. Cannot open print dialog.');
+    logger.error('Engine not initialized. Cannot open print dialog.');
     return;
   }
   host.engine.openPrintDialog();
@@ -72,7 +73,22 @@ export function loadFromFile(host: PivotHeadHost, file: File): Promise<void> {
 }
 
 export function loadFromUrl(host: PivotHeadHost, url: string): Promise<void> {
-  return fetch(url)
+  // Validate URL — only allow http(s) to prevent file://, javascript:, data: schemes
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(url, window.location.origin);
+  } catch {
+    return Promise.reject(new Error(`Invalid URL: ${url}`));
+  }
+  if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+    return Promise.reject(
+      new Error(
+        `Unsupported URL protocol: ${parsedUrl.protocol}. Only http and https are allowed.`
+      )
+    );
+  }
+
+  return fetch(parsedUrl.href)
     .then(response => {
       if (!response.ok) {
         throw new Error(
@@ -82,6 +98,9 @@ export function loadFromUrl(host: PivotHeadHost, url: string): Promise<void> {
       return response.json();
     })
     .then(data => {
+      if (!Array.isArray(data)) {
+        throw new Error('Expected JSON array from URL');
+      }
       host.data = data;
     });
 }
@@ -94,7 +113,7 @@ export async function connectToLocalCSV(
   // If engine doesn't exist, create a minimal/placeholder engine
   // ConnectService will replace its data and layout when the CSV is loaded
   if (!host.engine) {
-    console.log(
+    logger.info(
       '📦 No engine found. Creating placeholder engine for file import...'
     );
     // Create minimal placeholder data to satisfy engine initialization requirements
@@ -108,7 +127,7 @@ export async function connectToLocalCSV(
 
     // If engine still doesn't exist after initialization, return error
     if (!host.engine) {
-      console.error('Failed to create placeholder engine for CSV import.');
+      logger.error('Failed to create placeholder engine for CSV import.');
       return { success: false, error: 'Failed to initialize engine' };
     }
   }
@@ -133,7 +152,7 @@ export async function connectToLocalCSV(
 
     // Extract the layout configuration from the engine and update host._options
     const state = host.engine.getState();
-    console.log('🔍 CSV Upload - Engine state:', {
+    logger.info('🔍 CSV Upload - Engine state:', {
       hasProcessedData: !!state?.processedData,
       hasRows: !!state?.rows?.length,
       hasColumns: !!state?.columns?.length,
@@ -167,7 +186,7 @@ export async function connectToLocalCSV(
         measures: state.measures || [],
         groupConfig: newGroupConfig,
       };
-      console.log('🔍 CSV Upload - Updated options with NEW groupConfig:', {
+      logger.info('🔍 CSV Upload - Updated options with NEW groupConfig:', {
         rows: host._options.rows,
         columns: host._options.columns,
         measures: host._options.measures,
@@ -186,7 +205,7 @@ export async function connectToLocalCSV(
     // This allows the engine's subscription to fire first, then we trigger another render
     // with the updated host._options
     setTimeout(() => {
-      console.log('🔍 CSV Upload - Triggering render with updated options');
+      logger.info('🔍 CSV Upload - Triggering render with updated options');
       host.handleEngineStateChange(state);
     }, 0);
   }
@@ -201,7 +220,7 @@ export async function connectToLocalJSON(
   // If engine doesn't exist, create a minimal/placeholder engine
   // ConnectService will replace its data and layout when the JSON is loaded
   if (!host.engine) {
-    console.log(
+    logger.info(
       '📦 No engine found. Creating placeholder engine for file import...'
     );
     // Create minimal placeholder data to satisfy engine initialization requirements
@@ -215,7 +234,7 @@ export async function connectToLocalJSON(
 
     // If engine still doesn't exist after initialization, return error
     if (!host.engine) {
-      console.error('Failed to create placeholder engine for JSON import.');
+      logger.error('Failed to create placeholder engine for JSON import.');
       return { success: false, error: 'Failed to initialize engine' };
     }
   }
@@ -240,7 +259,7 @@ export async function connectToLocalJSON(
 
     // Extract the layout configuration from the engine and update host._options
     const state = host.engine.getState();
-    console.log('🔍 File Upload - Engine state:', {
+    logger.info('🔍 File Upload - Engine state:', {
       hasProcessedData: !!state?.processedData,
       hasRows: !!state?.rows?.length,
       hasColumns: !!state?.columns?.length,
@@ -274,7 +293,7 @@ export async function connectToLocalJSON(
         measures: state.measures || [],
         groupConfig: newGroupConfig,
       };
-      console.log('🔍 File Upload - Updated options:', {
+      logger.info('🔍 File Upload - Updated options:', {
         rows: host._options.rows,
         columns: host._options.columns,
         measures: host._options.measures,
@@ -293,7 +312,7 @@ export async function connectToLocalJSON(
     // This allows the engine's subscription to fire first, then we trigger another render
     // with the updated host._options
     setTimeout(() => {
-      console.log('🔍 File Upload - Triggering render with updated options');
+      logger.info('🔍 File Upload - Triggering render with updated options');
       host.handleEngineStateChange(state);
     }, 0);
   }
@@ -308,7 +327,7 @@ export async function connectToLocalFile(
   // If engine doesn't exist, create a minimal/placeholder engine
   // ConnectService will replace its data and layout when the file is loaded
   if (!host.engine) {
-    console.log(
+    logger.info(
       '📦 No engine found. Creating placeholder engine for file import...'
     );
     // Create minimal placeholder data to satisfy engine initialization requirements
@@ -322,7 +341,7 @@ export async function connectToLocalFile(
 
     // If engine still doesn't exist after initialization, return error
     if (!host.engine) {
-      console.error('Failed to create placeholder engine for file import.');
+      logger.error('Failed to create placeholder engine for file import.');
       return { success: false, error: 'Failed to initialize engine' };
     }
   }
@@ -347,7 +366,7 @@ export async function connectToLocalFile(
 
     // Extract the layout configuration from the engine and update host._options
     const state = host.engine.getState();
-    console.log('🔍 File Upload - Engine state:', {
+    logger.info('🔍 File Upload - Engine state:', {
       hasProcessedData: !!state?.processedData,
       hasRows: !!state?.rows?.length,
       hasColumns: !!state?.columns?.length,
@@ -381,7 +400,7 @@ export async function connectToLocalFile(
         measures: state.measures || [],
         groupConfig: newGroupConfig,
       };
-      console.log('🔍 File Upload - Updated options:', {
+      logger.info('🔍 File Upload - Updated options:', {
         rows: host._options.rows,
         columns: host._options.columns,
         measures: host._options.measures,
@@ -400,7 +419,7 @@ export async function connectToLocalFile(
     // This allows the engine's subscription to fire first, then we trigger another render
     // with the updated host._options
     setTimeout(() => {
-      console.log('🔍 File Upload - Triggering render with updated options');
+      logger.info('🔍 File Upload - Triggering render with updated options');
       host.handleEngineStateChange(state);
     }, 0);
   }

@@ -1,19 +1,15 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { PivotEngine } from './pivotEngine';
 import type {
   AggregationType,
   AxisConfig,
+  DataRecord,
   MeasureConfig,
+  FieldType,
+  FieldInfo,
+  LayoutSelection,
 } from '../types/interfaces';
 
-export type FieldType = 'string' | 'number' | 'date';
-
-export interface FieldInfo {
-  name: string;
-  type: FieldType;
-}
-
-import type { LayoutSelection } from '../types/interfaces';
+export type { FieldType, FieldInfo };
 
 /**
  * FieldService: Helper utilities to drive field selection and aggregations from UI.
@@ -23,7 +19,7 @@ import type { LayoutSelection } from '../types/interfaces';
  */
 export class FieldService {
   /** Returns all fields inferred from the engine's raw data */
-  public static getAvailableFields<TRow extends Record<string, any>>(
+  public static getAvailableFields<TRow extends DataRecord>(
     engine: PivotEngine<TRow>
   ): FieldInfo[] {
     const state = engine.getState();
@@ -51,7 +47,7 @@ export class FieldService {
   }
 
   /** Change aggregation for a specific measure and refresh engine */
-  public static setMeasureAggregation<TRow extends Record<string, any>>(
+  public static setMeasureAggregation<TRow extends DataRecord>(
     engine: PivotEngine<TRow>,
     field: string,
     aggregation: AggregationType
@@ -107,7 +103,10 @@ export class FieldService {
   }
 
   // --- helpers ---
-  private static inferFieldType(sample: any[], field: string): FieldType {
+  private static inferFieldType(
+    sample: DataRecord[],
+    field: string
+  ): FieldType {
     let numericCount = 0;
     let dateCount = 0;
 
@@ -124,7 +123,7 @@ export class FieldService {
     return 'string';
   }
 
-  private static looksLikeDate(v: any): boolean {
+  private static looksLikeDate(v: unknown): boolean {
     if (typeof v !== 'string' && !(v instanceof Date)) return false;
     const ts = Date.parse(String(v));
     return !isNaN(ts);

@@ -87,6 +87,7 @@ import type { Meta, StoryObj } from '@storybook/angular';
 import { PivotHeadWrapperComponent } from './pivothead-wrapper.component';
 import { applicationConfig } from '@storybook/angular';
 import { provideAnimations } from '@angular/platform-browser/animations';
+import { logger } from '../logger';
 import {
   PaginationConfig,
   PivotTableState,
@@ -204,11 +205,11 @@ const meta: Meta<PivotHeadWrapperComponent> = {
       pagination: args['pagination'],
       mode: args['mode'],
       onStateChange: (event: CustomEvent<PivotTableState<PivotDataRecord>>) =>
-        console.log('State changed:', event.detail),
+        logger.info('State changed:', event.detail),
       onViewModeChange: (event: CustomEvent<{ mode: 'raw' | 'processed' }>) =>
-        console.log('View mode changed:', event.detail),
+        logger.info('View mode changed:', event.detail),
       onPaginationChange: (event: CustomEvent<PaginationConfig>) =>
-        console.log('Pagination changed:', event.detail),
+        logger.info('Pagination changed:', event.detail),
     },
     template: `
       <div style="height: 600px; width: 100%;">
@@ -308,7 +309,7 @@ export const WithMethods: Story = {
         const pivotTable = document.querySelector('pivot-head-wrapper') as any;
         if (pivotTable) {
           pivotTable.refresh();
-          console.log('Table refreshed');
+          logger.info('Table refreshed');
         }
       },
       onExportToExcel: () => {

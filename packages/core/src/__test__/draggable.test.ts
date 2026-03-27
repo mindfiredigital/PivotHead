@@ -1,13 +1,19 @@
 import { PivotEngine } from '../engine/pivotEngine';
-import type { PivotTableConfig } from '../types/interfaces';
+import type { PivotTableConfig, DataRecord } from '../types/interfaces';
 
 describe('PivotEngine Draggable Feature', () => {
-  let engine: PivotEngine<any>;
-  let config: PivotTableConfig<any>;
+  let engine: PivotEngine<DataRecord>;
+  let config: PivotTableConfig<DataRecord>;
 
   beforeEach(() => {
     config = {
       data: [
+        { id: 1, name: 'John', age: 30 },
+        { id: 2, name: 'Jane', age: 25 },
+        { id: 3, name: 'Bob', age: 35 },
+        { id: 4, name: 'Alice', age: 28 },
+      ],
+      rawData: [
         { id: 1, name: 'John', age: 30 },
         { id: 2, name: 'Jane', age: 25 },
         { id: 3, name: 'Bob', age: 35 },

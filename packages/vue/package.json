@@ -76,7 +76,8 @@
     "test:coverage": "vitest run --coverage"
   },
   "peerDependencies": {
-    "vue": ">=3.0.0"
+    "vue": ">=3.0.0",
+    "winston": "^3.0.0"
   },
   "dependencies": {
     "@mindfiredigital/pivothead-web-component": "workspace:*"
@@ -90,5 +91,10 @@
     "typescript": "^5.0.0",
     "vitest": "^0.34.0",
     "vue": "^3.3.0"
+  },
+  "peerDependenciesMeta": {
+    "winston": {
+      "optional": true
+    }
   }
 }

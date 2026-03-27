@@ -121,6 +121,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, watch, onMounted, nextTick, defineOptions } from 'vue'
 import PivotHead from '@mindfiredigital/pivothead-vue'
+import { logger } from '../../logger'
 // @ts-ignore
 import ProcessedTable from './ProcessedTable.vue'
 // @ts-ignore
@@ -512,7 +513,7 @@ const toggleSort = (field: string, columnValue?: string, isMeasureHeader?: boole
       }
     }
   } catch (err) {
-    console.warn('Failed to compute local row order for processed sort:', err)
+    logger.warn('Failed to compute local row order for processed sort:', err)
   }
 }
 
@@ -553,7 +554,7 @@ const handleColDrop = (toIndex: number) => {
     try { 
       pivotRef.value?.swapColumns?.(from, to) 
     } catch (err) { 
-      console.warn('swapColumns failed', err) 
+      logger.warn('swapColumns failed', err) 
     }
   }
   

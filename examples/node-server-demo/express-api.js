@@ -4,17 +4,22 @@
  * This example demonstrates how to create a REST API for CSV parsing
  * using PivotHead's WASM-powered parser in Express.js
  */
+const { logger } = require('./logger');
 
 const express = require('express');
 const {
   WasmLoader,
   PivotEngine,
 } = require('../../packages/core/dist/pivothead-core.umd.js');
+const { applySecurity } = require('./security');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
+// Security middleware (CORS, rate limiting, API key auth, security headers)
+applySecurity(app);
+
+// Body parsing middleware
 app.use(express.json({ limit: '50mb' }));
 app.use(express.text({ type: 'text/csv', limit: '50mb' }));
 
@@ -23,15 +28,15 @@ let wasmReady = false;
 const wasm = WasmLoader.getInstance();
 
 // Initialize WASM on startup
-console.log('Initializing WASM module...');
+logger.info('Initializing WASM module...');
 wasm
   .load()
   .then(() => {
     wasmReady = true;
-    console.log(`✓ WASM module loaded successfully (v${wasm.getVersion()})`);
+    logger.info(`✓ WASM module loaded successfully (v${wasm.getVersion()})`);
   })
   .catch(err => {
-    console.error('✗ Failed to load WASM module:', err);
+    logger.error('✗ Failed to load WASM module:', err);
     process.exit(1);
   });
 
@@ -119,7 +124,7 @@ app.post('/api/parse', ensureWasmReady, (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Error in /api/parse:', error);
+    logger.error('Error in /api/parse:', error);
     res.status(500).json({
       error: 'Internal Server Error',
       message: error.message,
@@ -173,7 +178,7 @@ app.post('/api/analyze', ensureWasmReady, (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Error in /api/analyze:', error);
+    logger.error('Error in /api/analyze:', error);
     res.status(500).json({
       error: 'Internal Server Error',
       message: error.message,
@@ -208,7 +213,7 @@ app.post('/api/benchmark', ensureWasmReady, (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Error in /api/benchmark:', error);
+    logger.error('Error in /api/benchmark:', error);
     res.status(500).json({
       error: 'Internal Server Error',
       message: error.message,
@@ -242,7 +247,7 @@ app.post('/api/detect-types', ensureWasmReady, (req, res) => {
       results,
     });
   } catch (error) {
-    console.error('Error in /api/detect-types:', error);
+    logger.error('Error in /api/detect-types:', error);
     res.status(500).json({
       error: 'Internal Server Error',
       message: error.message,
@@ -363,7 +368,7 @@ app.post('/api/filter', ensureWasmReady, (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Error in /api/filter:', error);
+    logger.error('Error in /api/filter:', error);
     res.status(500).json({
       error: 'Internal Server Error',
       message: error.message,
@@ -383,7 +388,7 @@ app.get('/api/version', ensureWasmReady, (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error('Unhandled error:', err);
+  logger.error('Unhandled error:', err);
   res.status(500).json({
     error: 'Internal Server Error',
     message: err.message,
@@ -409,43 +414,43 @@ app.use((req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log('='.repeat(60));
-  console.log('PivotHead CSV Parser API Server');
-  console.log('='.repeat(60));
-  console.log(`Server running on: http://localhost:${PORT}`);
-  console.log('');
-  console.log('Available endpoints:');
-  console.log(`  GET  http://localhost:${PORT}/health`);
-  console.log(`  GET  http://localhost:${PORT}/api/version`);
-  console.log(`  POST http://localhost:${PORT}/api/parse`);
-  console.log(`  POST http://localhost:${PORT}/api/analyze`);
-  console.log(`  POST http://localhost:${PORT}/api/benchmark`);
-  console.log(`  POST http://localhost:${PORT}/api/detect-types`);
-  console.log(`  POST http://localhost:${PORT}/api/filter`);
-  console.log('');
-  console.log('Example curl commands:');
-  console.log(`  curl http://localhost:${PORT}/health`);
-  console.log(`  curl -X POST http://localhost:${PORT}/api/parse \\`);
-  console.log(`    -H "Content-Type: application/json" \\`);
-  console.log(`    -d '{"csv":"Name,Age\\nJohn,30\\nJane,25"}'`);
-  console.log('');
-  console.log(`  curl -X POST http://localhost:${PORT}/api/filter \\`);
-  console.log(`    -H "Content-Type: application/json" \\`);
-  console.log(
+  logger.info('='.repeat(60));
+  logger.info('PivotHead CSV Parser API Server');
+  logger.info('='.repeat(60));
+  logger.info(`Server running on: http://localhost:${PORT}`);
+  logger.info('');
+  logger.info('Available endpoints:');
+  logger.info(`  GET  http://localhost:${PORT}/health`);
+  logger.info(`  GET  http://localhost:${PORT}/api/version`);
+  logger.info(`  POST http://localhost:${PORT}/api/parse`);
+  logger.info(`  POST http://localhost:${PORT}/api/analyze`);
+  logger.info(`  POST http://localhost:${PORT}/api/benchmark`);
+  logger.info(`  POST http://localhost:${PORT}/api/detect-types`);
+  logger.info(`  POST http://localhost:${PORT}/api/filter`);
+  logger.info('');
+  logger.info('Example curl commands:');
+  logger.info(`  curl http://localhost:${PORT}/health`);
+  logger.info(`  curl -X POST http://localhost:${PORT}/api/parse \\`);
+  logger.info(`    -H "Content-Type: application/json" \\`);
+  logger.info(`    -d '{"csv":"Name,Age\\nJohn,30\\nJane,25"}'`);
+  logger.info('');
+  logger.info(`  curl -X POST http://localhost:${PORT}/api/filter \\`);
+  logger.info(`    -H "Content-Type: application/json" \\`);
+  logger.info(
     `    -d '{"csv":"Name,Age,Salary\\nJohn,30,75000\\nJane,28,65000","filters":[{"field":"Salary","operator":"greaterThan","value":70000}]}'`
   );
-  console.log('='.repeat(60));
+  logger.info('='.repeat(60));
 });
 
 // Handle shutdown gracefully
 process.on('SIGTERM', () => {
-  console.log('Received SIGTERM, shutting down gracefully...');
+  logger.info('Received SIGTERM, shutting down gracefully...');
   wasm.unload();
   process.exit(0);
 });
 
 process.on('SIGINT', () => {
-  console.log('\nReceived SIGINT, shutting down gracefully...');
+  logger.info('\nReceived SIGINT, shutting down gracefully...');
   wasm.unload();
   process.exit(0);
 });

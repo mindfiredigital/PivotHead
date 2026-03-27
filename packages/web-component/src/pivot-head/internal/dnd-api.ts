@@ -1,4 +1,5 @@
 import type { PivotHeadHost } from './host';
+import { logger } from '../../logger.js';
 
 export function dragRow(
   host: PivotHeadHost,
@@ -6,7 +7,7 @@ export function dragRow(
   toIndex: number
 ): void {
   if (!host.engine) {
-    console.error('Engine not initialized');
+    logger.error('Engine not initialized');
     return;
   }
   host.engine.dragRow(fromIndex, toIndex);
@@ -18,7 +19,7 @@ export function dragColumn(
   toIndex: number
 ): void {
   if (!host.engine) {
-    console.error('Engine not initialized');
+    logger.error('Engine not initialized');
     return;
   }
   host.engine.dragColumn(fromIndex, toIndex);
@@ -30,7 +31,7 @@ export function swapRows(
   toIndex: number
 ): void {
   if (!host.engine) {
-    console.error('Engine not initialized');
+    logger.error('Engine not initialized');
     return;
   }
   try {
@@ -40,7 +41,7 @@ export function swapRows(
       host.engine.swapDataRows(fromIndex, toIndex);
     }
   } catch (error) {
-    console.error('Row swap failed:', error);
+    logger.error('Row swap failed:', error);
   }
 }
 
@@ -50,7 +51,7 @@ export function swapColumns(
   toIndex: number
 ): void {
   if (!host.engine) {
-    console.error('Engine not initialized');
+    logger.error('Engine not initialized');
     return;
   }
   try {
@@ -62,7 +63,7 @@ export function swapColumns(
         fromIndex >= headers.length ||
         toIndex >= headers.length
       ) {
-        console.error(
+        logger.error(
           `Invalid column indices for raw data swap: ${fromIndex}, ${toIndex}, total: ${headers.length}`
         );
         return;
@@ -80,7 +81,7 @@ export function swapColumns(
       if (newOrder) host._processedColumnOrder = [...newOrder];
     }
   } catch (error) {
-    console.error('Column swap failed:', error);
+    logger.error('Column swap failed:', error);
   }
 }
 
@@ -90,7 +91,7 @@ export function swapRawDataColumns(
   toIndex: number
 ): void {
   if (!host._data || host._data.length === 0) {
-    console.error('No raw data available for column swap');
+    logger.error('No raw data available for column swap');
     return;
   }
   const headers = Object.keys(host._data[0]);
@@ -100,7 +101,7 @@ export function swapRawDataColumns(
     fromIndex >= headers.length ||
     toIndex >= headers.length
   ) {
-    console.error(
+    logger.error(
       `Invalid column indices for raw data swap: ${fromIndex}, ${toIndex}, total: ${headers.length}`
     );
     return;

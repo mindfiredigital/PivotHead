@@ -58,6 +58,8 @@
     "build": "rimraf dist && tsup src/index.ts --format esm,cjs --dts",
     "dev": "tsup src/index.ts --watch --format esm,cjs --dts",
     "clean": "rimraf dist",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "postinstall": "node ./postinstall.mjs"
   },
@@ -69,7 +71,8 @@
     "echarts": "^5.5.0",
     "plotly.js-dist": "^2.30.0",
     "d3": "^7.9.0",
-    "jspdf": "^2.5.0"
+    "jspdf": "^4.2.1",
+    "winston": "^3.0.0"
   },
   "peerDependenciesMeta": {
     "chart.js": {
@@ -86,13 +89,19 @@
     },
     "jspdf": {
       "optional": true
+    },
+    "winston": {
+      "optional": true
     }
   },
   "devDependencies": {
+    "@types/node": "^22.10.1",
     "chart.js": "^4.4.3",
-    "jspdf": "^2.5.0",
+    "jsdom": "^26.0.0",
+    "jspdf": "^4.2.1",
     "rimraf": "^5.0.0",
     "tsup": "^7.2.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vitest": "^0.32.0"
   }
 }

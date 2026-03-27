@@ -5,6 +5,7 @@ import { demoData, demoOptions } from '../demoConfig';
 import '../minimal.css';
 import ProcessedTable from '../minimalcomponent/ProcessedTable';
 import RawTable from '../minimalcomponent/RawTable';
+import { logger } from '../logger';
 
 // Local types for state we derive from the web component
 type ViewMode = 'processed' | 'raw';
@@ -106,7 +107,7 @@ export default function MinimalDemo() {
       setPivotState(el.getState?.() as PivotState);
       syncPagination();
     };
-    const handleError = (e: Event) => { console.warn('Pivot error:', (e as CustomEvent).detail || {}); };
+    const handleError = (e: Event) => { logger.warn('Pivot error:', (e as CustomEvent).detail || {}); };
 
     el.addEventListener('stateChange', handleStateChange as EventListener);
     el.addEventListener('paginationChange', handlePaginationChange as EventListener);

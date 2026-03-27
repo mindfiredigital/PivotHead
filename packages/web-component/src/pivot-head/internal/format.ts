@@ -1,9 +1,10 @@
 import type { PivotHeadHost } from './host';
 import type { FormatOptions } from '../../types/types';
+import { logger } from '../../logger.js';
 
 export function showFormatPopup(host: PivotHeadHost): void {
   if (!host.engine) {
-    console.error('Engine not initialized');
+    logger.error('Engine not initialized');
     return;
   }
 
@@ -250,7 +251,7 @@ export function showFormatPopup(host: PivotHeadHost): void {
                     host.engine.updateFieldFormatting(field, formatOptions);
                   }
                 });
-                console.log(
+                logger.info(
                   'Applied formatting to all numeric fields:',
                   numericFields
                 );
@@ -265,7 +266,7 @@ export function showFormatPopup(host: PivotHeadHost): void {
                   );
                 }
               });
-              console.log(
+              logger.info(
                 'Applied formatting to all measures:',
                 availableMeasures.map(m => m.uniqueName)
               );
@@ -285,7 +286,7 @@ export function showFormatPopup(host: PivotHeadHost): void {
             }
 
             host.engine.updateFieldFormatting(fieldName, formatOptions);
-            console.log(
+            logger.info(
               'Applied formatting:',
               formatOptions,
               'to field:',
@@ -297,7 +298,7 @@ export function showFormatPopup(host: PivotHeadHost): void {
           host._renderSwitch();
         }
       } catch (error) {
-        console.error('Error applying formatting:', error);
+        logger.error('Error applying formatting:', error);
       }
     }
 

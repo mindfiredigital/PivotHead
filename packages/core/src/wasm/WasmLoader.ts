@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * WebAssembly Loader for High-Performance CSV Parsing
  *
@@ -7,9 +6,18 @@
  */
 
 import { fetchWasmBinary, getWasmUrl } from './wasmAssets';
+import { logger } from '../logger/logger.js';
+import type {
+  WasmCSVResult,
+  WasmModule,
+  WasmInstance,
+  WasmInstantiateFunction,
+} from '../types/interfaces';
+
+export type { WasmCSVResult, WasmModule };
 
 // Dynamic import to make it optional
-let instantiate: any = null;
+let instantiate: WasmInstantiateFunction | null = null;
 
 // Try to load the loader asynchronously
 async function loadAssemblyScriptLoader() {
@@ -18,44 +26,17 @@ async function loadAssemblyScriptLoader() {
   try {
     // Try dynamic import (works in both dev and production)
     const module = await import('@assemblyscript/loader');
-    instantiate = module.instantiate;
+    instantiate = module.instantiate as WasmInstantiateFunction;
     return instantiate;
   } catch (error) {
-    console.warn('AssemblyScript loader not available:', error);
+    logger.warn('AssemblyScript loader not available:', error);
     return null;
   }
 }
 
-export interface WasmCSVResult {
-  rowCount: number;
-  colCount: number;
-  errorCode: number;
-  errorMessage: string;
-}
-
-export interface WasmModule {
-  parseCSVChunk(
-    input: string,
-    delimiter?: number,
-    hasHeader?: boolean,
-    trimValues?: boolean
-  ): WasmCSVResult;
-  extractField(
-    input: string,
-    start: number,
-    end: number,
-    trimValues: boolean
-  ): string;
-  parseNumber(input: string): number;
-  detectFieldType(value: string): number;
-  estimateMemory(rowCount: number, colCount: number): number;
-  getVersion(): string;
-  benchmark(input: string): number;
-}
-
 export class WasmLoader {
   private static instance: WasmLoader | null = null;
-  private wasmModule: any = null;
+  private wasmModule: WasmInstance | null = null;
   private isLoaded = false;
   private loadPromise: Promise<void> | null = null;
 
@@ -120,22 +101,22 @@ export class WasmLoader {
         throw new Error('WebAssembly is not supported in this browser');
       }
 
-      console.log('🚀 Loading WebAssembly CSV parser...');
+      logger.info('🚀 Loading WebAssembly CSV parser...');
 
       // Get WASM URL from the bundler-friendly helper
       // This automatically works with Vite, Webpack, Rollup, etc.
       const wasmUrl = getWasmUrl();
-      console.log(`Loading WASM from: ${wasmUrl}`);
+      logger.info(`Loading WASM from: ${wasmUrl}`);
 
       // Fetch the WASM binary using the helper
       let wasmBinary: ArrayBuffer;
       try {
         wasmBinary = await fetchWasmBinary();
-        console.log(
+        logger.info(
           `✅ WASM file loaded successfully (${wasmBinary.byteLength} bytes)`
         );
       } catch (fetchError) {
-        console.error(
+        logger.error(
           `❌ Failed to fetch WASM file from ${wasmUrl}:`,
           fetchError
         );
@@ -147,8 +128,8 @@ export class WasmLoader {
       // Instantiate the WASM module
       this.wasmModule = await loader(wasmBinary, {
         env: {
-          abort: (msg: any, file: any, line: number, column: number) => {
-            console.error(`WASM abort: ${msg} at ${file}:${line}:${column}`);
+          abort: (msg: number, file: number, line: number, column: number) => {
+            logger.error(`WASM abort: ${msg} at ${file}:${line}:${column}`);
           },
         },
       });
@@ -156,13 +137,13 @@ export class WasmLoader {
       this.isLoaded = true;
 
       const version = this.wasmModule.exports.getVersion();
-      console.log(
+      logger.info(
         `✅ WebAssembly CSV parser loaded successfully (v${version})`
       );
     } catch (error) {
       this.isLoaded = false;
       this.loadPromise = null;
-      console.error('❌ Failed to load WASM module:', error);
+      logger.error('❌ Failed to load WASM module:', error);
       throw error;
     }
   }
@@ -215,7 +196,7 @@ export class WasmLoader {
         errorMessage,
       };
     } catch (error) {
-      console.error('Error in WASM parseCSVChunk:', error);
+      logger.error('Error in WASM parseCSVChunk:', error);
       throw error;
     }
   }

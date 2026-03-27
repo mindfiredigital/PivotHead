@@ -1,23 +1,12 @@
+import { logger } from '../logger/logger.js';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Streaming File Reader
  * Reads large files in chunks for efficient processing
  */
+import type { ChunkInfo, StreamingOptions } from '../types/interfaces';
 
-export interface ChunkInfo {
-  chunkId: number;
-  text: string;
-  isFirstChunk: boolean;
-  isLastChunk: boolean;
-  progress: number;
-}
-
-export interface StreamingOptions {
-  chunkSizeBytes?: number;
-  onChunk?: (chunk: ChunkInfo) => void | Promise<void>;
-  onProgress?: (progress: number) => void;
-  encoding?: string;
-}
+export type { ChunkInfo, StreamingOptions };
 
 export class StreamingFileReader {
   private static readonly DEFAULT_CHUNK_SIZE = 1024 * 1024; // 1 MB
@@ -46,8 +35,16 @@ export class StreamingFileReader {
 
       let buffer = '';
       let done = false;
+      let aborted = false;
 
-      while (!done) {
+      while (!done && !aborted) {
+        // Check abort signal before each read
+        if (options.signal?.aborted) {
+          aborted = true;
+          reader.cancel();
+          break;
+        }
+
         const { value, done: streamDone } = await reader.read();
         done = streamDone;
 
@@ -57,6 +54,13 @@ export class StreamingFileReader {
 
           // Process complete chunks
           while (buffer.length >= chunkSize || (done && buffer.length > 0)) {
+            // Check abort signal before processing each chunk
+            if (options.signal?.aborted) {
+              aborted = true;
+              if (!done) reader.cancel();
+              break;
+            }
+
             const chunk = buffer.slice(0, chunkSize);
             buffer = buffer.slice(chunkSize);
 
@@ -105,7 +109,7 @@ export class StreamingFileReader {
         }
       }
     } catch (error) {
-      console.error('Error reading file stream:', error);
+      logger.error('Error reading file stream:', error);
       throw error;
     }
   }
@@ -123,6 +127,9 @@ export class StreamingFileReader {
     let chunkId = 0;
 
     while (offset < totalSize) {
+      // Check abort signal
+      if (options.signal?.aborted) break;
+
       const end = Math.min(offset + chunkSize, totalSize);
       const blob = file.slice(offset, end);
 

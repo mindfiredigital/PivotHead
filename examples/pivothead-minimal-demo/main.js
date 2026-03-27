@@ -1,4 +1,5 @@
 import '@mindfiredigital/pivothead-web-component';
+import { logger } from './logger.js';
 
 const pivot = document.getElementById('pivot');
 const tableEl = document.getElementById('table');
@@ -334,7 +335,7 @@ function wireToolbar() {
     if (pivot.showFormatPopup && typeof pivot.showFormatPopup === 'function') {
       pivot.showFormatPopup();
     } else {
-      console.log('Format functionality not available');
+      logger.info('Format functionality not available');
     }
   };
 }
@@ -757,7 +758,7 @@ pivot.addEventListener('viewModeChange', () => {
 
 pivot.addEventListener('pivotError', e => {
   const err = e.detail || {};
-  console.warn('Pivot error:', err);
+  logger.warn('Pivot error:', err);
 });
 
 // Initialize

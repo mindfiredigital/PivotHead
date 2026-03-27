@@ -56,6 +56,7 @@
 <script lang="ts">
 import { ref, onMounted, defineComponent } from 'vue'
 import PivotHead from '@mindfiredigital/pivothead-vue'
+import { logger } from '../../logger'
 
 interface Props {
   data: Array<Record<string, unknown>>
@@ -81,14 +82,14 @@ export default defineComponent({
 
     // Event handlers
     const handleStateChange = (e: CustomEvent) => {
-      console.log('Simple minimal mode - state change:', e.detail)
+      logger.info('Simple minimal mode - state change:', e.detail)
       pivotState.value = e.detail
     }
 
     onMounted(() => {
-      console.log('Simple minimal mode mounted')
-      console.log('Data:', props.data)
-      console.log('Options:', props.options)
+      logger.info('Simple minimal mode mounted')
+      logger.info('Data:', props.data)
+      logger.info('Options:', props.options)
     })
 
     return {

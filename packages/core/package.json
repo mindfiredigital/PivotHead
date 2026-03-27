@@ -2,7 +2,7 @@
   "name": "@mindfiredigital/pivothead",
   "version": "1.18.0",
   "private": false,
-  "main": "./dist/pivothead-core.umd.js",
+  "main": "./dist/pivothead-core.js",
   "module": "./dist/pivothead-core.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -13,7 +13,7 @@
       },
       "require": {
         "types": "./dist/index.d.ts",
-        "default": "./dist/pivothead-core.umd.js"
+        "default": "./dist/pivothead-core.js"
       }
     },
     "./wasm/*": "./dist/wasm/*"
@@ -93,21 +93,45 @@
   "devDependencies": {
     "@types/node": "^22.10.1",
     "assemblyscript": "^0.27.33",
+    "jsdom": "^26.0.0",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.7",
     "typescript": "^5.0.2",
     "vite": "^7.2.6",
     "vite-plugin-dts": "^2.3.0",
-    "vitest": "^0.32.0"
+    "vitest": "^0.32.0",
+    "xlsx": "^0.18.5"
   },
   "dependencies": {
-    "@assemblyscript/loader": "^0.27.33",
-    "jsdom": "^26.0.0",
-    "jspdf": "^3.0.2",
-    "jspdf-autotable": "^5.0.2",
-    "xlsx": "^0.18.5"
+    "@assemblyscript/loader": "^0.27.33"
   },
   "description": "PivotHead is a powerful and flexible library for creating interactive pivot tables in JavaScript applications. It provides a core engine for data manipulation and, in the future, will be compatible with wrappers for React, Vue, Svelte, and Angular, making it easy to integrate into applications built with these frameworks.",
   "bugs": {
     "url": "https://github.com/mindfiredigital/PivotHead/issues"
   },
-  "homepage": "https://github.com/mindfiredigital/PivotHead#readme"
+  "homepage": "https://github.com/mindfiredigital/PivotHead#readme",
+  "peerDependencies": {
+    "jsdom": "^26.0.0",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.7",
+    "winston": "^3.0.0",
+    "xlsx": "^0.18.5"
+  },
+  "peerDependenciesMeta": {
+    "jsdom": {
+      "optional": true
+    },
+    "jspdf": {
+      "optional": true
+    },
+    "jspdf-autotable": {
+      "optional": true
+    },
+    "winston": {
+      "optional": true
+    },
+    "xlsx": {
+      "optional": true
+    }
+  }
 }

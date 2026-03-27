@@ -96,6 +96,7 @@ import {
   isDragAndDropEnabled as isDragAndDropEnabledHelper,
 } from './internal/dnd-api';
 import { showFormatPopup as showFormatPopupHelper } from './internal/format';
+import { logger } from '../logger.js';
 
 export class PivotHeadElement extends HTMLElement {
   private engine!: EnhancedPivotEngine<PivotDataRecord>;
@@ -401,7 +402,7 @@ export class PivotHeadElement extends HTMLElement {
         })
       );
     } catch (err) {
-      console.error('Failed to set view mode:', err);
+      logger.error('Failed to set view mode:', err);
     }
   }
   public getViewMode(): 'raw' | 'processed' {

@@ -1,5 +1,7 @@
 import type { FilterConfig, AxisConfig } from '@mindfiredigital/pivothead';
 import type { PivotHeadHost } from './host';
+import { logger } from '../../logger.js';
+import { escapeHtml } from './sanitize.js';
 
 /**
  * Helper function to normalize string | AxisConfig to AxisConfig
@@ -21,7 +23,9 @@ export function bindControls(host: PivotHeadHost) {
     if (host._showRawData) {
       if (host._data.length > 0) {
         filterField.innerHTML = Object.keys(host._data[0])
-          .map(f => `<option value="${f}">${f}</option>`)
+          .map(
+            f => `<option value="${escapeHtml(f)}">${escapeHtml(f)}</option>`
+          )
           .join('');
       }
     } else {
@@ -29,19 +33,19 @@ export function bindControls(host: PivotHeadHost) {
       if (host._options.rows) {
         host._options.rows.forEach(rawRow => {
           const row = normalizeAxisConfig(rawRow);
-          options += `<option value="${row.uniqueName}">${row.caption}</option>`;
+          options += `<option value="${escapeHtml(row.uniqueName)}">${escapeHtml(row.caption)}</option>`;
         });
       }
       if (host._options.columns) {
         host._options.columns.forEach(rawCol => {
           const col = normalizeAxisConfig(rawCol);
-          options += `<option value="${col.uniqueName}">${col.caption}</option>`;
+          options += `<option value="${escapeHtml(col.uniqueName)}">${escapeHtml(col.caption)}</option>`;
         });
       }
       if (host._options.measures) {
         host._options.measures.forEach(measure => {
           const aggregatedKey = `${measure.aggregation}_${measure.uniqueName}`;
-          options += `<option value="${aggregatedKey}">${measure.caption}</option>`;
+          options += `<option value="${escapeHtml(aggregatedKey)}">${escapeHtml(measure.caption)}</option>`;
         });
       }
       (filterField as HTMLElement).innerHTML = options;
@@ -66,7 +70,7 @@ export function bindControls(host: PivotHeadHost) {
       if (filterOperatorElement) {
         filterOperatorElement.value = currentFilter.operator;
       }
-      filterValueInput.value = currentFilter.value;
+      filterValueInput.value = String(currentFilter.value);
     }
   }
 
@@ -183,7 +187,7 @@ export function bindControls(host: PivotHeadHost) {
           );
         }
       } catch (error) {
-        console.error('Error during view switch:', error);
+        logger.error('Error during view switch:', error);
       }
     });
   }
@@ -370,7 +374,7 @@ export function handleSortClick(host: PivotHeadHost, e: Event): void {
           host.engine.setCustomFieldOrder(rowFieldName, orderedRows, true);
         }
       } catch (err) {
-        console.error(
+        logger.error(
           'Failed to compute/set custom row order for processed sort:',
           err
         );
@@ -397,7 +401,7 @@ export function handleSortClick(host: PivotHeadHost, e: Event): void {
             host.engine.setCustomFieldOrder(rowFieldName, rows, true);
           }
         } catch (err) {
-          console.error(
+          logger.error(
             'Failed to set custom row order for dimension sort:',
             err
           );
@@ -446,11 +450,11 @@ export function handleDrillDownClick(host: PivotHeadHost, e: Event): void {
   content.className = 'drill-down-content';
   content.innerHTML = `
       <div class="drill-down-header">
-        <div class="drill-down-title">Details: ${rowField}: ${rowValue}${columnField ? `, ${columnField}: ${columnValue}` : ''}</div>
+        <div class="drill-down-title">Details: ${escapeHtml(rowField)}: ${escapeHtml(rowValue)}${columnField ? `, ${escapeHtml(columnField)}: ${escapeHtml(columnValue)}` : ''}</div>
         <button class="drill-down-close" aria-label="Close">&times;</button>
       </div>
       <div class="drill-down-summary">
-        Records: ${subset.length}. Measure: ${measureCaption} (${measureName}).
+        Records: ${subset.length}. Measure: ${escapeHtml(measureCaption)} (${escapeHtml(measureName)}).
       </div>
       <div class="drill-down-body"></div>
     `;

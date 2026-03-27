@@ -1,3 +1,4 @@
+import { logger } from './logger.js';
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
 import { copyFileSync, mkdirSync, existsSync } from 'fs';
@@ -9,6 +10,7 @@ export default defineConfig({
         __dirname,
         '../../packages/core/dist/pivothead-core.mjs'
       ),
+      '@types': resolve(__dirname, 'src'),
     },
     conditions: ['import', 'module', 'browser', 'default'],
   },
@@ -41,10 +43,10 @@ export default defineConfig({
         // Copy WASM file if source exists
         if (existsSync(wasmSource)) {
           copyFileSync(wasmSource, wasmDest);
-          console.log('✅ Copied WASM file to public/wasm/');
+          logger.info('✅ Copied WASM file to public/wasm/');
         } else {
-          console.warn('⚠️ WASM file not found at:', wasmSource);
-          console.warn('Run "pnpm build:wasm" in packages/core to generate it');
+          logger.warn('⚠️ WASM file not found at:', wasmSource);
+          logger.warn('Run "pnpm build:wasm" in packages/core to generate it');
         }
       },
     },
