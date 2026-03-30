@@ -1,5 +1,12 @@
 # vanilla-pivot-demo
 
+## 0.0.26
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead-web-component@1.0.15
+
 ## 0.0.25
 
 ### Patch Changes

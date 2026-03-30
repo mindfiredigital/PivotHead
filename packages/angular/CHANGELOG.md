@@ -1,5 +1,12 @@
 # @mindfiredigital/pivothead-angular
 
+## 0.1.11
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead-web-component@1.0.15
+
 ## 0.1.10
 
 ### Patch Changes
