@@ -145,6 +145,11 @@ export async function connectToLocalCSV(
       host._originalData = [...result.data];
     }
 
+    // Clear stale filter state from previous data — same as the data setter in pivotHead.ts
+    host._filters = [];
+    host._rawFilters = [];
+    host._processedFilters = [];
+
     // CRITICAL: Clear the cached column/row order from previous data
     // Otherwise the render will try to use old column names that don't exist in the new data
     host._processedColumnOrder = [];
@@ -252,6 +257,11 @@ export async function connectToLocalJSON(
       host._originalData = [...result.data];
     }
 
+    // Clear stale filter state from previous data — same as the data setter in pivotHead.ts
+    host._filters = [];
+    host._rawFilters = [];
+    host._processedFilters = [];
+
     // CRITICAL: Clear the cached column/row order from previous data
     // Otherwise the render will try to use old column names that don't exist in the new data
     host._processedColumnOrder = [];
@@ -358,6 +368,11 @@ export async function connectToLocalFile(
       host._data = result.data;
       host._originalData = [...result.data];
     }
+
+    // Clear stale filter state from previous data — same as the data setter in pivotHead.ts
+    host._filters = [];
+    host._rawFilters = [];
+    host._processedFilters = [];
 
     // CRITICAL: Clear the cached column/row order from previous data
     // Otherwise the render will try to use old column names that don't exist in the new data

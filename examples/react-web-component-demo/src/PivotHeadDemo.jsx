@@ -3,40 +3,10 @@ import '@mindfiredigital/pivothead-web-component';
 import { ChartService } from '@mindfiredigital/pivothead-analytics';
 import { Chart, registerables } from 'chart.js';
 import { data as sampleData, options as sampleOptions } from './config/config';
-import { initWasm, parseCSV, detectPivotOptions } from './utils/csvWasm';
 import { logger } from './logger.js';
 
 // Register Chart.js components
 Chart.register(...registerables);
-
-// ─── File reading utility (module level — no closure/stale-ref issues) ─────────
-
-/**
- * Read a File object as a UTF-8 string.
- * Uses the modern file.text() API (Promise-native, available in all modern browsers).
- * Falls back to FileReader for older environments.
- */
-async function readFileAsText(file) {
-  if (!file || !(file instanceof File)) {
-    throw new Error('Invalid file object received.');
-  }
-  if (file.size === 0) {
-    throw new Error(`"${file.name}" is empty (0 bytes). Please choose a non-empty CSV file.`);
-  }
-
-  // FileReader — always reliable, unaffected by input.value resets
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = function () {
-      if (reader.error) {
-        reject(new Error(`FileReader error: ${reader.error.message}`));
-      } else {
-        resolve(/** @type {string} */ (reader.result));
-      }
-    };
-    reader.readAsText(file, 'UTF-8');
-  });
-}
 
 // ─── Colour palette ────────────────────────────────────────────────────────────
 
@@ -59,7 +29,6 @@ const PivotHeadDemo = () => {
   const chartRef        = useRef(null);
   const chartCanvasRef  = useRef(null);
   const chartServiceRef = useRef(null);
-  const fileInputRef    = useRef(null);
   const enginePollRef   = useRef(null);
 
   const [activeTab, setActiveTab]           = useState('table');
@@ -71,17 +40,9 @@ const PivotHeadDemo = () => {
 
   // CSV upload state
   const [uploadStatus, setUploadStatus]   = useState(null); // null | 'parsing' | 'done' | 'error'
-  const [parseStats, setParseStats]       = useState(null); // { rowCount, colCount, parseTime, method, fileName }
+  const [uploadProgress, setUploadProgress] = useState(0);   // 0–100
+  const [parseStats, setParseStats]       = useState(null);  // { rowCount, colCount, parseTime, method, fileName }
   const [uploadError, setUploadError]     = useState(null);
-  const [wasmStatus, setWasmStatus]       = useState('loading'); // 'loading' | 'ready' | 'unavailable'
-
-  // ─── Init WASM on mount ────────────────────────────────────────────────────
-
-  useEffect(() => {
-    initWasm().then((ok) => {
-      setWasmStatus(ok ? 'ready' : 'unavailable');
-    });
-  }, []);
 
   // ─── Helper: start polling for pivotEngine ─────────────────────────────────
 
@@ -300,64 +261,76 @@ const PivotHeadDemo = () => {
 
   useEffect(() => () => destroyChart(), [destroyChart]);
 
-  // ─── CSV file upload handler ──────────────────────────────────────────────
+  // ─── CSV upload via ConnectService (streaming WASM for large files) ──────────
+  //
+  // Delegates to pivot-head's built-in connectToLocalCSV() which internally
+  // uses ConnectService with 4-tier processing:
+  //   < 1 MB  → JavaScript
+  //   1–8 MB  → Web Workers
+  //   8 MB+   → WASM in-memory
+  //   100 MB+ → Streaming WASM (chunked — supports up to 1 GB)
+  //
+  // This avoids loading the entire file as a JS string, which would OOM
+  // for files in the hundreds of MB range.
 
-  const handleFileChange = useCallback(async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleUploadCSV = useCallback(async () => {
+    const pivot = pivotRef.current;
+    if (!pivot) return;
 
     setUploadStatus('parsing');
     setUploadError(null);
     setParseStats(null);
+    setUploadProgress(0);
 
     try {
-      const text = await readFileAsText(file);
+      const result = await pivot.connectToLocalCSV({
+        maxFileSize: 1024 * 1024 * 1024, // 1 GB
+        onProgress: (progress) => setUploadProgress(Math.round(progress)),
+        csv: {
+          delimiter: ',',
+          hasHeader: true,
+          skipEmptyLines: true,
+          trimValues: true,
+        },
+      });
 
-      // Reset the input AFTER the file has been fully read.
-      // Resetting before the async read completes can invalidate the File object
-      // in some browsers, causing file.text() / FileReader to return empty content.
-      if (fileInputRef.current) fileInputRef.current.value = '';
+      // User cancelled the file picker — reset silently
+      if (!result || (!result.success && !result.error)) {
+        setUploadStatus(null);
+        return;
+      }
 
-      logger.info(`[CSV] Read "${file.name}": ${text.length} chars`);
-      const result = await parseCSV(text);
-
-      const pivotOptions = detectPivotOptions(result.data, result.headers);
-      if (!pivotOptions) throw new Error('Could not detect pivot configuration from this CSV.');
-
-      // Feed new data into the web component
-      const pivot = pivotRef.current;
-      if (!pivot) throw new Error('Pivot component not found.');
+      if (!result.success) {
+        throw new Error(result.error || 'CSV upload failed.');
+      }
 
       destroyChart();
       chartServiceRef.current = null;
       setChartFilterOptions({ measures: [], rows: [], columns: [] });
       setSelectedMeasure('');
-
-      pivot.data    = result.data;
-      pivot.options = pivotOptions;
-
-      // Switch to table tab so user sees the updated pivot
       setActiveTab('table');
-
-      // Wait for the pivot engine to reinitialise with the new data
       startEnginePoll();
 
+      // Map ConnectService performanceMode → display label
+      const isWasm =
+        result.performanceMode === 'wasm' ||
+        result.performanceMode === 'streaming-wasm';
+
       setParseStats({
-        fileName:  file.name,
-        rowCount:  result.rowCount,
-        colCount:  result.colCount,
-        parseTime: result.parseTime,
-        method:    result.method,
+        fileName:  result.fileName  || 'uploaded.csv',
+        rowCount:  result.recordCount ?? 0,
+        colCount:  result.columns?.length ?? 0,
+        parseTime: result.parseTime ?? 0,
+        method:    isWasm ? 'wasm' : 'js',
+        mode:      result.performanceMode || 'standard',
       });
       setUploadStatus('done');
     } catch (err) {
       logger.error('CSV upload failed:', err);
-      setUploadError(err.message || 'Failed to parse CSV file.');
+      setUploadError(err.message || 'Failed to upload CSV file.');
       setUploadStatus('error');
     }
   }, [destroyChart, startEnginePoll]);
-
-  const triggerFileInput = () => fileInputRef.current?.click();
 
   // ─── Shared tab switcher buttons ──────────────────────────────────────────
 
@@ -394,6 +367,8 @@ const PivotHeadDemo = () => {
 
   // ─── Render ───────────────────────────────────────────────────────────────
 
+  const wasmSupported = typeof WebAssembly !== 'undefined';
+
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f5f5f5' }}>
 
@@ -410,20 +385,12 @@ const PivotHeadDemo = () => {
           flexWrap: 'wrap',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-            {/* Hidden file input */}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".csv"
-              style={{ display: 'none' }}
-              onChange={handleFileChange}
-            />
 
-            {/* Upload button */}
+            {/* Upload button — opens native file picker via ConnectService */}
             <button
-              onClick={triggerFileInput}
+              onClick={handleUploadCSV}
               disabled={uploadStatus === 'parsing'}
-              title="Upload a CSV file to replace the current data"
+              title="Upload a CSV file (supports files up to 1 GB via streaming WASM)"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -439,38 +406,52 @@ const PivotHeadDemo = () => {
                 boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
               }}
             >
-              {uploadStatus === 'parsing' ? '⏳ Parsing…' : '📂 Upload CSV'}
+              {uploadStatus === 'parsing' ? '⏳ Uploading…' : '📂 Upload CSV'}
             </button>
 
-            {/* WASM badge */}
+            {/* WASM capability badge */}
             <span
               title={
-                wasmStatus === 'ready'
-                  ? 'WebAssembly is active — CSV parsing uses near-native speed'
-                  : wasmStatus === 'loading'
-                  ? 'Loading WebAssembly…'
-                  : 'WebAssembly unavailable — using JavaScript fallback'
+                wasmSupported
+                  ? 'WebAssembly is available — large files (100 MB+) use streaming WASM'
+                  : 'WebAssembly unavailable — JavaScript fallback will be used'
               }
               style={{
                 padding: '4px 10px',
                 borderRadius: '12px',
                 fontSize: '11px',
                 fontWeight: '600',
-                backgroundColor:
-                  wasmStatus === 'ready' ? '#e6f4ea' :
-                  wasmStatus === 'loading' ? '#fff8e1' : '#fce8e6',
-                color:
-                  wasmStatus === 'ready' ? '#137333' :
-                  wasmStatus === 'loading' ? '#e37400' : '#c5221f',
-                border: `1px solid ${
-                  wasmStatus === 'ready' ? '#ceead6' :
-                  wasmStatus === 'loading' ? '#fdd663' : '#f5c6c2'
-                }`,
+                backgroundColor: wasmSupported ? '#e6f4ea' : '#fce8e6',
+                color: wasmSupported ? '#137333' : '#c5221f',
+                border: `1px solid ${wasmSupported ? '#ceead6' : '#f5c6c2'}`,
               }}
             >
-              {wasmStatus === 'ready' ? '⚡ WASM Active' :
-               wasmStatus === 'loading' ? '⏳ WASM Loading' : '⚠️ JS Fallback'}
+              {wasmSupported ? '⚡ WASM Ready' : '⚠️ JS Fallback'}
             </span>
+
+            {/* Progress bar (shown while uploading) */}
+            {uploadStatus === 'parsing' && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{
+                  width: '160px',
+                  height: '8px',
+                  backgroundColor: '#e8eaed',
+                  borderRadius: '4px',
+                  overflow: 'hidden',
+                }}>
+                  <div style={{
+                    height: '100%',
+                    width: `${uploadProgress}%`,
+                    backgroundColor: '#1a73e8',
+                    borderRadius: '4px',
+                    transition: 'width 0.3s ease',
+                  }} />
+                </div>
+                <span style={{ fontSize: '12px', color: '#5f6368' }}>
+                  {uploadProgress}%
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Parse stats (shown after upload) */}
@@ -493,7 +474,9 @@ const PivotHeadDemo = () => {
                 color: parseStats.method === 'wasm' ? '#137333' : '#e37400',
                 fontWeight: '600',
               }}>
-                {parseStats.method === 'wasm' ? '⚡ WASM' : '📜 JS'}
+                {parseStats.method === 'wasm'
+                  ? `⚡ WASM (${parseStats.mode})`
+                  : '📜 JS'}
               </span>
             </div>
           )}

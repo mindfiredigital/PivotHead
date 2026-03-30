@@ -84,12 +84,6 @@
     "vitest": "^0.32.0"
   },
   "peerDependencies": {
-    "@webcomponents/webcomponentsjs": "^2.8.0",
-    "winston": "^3.0.0"
-  },
-  "peerDependenciesMeta": {
-    "winston": {
-      "optional": true
-    }
+    "@webcomponents/webcomponentsjs": "^2.8.0"
   }
 }

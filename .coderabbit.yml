@@ -1,0 +1,448 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  CodeRabbit Configuration for mindfiredigital/PivotHead
+#
+#  Stack   : TypeScript 5.x (strict) · pnpm workspaces · Turborepo · tsup
+#  Packages: core · analytics · react · angular · vue · web-component · llm
+#  Output  : ESM + CJS + .d.ts per package
+#
+#  Validate : https://docs.coderabbit.ai/configuration/yaml-validator
+#  Reference: https://docs.coderabbit.ai/reference/configuration
+# ─────────────────────────────────────────────────────────────────────────────
+
+language: "en-US"
+
+tone_instructions: "Senior TypeScript monorepo reviewer. Be concise and specific. Cite strict-mode, adapter patterns, or WebGPU best-practices when flagging issues. Suggest concrete fixes. Praise good patterns too."
+
+early_access: false
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  REVIEWS
+# ─────────────────────────────────────────────────────────────────────────────
+reviews:
+  profile: "assertive"
+  request_changes_workflow: true
+
+  # PR description enrichment
+  high_level_summary: true
+  high_level_summary_instructions: >
+    Summarise the PR as a concise bullet-point list. Group changes by:
+    (1) Core engine changes (packages/core),
+    (2) Framework adapter changes (react / angular / vue / web-component),
+    (3) Analytics package changes,
+    (4) LLM package changes,
+    (5) Tooling / config / CI changes,
+    (6) Docs / examples updates.
+    End with a "Breaking changes" section (write "None" if absent).
+  high_level_summary_in_walkthrough: false
+
+  # Walkthrough & diagnostics
+  collapse_walkthrough: false
+  changed_files_summary: true
+  sequence_diagrams: true
+  estimate_code_review_effort: true
+  assess_linked_issues: true
+  related_issues: true
+  related_prs: true
+
+  # Labels
+  suggested_labels: true
+  auto_apply_labels: false
+  labeling_instructions:
+    - label: "pkg: core"
+      instructions: "Apply when the PR touches packages/core/."
+    - label: "pkg: react"
+      instructions: "Apply when the PR touches packages/react/."
+    - label: "pkg: angular"
+      instructions: "Apply when the PR touches packages/angular/."
+    - label: "pkg: vue"
+      instructions: "Apply when the PR touches packages/vue/."
+    - label: "pkg: web-component"
+      instructions: "Apply when the PR touches packages/web-component/."
+    - label: "pkg: analytics"
+      instructions: "Apply when the PR touches packages/analytics/."
+    - label: "pkg: llm"
+      instructions: "Apply when the PR touches packages/llm/."
+    - label: "breaking change"
+      instructions: >
+        Apply when the PR removes or renames exported types/functions, changes
+        constructor option shapes, or alters public API in a backwards-incompatible way.
+    - label: "adapter: new"
+      instructions: "Apply when the PR introduces a brand-new framework adapter package."
+    - label: "pivot-engine"
+      instructions: "Apply when the PR modifies pivot calculation, aggregation, sorting, or filtering logic in packages/core/."
+    - label: "llm / webgpu"
+      instructions: "Apply when the PR touches ModelManager, LLMEngine, ActionParser, or WebGPU-related code."
+    - label: "types"
+      instructions: "Apply when the PR adds or modifies types.ts in any package."
+    - label: "tests"
+      instructions: "Apply when the PR adds or modifies test files (*.test.ts / *.spec.ts)."
+    - label: "build"
+      instructions: "Apply when the PR changes tsup.config.ts, turbo.json, package.json scripts, or CI workflows."
+    - label: "dependencies"
+      instructions: "Apply when the PR bumps or removes pnpm dependencies in any package."
+    - label: "docs"
+      instructions: "Apply when the PR only changes documentation, README files, or JSDoc comments."
+    - label: "examples"
+      instructions: "Apply when the PR touches the examples/ directory."
+
+  # Reviewer suggestions
+  suggested_reviewers: true
+  auto_assign_reviewers: false
+
+  # Commit status
+  commit_status: true
+  fail_commit_status: false
+  review_status: true
+  review_details: true
+
+  # Display
+  poem: false
+  in_progress_fortune: false
+
+  # Auto-review triggers — covers both integration target branches
+  auto_review:
+    enabled: true
+    base_branches:
+      - main
+      - dev
+
+  # Files excluded from review (still cloned for context)
+  path_filters:
+    - "!**/dist/**"
+    - "!**/node_modules/**"
+    - "!pnpm-lock.yaml"
+    - "!**/*.snap"
+    - "!**/__snapshots__/**"
+    - "!.turbo/**"
+    - "!coverage/**"
+    - "!**/storybook-static/**"
+    - "!examples/**/node_modules/**"
+    - "!examples/**/dist/**"
+
+  # ───────────────────────────────────────────────────────────────────────────
+  #  PATH-SPECIFIC REVIEW INSTRUCTIONS
+  # ───────────────────────────────────────────────────────────────────────────
+  path_instructions:
+
+    # ── Core engine ──────────────────────────────────────────────────────────
+    - path: "packages/core/src/**/*.ts"
+      instructions: |
+        ## Core Engine Review Checklist
+
+        ### TypeScript
+        - strict mode must be respected — no `any`, no `@ts-ignore`.
+        - All new public types belong in `src/types/` and must be exported via `src/index.ts`.
+        - Discriminated unions preferred over boolean flags for state variants.
+
+        ### Pivot Engine Logic
+        - Aggregation, sorting, filtering, and grouping functions must be pure where possible.
+        - Side-effect-free helpers should be unit-tested in `src/__test__/`.
+        - No hardcoded magic numbers — use `src/config/constants.ts`.
+        - VirtualScrollManager changes must not regress rendering performance.
+
+        ### Public API stability
+        - `packages/core` is published and stable. Any API change is a potential breaking change.
+        - Constructor option interfaces must remain additive (new optional fields only).
+        - Error results must follow the `{ type: 'error', message }` pattern — never raw throws after init.
+
+        ### Exports
+        - All public exports flow through `src/index.ts` only.
+        - Internal engine helpers must not be exported.
+
+    - path: "packages/core/src/__test__/**/*.test.ts"
+      instructions: |
+        ## Core Test Review Checklist
+        - Every public engine function must have at least one test covering the happy path
+          and one covering an edge case (empty data, null fields, type mismatches).
+        - Tests must not import from internal paths — only from the package public index.
+        - No `any` casts inside test files.
+        - Assert on the full output shape, not just a single property.
+
+    # ── React adapter ─────────────────────────────────────────────────────────
+    - path: "packages/react/src/**/*.ts"
+      instructions: |
+        ## React Adapter Review Checklist
+
+        ### Peer dependency hygiene
+        - Must NOT bundle `react` or `react-dom` — they are peer dependencies.
+        - No direct import from `packages/core/` source — use the `@mindfiredigital/pivothead` package.
+
+        ### TypeScript & hooks
+        - No `any`; all hook return types must be explicit.
+        - Custom hooks live in their own files with a `use` prefix.
+        - Props typed via exported `XxxProps` interfaces.
+
+        ### Types
+        - All types must live in `src/types.ts` — no duplication with core types.
+        - Re-export only what consumers need from `src/index.ts`.
+
+    # ── Angular adapter ───────────────────────────────────────────────────────
+    - path: "packages/angular/src/**/*.ts"
+      instructions: |
+        ## Angular Adapter Review Checklist
+
+        ### Peer dependency hygiene
+        - Must NOT bundle `@angular/core` or `@angular/common` — they are peer dependencies.
+        - No direct import from `packages/core/` source — use the `@mindfiredigital/pivothead` package.
+
+        ### Angular patterns
+        - Components must use `ChangeDetectionStrategy.OnPush` where feasible.
+        - Subscriptions must be unsubscribed in `ngOnDestroy` (or use `takeUntilDestroyed`).
+        - Standalone components preferred over NgModules for new additions.
+        - Public API exported via `src/public-api.ts` — nothing else should be importable.
+
+        ### TypeScript
+        - No `any`; Input/Output types must be explicit.
+        - All new types belong in the package's own `types.ts` (not duplicated from core).
+
+    # ── Vue adapter ───────────────────────────────────────────────────────────
+    - path: "packages/vue/src/**/*.ts"
+      instructions: |
+        ## Vue Adapter Review Checklist
+
+        ### Peer dependency hygiene
+        - Must NOT bundle `vue` — it is a peer dependency.
+        - No direct import from `packages/core/` source — use `@mindfiredigital/pivothead`.
+
+        ### Vue 3 patterns
+        - Composition API only (`setup()` or `<script setup>`); no Options API.
+        - Reactivity: prefer `ref`/`computed` over `reactive` for primitive state.
+        - `defineProps` and `defineEmits` must be fully typed.
+        - Composables (use* functions) must be in their own files.
+
+        ### TypeScript
+        - No `any`; all composable return types must be explicit.
+        - All new types belong in `src/types.ts`.
+
+    # ── Web Component adapter ─────────────────────────────────────────────────
+    - path: "packages/web-component/src/**/*.ts"
+      instructions: |
+        ## Web Component Adapter Review Checklist
+
+        ### Standards compliance
+        - Custom elements must extend `HTMLElement` (or a specific HTML element).
+        - Use `connectedCallback`/`disconnectedCallback`/`attributeChangedCallback` correctly.
+        - `customElements.define()` must only be called once per element name — guard with a check.
+        - Avoid direct DOM mutation outside the shadow root.
+
+        ### Peer dependency hygiene
+        - No direct import from `packages/core/` source — use `@mindfiredigital/pivothead`.
+        - Do not bundle framework-specific code.
+
+        ### Events
+        - Cross-component communication via `CustomEvent` must use the `pivothead:` namespace prefix.
+        - Event payloads must be typed in `src/types/types.ts`.
+
+        ### TypeScript
+        - No `any`; attribute reflection must be typed.
+
+    # ── Analytics package ─────────────────────────────────────────────────────
+    - path: "packages/analytics/src/**/*.ts"
+      instructions: |
+        ## Analytics Package Review Checklist
+
+        ### Architecture
+        - New chart types must extend `BaseChart` and implement the required interface.
+        - Renderer implementations (`ChartJsRenderer`, `EChartsRenderer`, etc.) must extend `BaseChartRenderer`.
+        - Chart detection/recommendation logic lives in `src/core/` — not in renderers.
+        - `ChartService` is the public façade; direct access to chart internals is a red flag.
+
+        ### Types
+        - Chart config types belong in `src/types/config-types.ts`.
+        - Renderer types belong in `src/types/renderer-types.ts`.
+        - No duplication — cross-cutting types stay in `src/types/index.ts`.
+
+        ### Performance
+        - `ProgressiveRenderer` and `DataSampler` must be used for large datasets.
+        - No synchronous blocking loops over unbounded data arrays.
+
+        ### Exports
+        - All public exports flow through `src/index.ts`.
+        - Internal chart helpers must not be exported.
+
+    - path: "packages/analytics/src/__test__/**/*.test.ts"
+      instructions: |
+        ## Analytics Test Review Checklist
+        - Each chart class must have tests for: instantiation, data transformation,
+          empty data, and render output shape.
+        - `ChartDetector` tests must cover all supported data structures.
+        - `DataTransformer` tests must cover edge cases: nulls, duplicate fields, single-row data.
+        - No direct DOM manipulation in unit tests — mock the renderer.
+
+    # ── LLM package ───────────────────────────────────────────────────────────
+    - path: "packages/llm/src/**/*.ts"
+      instructions: |
+        ## LLM Package Review Checklist
+
+        ### Layering (enforced)
+        - Dependency direction: `types.ts` → leaf modules → `LLMEngine` → `index.ts`.
+        - `ModelManager` must dynamically import `@mlc-ai/web-llm` (never a static top-level import).
+          Violation breaks SSR and non-WebGPU environments.
+        - `ActionParser` output must always be a `PivotAction` discriminated union — no raw strings.
+        - `LLMAssistant` is the public façade; consumers must not import leaf modules directly.
+
+        ### WebGPU / Browser-only
+        - No Node.js-only APIs (`fs`, `path`, `process.env`) in any file — this runs in the browser.
+        - Feature-detect WebGPU availability before calling `navigator.gpu.*`.
+        - Streaming must use `AsyncGenerator<string>` — no callback soup.
+
+        ### Error handling
+        - All `execute()` / async branches must be wrapped in try/catch.
+        - Errors forwarded via the `onError` callback, not raw throws after initialisation.
+
+        ### Types
+        - All `PivotAction` variants must be defined in `src/types.ts`.
+        - Adding a new action type requires: a new discriminant in the union, a handler branch
+          in `ActionExecutor`, and updated prompt templates in `PromptBuilder`.
+        - No magic strings for model IDs — use `src/constants.ts`.
+
+        ### Exports
+        - Only `LLMAssistant`, public types, and error classes flow through `src/index.ts`.
+        - `ModelManager`, `LLMEngine`, `ActionParser`, `PromptBuilder` are internal — do not export.
+
+    # ── Shared tsup configs ───────────────────────────────────────────────────
+    - path: "packages/*/tsup.config.ts"
+      instructions: |
+        - Output must include both `esm` and `cjs` formats plus `.d.ts` declarations.
+        - `external` must list the host framework (react, vue, @angular/core, etc.) for adapter packages.
+        - `treeshake: true` must be set for published packages.
+        - The LLM package must NOT statically bundle `@mlc-ai/web-llm` — ensure it stays external
+          or is dynamically imported.
+        - Confirm `sourcemap: true` is present for debuggability.
+
+    # ── Package-level package.json ────────────────────────────────────────────
+    - path: "packages/*/package.json"
+      instructions: |
+        - `exports` map must expose at minimum `"."` with `import` (ESM) and `require` (CJS) conditions.
+        - Framework adapter packages must list their framework in `peerDependencies` with a broad semver.
+        - `@mindfiredigital/pivothead` (core) must be a `peerDependency` in adapter packages — never bundled.
+        - `sideEffects: false` must be set for all published packages to enable tree-shaking.
+        - `main`, `module`, and `types` fields must point to existing build outputs.
+        - Version bumps must be accompanied by a changeset file (`.changeset/*.md`).
+
+    # ── Shared tsconfig ───────────────────────────────────────────────────────
+    - path: "packages/tsconfig/**"
+      instructions: |
+        - `strict: true` must remain enabled — this is the monorepo-wide contract.
+        - Changes here affect every package; justify any loosening with a comment.
+        - `moduleResolution` should be `bundler` for browser packages, `node16` or `nodenext` for Node targets.
+        - Flag if `noUncheckedIndexedAccess` or `exactOptionalPropertyTypes` are disabled without reason.
+
+    - path: "packages/*/tsconfig.json"
+      instructions: |
+        - Must extend from `@mindfiredigital/tsconfig` (the shared base in packages/tsconfig/).
+        - Package-level overrides must not disable `strict` or `noImplicitAny`.
+        - Path aliases must be consistent with the tsup resolver configuration.
+
+    # ── Root turbo.json ───────────────────────────────────────────────────────
+    - path: "turbo.json"
+      instructions: |
+        - New tasks must define `dependsOn`, `outputs`, and `cache` behaviour explicitly.
+        - Build tasks must declare `"dependsOn": ["^build"]` to respect workspace topology.
+        - Persistent tasks (dev, watch) must set `"cache": false` and `"persistent": true`.
+        - Test tasks must set `"dependsOn": ["^build"]` so packages are built before tests run.
+
+    # ── Root package.json ─────────────────────────────────────────────────────
+    - path: "package.json"
+      instructions: |
+        - Workspace scripts that use `turbo run` must pass `--filter` when operating on a subset.
+        - Do not add runtime dependencies here — this is the monorepo root, not a published package.
+        - pnpm version must be pinned in `packageManager` field.
+
+    # ── CI workflows ──────────────────────────────────────────────────────────
+    - path: ".github/workflows/**"
+      instructions: |
+        - All `uses:` action references must be pinned to a specific version tag (not `@main` or `@master`).
+        - Secrets must be accessed via `${{ secrets.* }}` — no hardcoded tokens or values.
+        - `pnpm` version must be pinned (via `pnpm/action-setup` or corepack).
+        - Test, lint, and build steps must NOT set `continue-on-error: true`.
+        - A `tsc --noEmit` typecheck step must exist alongside the lint step.
+        - The release workflow must run `pnpm turbo run build` before publishing.
+        - The `analytics-demo` package has no source files — if it appears in build scope,
+          its build script should be a no-op (already fixed); flag regressions.
+
+    # ── Changeset files ───────────────────────────────────────────────────────
+    - path: ".changeset/**"
+      instructions: |
+        - Changeset must reference the correct package name(s) that changed.
+        - Bump type must match the change: `major` for breaking, `minor` for new features,
+          `patch` for bug fixes and internal refactors.
+        - Description must be human-readable release-note prose (not just a commit message).
+        - Private packages (examples, demos) must NOT have changesets — they are never published.
+
+    # ── Examples ──────────────────────────────────────────────────────────────
+    - path: "examples/**"
+      instructions: |
+        - Examples are not published; they must import packages via `workspace:*` — not relative paths.
+        - If an example has a `build` script but no `index.html` / source files, the script must be
+          a no-op (`echo '...'`) to avoid breaking `turbo run build`.
+        - Examples must not introduce new dependencies not already in the monorepo.
+        - Do not add complex business logic to examples — they exist to demonstrate the API.
+
+    # ── Docs ──────────────────────────────────────────────────────────────────
+    - path: "docs/**"
+      instructions: |
+        - FRS.md and SDS.md are the source-of-truth specs — changes must accurately reflect
+          the implemented behaviour, not aspirational features.
+        - Code examples in docs must use fenced code blocks with a language tag.
+        - Architecture Decision Records in `docs/decisions/` must follow the standard ADR format.
+        - Verify all relative links point to existing files.
+
+    - path: "**/*.md"
+      instructions: |
+        - Code examples must use fenced code blocks with a language tag.
+        - Package usage examples must import from the published package name
+          (`@mindfiredigital/pivothead*`), not from relative paths.
+        - Verify relative links point to existing files.
+
+  # ── Static analysis tools ──────────────────────────────────────────────────
+  tools:
+    eslint:
+      enabled: true
+    biome:
+      enabled: false
+    markdownlint:
+      enabled: true
+    actionlint:
+      enabled: true
+    gitleaks:
+      enabled: true
+    checkov:
+      enabled: true
+    languagetool:
+      enabled: true
+      enabled_rules:
+        - "OXFORD_COMMA"
+        - "EN_QUOTES"
+        - "COMMA_PARENTHESIS_WHITESPACE"
+      disabled_categories:
+        - "TYPOGRAPHY"
+    yamllint:
+      enabled: true
+    ast-grep:
+      essential_rules: true
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  CHAT
+# ─────────────────────────────────────────────────────────────────────────────
+chat:
+  auto_reply: true
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  KNOWLEDGE BASE
+# ─────────────────────────────────────────────────────────────────────────────
+knowledge_base:
+  opt_out: false
+  web_search:
+    enabled: true
+  code_guidelines:
+    enabled: true
+    filePatterns:
+      - "AGENTS.md"
+      - "CLAUDE.md"
+      - "CONTRIBUTING.md"
+      - "README.md"
+      - "docs/FRS.md"
+      - "docs/SDS.md"
+  learnings:
+    scope: auto

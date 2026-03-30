@@ -293,12 +293,30 @@ export function addDragListeners(host: PivotHeadHost): void {
     header.addEventListener('click', (e: Event) => {
       handleSortClick(host, e);
     });
+    // Keyboard: Enter or Space triggers sort
+    header.addEventListener('keydown', (e: Event) => {
+      const ke = e as KeyboardEvent;
+      if (ke.key === 'Enter' || ke.key === ' ') {
+        ke.preventDefault();
+        handleSortClick(host, e);
+      }
+    });
   });
 
   const drillDownCells = host.shadowRoot?.querySelectorAll('.drill-down-cell');
   drillDownCells?.forEach(cell => {
     cell.addEventListener('dblclick', (e: Event) => {
       handleDrillDownClick(host, e);
+    });
+    // Keyboard: Enter triggers drill-down on focusable cells
+    (cell as HTMLElement).setAttribute('tabindex', '0');
+    (cell as HTMLElement).setAttribute('role', 'gridcell');
+    cell.addEventListener('keydown', (e: Event) => {
+      const ke = e as KeyboardEvent;
+      if (ke.key === 'Enter') {
+        ke.preventDefault();
+        handleDrillDownClick(host, e);
+      }
     });
   });
 }
@@ -446,11 +464,17 @@ export function handleDrillDownClick(host: PivotHeadHost, e: Event): void {
 
   const overlay = document.createElement('div');
   overlay.className = 'drill-down-modal';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.setAttribute(
+    'aria-label',
+    `Details for ${rowField}: ${rowValue}${columnField ? `, ${columnField}: ${columnValue}` : ''}`
+  );
   const content = document.createElement('div');
   content.className = 'drill-down-content';
   content.innerHTML = `
       <div class="drill-down-header">
-        <div class="drill-down-title">Details: ${escapeHtml(rowField)}: ${escapeHtml(rowValue)}${columnField ? `, ${escapeHtml(columnField)}: ${escapeHtml(columnValue)}` : ''}</div>
+        <div class="drill-down-title" id="drill-down-title">Details: ${escapeHtml(rowField)}: ${escapeHtml(rowValue)}${columnField ? `, ${escapeHtml(columnField)}: ${escapeHtml(columnValue)}` : ''}</div>
         <button class="drill-down-close" aria-label="Close">&times;</button>
       </div>
       <div class="drill-down-summary">
@@ -458,6 +482,7 @@ export function handleDrillDownClick(host: PivotHeadHost, e: Event): void {
       </div>
       <div class="drill-down-body"></div>
     `;
+  overlay.setAttribute('aria-labelledby', 'drill-down-title');
   const bodyDiv = content.querySelector('.drill-down-body') as HTMLElement;
   if (subset.length > 0) {
     const headers = Object.keys(subset[0] as Record<string, unknown>);
@@ -490,14 +515,35 @@ export function handleDrillDownClick(host: PivotHeadHost, e: Event): void {
   }
   overlay.appendChild(content);
   document.body.appendChild(overlay);
-  const close = () => overlay.remove();
+
+  // Store the element that had focus before opening
+  const previouslyFocused = document.activeElement as HTMLElement | null;
+
+  const close = () => {
+    overlay.remove();
+    // Restore focus to the element that triggered the modal
+    previouslyFocused?.focus();
+  };
+
   overlay.addEventListener('click', evt => {
     if (evt.target === overlay) close();
   });
+
+  // Keyboard: Escape closes the modal
+  overlay.addEventListener('keydown', (evt: KeyboardEvent) => {
+    if (evt.key === 'Escape') {
+      evt.stopPropagation();
+      close();
+    }
+  });
+
   const closeBtn = content.querySelector(
     '.drill-down-close'
   ) as HTMLButtonElement | null;
   closeBtn?.addEventListener('click', close);
+
+  // Focus the close button when modal opens
+  closeBtn?.focus();
 }
 
 function addModalStylesToDocument(): void {
