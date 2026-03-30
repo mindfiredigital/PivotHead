@@ -1,7 +1,7 @@
 {
   "name": "react-demo",
   "private": true,
-  "version": "0.0.23",
+  "version": "0.0.25",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@mindfiredigital/pivothead": "workspace:^1.18.0",
+    "@mindfiredigital/pivothead": "workspace:^1.20.0",
     "@mindfiredigital/pivothead-react": "workspace:*",
     "@mindfiredigital/pivothead-web-component": "workspace:*",
     "react": "^19.0.0",
