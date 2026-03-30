@@ -56,7 +56,7 @@
 <script lang="ts">
 import { ref, onMounted, defineComponent } from 'vue'
 import PivotHead from '@mindfiredigital/pivothead-vue'
-import { logger } from '../../logger'
+import { logger } from '../logger'
 
 interface Props {
   data: Array<Record<string, unknown>>

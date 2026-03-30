@@ -121,7 +121,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, watch, onMounted, nextTick, defineOptions } from 'vue'
 import PivotHead from '@mindfiredigital/pivothead-vue'
-import { logger } from '../../logger'
+import { logger } from '../logger'
 // @ts-ignore
 import ProcessedTable from './ProcessedTable.vue'
 // @ts-ignore

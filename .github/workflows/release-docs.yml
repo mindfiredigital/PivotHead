@@ -27,8 +27,8 @@ jobs:
       - name: 'Install dependencies and build'
         run: |
           cd documentation
-          npm install
-          npm run build
+          pnpm install
+          pnpm run build
 
       - name: 'Fetch branches'
         run: git fetch origin

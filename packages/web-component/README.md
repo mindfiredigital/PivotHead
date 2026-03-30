@@ -567,18 +567,10 @@ interface PivotTableState<T> {
 </script>
 ```
 
-### Example 2: Custom Themed Table
+### Example 2: Minimal Mode with Slots
 
 ```html
-<style>
-  .branded-pivot {
-    --pivot-primary-color: #007bff;
-    --pivot-header-bg: #f8f9fa;
-    --pivot-border-color: #dee2e6;
-  }
-</style>
-
-<pivot-head class="branded-pivot" mode="minimal">
+<pivot-head mode="minimal">
   <div slot="header" class="custom-toolbar">
     <h2>Company Analytics</h2>
     <div class="toolbar-actions">
@@ -622,39 +614,6 @@ interface PivotTableState<T> {
     values: ['count'],
   };
 </script>
-```
-
----
-
-## Customization & Theming
-
-### CSS Custom Properties
-
-```css
-pivot-head {
-  /* Colors */
-  --pivot-primary-color: #4a90e2;
-  --pivot-secondary-color: #6c757d;
-  --pivot-background: #ffffff;
-  --pivot-text-color: #212529;
-
-  /* Typography */
-  --pivot-font-family: 'Inter', sans-serif;
-  --pivot-font-size: 14px;
-
-  /* Spacing */
-  --pivot-padding: 16px;
-  --pivot-gap: 8px;
-
-  /* Borders */
-  --pivot-border-color: #dee2e6;
-  --pivot-border-radius: 4px;
-
-  /* Table */
-  --pivot-header-bg: #f8f9fa;
-  --pivot-row-hover-bg: #f1f3f5;
-  --pivot-cell-padding: 8px 12px;
-}
 ```
 
 ---

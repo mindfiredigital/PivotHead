@@ -193,6 +193,27 @@ export class PivotHeadElement extends HTMLElement {
     }
   }
 
+  disconnectedCallback(): void {
+    // Unsubscribe from engine state changes
+    if (this._engineUnsubscribe) {
+      this._engineUnsubscribe();
+      this._engineUnsubscribe = null;
+    }
+    // Destroy virtual scroller if active
+    const host = this as unknown as PivotHeadHost;
+    if (host._virtualScroller) {
+      host._virtualScroller.destroy();
+      host._virtualScroller = undefined;
+    }
+    // Remove modal styles injected into document head
+    const modalStyles = document.getElementById('pivot-head-modal-styles');
+    if (modalStyles) {
+      modalStyles.remove();
+    }
+    // Remove any open drill-down modals
+    document.querySelectorAll('.drill-down-modal').forEach(el => el.remove());
+  }
+
   private parseAttributesIfNeeded(): void {
     parseAttributesIfNeededHelper(this as unknown as PivotHeadHost);
   }

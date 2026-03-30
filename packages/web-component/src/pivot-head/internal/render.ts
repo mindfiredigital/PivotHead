@@ -175,6 +175,12 @@ export function renderFullUI(host: PivotHeadHost) {
         button:disabled { background-color: #cccccc; cursor: not-allowed; }
         select, input { padding: 5px; border-radius: 4px; border: 1px solid #ddd; }
         
+        /* Focus styles for keyboard navigation */
+        .sortable-header:focus, .drill-down-cell:focus {
+          outline: 2px solid #007bff;
+          outline-offset: -2px;
+        }
+
         /* Drill-down styles */
         .drill-down-cell { cursor: pointer; }
         .drill-down-cell:hover { background-color: #e3f2fd !important; }
@@ -275,31 +281,31 @@ export function renderFullUI(host: PivotHeadHost) {
             background-color: #e3f2fd;
         }
       </style>
-      <div class="controls-container">
-        <div class="filter-container">
-          <label>Filter:</label>
-          <select id="filterField"></select>
-          <select id="filterOperator">
+      <div class="controls-container" role="toolbar" aria-label="Pivot table controls">
+        <div class="filter-container" role="group" aria-label="Filter controls">
+          <label for="filterField">Filter:</label>
+          <select id="filterField" aria-label="Filter field"></select>
+          <select id="filterOperator" aria-label="Filter operator">
             <option value="equals">Equals</option>
             <option value="contains">Contains</option>
             <option value="greaterThan">Greater Than</option>
             <option value="lessThan">Less Than</option>
           </select>
-          <input type="text" id="filterValue" placeholder="Value">
+          <input type="text" id="filterValue" placeholder="Value" aria-label="Filter value">
           <button id="applyFilter">Apply</button>
           <button id="resetFilter">Reset</button>
         </div>
-        <div class="pagination-container">
-          <label>Items per page:</label>
-          <select id="pageSize">
+        <div class="pagination-container" role="navigation" aria-label="Pagination">
+          <label for="pageSize">Items per page:</label>
+          <select id="pageSize" aria-label="Items per page">
             <option value="5">5</option>
             <option value="10">10</option>
             <option value="25">25</option>
             <option value="50">50</option>
           </select>
-          <button id="prevPage">Previous</button>
-          <span id="pageInfo">Page ${host._pagination.currentPage} of ${host._pagination.totalPages}</span>
-          <button id="nextPage">Next</button>
+          <button id="prevPage" aria-label="Previous page">Previous</button>
+          <span id="pageInfo" aria-live="polite">Page ${host._pagination.currentPage} of ${host._pagination.totalPages}</span>
+          <button id="nextPage" aria-label="Next page">Next</button>
         </div>
         <button id="switchView">Switch to Raw Data</button>
         <button id="formatButton">Format</button>
@@ -341,30 +347,42 @@ export function renderFullUI(host: PivotHeadHost) {
     );
   }
 
-  html += '<table role="grid">';
-  html += '<thead>';
-  html += '<tr>';
-  html += `<th class="corner-cell">${escapeHtml(rowField.caption)} / ${escapeHtml(columnField.caption)}</th>`;
+  // Determine current sort state for aria-sort
+  const sortState = engine.getState().sortConfig;
+  const currentSort = sortState && sortState.length > 0 ? sortState[0] : null;
+
+  html += '<table role="grid" aria-label="Pivot table">';
+  html += '<thead role="rowgroup">';
+  html += '<tr role="row">';
+  html += `<th role="columnheader" class="corner-cell">${escapeHtml(rowField.caption)} / ${escapeHtml(columnField.caption)}</th>`;
   uniqueColumnValues.forEach((colValue, index) => {
-    html += `<th class="column-header" draggable="true" data-column-index="${index}" data-column-value="${escapeHtml(colValue)}" colspan="${measures.length}">${escapeHtml(colValue)}</th>`;
+    html += `<th role="columnheader" class="column-header" draggable="true" data-column-index="${index}" data-column-value="${escapeHtml(colValue)}" colspan="${measures.length}">${escapeHtml(colValue)}</th>`;
   });
   html += '</tr>';
-  html += '<tr>';
+  html += '<tr role="row">';
   const rowSortIcon = host.createProcessedSortIcon(rowField.uniqueName);
-  html += `<th class="row-cell sortable-header" data-field="${escapeHtml(rowField.uniqueName)}">
+  const rowAriaSorted =
+    currentSort && currentSort.field === rowField.uniqueName
+      ? `aria-sort="${currentSort.direction === 'asc' ? 'ascending' : 'descending'}"`
+      : 'aria-sort="none"';
+  html += `<th role="columnheader" class="row-cell sortable-header" data-field="${escapeHtml(rowField.uniqueName)}" ${rowAriaSorted} tabindex="0">
       ${escapeHtml(rowField.caption)}${rowSortIcon}
     </th>`;
   uniqueColumnValues.forEach(colValue => {
     measures.forEach((measure: MeasureConfig, measureIndex: number) => {
       const sortIcon = host.createProcessedSortIcon(measure.uniqueName);
-      html += `<th class="measure-header sortable-header" data-measure-index="${measureIndex}" data-field="${escapeHtml(measure.uniqueName)}" data-column-value="${escapeHtml(colValue)}">
+      const measureAriaSorted =
+        currentSort && currentSort.field === measure.uniqueName
+          ? `aria-sort="${currentSort.direction === 'asc' ? 'ascending' : 'descending'}"`
+          : 'aria-sort="none"';
+      html += `<th role="columnheader" class="measure-header sortable-header" data-measure-index="${measureIndex}" data-field="${escapeHtml(measure.uniqueName)}" data-column-value="${escapeHtml(colValue)}" ${measureAriaSorted} tabindex="0">
           ${escapeHtml(measure.caption)}${sortIcon}
         </th>`;
     });
   });
   html += '</tr>';
   html += '</thead>';
-  html += '<tbody>';
+  html += '<tbody role="rowgroup">';
 
   // Prefer engine-provided ordered row values (custom or due to sorting)
   const orderedFromEngine = engine.getOrderedRowValues() || [];
@@ -394,8 +412,8 @@ export function renderFullUI(host: PivotHeadHost) {
     values: paginatedRowValues,
   });
   paginatedRowValues.forEach((rowValue, rowIndex) => {
-    html += `<tr draggable="true" data-row-index="${rowIndex}" data-row-value="${escapeHtml(rowValue)}">`;
-    html += `<td class="row-cell">${escapeHtml(rowValue)}</td>`;
+    html += `<tr role="row" draggable="true" data-row-index="${rowIndex}" data-row-value="${escapeHtml(rowValue)}">`;
+    html += `<td role="rowheader" class="row-cell">${escapeHtml(rowValue)}</td>`;
     uniqueColumnValues.forEach(colValue => {
       measures.forEach((measure: MeasureConfig) => {
         const matchingGroup = groupedData.find((g: Group) => {
@@ -507,31 +525,31 @@ export function renderRawTable(host: PivotHeadHost) {
         button:disabled { background-color: #cccccc; cursor: not-allowed; }
         select, input { padding: 5px; border-radius: 4px; border: 1px solid #ddd; }
       </style>
-      <div class="controls-container">
-        <div class="filter-container">
-          <label>Filter:</label>
-          <select id="filterField"></select>
-          <select id="filterOperator">
+      <div class="controls-container" role="toolbar" aria-label="Raw data controls">
+        <div class="filter-container" role="group" aria-label="Filter controls">
+          <label for="filterField">Filter:</label>
+          <select id="filterField" aria-label="Filter field"></select>
+          <select id="filterOperator" aria-label="Filter operator">
             <option value="equals">Equals</option>
             <option value="contains">Contains</option>
             <option value="greaterThan">Greater Than</option>
             <option value="lessThan">Less Than</option>
           </select>
-          <input type="text" id="filterValue" placeholder="Value">
+          <input type="text" id="filterValue" placeholder="Value" aria-label="Filter value">
           <button id="applyFilter">Apply</button>
           <button id="resetFilter">Reset</button>
         </div>
-        <div class="pagination-container">
-          <label>Items per page:</label>
-          <select id="pageSize">
+        <div class="pagination-container" role="navigation" aria-label="Pagination">
+          <label for="pageSize">Items per page:</label>
+          <select id="pageSize" aria-label="Items per page">
             <option value="5">5</option>
             <option value="10">10</option>
             <option value="25">25</option>
             <option value="50">50</option>
           </select>
-          <button id="prevPage">Previous</button>
-          <span id="pageInfo">Page ${host._pagination.currentPage} of ${host._pagination.totalPages}</span>
-          <button id="nextPage">Next</button>
+          <button id="prevPage" aria-label="Previous page">Previous</button>
+          <span id="pageInfo" aria-live="polite">Page ${host._pagination.currentPage} of ${host._pagination.totalPages}</span>
+          <button id="nextPage" aria-label="Next page">Next</button>
         </div>
         <button id="switchView">Switch to Processed Data</button>
         <button id="formatButton">Format</button>
@@ -541,19 +559,29 @@ export function renderRawTable(host: PivotHeadHost) {
         <button id="printTable">Print</button>
       </div>
     `;
-  html += '<table data-raw="true">';
-  html += '<thead><tr>';
+
+  // Determine current sort state for aria-sort on raw table
+  const rawSortState = engine.getState().sortConfig;
+  const rawCurrentSort =
+    rawSortState && rawSortState.length > 0 ? rawSortState[0] : null;
+
+  html += '<table data-raw="true" role="grid" aria-label="Raw data table">';
+  html += '<thead role="rowgroup"><tr role="row">';
   headers.forEach((header, index) => {
     const sortIcon = host.createSortIcon(header);
-    html += `<th class="sortable-header" draggable="true" data-column-index="${index}" data-field="${escapeHtml(header)}">
+    const ariaSorted =
+      rawCurrentSort && rawCurrentSort.field === header
+        ? `aria-sort="${rawCurrentSort.direction === 'asc' ? 'ascending' : 'descending'}"`
+        : 'aria-sort="none"';
+    html += `<th role="columnheader" class="sortable-header" draggable="true" data-column-index="${index}" data-field="${escapeHtml(header)}" ${ariaSorted} tabindex="0">
         ${escapeHtml(header)}${sortIcon}
       </th>`;
   });
   html += '</tr></thead>';
-  html += '<tbody>';
+  html += '<tbody role="rowgroup">';
   displayData.forEach((row, rowIndex: number) => {
     const pivotRow = row as Record<string, unknown>;
-    html += `<tr draggable="true" data-row-index="${rowIndex}">`;
+    html += `<tr role="row" draggable="true" data-row-index="${rowIndex}">`;
     headers.forEach(header => {
       const cellValue = pivotRow[header];
       let formattedValue = cellValue;
@@ -561,7 +589,7 @@ export function renderRawTable(host: PivotHeadHost) {
         formattedValue = engine.formatValue(cellValue, header);
       }
       const textAlign = engine.getFieldAlignment(header);
-      html += `<td style="text-align: ${textAlign};">${escapeHtml(formattedValue)}</td>`;
+      html += `<td role="gridcell" style="text-align: ${textAlign};">${escapeHtml(formattedValue)}</td>`;
     });
     html += '</tr>';
   });
@@ -584,6 +612,9 @@ function createVirtualScrollHeader(
   headers.forEach((header, index) => {
     const th = document.createElement('th');
     th.className = 'sortable-header';
+    th.setAttribute('role', 'columnheader');
+    th.setAttribute('aria-sort', 'none');
+    th.setAttribute('tabindex', '0');
     th.dataset.columnIndex = String(index);
     th.dataset.field = header;
     th.textContent = header;
