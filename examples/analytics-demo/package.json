@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "echo 'No source files to build'",
     "preview": "vite preview"
   },
   "dependencies": {
