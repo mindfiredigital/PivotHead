@@ -476,6 +476,17 @@ export function renderTable() {
       return;
     }
 
+    // Build a lookup from grouped data so cell values reflect active filters.
+    // calculateCellValue reads from the original unfiltered config.data,
+    // so we use the already-filtered grouped data instead.
+    const groupedData = appState.pivotEngine.getGroupedData();
+    const groupLookup = {};
+    groupedData.forEach(g => {
+      if (g.key) {
+        groupLookup[g.key] = g.aggregates || {};
+      }
+    });
+
     updatePagination(allUniqueRowValues, false);
     const paginatedRowValues = getPaginatedData(
       allUniqueRowValues,
@@ -508,14 +519,15 @@ export function renderTable() {
           td.style.borderBottom = '1px solid #dee2e6';
           td.style.borderRight = '1px solid #dee2e6';
 
-          // Use engine's calculateCellValue method
-          const value = appState.pivotEngine.calculateCellValue(
-            rowValue,
-            columnValue,
-            measure,
-            rowFieldName,
-            columnFieldName
-          );
+          // Look up the value from filtered grouped data instead of
+          // calculateCellValue which ignores active filters.
+          const groupKey = `${rowValue}|${columnValue}`;
+          const aggKey = `${measure.aggregation}_${measure.uniqueName}`;
+          const aggregates = groupLookup[groupKey];
+          const value =
+            aggregates && aggregates[aggKey] != null
+              ? Number(aggregates[aggKey])
+              : 0;
 
           // Use engine's formatValue method
           const formattedValue = appState.pivotEngine.formatValue(

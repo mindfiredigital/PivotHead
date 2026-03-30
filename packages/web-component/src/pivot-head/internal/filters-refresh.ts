@@ -24,7 +24,11 @@ export function setFilters(host: PivotHeadHost, value: FilterConfig[]): void {
   }
 
   host._filters = value || [];
-  host.setAttribute('filters', JSON.stringify(value));
+  // Guard against recursive setAttribute → attributeChangedCallback → setFilters loop
+  const serialized = JSON.stringify(value);
+  if (host.getAttribute('filters') !== serialized) {
+    host.setAttribute('filters', serialized);
+  }
 
   // Clear filter UI if no filters are applied
   if (!value || value.length === 0) {

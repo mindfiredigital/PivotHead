@@ -73,7 +73,7 @@
 <script lang="ts">
 import { defineComponent, ref, computed, watch, onMounted, nextTick } from 'vue'
 import PivotHead from '@mindfiredigital/pivothead-vue'
-import { logger } from '../../logger'
+import { logger } from '../logger'
 
 // Simple processed table component
 const SimpleProcessedTable = defineComponent({

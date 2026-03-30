@@ -98,7 +98,7 @@
 
 <script setup lang="ts">
 import { computed, defineOptions } from 'vue'
-import { logger } from '../../logger'
+import { logger } from '../logger'
 
 defineOptions({
   name: 'ProcessedTable'

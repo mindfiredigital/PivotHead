@@ -41,7 +41,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, nextTick } from 'vue'
 import { PivotHead } from '@mindfiredigital/pivothead-vue'
-import { logger } from '../../logger'
+import { logger } from '../logger'
 
 export default defineComponent({
   name: 'TestMinimal',

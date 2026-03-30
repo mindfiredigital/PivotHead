@@ -460,6 +460,39 @@ const toggleView = () => {
   }
 }
 
+// After a successful upload, sync the new data and auto-detected layout to the reactive refs
+// so the visible PivotHead re-renders with the CSV/JSON data.
+const applyUploadResultToTable = async (result: FileConnectionResult) => {
+  uploadResult.value = result
+
+  if (!result.success) {
+    statusMessage.value = `Failed to upload: ${result.error}`
+    logger.error('Upload failed:', result)
+    return
+  }
+
+  logger.info('Upload result:', result)
+
+  // Wait one tick for io.ts's setTimeout to fire, then read the engine state
+  await nextTick()
+  await new Promise(resolve => setTimeout(resolve, 50))
+
+  const state = pivotRef.value?.getState?.() as any
+  if (result.data && result.data.length > 0) {
+    salesData.value = result.data as PivotDataRecord[]
+  }
+  if (state && (state.rows?.length || state.columns?.length || state.measures?.length)) {
+    pivotOptions.value = {
+      rows: state.rows || [],
+      columns: state.columns || [],
+      measures: state.measures || [],
+      pageSize: pivotOptions.value.pageSize || 10,
+    }
+  }
+
+  statusMessage.value = `Successfully loaded ${result.recordCount?.toLocaleString()} records from ${result.fileName}`
+}
+
 // ConnectService methods
 const uploadCSVFile = async () => {
   if (!pivotRef.value) {
@@ -479,15 +512,7 @@ const uploadCSVFile = async () => {
       }
     })
 
-    uploadResult.value = result
-
-    if (result.success) {
-      statusMessage.value = `Successfully loaded ${result.recordCount} records from ${result.fileName}`
-      logger.info('Upload result:', result)
-    } else {
-      statusMessage.value = `Failed to upload: ${result.error}`
-      logger.error('Upload failed:', result)
-    }
+    await applyUploadResultToTable(result)
   } catch (error) {
     logger.error('Error uploading CSV:', error)
     statusMessage.value = `Error: ${error instanceof Error ? error.message : 'Unknown error'}`
@@ -515,15 +540,7 @@ const uploadJSONFile = async () => {
       }
     })
 
-    uploadResult.value = result
-
-    if (result.success) {
-      statusMessage.value = `Successfully loaded ${result.recordCount} records from ${result.fileName}`
-      logger.info('Upload result:', result)
-    } else {
-      statusMessage.value = `Failed to upload: ${result.error}`
-      logger.error('Upload failed:', result)
-    }
+    await applyUploadResultToTable(result)
   } catch (error) {
     logger.error('Error uploading JSON:', error)
     statusMessage.value = `Error: ${error instanceof Error ? error.message : 'Unknown error'}`
@@ -551,15 +568,7 @@ const uploadAnyFile = async () => {
       }
     })
 
-    uploadResult.value = result
-
-    if (result.success) {
-      statusMessage.value = `Successfully loaded ${result.recordCount} records from ${result.fileName}`
-      logger.info('Upload result:', result)
-    } else {
-      statusMessage.value = `Failed to upload: ${result.error}`
-      logger.error('Upload failed:', result)
-    }
+    await applyUploadResultToTable(result)
   } catch (error) {
     logger.error('Error uploading file:', error)
     statusMessage.value = `Error: ${error instanceof Error ? error.message : 'Unknown error'}`

@@ -8,8 +8,8 @@
   "exports": {
     ".": {
       "types": "../../dist/angular/index.d.ts",
-      "esm2022": "../../dist/angular/esm2022/mindfiredigital-pivothead-angular.mjs",
-      "esm": "../../dist/angular/esm2022/mindfiredigital-pivothead-angular.mjs",
+      "esm2022": "../../dist/angular/fesm2022/mindfiredigital-pivothead-angular.mjs",
+      "esm": "../../dist/angular/fesm2022/mindfiredigital-pivothead-angular.mjs",
       "default": "../../dist/angular/fesm2022/mindfiredigital-pivothead-angular.mjs"
     }
   },
@@ -19,8 +19,8 @@
     "*.d.ts"
   ],
   "peerDependencies": {
-    "@angular/common": "^17.3.0",
-    "@angular/core": "^17.3.0"
+    "@angular/common": "^17.3.0 || ^18.0.0 || ^19.0.0 || ^20.0.0",
+    "@angular/core": "^17.3.0 || ^18.0.0 || ^19.0.0 || ^20.0.0"
   },
   "dependencies": {
     "@mindfiredigital/pivothead-web-component": "workspace:*",
@@ -28,8 +28,8 @@
   },
   "devDependencies": {
     "jsdom": "^26.0.0",
-    "ng-packagr": "^17.3.0",
-    "typescript": "~5.4.5",
+    "ng-packagr": "^20.3.2",
+    "typescript": "~5.8.0",
     "vitest": "^0.32.0"
   },
   "sideEffects": false,

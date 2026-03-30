@@ -380,5 +380,210 @@ describe('PivotHeadWrapperComponent', () => {
       await component.loadFromFile(file);
       expect(mockEl.loadFromFile).toHaveBeenCalledWith(file);
     });
+
+    it('setDimensions delegates to nativeElement.setDimensions()', () => {
+      const dims = [{ uniqueName: 'region', caption: 'Region' }];
+      component.setDimensions(dims as never);
+      expect(mockEl.setDimensions).toHaveBeenCalledWith(dims);
+    });
+
+    it('setGroupConfig delegates config to nativeElement.setGroupConfig()', () => {
+      const config = { field: 'category', values: ['A', 'B'] };
+      component.setGroupConfig(config as never);
+      expect(mockEl.setGroupConfig).toHaveBeenCalledWith(config);
+    });
+
+    it('setGroupConfig passes null to nativeElement.setGroupConfig()', () => {
+      component.setGroupConfig(null);
+      expect(mockEl.setGroupConfig).toHaveBeenCalledWith(null);
+    });
+
+    it('getPagination delegates to nativeElement.getPagination()', () => {
+      const result = component.getPagination();
+      expect(mockEl.getPagination).toHaveBeenCalled();
+      expect(result).toEqual({ currentPage: 1, totalPages: 1, pageSize: 10 });
+    });
+
+    it('getProcessedData delegates to nativeElement.getProcessedData()', () => {
+      const result = component.getProcessedData();
+      expect(mockEl.getProcessedData).toHaveBeenCalled();
+      expect(result).toEqual({});
+    });
+
+    it('formatValue delegates value and field to nativeElement.formatValue()', () => {
+      const result = component.formatValue(42, 'revenue');
+      expect(mockEl.formatValue).toHaveBeenCalledWith(42, 'revenue');
+      expect(result).toBe('42');
+    });
+
+    it('updateFieldFormatting delegates field and format to nativeElement.updateFieldFormatting()', () => {
+      const format = { type: 'currency', decimals: 2 };
+      component.updateFieldFormatting('revenue', format as never);
+      expect(mockEl.updateFieldFormatting).toHaveBeenCalledWith(
+        'revenue',
+        format
+      );
+    });
+
+    it('getFieldAlignment delegates field to nativeElement.getFieldAlignment()', () => {
+      const result = component.getFieldAlignment('revenue');
+      expect(mockEl.getFieldAlignment).toHaveBeenCalledWith('revenue');
+      expect(result).toBe('left');
+    });
+
+    it('showFormatPopup delegates to nativeElement.showFormatPopup()', () => {
+      component.showFormatPopup();
+      expect(mockEl.showFormatPopup).toHaveBeenCalled();
+    });
+
+    it('getGroupedData delegates to nativeElement.getGroupedData()', () => {
+      const result = component.getGroupedData();
+      expect(mockEl.getGroupedData).toHaveBeenCalled();
+      expect(result).toEqual([]);
+    });
+
+    it('swapRows delegates from/to indices to nativeElement.swapRows()', () => {
+      component.swapRows(0, 2);
+      expect(mockEl.swapRows).toHaveBeenCalledWith(0, 2);
+    });
+
+    it('swapColumns delegates from/to indices to nativeElement.swapColumns()', () => {
+      component.swapColumns(1, 3);
+      expect(mockEl.swapColumns).toHaveBeenCalledWith(1, 3);
+    });
+
+    it('previousPage delegates to nativeElement.previousPage()', () => {
+      component.previousPage();
+      expect(mockEl.previousPage).toHaveBeenCalled();
+    });
+
+    it('setPageSize delegates size to nativeElement.setPageSize()', () => {
+      component.setPageSize(25);
+      expect(mockEl.setPageSize).toHaveBeenCalledWith(25);
+    });
+
+    it('openPrintDialog delegates to nativeElement.openPrintDialog()', () => {
+      component.openPrintDialog();
+      expect(mockEl.openPrintDialog).toHaveBeenCalled();
+    });
+
+    it('getRawData delegates to nativeElement.getRawData()', () => {
+      const result = component.getRawData();
+      expect(mockEl.getRawData).toHaveBeenCalled();
+      expect(result).toEqual([]);
+    });
+
+    it('loadFromUrl delegates url to nativeElement.loadFromUrl()', async () => {
+      await component.loadFromUrl('https://example.com/data.csv');
+      expect(mockEl.loadFromUrl).toHaveBeenCalledWith(
+        'https://example.com/data.csv'
+      );
+    });
+
+    it('connectToLocalCSV delegates to nativeElement.connectToLocalCSV()', async () => {
+      const result = await component.connectToLocalCSV();
+      expect(mockEl.connectToLocalCSV).toHaveBeenCalled();
+      expect(result).toEqual({ success: true });
+    });
+
+    it('connectToLocalJSON delegates to nativeElement.connectToLocalJSON()', async () => {
+      const result = await component.connectToLocalJSON();
+      expect(mockEl.connectToLocalJSON).toHaveBeenCalled();
+      expect(result).toEqual({ success: true });
+    });
+
+    it('connectToLocalFile delegates to nativeElement.connectToLocalFile()', async () => {
+      const result = await component.connectToLocalFile();
+      expect(mockEl.connectToLocalFile).toHaveBeenCalled();
+      expect(result).toEqual({ success: true });
+    });
+
+    it('getAvailableFields delegates to nativeElement.getAvailableFields()', () => {
+      const result = component.getAvailableFields();
+      expect(mockEl.getAvailableFields).toHaveBeenCalled();
+      expect(result).toEqual([]);
+    });
+
+    it('getSupportedAggregations delegates to nativeElement.getSupportedAggregations()', () => {
+      const result = component.getSupportedAggregations();
+      expect(mockEl.getSupportedAggregations).toHaveBeenCalled();
+      expect(result).toEqual([]);
+    });
+
+    it('setMeasureAggregation delegates field and aggregation to nativeElement.setMeasureAggregation()', () => {
+      component.setMeasureAggregation('revenue', 'sum');
+      expect(mockEl.setMeasureAggregation).toHaveBeenCalledWith(
+        'revenue',
+        'sum'
+      );
+    });
+
+    it('buildLayout delegates selection to nativeElement.buildLayout()', () => {
+      const selection = { rows: ['region'], columns: ['product'] };
+      component.buildLayout(selection as never);
+      expect(mockEl.buildLayout).toHaveBeenCalledWith(selection);
+    });
+
+    it('dragRow delegates from/to indices to nativeElement.dragRow()', () => {
+      component.dragRow(1, 4);
+      expect(mockEl.dragRow).toHaveBeenCalledWith(1, 4);
+    });
+
+    it('dragColumn delegates from/to indices to nativeElement.dragColumn()', () => {
+      component.dragColumn(2, 5);
+      expect(mockEl.dragColumn).toHaveBeenCalledWith(2, 5);
+    });
+  });
+
+  // ── Null pivotHeadRef — graceful no-op ──────────────────────────────────────
+
+  describe('null pivotHeadRef — graceful no-op', () => {
+    let bare: PivotHeadWrapperComponent;
+
+    beforeEach(() => {
+      bare = new PivotHeadWrapperComponent();
+      // pivotHeadRef is intentionally left unset to simulate pre-view-init state
+    });
+
+    it('getState returns undefined when ref is absent', () => {
+      expect(bare.getState()).toBeUndefined();
+    });
+
+    it('refresh does not throw when ref is absent', () => {
+      expect(() => bare.refresh()).not.toThrow();
+    });
+
+    it('reset does not throw when ref is absent', () => {
+      expect(() => bare.reset()).not.toThrow();
+    });
+
+    it('sort does not throw when ref is absent', () => {
+      expect(() => bare.sort('field', 'asc')).not.toThrow();
+    });
+
+    it('getData returns undefined when ref is absent', () => {
+      expect(bare.getData()).toBeUndefined();
+    });
+
+    it('getFilters returns undefined when ref is absent', () => {
+      expect(bare.getFilters()).toBeUndefined();
+    });
+
+    it('getPagination returns undefined when ref is absent', () => {
+      expect(bare.getPagination()).toBeUndefined();
+    });
+
+    it('getViewMode returns undefined when ref is absent', () => {
+      expect(bare.getViewMode()).toBeUndefined();
+    });
+
+    it('isDragAndDropEnabled returns undefined when ref is absent', () => {
+      expect(bare.isDragAndDropEnabled()).toBeUndefined();
+    });
+
+    it('loadFromFile resolves without throwing when ref is absent', async () => {
+      const file = new File([''], 'test.csv');
+      await expect(bare.loadFromFile(file)).resolves.toBeUndefined();
+    });
   });
 });

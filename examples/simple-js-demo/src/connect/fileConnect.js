@@ -352,8 +352,21 @@ export async function handleFileConnection(fileType) {
       // Show success notification
       showImportNotification(result, true);
 
-      // Re-render the table via registered callback
-      if (typeof appState.onRenderTable === 'function') {
+      // Re-initialize engine with the groupConfig that matches the new CSV
+      // field names.  applyParsedDataToEngine (core) updates rows/columns/
+      // measures on the existing engine but never touches groupConfig, so
+      // the old grouper still uses the previous dataset's field names and
+      // produces "undefined|undefined" group keys → all cell values show 0.
+      // Calling onFormatTable rebuilds the engine (and groupConfig) from the
+      // layout that core auto-detected, which fixes the zero-values bug.
+      if (typeof appState.onFormatTable === 'function') {
+        const updatedState = appState.pivotEngine.getState();
+        appState.onFormatTable({
+          rows: updatedState.rows || [],
+          columns: updatedState.columns || [],
+          measures: updatedState.measures || [],
+        });
+      } else if (typeof appState.onRenderTable === 'function') {
         appState.onRenderTable();
       }
 

@@ -38,7 +38,6 @@ function buildConsoleLogger() {
 function buildWinstonLogger() {
   if (typeof window !== 'undefined') return null;
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const winston = require('winston');
     const { combine, label, colorize, printf, timestamp } = winston.format;
     const fmt = printf(
