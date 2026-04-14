@@ -357,7 +357,7 @@ function HeroSection() {
             </svg>
           </Link>
           <Link
-            to="#"
+            to="https://pivot-demo-gamma.vercel.app/"
             className={clsx(
               'btn-base',
               colorMode === 'dark'
