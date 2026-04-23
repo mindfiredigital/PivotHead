@@ -1,5 +1,13 @@
 # @mindfiredigital/pivothead-llm
 
+## 4.0.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @mindfiredigital/pivothead@1.22.1
+  - @mindfiredigital/pivothead-analytics@1.0.12
+
 ## 4.0.0
 
 ### Patch Changes
